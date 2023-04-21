@@ -1,8 +1,18 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  Param,
+  Post,
+  Put,
+  Query,
+} from '@nestjs/common';
 import { BlogsService } from './blogs.service';
 import { BlogCreateDto } from './dto/blog.create.dto';
 import { BlogQuery } from './dto/blog.query';
 import { BlogsQueryRepository } from './blogs.query.repository';
+import { BlogUpdateDto } from './dto/blog.update.dto';
 
 @Controller('blogs')
 export class BlogsController {
@@ -17,12 +27,26 @@ export class BlogsController {
   }
 
   @Get()
-  async findAll(@Query() query: BlogQuery) {
+  async findBlogs(@Query() query: BlogQuery) {
     return this.blogsQueryRepository.findBlogs(query);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  async findBlog(@Param('id') id: string) {
     return this.blogsQueryRepository.findBlog(id);
   }
+
+  @Put(':id')
+  @HttpCode(204)
+  async updateBlog(
+    @Param('id') id: string,
+    @Body() updateBlogDto: BlogUpdateDto,
+  ) {
+    return this.blogsService.updateBlog(id, updateBlogDto);
+  }
+
+  /*@Delete(':id')
+  async deleteBlog(@Param('id') id: string) {
+    return this.blogsService.deleteBlog(id);
+  }*/
 }

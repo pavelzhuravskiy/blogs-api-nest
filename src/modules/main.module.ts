@@ -13,4 +13,4 @@ import { BlogsQueryRepository } from '../blogs/blogs.query.repository';
   controllers: [BlogsController],
   providers: [BlogsService, BlogsRepository, BlogsQueryRepository],
 })
-export class BlogsModule {}
+export class MainModule {}
