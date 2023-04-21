@@ -7,7 +7,7 @@ export class BlogsController {
   constructor(private readonly blogsService: BlogsService) {}
 
   @Post()
-  async create(@Body() createBlogDto: CreateBlogDto) {
+  async createBlog(@Body() createBlogDto: CreateBlogDto) {
     await this.blogsService.createBlog(createBlogDto);
   }
 }
