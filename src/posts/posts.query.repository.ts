@@ -1,26 +1,25 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import {
-  Blog,
-  BlogDocument,
-  BlogModelType,
-} from '../blogs/schemas/blog.entity';
-import { BlogQuery } from '../blogs/dto/blog.query';
 import mongoose, { FilterQuery, SortOrder } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Paginator } from '../common/schemas/paginator';
-import { BlogViewModel } from '../blogs/schemas/blog.view';
+import { Post, PostDocument, PostModelType } from './schemas/post.entity';
+import { PostQuery } from './dto/post.query';
+import { PostViewModel } from './schemas/post.view';
 
 @Injectable()
 export class PostsQueryRepository {
   constructor(
-    @InjectModel(Blog.name)
-    private BlogModel: BlogModelType,
+    @InjectModel(Post.name)
+    private PostModel: PostModelType,
   ) {}
-  async findBlogs(query: BlogQuery): Promise<Paginator<BlogViewModel[]>> {
-    const filter: FilterQuery<BlogDocument> = {};
+  async findPosts(
+    query: PostQuery,
+    blogId?: string,
+  ): Promise<Paginator<PostViewModel[]>> {
+    const filter: FilterQuery<PostDocument> = {};
 
-    if (query.searchNameTerm) {
-      filter.name = { $regex: query.searchNameTerm, $options: 'i' };
+    if (blogId) {
+      filter.blogId = blogId;
     }
 
     const sortingObj: { [key: string]: SortOrder } = {
@@ -31,7 +30,7 @@ export class PostsQueryRepository {
       sortingObj[query.sortBy || 'createdAt'] = 'asc';
     }
 
-    const blogs = await this.BlogModel.find(filter)
+    const posts = await this.PostModel.find(filter)
       .sort(sortingObj)
       .skip(
         +query.pageNumber > 0 ? (+query.pageNumber - 1) * +query.pageSize : 0,
@@ -39,7 +38,7 @@ export class PostsQueryRepository {
       .limit(+query.pageSize > 0 ? +query.pageSize : 0)
       .lean();
 
-    const totalCount = await this.BlogModel.countDocuments(filter);
+    const totalCount = await this.PostModel.countDocuments(filter);
     const pagesCount = Math.ceil(totalCount / +query.pageSize);
 
     return {
@@ -47,37 +46,51 @@ export class PostsQueryRepository {
       page: +query.pageNumber || 1,
       pageSize: +query.pageSize || 10,
       totalCount,
-      items: blogs.map((blog) => {
+      items: posts.map((post) => {
         return {
-          id: blog._id.toString(),
-          name: blog.name,
-          description: blog.description,
-          websiteUrl: blog.websiteUrl,
-          createdAt: blog.createdAt.toISOString(),
-          isMembership: blog.isMembership,
+          id: post._id.toString(),
+          title: post.title,
+          shortDescription: post.shortDescription,
+          content: post.content,
+          blogId: post.blogId,
+          blogName: post.blogName,
+          createdAt: post.createdAt.toISOString(),
+          extendedLikesInfo: {
+            likesCount: post.extendedLikesInfo.likesCount,
+            dislikesCount: post.extendedLikesInfo.dislikesCount,
+            myStatus: 'None',
+            newestLikes: [],
+          },
         };
       }),
     };
   }
 
-  async findBlog(id: string): Promise<BlogViewModel> {
+  async findPost(id: string): Promise<PostViewModel> {
     if (!mongoose.isValidObjectId(id)) {
       throw new NotFoundException();
     }
 
-    const foundBlog = await this.BlogModel.findOne({ _id: id });
+    const post = await this.PostModel.findOne({ _id: id });
 
-    if (!foundBlog) {
+    if (!post) {
       throw new NotFoundException();
     }
 
     return {
-      id: foundBlog._id.toString(),
-      name: foundBlog.name,
-      description: foundBlog.description,
-      websiteUrl: foundBlog.websiteUrl,
-      createdAt: foundBlog.createdAt.toISOString(),
-      isMembership: foundBlog.isMembership,
+      id: post._id.toString(),
+      title: post.title,
+      shortDescription: post.shortDescription,
+      content: post.content,
+      blogId: post.blogId,
+      blogName: post.blogName,
+      createdAt: post.createdAt.toISOString(),
+      extendedLikesInfo: {
+        likesCount: post.extendedLikesInfo.likesCount,
+        dislikesCount: post.extendedLikesInfo.dislikesCount,
+        myStatus: 'None',
+        newestLikes: [],
+      },
     };
   }
 }

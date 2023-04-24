@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Post, PostDocument, PostModelType } from './schemas/post.entity';
 import {
@@ -39,7 +43,7 @@ export class PostsRepository {
     };
   }
 
-  async findBlog(id: string): Promise<BlogDocument | null> {
+  async findBlog(id?: string): Promise<BlogDocument | null> {
     if (!mongoose.isValidObjectId(id)) {
       throw new BadRequestException(`Blog with provided ID not found`);
     }
@@ -52,23 +56,23 @@ export class PostsRepository {
 
     return blog;
   }
-  //
-  // async findBlog(id: string): Promise<BlogDocument | null> {
-  //   if (!mongoose.isValidObjectId(id)) {
-  //     throw new NotFoundException();
-  //   }
-  //
-  //   const blog = await this.BlogModel.findOne({ _id: id });
-  //
-  //   if (!blog) {
-  //     throw new NotFoundException();
-  //   }
-  //
-  //   return blog;
-  // }
-  //
-  // async deleteBlog(id: string): Promise<boolean> {
-  //   const blog = await this.BlogModel.deleteOne({ _id: id });
-  //   return blog.deletedCount === 1;
-  // }
+
+  async findPost(id: string): Promise<PostDocument | null> {
+    if (!mongoose.isValidObjectId(id)) {
+      throw new NotFoundException();
+    }
+
+    const post = await this.PostModel.findOne({ _id: id });
+
+    if (!post) {
+      throw new NotFoundException();
+    }
+
+    return post;
+  }
+
+  async deletePost(id: string): Promise<boolean> {
+    const post = await this.PostModel.deleteOne({ _id: id });
+    return post.deletedCount === 1;
+  }
 }

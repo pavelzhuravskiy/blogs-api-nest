@@ -61,19 +61,19 @@ export class BlogsQueryRepository {
       throw new NotFoundException();
     }
 
-    const foundBlog = await this.BlogModel.findOne({ _id: id });
+    const blog = await this.BlogModel.findOne({ _id: id });
 
-    if (!foundBlog) {
+    if (!blog) {
       throw new NotFoundException();
     }
 
     return {
-      id: foundBlog._id.toString(),
-      name: foundBlog.name,
-      description: foundBlog.description,
-      websiteUrl: foundBlog.websiteUrl,
-      createdAt: foundBlog.createdAt.toISOString(),
-      isMembership: foundBlog.isMembership,
+      id: blog._id.toString(),
+      name: blog.name,
+      description: blog.description,
+      websiteUrl: blog.websiteUrl,
+      createdAt: blog.createdAt.toISOString(),
+      isMembership: blog.isMembership,
     };
   }
 }

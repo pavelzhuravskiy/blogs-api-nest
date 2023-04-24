@@ -1,7 +1,19 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  Param,
+  Post,
+  Put,
+  Query,
+} from '@nestjs/common';
 import { PostCreateDto } from './dto/post.create.dto';
 import { PostsService } from './posts.service';
 import { PostsQueryRepository } from './posts.query.repository';
+import { PostQuery } from './dto/post.query';
+import { PostUpdateDto } from './dto/post.update.dto';
 
 @Controller('posts')
 export class PostsController {
@@ -14,29 +26,29 @@ export class PostsController {
   async createPost(@Body() createPostDto: PostCreateDto) {
     return this.postsService.createPost(createPostDto);
   }
-  //
-  // @Get()
-  // async findBlogs(@Query() query: BlogQuery) {
-  //   return this.blogsQueryRepository.findBlogs(query);
-  // }
-  //
-  // @Get(':id')
-  // async findBlog(@Param('id') id: string) {
-  //   return this.blogsQueryRepository.findBlog(id);
-  // }
-  //
-  // @Put(':id')
-  // @HttpCode(204)
-  // async updateBlog(
-  //   @Param('id') id: string,
-  //   @Body() updateBlogDto: BlogUpdateDto,
-  // ) {
-  //   return this.blogsService.updateBlog(id, updateBlogDto);
-  // }
-  //
-  // @Delete(':id')
-  // @HttpCode(204)
-  // async deleteBlog(@Param('id') id: string) {
-  //   return this.blogsService.deleteBlog(id);
-  // }
+
+  @Get()
+  async findPosts(@Query() query: PostQuery) {
+    return this.postsQueryRepository.findPosts(query);
+  }
+
+  @Get(':id')
+  async findPost(@Param('id') id: string) {
+    return this.postsQueryRepository.findPost(id);
+  }
+
+  @Put(':id')
+  @HttpCode(204)
+  async updatePost(
+    @Param('id') id: string,
+    @Body() updatePostDto: PostUpdateDto,
+  ) {
+    return this.postsService.updatePost(id, updatePostDto);
+  }
+
+  @Delete(':id')
+  @HttpCode(204)
+  async deletePost(@Param('id') id: string) {
+    return this.postsService.deletePost(id);
+  }
 }

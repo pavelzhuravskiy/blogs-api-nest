@@ -4,6 +4,7 @@ import { Post, PostModelType } from './schemas/post.entity';
 import { PostsRepository } from './posts.repository';
 import { PostCreateDto } from './dto/post.create.dto';
 import { PostViewModel } from './schemas/post.view';
+import { PostUpdateDto } from './dto/post.update.dto';
 
 @Injectable()
 export class PostsService {
@@ -13,8 +14,13 @@ export class PostsService {
     private readonly postsRepository: PostsRepository,
   ) {}
 
-  async createPost(createPostDto: PostCreateDto): Promise<PostViewModel> {
-    const blog = await this.postsRepository.findBlog(createPostDto.blogId);
+  async createPost(
+    createPostDto: PostCreateDto,
+    blogIdParam?: string,
+  ): Promise<PostViewModel> {
+    const blogId = createPostDto.blogId || blogIdParam;
+
+    const blog = await this.postsRepository.findBlog(blogId);
 
     if (!blog) {
       throw new InternalServerErrorException(
@@ -26,28 +32,28 @@ export class PostsService {
     return this.postsRepository.createPost(post);
   }
 
-  // async updateBlog(id: string, updateBlogDto: BlogUpdateDto): Promise<Blog> {
-  //   const blog = await this.blogsRepository.findBlog(id);
-  //
-  //   if (!blog) {
-  //     throw new InternalServerErrorException(
-  //       `Something went wrong during blog find operation`,
-  //     );
-  //   }
-  //
-  //   await blog.updateBlog(updateBlogDto);
-  //   return this.blogsRepository.save(blog);
-  // }
-  //
-  // async deleteBlog(id: string): Promise<boolean> {
-  //   const blog = await this.blogsRepository.findBlog(id);
-  //
-  //   if (!blog) {
-  //     throw new InternalServerErrorException(
-  //       `Something went wrong during blog find operation`,
-  //     );
-  //   }
-  //
-  //   return this.blogsRepository.deleteBlog(id);
-  // }
+  async updatePost(id: string, updatePostDto: PostUpdateDto): Promise<Post> {
+    const post = await this.postsRepository.findPost(id);
+
+    if (!post) {
+      throw new InternalServerErrorException(
+        `Something went wrong during post find operation`,
+      );
+    }
+
+    await post.updatePost(updatePostDto);
+    return this.postsRepository.save(post);
+  }
+
+  async deletePost(id: string): Promise<boolean> {
+    const post = await this.postsRepository.findPost(id);
+
+    if (!post) {
+      throw new InternalServerErrorException(
+        `Something went wrong during blog find operation`,
+      );
+    }
+
+    return this.postsRepository.deletePost(id);
+  }
 }

@@ -39,11 +39,12 @@ export class Post {
   @Prop({ required: true })
   extendedLikesInfo: LikesInfoSchema;
 
-  /*updateBlog(updateBlogDto) {
-    this.name = updateBlogDto.name;
-    this.description = updateBlogDto.description;
-    this.websiteUrl = updateBlogDto.websiteUrl;
-  }*/
+  updatePost(updatePostDto) {
+    this.title = updatePostDto.title;
+    this.shortDescription = updatePostDto.shortDescription;
+    this.content = updatePostDto.content;
+    this.blogId = updatePostDto.blogId;
+  }
 
   static createPost(
     createPostDto: PostCreateDto,
@@ -69,9 +70,9 @@ export class Post {
 
 export const PostSchema = SchemaFactory.createForClass(Post);
 
-/*PostSchema.methods = {
+PostSchema.methods = {
   updatePost: Post.prototype.updatePost,
-};*/
+};
 
 const postStaticMethods: PostModelStaticType = {
   createPost: Post.createPost,
