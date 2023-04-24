@@ -36,8 +36,13 @@ export class BlogsQueryRepository {
       .lean();
 
     const totalCount = await this.BlogModel.countDocuments(filter);
+    const pagesCount = Math.ceil(totalCount / +query.pageSize);
 
-    return Paginator.getPaginated({
+    return {
+      pagesCount: pagesCount || 1,
+      page: +query.pageNumber || 1,
+      pageSize: +query.pageSize || 10,
+      totalCount,
       items: blogs.map((blog) => {
         return {
           id: blog._id.toString(),
@@ -48,10 +53,7 @@ export class BlogsQueryRepository {
           isMembership: blog.isMembership,
         };
       }),
-      pageSize: +query.pageSize,
-      page: +query.pageNumber,
-      totalCount: totalCount,
-    });
+    };
   }
 
   async findBlog(id: string): Promise<BlogViewModel> {
@@ -59,19 +61,19 @@ export class BlogsQueryRepository {
       throw new NotFoundException();
     }
 
-    const blog = await this.BlogModel.findOne({ _id: id });
+    const foundBlog = await this.BlogModel.findOne({ _id: id });
 
-    if (!blog) {
+    if (!foundBlog) {
       throw new NotFoundException();
     }
 
     return {
-      id: blog._id.toString(),
-      name: blog.name,
-      description: blog.description,
-      websiteUrl: blog.websiteUrl,
-      createdAt: blog.createdAt.toISOString(),
-      isMembership: blog.isMembership,
+      id: foundBlog._id.toString(),
+      name: foundBlog.name,
+      description: foundBlog.description,
+      websiteUrl: foundBlog.websiteUrl,
+      createdAt: foundBlog.createdAt.toISOString(),
+      isMembership: foundBlog.isMembership,
     };
   }
 }
