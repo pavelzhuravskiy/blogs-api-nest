@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Blog, BlogDocument, BlogModelType } from './schemas/blog.schema';
+import { Blog, BlogDocument, BlogModelType } from './schemas/blog.entity';
 import { BlogQuery } from './dto/blog.query';
 import mongoose, { FilterQuery, SortOrder } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';

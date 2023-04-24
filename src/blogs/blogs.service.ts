@@ -1,6 +1,6 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Blog, BlogModelType } from './schemas/blog.schema';
+import { Blog, BlogModelType } from './schemas/blog.entity';
 import { BlogCreateDto } from './dto/blog.create.dto';
 import { BlogsRepository } from './blogs.repository';
 import { BlogUpdateDto } from './dto/blog.update.dto';

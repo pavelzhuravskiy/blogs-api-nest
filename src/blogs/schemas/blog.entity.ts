@@ -51,9 +51,9 @@ export class Blog {
   }
 }
 
-export const BlogSchema = SchemaFactory.createForClass(Blog);
+export const BlogEntity = SchemaFactory.createForClass(Blog);
 
-BlogSchema.methods = {
+BlogEntity.methods = {
   updateBlog: Blog.prototype.updateBlog,
 };
 
@@ -61,4 +61,4 @@ const blogStaticMethods: BlogModelStaticType = {
   createBlog: Blog.createBlog,
 };
 
-BlogSchema.statics = blogStaticMethods;
+BlogEntity.statics = blogStaticMethods;
