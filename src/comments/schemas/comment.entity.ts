@@ -34,12 +34,6 @@ export class Comment {
   @Prop({ required: true })
   extendedLikesInfo: LikesInfoSchema;
 
-  // updateComment(updateCommentDto) {
-  //   this.name = updateCommentDto.name;
-  //   this.description = updateCommentDto.description;
-  //   this.websiteUrl = updateCommentDto.websiteUrl;
-  // }
-
   static createComment(
     createCommentDto: CommentCreateDto,
     CommentModel: CommentModelType,
@@ -65,10 +59,6 @@ export class Comment {
 
 export const CommentSchema = SchemaFactory.createForClass(Comment);
 
-// BlogSchema.methods = {
-//   updateBlog: Blog.prototype.updateBlog,
-// };
-//
 const commentStaticMethods: CommentModelStaticType = {
   createComment: Comment.createComment,
 };

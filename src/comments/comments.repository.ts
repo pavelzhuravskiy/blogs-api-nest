@@ -12,10 +12,6 @@ export class CommentsRepository {
     @InjectModel(Comment.name)
     private CommentModel: CommentModelType,
   ) {}
-  async save(comment: CommentDocument) {
-    return comment.save();
-  }
-
   async createComment(comment: CommentDocument) {
     await comment.save();
     return {
@@ -33,23 +29,4 @@ export class CommentsRepository {
       },
     };
   }
-  //
-  // async findBlog(id: string): Promise<BlogDocument | null> {
-  //   if (!mongoose.isValidObjectId(id)) {
-  //     throw new NotFoundException();
-  //   }
-  //
-  //   const blog = await this.BlogModel.findOne({ _id: id });
-  //
-  //   if (!blog) {
-  //     throw new NotFoundException();
-  //   }
-  //
-  //   return blog;
-  // }
-  //
-  // async deleteBlog(id: string): Promise<boolean> {
-  //   const blog = await this.BlogModel.deleteOne({ _id: id });
-  //   return blog.deletedCount === 1;
-  // }
 }
