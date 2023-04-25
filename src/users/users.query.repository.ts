@@ -15,7 +15,7 @@ export class UsersQueryRepository {
   async findUsers(query: UserQuery): Promise<Paginator<UserViewModel[]>> {
     const loginTerm = query.searchLoginTerm;
     const emailTerm = query.searchEmailTerm;
-    const sortBy = query.sortBy || 'createdAt';
+    const sortBy = query.sortBy || 'accountData.createdAt';
     const sortDirection = query.sortDirection;
     const pageNumber = Number(query.pageNumber) || 1;
     const pageSize = Number(query.pageSize) || 10;
