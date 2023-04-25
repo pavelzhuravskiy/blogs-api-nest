@@ -31,4 +31,8 @@ export class UsersService {
 
     return this.usersRepository.deleteUser(id);
   }
+
+  async deleteUsers(): Promise<boolean> {
+    return this.usersRepository.deleteUsers();
+  }
 }

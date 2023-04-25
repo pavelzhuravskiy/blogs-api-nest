@@ -13,35 +13,39 @@ export class BlogsQueryRepository {
     private BlogModel: BlogModelType,
   ) {}
   async findBlogs(query: BlogQuery): Promise<Paginator<BlogViewModel[]>> {
+    const term = query.searchNameTerm;
+    const sortBy = query.sortBy || 'createdAt';
+    const sortDirection = query.sortDirection;
+    const pageNumber = Number(query.pageNumber) || 1;
+    const pageSize = Number(query.pageSize) || 10;
+
     const filter: FilterQuery<BlogDocument> = {};
 
-    if (query.searchNameTerm) {
-      filter.name = { $regex: query.searchNameTerm, $options: 'i' };
+    if (term) {
+      filter.name = { $regex: term, $options: 'i' };
     }
 
     const sortingObj: { [key: string]: SortOrder } = {
-      [query.sortBy || 'createdAt']: 'desc',
+      [sortBy]: 'desc',
     };
 
-    if (query.sortDirection === 'asc') {
-      sortingObj[query.sortBy || 'createdAt'] = 'asc';
+    if (sortDirection === 'asc') {
+      sortingObj[sortBy] = 'asc';
     }
 
     const blogs = await this.BlogModel.find(filter)
       .sort(sortingObj)
-      .skip(
-        +query.pageNumber > 0 ? (+query.pageNumber - 1) * +query.pageSize : 0,
-      )
-      .limit(+query.pageSize > 0 ? +query.pageSize : 0)
+      .skip(pageNumber > 0 ? (pageNumber - 1) * pageSize : 0)
+      .limit(pageSize > 0 ? pageSize : 0)
       .lean();
 
     const totalCount = await this.BlogModel.countDocuments(filter);
-    const pagesCount = Math.ceil(totalCount / +query.pageSize);
+    const pagesCount = Math.ceil(totalCount / pageSize);
 
     return {
-      pagesCount: pagesCount || 1,
-      page: +query.pageNumber || 1,
-      pageSize: +query.pageSize || 10,
+      pagesCount: pagesCount,
+      page: pageNumber,
+      pageSize: pageSize,
       totalCount,
       items: blogs.map((blog) => {
         return {

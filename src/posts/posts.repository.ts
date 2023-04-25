@@ -75,4 +75,9 @@ export class PostsRepository {
     const post = await this.PostModel.deleteOne({ _id: id });
     return post.deletedCount === 1;
   }
+
+  async deletePosts(): Promise<boolean> {
+    await this.PostModel.deleteMany({});
+    return (await this.PostModel.countDocuments()) === 0;
+  }
 }

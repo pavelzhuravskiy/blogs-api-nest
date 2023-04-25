@@ -13,47 +13,52 @@ export class UsersQueryRepository {
     private UserModel: UserModelType,
   ) {}
   async findUsers(query: UserQuery): Promise<Paginator<UserViewModel[]>> {
+    const loginTerm = query.searchLoginTerm;
+    const emailTerm = query.searchEmailTerm;
+    const sortBy = query.sortBy || 'createdAt';
+    const sortDirection = query.sortDirection;
+    const pageNumber = Number(query.pageNumber) || 1;
+    const pageSize = Number(query.pageSize) || 10;
+
     const filter: FilterQuery<UserDocument> = {};
 
-    if (query.searchLoginTerm || query.searchEmailTerm) {
+    if (loginTerm || emailTerm) {
       filter.$or = [];
 
-      if (query.searchLoginTerm) {
+      if (loginTerm) {
         filter.$or.push({
-          'accountData.login': { $regex: query.searchLoginTerm, $options: 'i' },
+          'accountData.login': { $regex: loginTerm, $options: 'i' },
         });
       }
 
-      if (query.searchEmailTerm) {
+      if (emailTerm) {
         filter.$or.push({
-          'accountData.email': { $regex: query.searchEmailTerm, $options: 'i' },
+          'accountData.email': { $regex: emailTerm, $options: 'i' },
         });
       }
     }
 
     const sortingObj: { [key: string]: SortOrder } = {
-      [query.sortBy || 'createdAt']: 'desc',
+      [sortBy]: 'desc',
     };
 
-    if (query.sortDirection === 'asc') {
-      sortingObj[query.sortBy || 'createdAt'] = 'asc';
+    if (sortDirection === 'asc') {
+      sortingObj[sortBy] = 'asc';
     }
 
     const users = await this.UserModel.find(filter)
       .sort(sortingObj)
-      .skip(
-        +query.pageNumber > 0 ? (+query.pageNumber - 1) * +query.pageSize : 0,
-      )
-      .limit(+query.pageSize > 0 ? +query.pageSize : 0)
+      .skip(pageNumber > 0 ? (pageNumber - 1) * pageSize : 0)
+      .limit(pageSize > 0 ? pageSize : 0)
       .lean();
 
     const totalCount = await this.UserModel.countDocuments(filter);
-    const pagesCount = Math.ceil(totalCount / +query.pageSize);
+    const pagesCount = Math.ceil(totalCount / pageSize);
 
     return {
-      pagesCount: pagesCount || 1,
-      page: +query.pageNumber || 1,
-      pageSize: +query.pageSize || 10,
+      pagesCount: pagesCount,
+      page: pageNumber,
+      pageSize: pageSize,
       totalCount,
       items: users.map((user) => {
         return {

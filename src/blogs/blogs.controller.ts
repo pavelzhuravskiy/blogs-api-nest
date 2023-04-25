@@ -58,6 +58,12 @@ export class BlogsController {
     return this.blogsService.deleteBlog(id);
   }
 
+  @Delete()
+  @HttpCode(204)
+  async deleteBlogs() {
+    return this.blogsService.deleteBlogs();
+  }
+
   @Post('/:id/posts')
   async createPost(
     @Param('id') id: string,

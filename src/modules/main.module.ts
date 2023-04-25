@@ -19,6 +19,8 @@ import { UsersService } from '../users/users.service';
 import { UsersRepository } from '../users/users.repository';
 import { UsersQueryRepository } from '../users/users.query.repository';
 import { User, UserSchema } from '../users/schemas/user.entity';
+import { CommentsService } from '../comments/comments.service';
+import { TestingController } from '../testing/testing.controller';
 
 @Module({
   imports: [
@@ -32,6 +34,7 @@ import { User, UserSchema } from '../users/schemas/user.entity';
     PostsController,
     CommentsController,
     UsersController,
+    TestingController,
   ],
   providers: [
     BlogsService,
@@ -40,8 +43,9 @@ import { User, UserSchema } from '../users/schemas/user.entity';
     PostsService,
     PostsRepository,
     PostsQueryRepository,
-    CommentsQueryRepository,
+    CommentsService,
     CommentsRepository,
+    CommentsQueryRepository,
     UsersService,
     UsersRepository,
     UsersQueryRepository,

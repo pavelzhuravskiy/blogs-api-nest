@@ -43,4 +43,9 @@ export class BlogsRepository {
     const blog = await this.BlogModel.deleteOne({ _id: id });
     return blog.deletedCount === 1;
   }
+
+  async deleteBlogs(): Promise<boolean> {
+    await this.BlogModel.deleteMany({});
+    return (await this.BlogModel.countDocuments()) === 0;
+  }
 }

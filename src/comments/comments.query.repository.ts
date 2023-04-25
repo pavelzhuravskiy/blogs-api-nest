@@ -20,31 +20,34 @@ export class CommentsQueryRepository {
     query: CommentQuery,
     postId: string,
   ): Promise<Paginator<CommentViewModel[]>> {
+    const sortBy = query.sortBy || 'createdAt';
+    const sortDirection = query.sortDirection;
+    const pageNumber = Number(query.pageNumber) || 1;
+    const pageSize = Number(query.pageSize) || 10;
+
     const filter: FilterQuery<CommentDocument> = { postId };
 
     const sortingObj: { [key: string]: SortOrder } = {
-      [query.sortBy || 'createdAt']: 'desc',
+      [sortBy]: 'desc',
     };
 
-    if (query.sortDirection === 'asc') {
-      sortingObj[query.sortBy || 'createdAt'] = 'asc';
+    if (sortDirection === 'asc') {
+      sortingObj[sortBy] = 'asc';
     }
 
     const comments = await this.CommentModel.find(filter)
       .sort(sortingObj)
-      .skip(
-        +query.pageNumber > 0 ? (+query.pageNumber - 1) * +query.pageSize : 0,
-      )
-      .limit(+query.pageSize > 0 ? +query.pageSize : 0)
+      .skip(pageNumber > 0 ? (pageNumber - 1) * pageSize : 0)
+      .limit(pageSize > 0 ? pageSize : 0)
       .lean();
 
     const totalCount = await this.CommentModel.countDocuments(filter);
-    const pagesCount = Math.ceil(totalCount / +query.pageSize);
+    const pagesCount = Math.ceil(totalCount / pageSize);
 
     return {
-      pagesCount: pagesCount || 1,
-      page: +query.pageNumber || 1,
-      pageSize: +query.pageSize || 10,
+      pagesCount: pagesCount,
+      page: pageNumber,
+      pageSize: pageSize,
       totalCount,
       items: comments.map((comment) => {
         return {

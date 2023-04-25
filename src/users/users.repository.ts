@@ -38,4 +38,9 @@ export class UsersRepository {
     const user = await this.UserModel.deleteOne({ _id: id });
     return user.deletedCount === 1;
   }
+
+  async deleteUsers(): Promise<boolean> {
+    await this.UserModel.deleteMany({});
+    return (await this.UserModel.countDocuments()) === 0;
+  }
 }

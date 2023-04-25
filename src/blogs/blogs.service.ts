@@ -43,4 +43,8 @@ export class BlogsService {
 
     return this.blogsRepository.deleteBlog(id);
   }
+
+  async deleteBlogs(): Promise<boolean> {
+    return this.blogsRepository.deleteBlogs();
+  }
 }

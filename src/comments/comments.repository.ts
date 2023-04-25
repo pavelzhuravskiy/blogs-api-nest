@@ -29,4 +29,8 @@ export class CommentsRepository {
       },
     };
   }
+  async deleteComments(): Promise<boolean> {
+    await this.CommentModel.deleteMany({});
+    return (await this.CommentModel.countDocuments()) === 0;
+  }
 }

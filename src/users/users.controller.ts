@@ -35,4 +35,10 @@ export class UsersController {
   async deleteUser(@Param('id') id: string) {
     return this.usersService.deleteUser(id);
   }
+
+  @Delete()
+  @HttpCode(204)
+  async deleteUsers() {
+    return this.usersService.deleteUsers();
+  }
 }

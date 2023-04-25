@@ -9,6 +9,7 @@ import { CommentCreateDto } from '../comments/dto/comment.create.dto';
 import { CommentViewModel } from '../comments/schemas/comment.view';
 import { Comment, CommentModelType } from '../comments/schemas/comment.entity';
 import { CommentsRepository } from '../comments/comments.repository';
+import { BlogsRepository } from '../blogs/blogs.repository';
 
 @Injectable()
 export class PostsService {
@@ -19,20 +20,30 @@ export class PostsService {
     private CommentModel: CommentModelType,
     private readonly postsRepository: PostsRepository,
     private readonly commentsRepository: CommentsRepository,
+    private readonly blogsRepository: BlogsRepository,
   ) {}
 
   async createPost(
     createPostDto: PostCreateDto,
     blogIdParam?: string,
   ): Promise<PostViewModel> {
-    const blogId = createPostDto.blogId || blogIdParam;
+    let blog;
 
-    const blog = await this.postsRepository.findBlog(blogId);
+    if (blogIdParam) {
+      blog = await this.blogsRepository.findBlog(blogIdParam);
 
-    if (!blog) {
-      throw new InternalServerErrorException(
-        `Something went wrong during blog find operation`,
-      );
+      if (!blog) {
+        throw new InternalServerErrorException(
+          `Something went wrong during blog find operation`,
+        );
+      }
+    } else {
+      blog = await this.postsRepository.findBlog(createPostDto.blogId);
+      if (!blog) {
+        throw new InternalServerErrorException(
+          `Something went wrong during blog find operation`,
+        );
+      }
     }
 
     const post = this.PostModel.createPost(createPostDto, this.PostModel, blog);
@@ -62,6 +73,10 @@ export class PostsService {
     }
 
     return this.postsRepository.deletePost(id);
+  }
+
+  async deletePosts(): Promise<boolean> {
+    return this.postsRepository.deletePosts();
   }
 
   async createComment(
