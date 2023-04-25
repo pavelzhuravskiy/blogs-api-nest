@@ -39,11 +39,11 @@ export class UsersQueryRepository {
     }
 
     const sortingObj: { [key: string]: SortOrder } = {
-      [sortBy]: 'desc',
+      [`accountData.${sortBy}`]: 'desc',
     };
 
     if (sortDirection === 'asc') {
-      sortingObj[sortBy] = 'asc';
+      sortingObj[`accountData.${sortBy}`] = 'asc';
     }
 
     const users = await this.UserModel.find(filter)
