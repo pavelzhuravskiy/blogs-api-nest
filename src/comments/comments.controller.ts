@@ -1,6 +1,8 @@
 import { Controller, Delete, Get, HttpCode, Param } from '@nestjs/common';
 import { CommentsQueryRepository } from './comments.query.repository';
 import { CommentsService } from './comments.service';
+import { errorHandler } from '../common/helpers/error.handler';
+import { ErrorCodes } from '../common/enums/error.codes';
 
 @Controller('comments')
 export class CommentsController {
@@ -11,7 +13,13 @@ export class CommentsController {
 
   @Get(':id')
   async findComment(@Param('id') id: string) {
-    return this.commentsQueryRepository.findComment(id);
+    const result = await this.commentsQueryRepository.findComment(id);
+
+    if (!result) {
+      return errorHandler(ErrorCodes.NotFound);
+    }
+
+    return result;
   }
   @Delete()
   @HttpCode(204)

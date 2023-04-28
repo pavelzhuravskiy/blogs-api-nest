@@ -1,24 +1,23 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import mongoose, { FilterQuery, SortOrder } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Paginator } from '../common/schemas/paginator';
 import { Post, PostDocument, PostModelType } from './schemas/post.entity';
 import { PostQuery } from './dto/post.query';
 import { PostViewModel } from './schemas/post.view';
-import { Blog, BlogModelType } from '../blogs/schemas/blog.entity';
+import { BlogsQueryRepository } from '../blogs/blogs.query.repository';
 
 @Injectable()
 export class PostsQueryRepository {
   constructor(
     @InjectModel(Post.name)
     private PostModel: PostModelType,
-    @InjectModel(Blog.name)
-    private BlogModel: BlogModelType,
+    private readonly blogsQueryRepository: BlogsQueryRepository,
   ) {}
   async findPosts(
     query: PostQuery,
     blogId?: string,
-  ): Promise<Paginator<PostViewModel[]>> {
+  ): Promise<Paginator<PostViewModel[]> | null> {
     const sortBy = query.sortBy || 'createdAt';
     const sortDirection = query.sortDirection;
     const pageNumber = Number(query.pageNumber) || 1;
@@ -27,14 +26,10 @@ export class PostsQueryRepository {
     const filter: FilterQuery<PostDocument> = {};
 
     if (blogId) {
-      if (!mongoose.isValidObjectId(blogId)) {
-        throw new NotFoundException();
-      }
-
-      const blog = await this.BlogModel.findOne({ _id: blogId });
+      const blog = await this.blogsQueryRepository.findBlog(blogId);
 
       if (!blog) {
-        throw new NotFoundException();
+        return null;
       }
 
       filter.blogId = blogId;
@@ -82,15 +77,15 @@ export class PostsQueryRepository {
     };
   }
 
-  async findPost(id: string): Promise<PostViewModel> {
+  async findPost(id: string): Promise<PostViewModel | null> {
     if (!mongoose.isValidObjectId(id)) {
-      throw new NotFoundException();
+      return null;
     }
 
     const post = await this.PostModel.findOne({ _id: id });
 
     if (!post) {
-      throw new NotFoundException();
+      return null;
     }
 
     return {

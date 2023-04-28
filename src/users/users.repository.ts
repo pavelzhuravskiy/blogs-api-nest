@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import mongoose from 'mongoose';
 import { User, UserDocument, UserModelType } from './schemas/user.entity';
@@ -10,25 +10,19 @@ export class UsersRepository {
     private UserModel: UserModelType,
   ) {}
 
-  async createUser(user: UserDocument) {
-    await user.save();
-    return {
-      id: user._id.toString(),
-      login: user.accountData.login,
-      email: user.accountData.email,
-      createdAt: user.accountData.createdAt.toISOString(),
-    };
+  async save(user: UserDocument) {
+    return user.save();
   }
 
   async findUser(id: string): Promise<UserDocument | null> {
     if (!mongoose.isValidObjectId(id)) {
-      throw new NotFoundException();
+      return null;
     }
 
     const user = await this.UserModel.findOne({ _id: id });
 
     if (!user) {
-      throw new NotFoundException();
+      return null;
     }
 
     return user;

@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import mongoose, { FilterQuery, SortOrder } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Paginator } from '../common/schemas/paginator';
@@ -68,15 +68,15 @@ export class CommentsQueryRepository {
     };
   }
 
-  async findComment(id: string): Promise<CommentViewModel> {
+  async findComment(id: string): Promise<CommentViewModel | null> {
     if (!mongoose.isValidObjectId(id)) {
-      throw new NotFoundException();
+      return null;
     }
 
     const comment = await this.CommentModel.findOne({ _id: id });
 
     if (!comment) {
-      throw new NotFoundException();
+      return null;
     }
 
     return {

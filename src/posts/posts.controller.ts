@@ -17,6 +17,8 @@ import { PostUpdateDto } from './dto/post.update.dto';
 import { CommentCreateDto } from '../comments/dto/comment.create.dto';
 import { CommentQuery } from '../comments/dto/comment.query';
 import { CommentsQueryRepository } from '../comments/comments.query.repository';
+import { errorHandler } from '../common/helpers/error.handler';
+import { ErrorCodes } from '../common/enums/error.codes';
 
 @Controller('posts')
 export class PostsController {
@@ -28,7 +30,13 @@ export class PostsController {
 
   @Post()
   async createPost(@Body() createPostDto: PostCreateDto) {
-    return this.postsService.createPost(createPostDto);
+    const result = await this.postsService.createPost(createPostDto);
+
+    if (!result) {
+      return errorHandler(ErrorCodes.BadRequest);
+    }
+
+    return result;
   }
 
   @Get()
@@ -38,7 +46,13 @@ export class PostsController {
 
   @Get(':id')
   async findPost(@Param('id') id: string) {
-    return this.postsQueryRepository.findPost(id);
+    const result = await this.postsQueryRepository.findPost(id);
+
+    if (!result) {
+      return errorHandler(ErrorCodes.NotFound);
+    }
+
+    return result;
   }
 
   @Put(':id')
@@ -47,13 +61,25 @@ export class PostsController {
     @Param('id') id: string,
     @Body() updatePostDto: PostUpdateDto,
   ) {
-    return this.postsService.updatePost(id, updatePostDto);
+    const result = await this.postsService.updatePost(id, updatePostDto);
+
+    if (!result) {
+      return errorHandler(ErrorCodes.NotFound);
+    }
+
+    return result;
   }
 
   @Delete(':id')
   @HttpCode(204)
   async deletePost(@Param('id') id: string) {
-    return this.postsService.deletePost(id);
+    const result = await this.postsService.deletePost(id);
+
+    if (!result) {
+      return errorHandler(ErrorCodes.NotFound);
+    }
+
+    return result;
   }
 
   @Delete()

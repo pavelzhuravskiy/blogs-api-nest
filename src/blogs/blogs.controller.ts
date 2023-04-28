@@ -18,6 +18,8 @@ import { PostsService } from '../posts/posts.service';
 import { PostCreateDto } from '../posts/dto/post.create.dto';
 import { PostQuery } from '../posts/dto/post.query';
 import { PostsQueryRepository } from '../posts/posts.query.repository';
+import { ErrorCodes } from '../common/enums/error.codes';
+import { errorHandler } from '../common/helpers/error.handler';
 
 @Controller('blogs')
 export class BlogsController {
@@ -40,7 +42,13 @@ export class BlogsController {
 
   @Get(':id')
   async findBlog(@Param('id') id: string) {
-    return this.blogsQueryRepository.findBlog(id);
+    const result = await this.blogsQueryRepository.findBlog(id);
+
+    if (!result) {
+      return errorHandler(ErrorCodes.NotFound);
+    }
+
+    return result;
   }
 
   @Put(':id')
@@ -49,13 +57,25 @@ export class BlogsController {
     @Param('id') id: string,
     @Body() updateBlogDto: BlogUpdateDto,
   ) {
-    return this.blogsService.updateBlog(id, updateBlogDto);
+    const result = await this.blogsService.updateBlog(id, updateBlogDto);
+
+    if (!result) {
+      return errorHandler(ErrorCodes.NotFound);
+    }
+
+    return result;
   }
 
   @Delete(':id')
   @HttpCode(204)
   async deleteBlog(@Param('id') id: string) {
-    return this.blogsService.deleteBlog(id);
+    const result = await this.blogsService.deleteBlog(id);
+
+    if (!result) {
+      return errorHandler(ErrorCodes.NotFound);
+    }
+
+    return result;
   }
 
   @Delete()
@@ -69,11 +89,23 @@ export class BlogsController {
     @Param('id') id: string,
     @Body() createPostDto: PostCreateDto,
   ) {
-    return this.postsService.createPost(createPostDto, id);
+    const result = await this.postsService.createPost(createPostDto, id);
+
+    if (!result) {
+      return errorHandler(ErrorCodes.NotFound);
+    }
+
+    return result;
   }
 
   @Get('/:id/posts')
   async findPosts(@Query() query: PostQuery, @Param('id') id: string) {
-    return this.postsQueryRepository.findPosts(query, id);
+    const result = await this.postsQueryRepository.findPosts(query, id);
+
+    if (!result) {
+      return errorHandler(ErrorCodes.NotFound);
+    }
+
+    return result;
   }
 }
