@@ -12,13 +12,12 @@ import {
 import { PostCreateDto } from './dto/post.create.dto';
 import { PostsService } from './posts.service';
 import { PostsQueryRepository } from './posts.query.repository';
-import { PostQuery } from './dto/post.query';
 import { PostUpdateDto } from './dto/post.update.dto';
 import { CommentCreateDto } from '../comments/dto/comment.create.dto';
-import { CommentQuery } from '../comments/dto/comment.query';
 import { CommentsQueryRepository } from '../comments/comments.query.repository';
 import { errorHandler } from '../common/helpers/error.handler';
 import { ErrorCodes } from '../common/enums/error.codes';
+import { CommonQuery } from '../common/dto/common.query';
 
 @Controller('posts')
 export class PostsController {
@@ -40,7 +39,7 @@ export class PostsController {
   }
 
   @Get()
-  async findPosts(@Query() query: PostQuery) {
+  async findPosts(@Query() query: CommonQuery) {
     return this.postsQueryRepository.findPosts(query);
   }
 
@@ -97,7 +96,7 @@ export class PostsController {
   }
 
   @Get('/:id/comments')
-  async findComments(@Query() query: CommentQuery, @Param('id') id: string) {
+  async findComments(@Query() query: CommonQuery, @Param('id') id: string) {
     return this.commentsQueryRepository.findComments(query, id);
   }
 }

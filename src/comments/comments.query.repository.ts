@@ -7,8 +7,8 @@ import {
   CommentDocument,
   CommentModelType,
 } from './schemas/comment.entity';
-import { CommentQuery } from './dto/comment.query';
 import { CommentViewModel } from './schemas/comment.view';
+import { CommonQuery } from '../common/dto/common.query';
 
 @Injectable()
 export class CommentsQueryRepository {
@@ -17,7 +17,7 @@ export class CommentsQueryRepository {
     private CommentModel: CommentModelType,
   ) {}
   async findComments(
-    query: CommentQuery,
+    query: CommonQuery,
     postId: string,
   ): Promise<Paginator<CommentViewModel[]>> {
     const sortBy = query.sortBy || 'createdAt';

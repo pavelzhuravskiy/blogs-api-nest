@@ -1,7 +1,5 @@
-export class BlogQuery {
+import { CommonQuery } from '../../common/dto/common.query';
+
+export class BlogQuery extends CommonQuery {
   searchNameTerm: string;
-  sortBy: string;
-  sortDirection: string;
-  pageNumber: string;
-  pageSize: string;
 }

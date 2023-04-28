@@ -16,10 +16,10 @@ import { BlogsQueryRepository } from './blogs.query.repository';
 import { BlogUpdateDto } from './dto/blog.update.dto';
 import { PostsService } from '../posts/posts.service';
 import { PostCreateDto } from '../posts/dto/post.create.dto';
-import { PostQuery } from '../posts/dto/post.query';
 import { PostsQueryRepository } from '../posts/posts.query.repository';
 import { ErrorCodes } from '../common/enums/error.codes';
 import { errorHandler } from '../common/helpers/error.handler';
+import { CommonQuery } from '../common/dto/common.query';
 
 @Controller('blogs')
 export class BlogsController {
@@ -99,7 +99,7 @@ export class BlogsController {
   }
 
   @Get('/:id/posts')
-  async findPosts(@Query() query: PostQuery, @Param('id') id: string) {
+  async findPosts(@Query() query: CommonQuery, @Param('id') id: string) {
     const result = await this.postsQueryRepository.findPosts(query, id);
 
     if (!result) {

@@ -1,8 +1,6 @@
-export class UserQuery {
+import { CommonQuery } from '../../common/dto/common.query';
+
+export class UserQuery extends CommonQuery {
   searchLoginTerm: string;
   searchEmailTerm: string;
-  sortBy: string;
-  sortDirection: string;
-  pageNumber: string;
-  pageSize: string;
 }

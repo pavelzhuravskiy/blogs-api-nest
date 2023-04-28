@@ -3,9 +3,9 @@ import mongoose, { FilterQuery, SortOrder } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Paginator } from '../common/schemas/paginator';
 import { Post, PostDocument, PostModelType } from './schemas/post.entity';
-import { PostQuery } from './dto/post.query';
 import { PostViewModel } from './schemas/post.view';
 import { BlogsQueryRepository } from '../blogs/blogs.query.repository';
+import { CommonQuery } from '../common/dto/common.query';
 
 @Injectable()
 export class PostsQueryRepository {
@@ -15,7 +15,7 @@ export class PostsQueryRepository {
     private readonly blogsQueryRepository: BlogsQueryRepository,
   ) {}
   async findPosts(
-    query: PostQuery,
+    query: CommonQuery,
     blogId?: string,
   ): Promise<Paginator<PostViewModel[]> | null> {
     const sortBy = query.sortBy || 'createdAt';
