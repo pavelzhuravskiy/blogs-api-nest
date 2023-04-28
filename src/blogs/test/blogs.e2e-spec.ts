@@ -39,6 +39,8 @@ describe('Blogs testing', () => {
     agent = supertest.agent(app.getHttpServer());
   });
 
+  let blogId;
+
   describe('Blogs status 404 checks', () => {
     beforeAll(async () => await agent.delete(testingURI));
     it(`should return 404 when getting nonexistent blog`, async () => {
@@ -73,8 +75,6 @@ describe('Blogs testing', () => {
         items: [blogObject],
       });
     });
-
-    let blogId;
 
     it(`should return blog by ID`, async () => {
       const blogs = await agent.get(blogsURI).expect(200);
