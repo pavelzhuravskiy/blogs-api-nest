@@ -21,6 +21,7 @@ import { UsersQueryRepository } from '../users/users.query.repository';
 import { User, UserSchema } from '../users/schemas/user.entity';
 import { CommentsService } from '../comments/comments.service';
 import { TestingController } from '../testing/testing.controller';
+import { IsUserAlreadyExistConstraint } from '../exceptions/decorators/unique-user.decorator';
 
 @Module({
   imports: [
@@ -49,6 +50,7 @@ import { TestingController } from '../testing/testing.controller';
     UsersService,
     UsersRepository,
     UsersQueryRepository,
+    IsUserAlreadyExistConstraint,
   ],
 })
 export class MainModule {}

@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserModelType } from './schemas/user.entity';
 import { UsersRepository } from './users.repository';
-import { UserCreateDto } from './dto/user.create.dto';
+import { UserCreateDto } from './dto/user-create.dto';
 import { UserViewModel } from './schemas/user.view';
 import bcrypt from 'bcrypt';
 import { UsersQueryRepository } from './users.query.repository';
@@ -26,7 +26,7 @@ export class UsersService {
   }
 
   async deleteUser(id: string): Promise<boolean | null> {
-    const user = await this.usersRepository.findUser(id);
+    const user = await this.usersRepository.findUserById(id);
 
     if (!user) {
       return null;

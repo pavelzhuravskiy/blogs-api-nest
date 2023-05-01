@@ -1,5 +1,5 @@
 import { Prop, Schema } from '@nestjs/mongoose';
-import { UsersLikesInfo } from './likes.users.schema';
+import { UsersLikesInfo } from './likes-users.schema';
 
 @Schema()
 export class LikesInfoSchema {

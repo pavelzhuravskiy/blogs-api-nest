@@ -9,15 +9,21 @@ import {
   Put,
   Query,
 } from '@nestjs/common';
-import { PostCreateDto } from './dto/post.create.dto';
+import { PostCreateDto } from './dto/post-create.dto';
 import { PostsService } from './posts.service';
 import { PostsQueryRepository } from './posts.query.repository';
-import { PostUpdateDto } from './dto/post.update.dto';
-import { CommentCreateDto } from '../comments/dto/comment.create.dto';
+import { PostUpdateDto } from './dto/post-update.dto';
+import { CommentCreateDto } from '../comments/dto/comment-create.dto';
 import { CommentsQueryRepository } from '../comments/comments.query.repository';
-import { errorHandler } from '../common/helpers/error.handler';
-import { ErrorCodes } from '../common/enums/error.codes';
+import { exceptionHandler } from '../exceptions/exception.handler';
+import { ErrorCodes } from '../common/enums/error-codes.enum';
 import { CommonQuery } from '../common/dto/common.query';
+import {
+  blogIDField,
+  blogNotFound,
+  postIDField,
+  postNotFound,
+} from '../exceptions/exception.constants';
 
 @Controller('posts')
 export class PostsController {
@@ -32,7 +38,7 @@ export class PostsController {
     const result = await this.postsService.createPost(createPostDto);
 
     if (!result) {
-      return errorHandler(ErrorCodes.BadRequest);
+      return exceptionHandler(ErrorCodes.BadRequest, blogNotFound, blogIDField);
     }
 
     return result;
@@ -48,7 +54,7 @@ export class PostsController {
     const result = await this.postsQueryRepository.findPost(id);
 
     if (!result) {
-      return errorHandler(ErrorCodes.NotFound);
+      return exceptionHandler(ErrorCodes.NotFound, postNotFound, postIDField);
     }
 
     return result;
@@ -62,9 +68,11 @@ export class PostsController {
   ) {
     const result = await this.postsService.updatePost(id, updatePostDto);
 
-    if (!result) {
-      return errorHandler(ErrorCodes.NotFound);
+    if (result.code !== ErrorCodes.Success) {
+      return exceptionHandler(result.code, result.message, result.field);
     }
+
+    console.log(result);
 
     return result;
   }
@@ -75,7 +83,7 @@ export class PostsController {
     const result = await this.postsService.deletePost(id);
 
     if (!result) {
-      return errorHandler(ErrorCodes.NotFound);
+      return exceptionHandler(ErrorCodes.NotFound, postNotFound, postIDField);
     }
 
     return result;

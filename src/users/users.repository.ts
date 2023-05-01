@@ -14,7 +14,7 @@ export class UsersRepository {
     return user.save();
   }
 
-  async findUser(id: string): Promise<UserDocument | null> {
+  async findUserById(id: string): Promise<UserDocument | null> {
     if (!mongoose.isValidObjectId(id)) {
       return null;
     }
@@ -26,6 +26,23 @@ export class UsersRepository {
     }
 
     return user;
+  }
+
+  async findUserByLoginOrEmail(
+    loginOrEmail: string,
+  ): Promise<UserDocument | null> {
+    const foundUser = await this.UserModel.findOne({
+      $or: [
+        { 'accountData.login': loginOrEmail },
+        { 'accountData.email': loginOrEmail },
+      ],
+    });
+
+    if (!foundUser) {
+      return null;
+    }
+
+    return foundUser;
   }
 
   async deleteUser(id: string): Promise<boolean> {

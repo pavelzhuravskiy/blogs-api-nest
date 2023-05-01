@@ -8,12 +8,13 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
-import { UserCreateDto } from './dto/user.create.dto';
+import { UserCreateDto } from './dto/user-create.dto';
 import { UsersService } from './users.service';
 import { UserQuery } from './dto/user.query';
 import { UsersQueryRepository } from './users.query.repository';
-import { errorHandler } from '../common/helpers/error.handler';
-import { ErrorCodes } from '../common/enums/error.codes';
+import { exceptionHandler } from '../exceptions/exception.handler';
+import { ErrorCodes } from '../common/enums/error-codes.enum';
+import { userIDField, userNotFound } from '../exceptions/exception.constants';
 
 @Controller('users')
 export class UsersController {
@@ -38,7 +39,7 @@ export class UsersController {
     const result = await this.usersService.deleteUser(id);
 
     if (!result) {
-      return errorHandler(ErrorCodes.NotFound);
+      return exceptionHandler(ErrorCodes.NotFound, userNotFound, userIDField);
     }
 
     return result;

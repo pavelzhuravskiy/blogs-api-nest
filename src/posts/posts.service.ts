@@ -2,16 +2,26 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Post, PostModelType } from './schemas/post.entity';
 import { PostsRepository } from './posts.repository';
-import { PostCreateDto } from './dto/post.create.dto';
+import { PostCreateDto } from './dto/post-create.dto';
 import { PostViewModel } from './schemas/post.view';
-import { PostUpdateDto } from './dto/post.update.dto';
-import { CommentCreateDto } from '../comments/dto/comment.create.dto';
+import { PostUpdateDto } from './dto/post-update.dto';
+import { CommentCreateDto } from '../comments/dto/comment-create.dto';
 import { CommentViewModel } from '../comments/schemas/comment.view';
 import { Comment, CommentModelType } from '../comments/schemas/comment.entity';
 import { CommentsRepository } from '../comments/comments.repository';
 import { BlogsRepository } from '../blogs/blogs.repository';
 import { PostsQueryRepository } from './posts.query.repository';
 import { CommentsQueryRepository } from '../comments/comments.query.repository';
+import { ErrorCodes } from '../common/enums/error-codes.enum';
+import {
+  allFields,
+  blogIDField,
+  blogNotFound,
+  postIDField,
+  postNotFound,
+  success,
+} from '../exceptions/exception.constants';
+import { ExceptionResultType } from '../exceptions/types/exception-result.type';
 
 @Injectable()
 export class PostsService {
@@ -32,6 +42,7 @@ export class PostsService {
     blogIdParam?: string,
   ): Promise<PostViewModel | null> {
     const blogId = createPostDto.blogId || blogIdParam;
+
     const blog = await this.blogsRepository.findBlog(blogId);
 
     if (!blog) {
@@ -47,15 +58,38 @@ export class PostsService {
   async updatePost(
     id: string,
     updatePostDto: PostUpdateDto,
-  ): Promise<Post | null> {
+  ): Promise<ExceptionResultType<boolean | null>> {
     const post = await this.postsRepository.findPost(id);
 
     if (!post) {
-      return null;
+      return {
+        data: false,
+        code: ErrorCodes.NotFound,
+        field: postIDField,
+        message: postNotFound,
+      };
+    }
+
+    const blog = await this.blogsRepository.findBlog(updatePostDto.blogId);
+
+    if (!blog) {
+      return {
+        data: false,
+        code: ErrorCodes.NotFound,
+        field: blogIDField,
+        message: blogNotFound,
+      };
     }
 
     await post.updatePost(updatePostDto);
-    return this.postsRepository.save(post);
+    await this.postsRepository.save(post);
+
+    return {
+      data: true,
+      code: ErrorCodes.Success,
+      field: allFields,
+      message: success,
+    };
   }
 
   async deletePost(id: string): Promise<boolean | null> {
