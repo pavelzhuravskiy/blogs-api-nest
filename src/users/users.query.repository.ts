@@ -13,52 +13,47 @@ export class UsersQueryRepository {
     private UserModel: UserModelType,
   ) {}
   async findUsers(query: UserQuery): Promise<Paginator<UserViewModel[]>> {
-    const loginTerm = query.searchLoginTerm;
-    const emailTerm = query.searchEmailTerm;
-    const sortBy = query.sortBy || 'createdAt';
-    const sortDirection = query.sortDirection;
-    const pageNumber = Number(query.pageNumber) || 1;
-    const pageSize = Number(query.pageSize) || 10;
-
     const filter: FilterQuery<UserDocument> = {};
 
-    if (loginTerm || emailTerm) {
+    if (query.searchLoginTerm || query.searchEmailTerm) {
       filter.$or = [];
 
-      if (loginTerm) {
+      if (query.searchLoginTerm) {
         filter.$or.push({
-          'accountData.login': { $regex: loginTerm, $options: 'i' },
+          'accountData.login': { $regex: query.searchLoginTerm, $options: 'i' },
         });
       }
 
-      if (emailTerm) {
+      if (query.searchEmailTerm) {
         filter.$or.push({
-          'accountData.email': { $regex: emailTerm, $options: 'i' },
+          'accountData.email': { $regex: query.searchEmailTerm, $options: 'i' },
         });
       }
     }
 
     const sortingObj: { [key: string]: SortOrder } = {
-      [`accountData.${sortBy}`]: 'desc',
+      [`accountData.${query.sortBy}`]: query.sortDirection,
     };
 
-    if (sortDirection === 'asc') {
-      sortingObj[`accountData.${sortBy}`] = 'asc';
+    if (query.sortDirection === 'asc') {
+      sortingObj[`accountData.${query.sortBy}`] = 'asc';
     }
 
     const users = await this.UserModel.find(filter)
       .sort(sortingObj)
-      .skip(pageNumber > 0 ? (pageNumber - 1) * pageSize : 0)
-      .limit(pageSize > 0 ? pageSize : 0)
+      .skip(
+        +query.pageNumber > 0 ? (+query.pageNumber - 1) * +query.pageSize : 0,
+      )
+      .limit(+query.pageSize > 0 ? +query.pageSize : 0)
       .lean();
 
     const totalCount = await this.UserModel.countDocuments(filter);
-    const pagesCount = Math.ceil(totalCount / pageSize);
+    const pagesCount = Math.ceil(totalCount / +query.pageSize);
 
     return {
       pagesCount: pagesCount,
-      page: pageNumber,
-      pageSize: pageSize,
+      page: +query.pageNumber,
+      pageSize: +query.pageSize,
       totalCount,
       items: users.map((user) => {
         return {

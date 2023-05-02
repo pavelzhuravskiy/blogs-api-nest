@@ -80,8 +80,6 @@ export class PostsController {
       return exceptionHandler(result.code, result.message, result.field);
     }
 
-    console.log(result);
-
     return result;
   }
 

@@ -12,9 +12,6 @@ import {
   blogUpdatedName,
   blogUpdatedWebsite,
   blogWebsite,
-  descriptionField,
-  nameField,
-  urlField,
 } from '../../../test/constants/blogs.constants';
 import { testingURI } from '../../../test/constants/testing.constants';
 import {
@@ -30,6 +27,11 @@ import {
 import { customExceptionFactory } from '../../exceptions/exception.factory';
 import { HttpExceptionFilter } from '../../exceptions/exception.filter';
 import { exceptionObject } from '../../../test/objects/common.objects';
+import {
+  descriptionField,
+  nameField,
+  urlField,
+} from '../../../test/constants/exceptions.constants';
 
 describe('Blogs testing', () => {
   let app: INestApplication;

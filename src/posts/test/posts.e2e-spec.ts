@@ -9,9 +9,6 @@ import {
   blogName,
   blogsURI,
   blogWebsite,
-  contentField,
-  shortDescriptionField,
-  titleField,
 } from '../../../test/constants/blogs.constants';
 import { testingURI } from '../../../test/constants/testing.constants';
 import {
@@ -38,6 +35,11 @@ import { exceptionObject } from '../../../test/objects/common.objects';
 import { customExceptionFactory } from '../../exceptions/exception.factory';
 import { HttpExceptionFilter } from '../../exceptions/exception.filter';
 import { blogIDField } from '../../exceptions/exception.constants';
+import {
+  contentField,
+  shortDescriptionField,
+  titleField,
+} from '../../../test/constants/exceptions.constants';
 
 describe('Posts testing', () => {
   let app: INestApplication;
@@ -245,7 +247,15 @@ describe('Posts testing', () => {
       return agent.get(postsURI + invalidURI).expect(404);
     });
     it(`should return 404 when updating nonexistent post`, async () => {
-      return agent.put(postsURI + invalidURI).expect(404);
+      return agent
+        .put(postsURI + invalidURI)
+        .send({
+          title: postUpdatedTitle,
+          shortDescription: postUpdatedShortDescription,
+          content: postUpdatedContent,
+          blogId: firstBlogId,
+        })
+        .expect(404);
     });
     it(`should return 404 when deleting nonexistent post`, async () => {
       return agent.delete(postsURI + invalidURI).expect(404);

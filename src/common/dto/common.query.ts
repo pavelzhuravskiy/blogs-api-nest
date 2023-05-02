@@ -1,6 +1,6 @@
 export class CommonQuery {
-  sortBy: string;
-  sortDirection: string;
-  pageNumber: string;
-  pageSize: string;
+  sortBy = 'createdAt';
+  sortDirection: 'desc' | 'asc' = 'desc';
+  pageNumber = '1';
+  pageSize = '10';
 }

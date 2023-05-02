@@ -8,6 +8,7 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { BlogsService } from './blogs.service';
 import { BlogCreateDto } from './dto/blog-create.dto';
@@ -21,7 +22,9 @@ import { ExceptionCodes } from '../exceptions/exception-codes.enum';
 import { exceptionHandler } from '../exceptions/exception.handler';
 import { CommonQuery } from '../common/dto/common.query';
 import { blogIDField, blogNotFound } from '../exceptions/exception.constants';
+import { AuthGuard } from '../auth.guard';
 
+@UseGuards(AuthGuard)
 @Controller('blogs')
 export class BlogsController {
   constructor(
