@@ -16,7 +16,7 @@ import { PostUpdateDto } from './dto/post-update.dto';
 import { CommentCreateDto } from '../comments/dto/comment-create.dto';
 import { CommentsQueryRepository } from '../comments/comments.query.repository';
 import { exceptionHandler } from '../exceptions/exception.handler';
-import { ErrorCodes } from '../common/enums/error-codes.enum';
+import { ExceptionCodes } from '../exceptions/exception-codes.enum';
 import { CommonQuery } from '../common/dto/common.query';
 import {
   blogIDField,
@@ -38,7 +38,11 @@ export class PostsController {
     const result = await this.postsService.createPost(createPostDto);
 
     if (!result) {
-      return exceptionHandler(ErrorCodes.BadRequest, blogNotFound, blogIDField);
+      return exceptionHandler(
+        ExceptionCodes.BadRequest,
+        blogNotFound,
+        blogIDField,
+      );
     }
 
     return result;
@@ -54,7 +58,11 @@ export class PostsController {
     const result = await this.postsQueryRepository.findPost(id);
 
     if (!result) {
-      return exceptionHandler(ErrorCodes.NotFound, postNotFound, postIDField);
+      return exceptionHandler(
+        ExceptionCodes.NotFound,
+        postNotFound,
+        postIDField,
+      );
     }
 
     return result;
@@ -68,7 +76,7 @@ export class PostsController {
   ) {
     const result = await this.postsService.updatePost(id, updatePostDto);
 
-    if (result.code !== ErrorCodes.Success) {
+    if (result.code !== ExceptionCodes.Success) {
       return exceptionHandler(result.code, result.message, result.field);
     }
 
@@ -83,7 +91,11 @@ export class PostsController {
     const result = await this.postsService.deletePost(id);
 
     if (!result) {
-      return exceptionHandler(ErrorCodes.NotFound, postNotFound, postIDField);
+      return exceptionHandler(
+        ExceptionCodes.NotFound,
+        postNotFound,
+        postIDField,
+      );
     }
 
     return result;

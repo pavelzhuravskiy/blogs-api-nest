@@ -2,7 +2,7 @@ import { Controller, Delete, Get, HttpCode, Param } from '@nestjs/common';
 import { CommentsQueryRepository } from './comments.query.repository';
 import { CommentsService } from './comments.service';
 import { exceptionHandler } from '../exceptions/exception.handler';
-import { ErrorCodes } from '../common/enums/error-codes.enum';
+import { ExceptionCodes } from '../exceptions/exception-codes.enum';
 import {
   commentIDField,
   commentNotFound,
@@ -21,7 +21,7 @@ export class CommentsController {
 
     if (!result) {
       return exceptionHandler(
-        ErrorCodes.NotFound,
+        ExceptionCodes.NotFound,
         commentNotFound,
         commentIDField,
       );

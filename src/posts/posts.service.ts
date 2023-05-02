@@ -12,7 +12,7 @@ import { CommentsRepository } from '../comments/comments.repository';
 import { BlogsRepository } from '../blogs/blogs.repository';
 import { PostsQueryRepository } from './posts.query.repository';
 import { CommentsQueryRepository } from '../comments/comments.query.repository';
-import { ErrorCodes } from '../common/enums/error-codes.enum';
+import { ExceptionCodes } from '../exceptions/exception-codes.enum';
 import {
   allFields,
   blogIDField,
@@ -64,7 +64,7 @@ export class PostsService {
     if (!post) {
       return {
         data: false,
-        code: ErrorCodes.NotFound,
+        code: ExceptionCodes.NotFound,
         field: postIDField,
         message: postNotFound,
       };
@@ -75,7 +75,7 @@ export class PostsService {
     if (!blog) {
       return {
         data: false,
-        code: ErrorCodes.NotFound,
+        code: ExceptionCodes.NotFound,
         field: blogIDField,
         message: blogNotFound,
       };
@@ -86,7 +86,7 @@ export class PostsService {
 
     return {
       data: true,
-      code: ErrorCodes.Success,
+      code: ExceptionCodes.Success,
       field: allFields,
       message: success,
     };

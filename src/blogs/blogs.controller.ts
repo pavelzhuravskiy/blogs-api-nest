@@ -17,7 +17,7 @@ import { BlogUpdateDto } from './dto/blog-update.dto';
 import { PostsService } from '../posts/posts.service';
 import { PostCreateDto } from '../posts/dto/post-create.dto';
 import { PostsQueryRepository } from '../posts/posts.query.repository';
-import { ErrorCodes } from '../common/enums/error-codes.enum';
+import { ExceptionCodes } from '../exceptions/exception-codes.enum';
 import { exceptionHandler } from '../exceptions/exception.handler';
 import { CommonQuery } from '../common/dto/common.query';
 import { blogIDField, blogNotFound } from '../exceptions/exception.constants';
@@ -46,7 +46,11 @@ export class BlogsController {
     const result = await this.blogsQueryRepository.findBlog(id);
 
     if (!result) {
-      return exceptionHandler(ErrorCodes.NotFound, blogNotFound, blogIDField);
+      return exceptionHandler(
+        ExceptionCodes.NotFound,
+        blogNotFound,
+        blogIDField,
+      );
     }
 
     return result;
@@ -61,7 +65,11 @@ export class BlogsController {
     const result = await this.blogsService.updateBlog(id, updateBlogDto);
 
     if (!result) {
-      return exceptionHandler(ErrorCodes.NotFound, blogNotFound, blogIDField);
+      return exceptionHandler(
+        ExceptionCodes.NotFound,
+        blogNotFound,
+        blogIDField,
+      );
     }
 
     return result;
@@ -73,7 +81,11 @@ export class BlogsController {
     const result = await this.blogsService.deleteBlog(id);
 
     if (!result) {
-      return exceptionHandler(ErrorCodes.NotFound, blogNotFound, blogIDField);
+      return exceptionHandler(
+        ExceptionCodes.NotFound,
+        blogNotFound,
+        blogIDField,
+      );
     }
 
     return result;
@@ -93,7 +105,11 @@ export class BlogsController {
     const result = await this.postsService.createPost(createPostDto, id);
 
     if (!result) {
-      return exceptionHandler(ErrorCodes.NotFound, blogNotFound, blogIDField);
+      return exceptionHandler(
+        ExceptionCodes.NotFound,
+        blogNotFound,
+        blogIDField,
+      );
     }
 
     return result;
@@ -104,7 +120,11 @@ export class BlogsController {
     const result = await this.postsQueryRepository.findPosts(query, id);
 
     if (!result) {
-      return exceptionHandler(ErrorCodes.NotFound, blogNotFound, blogIDField);
+      return exceptionHandler(
+        ExceptionCodes.NotFound,
+        blogNotFound,
+        blogIDField,
+      );
     }
 
     return result;

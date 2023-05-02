@@ -1,4 +1,4 @@
-export enum ErrorCodes {
+export enum ExceptionCodes {
   Success,
   BadRequest,
   NotFound,

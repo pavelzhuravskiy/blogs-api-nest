@@ -13,5 +13,6 @@ export class PostCreateDto {
   @Length(1, 1000)
   content: string;
 
+  @IsString()
   blogId?: string;
 }

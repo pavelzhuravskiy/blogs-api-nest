@@ -1,6 +1,6 @@
 import supertest, { SuperAgentTest } from 'supertest';
 import { Test } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
+import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { MainModule } from '../../modules/main.module';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -12,13 +12,24 @@ import {
   blogUpdatedName,
   blogUpdatedWebsite,
   blogWebsite,
+  descriptionField,
+  nameField,
+  urlField,
 } from '../../../test/constants/blogs.constants';
 import { testingURI } from '../../../test/constants/testing.constants';
 import {
   blogObject,
   updatedBlogObject,
 } from '../../../test/objects/blogs.objects';
-import { invalidURI } from '../../../test/constants/common.constants';
+import {
+  invalidURI,
+  longString109,
+  longString17,
+  longString508,
+} from '../../../test/constants/common.constants';
+import { customExceptionFactory } from '../../exceptions/exception.factory';
+import { HttpExceptionFilter } from '../../exceptions/exception.filter';
+import { exceptionObject } from '../../../test/objects/common.objects';
 
 describe('Blogs testing', () => {
   let app: INestApplication;
@@ -34,6 +45,15 @@ describe('Blogs testing', () => {
     }).compile();
 
     app = moduleRef.createNestApplication();
+    app.useGlobalPipes(
+      new ValidationPipe({
+        transform: true,
+        stopAtFirstError: true,
+        exceptionFactory: customExceptionFactory,
+      }),
+    );
+    app.useGlobalFilters(new HttpExceptionFilter());
+
     await app.init();
 
     agent = supertest.agent(app.getHttpServer());
@@ -41,13 +61,140 @@ describe('Blogs testing', () => {
 
   let blogId;
 
+  describe('Blogs status 400 checks', () => {
+    beforeAll(async () => await agent.delete(testingURI));
+    it(`should return 400 when trying to create blog without name`, async () => {
+      const response = await agent
+        .post(blogsURI)
+        .send({
+          description: blogDescription,
+          websiteUrl: blogWebsite,
+        })
+        .expect(400);
+
+      expect(response.body).toEqual(exceptionObject(nameField));
+    });
+    it(`should return 400 when trying to create blog with incorrect name type`, async () => {
+      const response = await agent
+        .post(blogsURI)
+        .send({
+          name: 123,
+          description: blogDescription,
+          websiteUrl: blogWebsite,
+        })
+        .expect(400);
+
+      expect(response.body).toEqual(exceptionObject(nameField));
+    });
+    it(`should return 400 when trying to create blog with incorrect name length`, async () => {
+      const response = await agent
+        .post(blogsURI)
+        .send({
+          name: longString17,
+          description: blogDescription,
+          websiteUrl: blogWebsite,
+        })
+        .expect(400);
+
+      expect(response.body).toEqual(exceptionObject(nameField));
+    });
+    it(`should return 400 when trying to create blog without description`, async () => {
+      const response = await agent
+        .post(blogsURI)
+        .send({
+          name: blogName,
+          websiteUrl: blogWebsite,
+        })
+        .expect(400);
+
+      expect(response.body).toEqual(exceptionObject(descriptionField));
+    });
+    it(`should return 400 when trying to create blog with incorrect description type`, async () => {
+      const response = await agent
+        .post(blogsURI)
+        .send({
+          name: blogName,
+          description: 123,
+          websiteUrl: blogWebsite,
+        })
+        .expect(400);
+
+      expect(response.body).toEqual(exceptionObject(descriptionField));
+    });
+    it(`should return 400 when trying to create blog with incorrect description length`, async () => {
+      const response = await agent
+        .post(blogsURI)
+        .send({
+          name: blogName,
+          description: longString508,
+          websiteUrl: blogWebsite,
+        })
+        .expect(400);
+
+      expect(response.body).toEqual(exceptionObject(descriptionField));
+    });
+    it(`should return 400 when trying to create blog without URL`, async () => {
+      const response = await agent
+        .post(blogsURI)
+        .send({
+          name: blogName,
+          description: blogDescription,
+        })
+        .expect(400);
+
+      expect(response.body).toEqual(exceptionObject(urlField));
+    });
+    it(`should return 400 when trying to create blog with incorrect URL type`, async () => {
+      const response = await agent
+        .post(blogsURI)
+        .send({
+          name: blogName,
+          description: blogDescription,
+          websiteUrl: 123,
+        })
+        .expect(400);
+
+      expect(response.body).toEqual(exceptionObject(urlField));
+    });
+    it(`should return 400 when trying to create blog with incorrect URL length`, async () => {
+      const response = await agent
+        .post(blogsURI)
+        .send({
+          name: blogName,
+          description: blogDescription,
+          websiteUrl: longString109,
+        })
+        .expect(400);
+
+      expect(response.body).toEqual(exceptionObject(urlField));
+    });
+    it(`should return 400 when trying to create blog with incorrect URL format`, async () => {
+      const response = await agent
+        .post(blogsURI)
+        .send({
+          name: blogName,
+          description: blogDescription,
+          websiteUrl: urlField,
+        })
+        .expect(400);
+
+      expect(response.body).toEqual(exceptionObject(urlField));
+    });
+  });
   describe('Blogs status 404 checks', () => {
     beforeAll(async () => await agent.delete(testingURI));
     it(`should return 404 when getting nonexistent blog`, async () => {
       return agent.get(blogsURI + invalidURI).expect(404);
     });
     it(`should return 404 when updating nonexistent blog`, async () => {
-      return agent.put(blogsURI + invalidURI).expect(404);
+      return agent
+        .put(blogsURI + invalidURI)
+        .send({
+          name: blogUpdatedName,
+          description: blogUpdatedDescription,
+          websiteUrl: blogUpdatedWebsite,
+        })
+        .expect(404);
     });
     it(`should return 404 when deleting nonexistent blog`, async () => {
       return agent.delete(blogsURI + invalidURI).expect(404);

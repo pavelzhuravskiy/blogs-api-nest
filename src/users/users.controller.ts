@@ -13,7 +13,7 @@ import { UsersService } from './users.service';
 import { UserQuery } from './dto/user.query';
 import { UsersQueryRepository } from './users.query.repository';
 import { exceptionHandler } from '../exceptions/exception.handler';
-import { ErrorCodes } from '../common/enums/error-codes.enum';
+import { ExceptionCodes } from '../exceptions/exception-codes.enum';
 import { userIDField, userNotFound } from '../exceptions/exception.constants';
 
 @Controller('users')
@@ -39,7 +39,11 @@ export class UsersController {
     const result = await this.usersService.deleteUser(id);
 
     if (!result) {
-      return exceptionHandler(ErrorCodes.NotFound, userNotFound, userIDField);
+      return exceptionHandler(
+        ExceptionCodes.NotFound,
+        userNotFound,
+        userIDField,
+      );
     }
 
     return result;

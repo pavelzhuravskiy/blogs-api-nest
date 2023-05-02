@@ -1,8 +1,8 @@
-import { ErrorCodes } from '../../common/enums/error-codes.enum';
+import { ExceptionCodes } from '../exception-codes.enum';
 
 export type ExceptionResultType<T> = {
   data: T;
-  code: ErrorCodes;
+  code: ExceptionCodes;
   field: string;
   message: string;
 };
