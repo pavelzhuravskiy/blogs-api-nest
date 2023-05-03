@@ -1,7 +1,6 @@
 import supertest, { SuperAgentTest } from 'supertest';
 import { Test } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
-import { MainModule } from '../../modules/main.module';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import {
@@ -9,15 +8,15 @@ import {
   blogName,
   blogsURI,
   blogWebsite,
-} from '../../../test/constants/blogs.constants';
-import { testingURI } from '../../../test/constants/testing.constants';
+} from '../../test/constants/blogs.constants';
+import { testingURI } from '../../test/constants/testing.constants';
 import {
   invalidURI,
   longString1013,
   longString109,
   longString17,
   longString39,
-} from '../../../test/constants/common.constants';
+} from '../../test/constants/common.constants';
 import {
   postContent,
   postShortDescription,
@@ -26,20 +25,21 @@ import {
   postUpdatedContent,
   postUpdatedShortDescription,
   postUpdatedTitle,
-} from '../../../test/constants/posts.constants';
+} from '../../test/constants/posts.constants';
 import {
   postObject,
   updatedPostObject,
-} from '../../../test/objects/posts.objects';
-import { exceptionObject } from '../../../test/objects/common.objects';
-import { customExceptionFactory } from '../../exceptions/exception.factory';
-import { HttpExceptionFilter } from '../../exceptions/exception.filter';
-import { blogIDField } from '../../exceptions/exception.constants';
+} from '../../test/objects/posts.objects';
+import { exceptionObject } from '../../test/objects/common.objects';
+import { customExceptionFactory } from '../exceptions/exception.factory';
+import { HttpExceptionFilter } from '../exceptions/exception.filter';
+import { blogIDField } from '../exceptions/exception.constants';
 import {
   contentField,
   shortDescriptionField,
   titleField,
-} from '../../../test/constants/exceptions.constants';
+} from '../../test/constants/exceptions.constants';
+import { AppModule } from '../app.module';
 
 describe('Posts testing', () => {
   let app: INestApplication;
@@ -50,7 +50,7 @@ describe('Posts testing', () => {
       imports: [
         ConfigModule.forRoot(),
         MongooseModule.forRoot(process.env.TEST_URI || ''),
-        MainModule,
+        AppModule,
       ],
     }).compile();
 

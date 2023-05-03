@@ -8,7 +8,6 @@ import {
   Post,
   Put,
   Query,
-  UseGuards,
 } from '@nestjs/common';
 import { BlogsService } from './blogs.service';
 import { BlogCreateDto } from './dto/blog-create.dto';
@@ -18,13 +17,12 @@ import { BlogUpdateDto } from './dto/blog-update.dto';
 import { PostsService } from '../posts/posts.service';
 import { PostCreateDto } from '../posts/dto/post-create.dto';
 import { PostsQueryRepository } from '../posts/posts.query.repository';
-import { ExceptionCodes } from '../exceptions/exception-codes.enum';
+import { ExceptionCode } from '../exceptions/exception-codes.enum';
 import { exceptionHandler } from '../exceptions/exception.handler';
 import { CommonQuery } from '../common/dto/common.query';
 import { blogIDField, blogNotFound } from '../exceptions/exception.constants';
-import { AuthGuard } from '../auth.guard';
 
-@UseGuards(AuthGuard)
+// @UseGuards(AuthGuard)
 @Controller('blogs')
 export class BlogsController {
   constructor(
@@ -50,7 +48,7 @@ export class BlogsController {
 
     if (!result) {
       return exceptionHandler(
-        ExceptionCodes.NotFound,
+        ExceptionCode.NotFound,
         blogNotFound,
         blogIDField,
       );
@@ -69,7 +67,7 @@ export class BlogsController {
 
     if (!result) {
       return exceptionHandler(
-        ExceptionCodes.NotFound,
+        ExceptionCode.NotFound,
         blogNotFound,
         blogIDField,
       );
@@ -85,7 +83,7 @@ export class BlogsController {
 
     if (!result) {
       return exceptionHandler(
-        ExceptionCodes.NotFound,
+        ExceptionCode.NotFound,
         blogNotFound,
         blogIDField,
       );
@@ -109,7 +107,7 @@ export class BlogsController {
 
     if (!result) {
       return exceptionHandler(
-        ExceptionCodes.NotFound,
+        ExceptionCode.NotFound,
         blogNotFound,
         blogIDField,
       );
@@ -124,7 +122,7 @@ export class BlogsController {
 
     if (!result) {
       return exceptionHandler(
-        ExceptionCodes.NotFound,
+        ExceptionCode.NotFound,
         blogNotFound,
         blogIDField,
       );

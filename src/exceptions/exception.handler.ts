@@ -1,8 +1,8 @@
-import { ExceptionCodes } from './exception-codes.enum';
+import { ExceptionCode } from './exception-codes.enum';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 
 export const exceptionHandler = (
-  code: ExceptionCodes,
+  code: ExceptionCode,
   message: string,
   field: string,
 ) => {
@@ -16,10 +16,10 @@ export const exceptionHandler = (
   };
 
   switch (code) {
-    case ExceptionCodes.BadRequest: {
+    case ExceptionCode.BadRequest: {
       throw new BadRequestException(exceptionObject);
     }
-    case ExceptionCodes.NotFound: {
+    case ExceptionCode.NotFound: {
       throw new NotFoundException(exceptionObject);
     }
   }

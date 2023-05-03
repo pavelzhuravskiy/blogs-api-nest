@@ -13,7 +13,7 @@ import { UsersService } from './users.service';
 import { UserQuery } from './dto/user.query';
 import { UsersQueryRepository } from './users.query.repository';
 import { exceptionHandler } from '../exceptions/exception.handler';
-import { ExceptionCodes } from '../exceptions/exception-codes.enum';
+import { ExceptionCode } from '../exceptions/exception-codes.enum';
 import { userIDField, userNotFound } from '../exceptions/exception.constants';
 
 @Controller('users')
@@ -40,7 +40,7 @@ export class UsersController {
 
     if (!result) {
       return exceptionHandler(
-        ExceptionCodes.NotFound,
+        ExceptionCode.NotFound,
         userNotFound,
         userIDField,
       );

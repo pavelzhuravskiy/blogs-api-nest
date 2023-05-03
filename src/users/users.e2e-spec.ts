@@ -1,22 +1,21 @@
 import supertest, { SuperAgentTest } from 'supertest';
 import { Test } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
-import { testingURI } from '../../../test/constants/testing.constants';
-import { invalidURI } from '../../../test/constants/common.constants';
+import { testingURI } from '../../test/constants/testing.constants';
+import { invalidURI } from '../../test/constants/common.constants';
 import {
   userEmail,
   userLogin,
   userPassword,
   usersURI,
-} from '../../../test/constants/users.constants';
-import { userObject } from '../../../test/objects/users.objects';
-import { customExceptionFactory } from '../../exceptions/exception.factory';
-import { HttpExceptionFilter } from '../../exceptions/exception.filter';
+} from '../../test/constants/users.constants';
+import { userObject } from '../../test/objects/users.objects';
+import { customExceptionFactory } from '../exceptions/exception.factory';
+import { HttpExceptionFilter } from '../exceptions/exception.filter';
 import { useContainer } from 'class-validator';
-import { AppModule } from '../../app.module';
+import { AppModule } from '../app.module';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
-import { MainModule } from '../../modules/main.module';
 
 describe('Users testing', () => {
   let app: INestApplication;
@@ -26,8 +25,7 @@ describe('Users testing', () => {
     const moduleRef = await Test.createTestingModule({
       imports: [
         ConfigModule.forRoot(),
-        MongooseModule.forRoot(process.env.MONGOOSE_URI || ''),
-        MainModule,
+        MongooseModule.forRoot(process.env.TEST_URI || ''),
         AppModule,
       ],
     }).compile();
