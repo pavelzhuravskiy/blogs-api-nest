@@ -35,7 +35,7 @@ export class BlogsService {
     }
 
     await blog.updateBlog(updateBlogDto);
-    return await this.blogsRepository.save(blog);
+    return this.blogsRepository.save(blog);
   }
 
   async deleteBlog(id: string): Promise<boolean | null> {

@@ -26,6 +26,6 @@ import { DevicesRepository } from '../devices/devices.repository';
     JwtStrategy,
   ],
   controllers: [AuthController],
-  exports: [AuthService],
+  exports: [AuthService, DevicesService],
 })
 export class AuthModule {}

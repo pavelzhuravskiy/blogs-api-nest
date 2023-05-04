@@ -11,25 +11,60 @@ import { LocalAuthGuard } from './guards/local-auth.guard';
 import { AuthService } from './auth.service';
 import { UsersRepository } from '../users/users.repository';
 import { CurrentUserId } from './decorators/current-user-id.param.decorator';
+import { DevicesService } from '../devices/devices.service';
+import { randomUUID } from 'crypto';
+import { JwtService } from '@nestjs/jwt';
 
 @Controller()
 export class AuthController {
   constructor(
     private authService: AuthService,
+    private jwtService: JwtService,
+    private devicesService: DevicesService,
     private usersRepository: UsersRepository,
   ) {}
 
   @UseGuards(LocalAuthGuard)
   @Post('auth/login')
   async login(@Request() req, @Response() res) {
-    const login = await this.authService.login(req);
+    const ip = req.ip;
+    const userAgent = req.headers['user-agent'] || 'unknown';
+
+    const deviceId = randomUUID();
+    const tokens = await this.authService.getTokens(req, deviceId);
+
+    await this.devicesService.createDevice(tokens.refreshToken, ip, userAgent);
+
     res
-      .cookie('refreshToken', login.refreshToken, {
+      .cookie('refreshToken', tokens.refreshToken, {
         httpOnly: true,
         secure: true,
       })
       .status(200)
-      .json({ accessToken: login.accessToken });
+      .json({ accessToken: tokens.accessToken });
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('auth/refresh-token')
+  async refreshTokens(@Request() req, @Response() res) {
+    const ip = req.ip;
+    const userAgent = req.headers['user-agent'] || 'unknown';
+    const token = req.cookies.refreshToken;
+
+    const decodedToken: any = await this.jwtService.decode(token);
+    const deviceId = decodedToken?.deviceId;
+    const tokens = await this.authService.getTokens(req, deviceId);
+    const newToken = await this.jwtService.decode(tokens.refreshToken);
+
+    await this.devicesService.updateDevice(newToken, ip, userAgent);
+
+    res
+      .cookie('refreshToken', tokens.refreshToken, {
+        httpOnly: true,
+        secure: true,
+      })
+      .status(200)
+      .json({ accessToken: tokens.accessToken });
   }
 
   @UseGuards(JwtAuthGuard)

@@ -33,4 +33,23 @@ export class DevicesService {
 
     return this.devicesRepository.save(device);
   }
+
+  async updateDevice(
+    token: any,
+    ip: string,
+    userAgent: string,
+  ): Promise<Device | null> {
+    const device = await this.devicesRepository.findDevice(token.deviceId);
+
+    if (!device) {
+      return null;
+    }
+
+    await device.updateDevice(token, ip, userAgent);
+    return this.devicesRepository.save(device);
+  }
+
+  async deleteDevices(): Promise<boolean> {
+    return this.devicesRepository.deleteDevices();
+  }
 }

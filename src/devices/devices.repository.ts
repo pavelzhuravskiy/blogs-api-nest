@@ -15,4 +15,19 @@ export class DevicesRepository {
   async save(device: DeviceDocument) {
     return device.save();
   }
+
+  async findDevice(id: string): Promise<DeviceDocument | null> {
+    const device = await this.DeviceModel.findOne({ deviceId: id });
+
+    if (!device) {
+      return null;
+    }
+
+    return device;
+  }
+
+  async deleteDevices(): Promise<boolean> {
+    await this.DeviceModel.deleteMany({});
+    return (await this.DeviceModel.countDocuments()) === 0;
+  }
 }

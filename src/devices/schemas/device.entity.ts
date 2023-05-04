@@ -34,13 +34,18 @@ export class Device {
   @Prop({ required: true })
   expirationDate: number;
 
+  updateDevice(token: any, ip: string, userAgent: string) {
+    this.lastActiveDate = token.iat;
+    this.ip = ip;
+    this.title = userAgent;
+  }
+
   static createDevice(
     token: any,
     ip: string,
     userAgent: string,
     DeviceModel: DeviceModelType,
   ): DeviceDocument {
-    console.log(token);
     const device = {
       ip: ip,
       title: userAgent,
@@ -54,6 +59,10 @@ export class Device {
 }
 
 export const DeviceSchema = SchemaFactory.createForClass(Device);
+
+DeviceSchema.methods = {
+  updateDevice: Device.prototype.updateDevice,
+};
 
 const deviceStaticMethods: DeviceModelStaticType = {
   createDevice: Device.createDevice,

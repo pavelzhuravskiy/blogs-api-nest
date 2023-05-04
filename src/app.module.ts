@@ -5,8 +5,8 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
-import { BloggersModule } from './common/modules/bloggers.module';
-import { TestingModule } from './common/modules/testing.module';
+import { BloggersModule } from './common/bloggers.module';
+import { TestingModule } from './testing/testing.module';
 
 @Module({
   imports: [
