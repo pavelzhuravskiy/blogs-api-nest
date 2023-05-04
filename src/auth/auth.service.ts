@@ -39,7 +39,6 @@ export class AuthService {
 
   async validateRefreshToken(payload: any): Promise<DeviceDocument | null> {
     const device = await this.devicesRepository.findDevice(payload.deviceId);
-    console.log(device);
 
     if (!device || payload.iat < device.lastActiveDate) {
       return null;
@@ -48,9 +47,9 @@ export class AuthService {
     return device;
   }
 
-  async getTokens(req: any, deviceId: string) {
-    const accessTokenPayload = { sub: req.user.id };
-    const refreshTokenPayload = { sub: req.user.id, deviceId: deviceId };
+  async getTokens(userId: string, deviceId: string) {
+    const accessTokenPayload = { sub: userId };
+    const refreshTokenPayload = { sub: userId, deviceId: deviceId };
 
     const accessToken = this.jwtService.sign(accessTokenPayload, {
       secret: jwtConstants.accessTokenSecret,

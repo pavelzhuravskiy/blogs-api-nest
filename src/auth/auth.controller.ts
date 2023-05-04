@@ -1,6 +1,7 @@
 import {
   Controller,
   Get,
+  HttpCode,
   Post,
   Request,
   Response,
@@ -27,11 +28,12 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   @Post('auth/login')
   async login(@Request() req, @Response() res) {
+    const userId = req.user.id;
     const ip = req.ip;
     const userAgent = req.headers['user-agent'] || 'unknown';
 
     const deviceId = randomUUID();
-    const tokens = await this.authService.getTokens(req, deviceId);
+    const tokens = await this.authService.getTokens(userId, deviceId);
 
     await this.devicesService.createDevice(tokens.refreshToken, ip, userAgent);
 
@@ -47,13 +49,14 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Post('auth/refresh-token')
   async refreshTokens(@Request() req, @Response() res) {
+    const userId = req.user.id;
     const ip = req.ip;
     const userAgent = req.headers['user-agent'] || 'unknown';
     const token = req.cookies.refreshToken;
 
     const decodedToken: any = await this.jwtService.decode(token);
     const deviceId = decodedToken?.deviceId;
-    const tokens = await this.authService.getTokens(req, deviceId);
+    const tokens = await this.authService.getTokens(userId, deviceId);
     const newToken = await this.jwtService.decode(tokens.refreshToken);
 
     await this.devicesService.updateDevice(newToken, ip, userAgent);
@@ -65,6 +68,16 @@ export class AuthController {
       })
       .status(200)
       .json({ accessToken: tokens.accessToken });
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('auth/logout')
+  @HttpCode(204)
+  async logout(@Request() req) {
+    const token = req.cookies.refreshToken;
+    const decodedToken: any = await this.jwtService.decode(token);
+    const deviceId = decodedToken?.deviceId;
+    return this.devicesService.deleteDevice(deviceId);
   }
 
   @UseGuards(JwtAuthGuard)
