@@ -83,8 +83,14 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Get('auth/me')
   async getProfile(@CurrentUserId() currentUserId) {
-    // console.log(currentUserId);
     const user = await this.usersRepository.findUserById(currentUserId);
-    return user;
+    const email = user?.accountData.email;
+    const login = user?.accountData.login;
+
+    return {
+      email: email,
+      login: login,
+      id: currentUserId,
+    };
   }
 }

@@ -10,8 +10,6 @@ import { CommentViewModel } from '../comments/schemas/comment.view';
 import { Comment, CommentModelType } from '../comments/schemas/comment.entity';
 import { CommentsRepository } from '../comments/comments.repository';
 import { BlogsRepository } from '../blogs/blogs.repository';
-import { PostsQueryRepository } from './posts.query.repository';
-import { CommentsQueryRepository } from '../comments/comments.query.repository';
 import { ExceptionCode } from '../exceptions/exception-codes.enum';
 import {
   allFields,
@@ -31,9 +29,7 @@ export class PostsService {
     @InjectModel(Comment.name)
     private CommentModel: CommentModelType,
     private readonly postsRepository: PostsRepository,
-    private readonly postsQueryRepository: PostsQueryRepository,
     private readonly commentsRepository: CommentsRepository,
-    private readonly commentsQueryRepository: CommentsQueryRepository,
     private readonly blogsRepository: BlogsRepository,
   ) {}
 
@@ -51,8 +47,7 @@ export class PostsService {
 
     const post = this.PostModel.createPost(createPostDto, this.PostModel, blog);
 
-    await this.postsRepository.save(post);
-    return this.postsQueryRepository.findPost(post.id);
+    return this.postsRepository.createPost(post);
   }
 
   async updatePost(
@@ -102,10 +97,6 @@ export class PostsService {
     return this.postsRepository.deletePost(id);
   }
 
-  async deletePosts(): Promise<boolean> {
-    return this.postsRepository.deletePosts();
-  }
-
   async createComment(
     id: string,
     createCommentDto: CommentCreateDto,
@@ -121,7 +112,6 @@ export class PostsService {
       this.CommentModel,
       post,
     );
-    await this.commentsRepository.save(comment);
-    return this.commentsQueryRepository.findComment(comment.id);
+    return this.commentsRepository.createComment(comment);
   }
 }

@@ -68,7 +68,7 @@ export class BlogsQueryRepository {
     }
 
     return {
-      id: blog._id.toString(),
+      id: blog.id,
       name: blog.name,
       description: blog.description,
       websiteUrl: blog.websiteUrl,

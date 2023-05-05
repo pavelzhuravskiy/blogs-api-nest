@@ -52,8 +52,4 @@ export class DevicesService {
   async deleteDevice(deviceId: string): Promise<boolean> {
     return this.devicesRepository.deleteDevice(deviceId);
   }
-
-  async deleteDevices(): Promise<boolean> {
-    return this.devicesRepository.deleteDevices();
-  }
 }

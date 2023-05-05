@@ -5,7 +5,6 @@ import { BlogCreateDto } from './dto/blog-create.dto';
 import { BlogsRepository } from './blogs.repository';
 import { BlogUpdateDto } from './dto/blog-update.dto';
 import { BlogViewModel } from './schemas/blog.view';
-import { BlogsQueryRepository } from './blogs.query.repository';
 
 @Injectable()
 export class BlogsService {
@@ -13,15 +12,13 @@ export class BlogsService {
     @InjectModel(Blog.name)
     private BlogModel: BlogModelType,
     private readonly blogsRepository: BlogsRepository,
-    private readonly blogsQueryRepository: BlogsQueryRepository,
   ) {}
 
   async createBlog(
     createBlogDto: BlogCreateDto,
   ): Promise<BlogViewModel | null> {
     const blog = this.BlogModel.createBlog(createBlogDto, this.BlogModel);
-    await this.blogsRepository.save(blog);
-    return this.blogsQueryRepository.findBlog(blog.id);
+    return this.blogsRepository.createBlog(blog);
   }
 
   async updateBlog(
@@ -46,9 +43,5 @@ export class BlogsService {
     }
 
     return this.blogsRepository.deleteBlog(id);
-  }
-
-  async deleteBlogs(): Promise<boolean> {
-    return this.blogsRepository.deleteBlogs();
   }
 }

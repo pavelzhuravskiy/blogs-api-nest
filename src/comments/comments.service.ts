@@ -10,7 +10,4 @@ export class CommentsService {
     private CommentModel: CommentModelType,
     private readonly commentsRepository: CommentsRepository,
   ) {}
-  async deleteComments(): Promise<boolean> {
-    return this.commentsRepository.deleteComments();
-  }
 }

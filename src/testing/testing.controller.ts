@@ -1,27 +1,33 @@
 import { Controller, Delete, HttpCode } from '@nestjs/common';
-import { BlogsService } from '../blogs/blogs.service';
-import { PostsService } from '../posts/posts.service';
-import { CommentsService } from '../comments/comments.service';
-import { UsersService } from '../users/users.service';
-import { DevicesService } from '../devices/devices.service';
+import { InjectModel } from '@nestjs/mongoose';
+import { Device, DeviceModelType } from '../devices/schemas/device.entity';
+import { Blog, BlogModelType } from '../blogs/schemas/blog.entity';
+import { Post, PostModelType } from '../posts/schemas/post.entity';
+import { Comment, CommentModelType } from '../comments/schemas/comment.entity';
+import { User, UserModelType } from '../users/schemas/user.entity';
 
 @Controller('testing')
 export class TestingController {
   constructor(
-    private readonly blogsService: BlogsService,
-    private readonly postsService: PostsService,
-    private readonly commentsService: CommentsService,
-    private readonly usersService: UsersService,
-    private readonly devicesService: DevicesService,
+    @InjectModel(Blog.name)
+    private BlogModel: BlogModelType,
+    @InjectModel(Post.name)
+    private PostModel: PostModelType,
+    @InjectModel(Comment.name)
+    private CommentModel: CommentModelType,
+    @InjectModel(User.name)
+    private UserModel: UserModelType,
+    @InjectModel(Device.name)
+    private DeviceModel: DeviceModelType,
   ) {}
 
   @Delete('/all-data')
   @HttpCode(204)
   async deleteAll() {
-    await this.blogsService.deleteBlogs();
-    await this.postsService.deletePosts();
-    await this.commentsService.deleteComments();
-    await this.usersService.deleteUsers();
-    return this.devicesService.deleteDevices();
+    await this.BlogModel.deleteMany();
+    await this.PostModel.deleteMany();
+    await this.CommentModel.deleteMany();
+    await this.UserModel.deleteMany();
+    await this.DeviceModel.deleteMany();
   }
 }
