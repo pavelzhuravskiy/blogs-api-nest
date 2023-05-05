@@ -5,7 +5,6 @@ import { UsersRepository } from './users.repository';
 import { UserCreateDto } from './dto/user-create.dto';
 import { UserViewModel } from './schemas/user.view';
 import bcrypt from 'bcrypt';
-import * as process from 'process';
 
 @Injectable()
 export class UsersService {

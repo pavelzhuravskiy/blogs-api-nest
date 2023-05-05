@@ -8,6 +8,7 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { BlogsService } from './blogs.service';
 import { BlogCreateDto } from './dto/blog-create.dto';
@@ -21,6 +22,7 @@ import { ExceptionCode } from '../exceptions/exception-codes.enum';
 import { exceptionHandler } from '../exceptions/exception.handler';
 import { CommonQuery } from '../common/dto/common.query';
 import { blogIDField, blogNotFound } from '../exceptions/exception.constants';
+import { BasicAuthGuard } from '../auth/guards/basic-auth.guard';
 
 // @UseGuards(AuthGuard)
 @Controller('blogs')
@@ -32,6 +34,7 @@ export class BlogsController {
     private readonly postsQueryRepository: PostsQueryRepository,
   ) {}
 
+  @UseGuards(BasicAuthGuard)
   @Post()
   async createBlog(@Body() createBlogDto: BlogCreateDto) {
     return this.blogsService.createBlog(createBlogDto);

@@ -10,6 +10,8 @@ import { Device, DeviceSchema } from '../devices/schemas/device.entity';
 import { JwtService } from '@nestjs/jwt';
 import { DevicesService } from '../devices/devices.service';
 import { DevicesRepository } from '../devices/devices.repository';
+import { JwtRefreshTokenStrategy } from './strategies/jwt-refresh.strategy';
+import { BasicStrategy } from './strategies/basic.strategy';
 
 @Module({
   imports: [
@@ -24,6 +26,8 @@ import { DevicesRepository } from '../devices/devices.repository';
     DevicesRepository,
     LocalStrategy,
     JwtBearerStrategy,
+    JwtRefreshTokenStrategy,
+    BasicStrategy,
   ],
   controllers: [AuthController],
   exports: [AuthService, DevicesService],

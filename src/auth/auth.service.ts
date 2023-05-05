@@ -57,12 +57,12 @@ export class AuthService {
 
     const accessToken = this.jwtService.sign(accessTokenPayload, {
       secret: jwtConstants.accessTokenSecret,
-      expiresIn: '1h',
+      expiresIn: jwtConstants.accessTokenExpirationTime,
     });
 
     const refreshToken = this.jwtService.sign(refreshTokenPayload, {
       secret: jwtConstants.refreshTokenSecret,
-      expiresIn: '2h',
+      expiresIn: jwtConstants.refreshTokenExpirationTime,
     });
 
     return {
