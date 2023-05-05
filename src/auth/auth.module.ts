@@ -4,7 +4,7 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { PassportModule } from '@nestjs/passport';
 import { LocalStrategy } from './strategies/local.strategy';
-import { JwtStrategy } from './strategies/jwt.strategy';
+import { JwtBearerStrategy } from './strategies/jwt-bearer.strategy';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Device, DeviceSchema } from '../devices/schemas/device.entity';
 import { JwtService } from '@nestjs/jwt';
@@ -23,7 +23,7 @@ import { DevicesRepository } from '../devices/devices.repository';
     DevicesService,
     DevicesRepository,
     LocalStrategy,
-    JwtStrategy,
+    JwtBearerStrategy,
   ],
   controllers: [AuthController],
   exports: [AuthService, DevicesService],

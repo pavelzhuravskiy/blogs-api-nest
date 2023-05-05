@@ -5,6 +5,7 @@ import { UsersRepository } from './users.repository';
 import { UserCreateDto } from './dto/user-create.dto';
 import { UserViewModel } from './schemas/user.view';
 import bcrypt from 'bcrypt';
+import * as process from 'process';
 
 @Injectable()
 export class UsersService {
@@ -17,7 +18,10 @@ export class UsersService {
   async createUser(
     createUserDto: UserCreateDto,
   ): Promise<UserViewModel | null> {
-    const hash = await bcrypt.hash(createUserDto.password, 10);
+    const hash = await bcrypt.hash(
+      createUserDto.password,
+      Number(process.env.HASH_ROUNDS),
+    );
     const user = this.UserModel.createUser(createUserDto, this.UserModel, hash);
     return this.usersRepository.createUser(user);
   }

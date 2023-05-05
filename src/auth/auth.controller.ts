@@ -7,7 +7,7 @@ import {
   Response,
   UseGuards,
 } from '@nestjs/common';
-import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { AuthService } from './auth.service';
 import { UsersRepository } from '../users/users.repository';
@@ -15,6 +15,7 @@ import { CurrentUserId } from './decorators/current-user-id.param.decorator';
 import { DevicesService } from '../devices/devices.service';
 import { randomUUID } from 'crypto';
 import { JwtService } from '@nestjs/jwt';
+import { JwtBearerGuard } from './guards/jwt-bearer.guard';
 
 @Controller()
 export class AuthController {
@@ -46,7 +47,7 @@ export class AuthController {
       .json({ accessToken: tokens.accessToken });
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtRefreshGuard)
   @Post('auth/refresh-token')
   async refreshTokens(@Request() req, @Response() res) {
     const userId = req.user.id;
@@ -70,7 +71,7 @@ export class AuthController {
       .json({ accessToken: tokens.accessToken });
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtBearerGuard)
   @Post('auth/logout')
   @HttpCode(204)
   async logout(@Request() req) {
@@ -80,7 +81,7 @@ export class AuthController {
     return this.devicesService.deleteDevice(deviceId);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtBearerGuard)
   @Get('auth/me')
   async getProfile(@CurrentUserId() currentUserId) {
     const user = await this.usersRepository.findUserById(currentUserId);

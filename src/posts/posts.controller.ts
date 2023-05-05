@@ -99,12 +99,6 @@ export class PostsController {
     return result;
   }
 
-  @Delete()
-  @HttpCode(204)
-  async deletePosts() {
-    return this.postsService.deletePosts();
-  }
-
   @Post('/:id/comments')
   async createComment(
     @Param('id') id: string,

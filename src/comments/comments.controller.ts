@@ -1,6 +1,5 @@
-import { Controller, Delete, Get, HttpCode, Param } from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
 import { CommentsQueryRepository } from './comments.query.repository';
-import { CommentsService } from './comments.service';
 import { exceptionHandler } from '../exceptions/exception.handler';
 import { ExceptionCode } from '../exceptions/exception-codes.enum';
 import {
@@ -12,7 +11,6 @@ import {
 export class CommentsController {
   constructor(
     private readonly commentsQueryRepository: CommentsQueryRepository,
-    private readonly commentsService: CommentsService,
   ) {}
 
   @Get(':id')
@@ -28,10 +26,5 @@ export class CommentsController {
     }
 
     return result;
-  }
-  @Delete()
-  @HttpCode(204)
-  async deleteComments() {
-    return this.commentsService.deleteComments();
   }
 }

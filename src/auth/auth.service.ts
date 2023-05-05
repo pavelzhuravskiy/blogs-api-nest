@@ -6,6 +6,7 @@ import { jwtConstants } from './constants';
 import { DevicesService } from '../devices/devices.service';
 import { DevicesRepository } from '../devices/devices.repository';
 import { DeviceDocument } from '../devices/schemas/device.entity';
+import { UserDocument } from '../users/schemas/user.entity';
 
 @Injectable()
 export class AuthService {
@@ -16,7 +17,10 @@ export class AuthService {
     private devicesRepository: DevicesRepository,
   ) {}
 
-  async validateUser(loginOrEmail: string, password: string): Promise<any> {
+  async validateUser(
+    loginOrEmail: string,
+    password: string,
+  ): Promise<UserDocument | null> {
     const user = await this.usersRepository.findUserByLoginOrEmail(
       loginOrEmail,
     );
