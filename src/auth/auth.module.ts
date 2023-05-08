@@ -9,12 +9,14 @@ import { JwtService } from '@nestjs/jwt';
 import { JwtRefreshTokenStrategy } from './strategies/jwt-refresh.strategy';
 import { BasicStrategy } from './strategies/basic.strategy';
 import { DevicesModule } from '../devices/devices.module';
+import { MailService } from '../mail/mail.service';
 
 @Module({
   imports: [UsersModule, PassportModule, DevicesModule],
   providers: [
     AuthService,
     JwtService,
+    MailService,
     LocalStrategy,
     JwtBearerStrategy,
     JwtRefreshTokenStrategy,

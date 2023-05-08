@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   Get,
   HttpCode,
@@ -15,6 +16,8 @@ import { CurrentUserId } from './decorators/current-user-id.param.decorator';
 import { DevicesService } from '../devices/devices.service';
 import { JwtService } from '@nestjs/jwt';
 import { JwtBearerGuard } from './guards/jwt-bearer.guard';
+import { MailService } from '../mail/mail.service';
+import { UserCreateDto } from '../users/dto/user-create.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -22,8 +25,14 @@ export class AuthController {
     private authService: AuthService,
     private jwtService: JwtService,
     private devicesService: DevicesService,
+    private mailService: MailService,
     private usersRepository: UsersRepository,
   ) {}
+
+  @Post('send')
+  async sendEmail(@Body() createUserDto: UserCreateDto) {
+    return await this.mailService.sendMail(createUserDto);
+  }
 
   @UseGuards(LocalAuthGuard)
   @HttpCode(200)
