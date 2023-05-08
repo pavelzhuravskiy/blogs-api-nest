@@ -24,7 +24,6 @@ import { CommonQuery } from '../common/dto/common.query';
 import { blogIDField, blogNotFound } from '../exceptions/exception.constants';
 import { BasicAuthGuard } from '../auth/guards/basic-auth.guard';
 
-// @UseGuards(AuthGuard)
 @Controller('blogs')
 export class BlogsController {
   constructor(
@@ -60,6 +59,7 @@ export class BlogsController {
     return result;
   }
 
+  @UseGuards(BasicAuthGuard)
   @Put(':id')
   @HttpCode(204)
   async updateBlog(
@@ -79,6 +79,7 @@ export class BlogsController {
     return result;
   }
 
+  @UseGuards(BasicAuthGuard)
   @Delete(':id')
   @HttpCode(204)
   async deleteBlog(@Param('id') id: string) {
@@ -95,7 +96,8 @@ export class BlogsController {
     return result;
   }
 
-  @Post('/:id/posts')
+  @UseGuards(BasicAuthGuard)
+  @Post(':id/posts')
   async createPost(
     @Param('id') id: string,
     @Body() createPostDto: PostCreateDto,
@@ -113,7 +115,7 @@ export class BlogsController {
     return result;
   }
 
-  @Get('/:id/posts')
+  @Get(':id/posts')
   async findPosts(@Query() query: CommonQuery, @Param('id') id: string) {
     const result = await this.postsQueryRepository.findPosts(query, id);
 

@@ -8,6 +8,7 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { PostCreateDto } from './dto/post-create.dto';
 import { PostsService } from './posts.service';
@@ -24,6 +25,8 @@ import {
   postIDField,
   postNotFound,
 } from '../exceptions/exception.constants';
+import { JwtBearerGuard } from '../auth/guards/jwt-bearer.guard';
+import { BasicAuthGuard } from '../auth/guards/basic-auth.guard';
 
 @Controller('posts')
 export class PostsController {
@@ -33,6 +36,7 @@ export class PostsController {
     private readonly commentsQueryRepository: CommentsQueryRepository,
   ) {}
 
+  @UseGuards(BasicAuthGuard)
   @Post()
   async createPost(@Body() createPostDto: PostCreateDto) {
     const result = await this.postsService.createPost(createPostDto);
@@ -68,6 +72,7 @@ export class PostsController {
     return result;
   }
 
+  @UseGuards(BasicAuthGuard)
   @Put(':id')
   @HttpCode(204)
   async updatePost(
@@ -83,6 +88,7 @@ export class PostsController {
     return result;
   }
 
+  @UseGuards(BasicAuthGuard)
   @Delete(':id')
   @HttpCode(204)
   async deletePost(@Param('id') id: string) {
@@ -99,7 +105,8 @@ export class PostsController {
     return result;
   }
 
-  @Post('/:id/comments')
+  @UseGuards(JwtBearerGuard)
+  @Post(':id/comments')
   async createComment(
     @Param('id') id: string,
     @Body() createCommentDto: CommentCreateDto,
@@ -107,7 +114,7 @@ export class PostsController {
     return this.postsService.createComment(id, createCommentDto);
   }
 
-  @Get('/:id/comments')
+  @Get(':id/comments')
   async findComments(@Query() query: CommonQuery, @Param('id') id: string) {
     return this.commentsQueryRepository.findComments(query, id);
   }

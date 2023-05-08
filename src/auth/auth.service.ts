@@ -7,6 +7,7 @@ import { DevicesService } from '../devices/devices.service';
 import { DevicesRepository } from '../devices/devices.repository';
 import { DeviceDocument } from '../devices/schemas/device.entity';
 import { UserDocument } from '../users/schemas/user.entity';
+import { randomUUID } from 'crypto';
 
 @Injectable()
 export class AuthService {
@@ -51,7 +52,7 @@ export class AuthService {
     return device;
   }
 
-  async getTokens(userId: string, deviceId: string) {
+  async getTokens(userId: string, deviceId: string = randomUUID()) {
     const accessTokenPayload = { sub: userId };
     const refreshTokenPayload = { sub: userId, deviceId: deviceId };
 

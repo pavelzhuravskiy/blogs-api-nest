@@ -1,10 +1,14 @@
 import { ExceptionCode } from './exception-codes.enum';
-import { BadRequestException, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  NotFoundException,
+} from '@nestjs/common';
 
 export const exceptionHandler = (
   code: ExceptionCode,
-  message: string,
-  field: string,
+  message?: string,
+  field?: string,
 ) => {
   const exceptionObject = {
     message: [
@@ -21,6 +25,9 @@ export const exceptionHandler = (
     }
     case ExceptionCode.NotFound: {
       throw new NotFoundException(exceptionObject);
+    }
+    case ExceptionCode.Forbidden: {
+      throw new ForbiddenException(exceptionObject);
     }
   }
 };

@@ -13,11 +13,10 @@ import { AuthService } from './auth.service';
 import { UsersRepository } from '../users/users.repository';
 import { CurrentUserId } from './decorators/current-user-id.param.decorator';
 import { DevicesService } from '../devices/devices.service';
-import { randomUUID } from 'crypto';
 import { JwtService } from '@nestjs/jwt';
 import { JwtBearerGuard } from './guards/jwt-bearer.guard';
 
-@Controller()
+@Controller('auth')
 export class AuthController {
   constructor(
     private authService: AuthService,
@@ -27,14 +26,14 @@ export class AuthController {
   ) {}
 
   @UseGuards(LocalAuthGuard)
-  @Post('auth/login')
+  @HttpCode(200)
+  @Post('login')
   async login(@Request() req, @Response() res) {
     const userId = req.user.id;
     const ip = req.ip;
     const userAgent = req.headers['user-agent'] || 'unknown';
 
-    const deviceId = randomUUID();
-    const tokens = await this.authService.getTokens(userId, deviceId);
+    const tokens = await this.authService.getTokens(userId);
 
     await this.devicesService.createDevice(tokens.refreshToken, ip, userAgent);
 
@@ -43,12 +42,12 @@ export class AuthController {
         httpOnly: true,
         secure: true,
       })
-      .status(200)
       .json({ accessToken: tokens.accessToken });
   }
 
   @UseGuards(JwtRefreshGuard)
-  @Post('auth/refresh-token')
+  @HttpCode(200)
+  @Post('refresh-token')
   async refreshTokens(@Request() req, @Response() res) {
     const userId = req.user.id;
     const ip = req.ip;
@@ -67,30 +66,27 @@ export class AuthController {
         httpOnly: true,
         secure: true,
       })
-      .status(200)
       .json({ accessToken: tokens.accessToken });
   }
 
   @UseGuards(JwtBearerGuard)
-  @Post('auth/logout')
+  @Post('logout')
   @HttpCode(204)
   async logout(@Request() req) {
     const token = req.cookies.refreshToken;
     const decodedToken: any = await this.jwtService.decode(token);
     const deviceId = decodedToken?.deviceId;
-    return this.devicesService.deleteDevice(deviceId);
+    return this.devicesService.logout(deviceId);
   }
 
   @UseGuards(JwtBearerGuard)
-  @Get('auth/me')
+  @Get('me')
   async getProfile(@CurrentUserId() currentUserId) {
     const user = await this.usersRepository.findUserById(currentUserId);
-    const email = user?.accountData.email;
-    const login = user?.accountData.login;
 
     return {
-      email: email,
-      login: login,
+      email: user?.accountData.email,
+      login: user?.accountData.login,
       id: currentUserId,
     };
   }

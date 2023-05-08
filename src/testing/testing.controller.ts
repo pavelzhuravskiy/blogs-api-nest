@@ -21,7 +21,7 @@ export class TestingController {
     private DeviceModel: DeviceModelType,
   ) {}
 
-  @Delete('/all-data')
+  @Delete('all-data')
   @HttpCode(204)
   async deleteAll() {
     await this.BlogModel.deleteMany();

@@ -7,6 +7,7 @@ import {
   Param,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { UserCreateDto } from './dto/user-create.dto';
 import { UsersService } from './users.service';
@@ -15,6 +16,7 @@ import { UsersQueryRepository } from './users.query.repository';
 import { exceptionHandler } from '../exceptions/exception.handler';
 import { ExceptionCode } from '../exceptions/exception-codes.enum';
 import { userIDField, userNotFound } from '../exceptions/exception.constants';
+import { BasicAuthGuard } from '../auth/guards/basic-auth.guard';
 
 @Controller('users')
 export class UsersController {
@@ -23,16 +25,19 @@ export class UsersController {
     private readonly usersQueryRepository: UsersQueryRepository,
   ) {}
 
+  @UseGuards(BasicAuthGuard)
   @Post()
   async createUser(@Body() createUserDto: UserCreateDto) {
     return this.usersService.createUser(createUserDto);
   }
 
+  @UseGuards(BasicAuthGuard)
   @Get()
   async findUsers(@Query() query: UserQuery) {
     return this.usersQueryRepository.findUsers(query);
   }
 
+  @UseGuards(BasicAuthGuard)
   @Delete(':id')
   @HttpCode(204)
   async deleteUser(@Param('id') id: string) {

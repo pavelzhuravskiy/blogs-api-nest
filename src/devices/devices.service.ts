@@ -7,6 +7,12 @@ import {
   DeviceModelType,
 } from './schemas/device.entity';
 import { DevicesRepository } from './devices.repository';
+import { ExceptionCode } from '../exceptions/exception-codes.enum';
+import {
+  deviceIDField,
+  deviceNotFound,
+} from '../exceptions/exception.constants';
+import { ExceptionResultType } from '../exceptions/types/exception-result.type';
 
 @Injectable()
 export class DevicesService {
@@ -49,7 +55,39 @@ export class DevicesService {
     return this.devicesRepository.save(device);
   }
 
-  async deleteDevice(deviceId: string): Promise<boolean> {
+  async logout(deviceId: string): Promise<boolean> {
     return this.devicesRepository.deleteDevice(deviceId);
+  }
+
+  async terminateSession(
+    currentUserId: string,
+    deviceId: string,
+  ): Promise<ExceptionResultType<boolean>> {
+    const device = await this.devicesRepository.findDevice(deviceId);
+
+    if (!device) {
+      return {
+        data: false,
+        code: ExceptionCode.NotFound,
+        field: deviceIDField,
+        message: deviceNotFound,
+      };
+    }
+
+    if (device.userId !== currentUserId) {
+      return {
+        data: false,
+        code: ExceptionCode.Forbidden,
+      };
+    }
+
+    return {
+      data: true,
+      code: ExceptionCode.Success,
+    };
+  }
+
+  async deleteOldDevices(deviceId: string): Promise<boolean> {
+    return this.devicesRepository.deleteOldDevices(deviceId);
   }
 }

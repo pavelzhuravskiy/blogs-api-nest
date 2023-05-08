@@ -12,12 +12,10 @@ import { CommentsRepository } from '../comments/comments.repository';
 import { BlogsRepository } from '../blogs/blogs.repository';
 import { ExceptionCode } from '../exceptions/exception-codes.enum';
 import {
-  allFields,
   blogIDField,
   blogNotFound,
   postIDField,
   postNotFound,
-  success,
 } from '../exceptions/exception.constants';
 import { ExceptionResultType } from '../exceptions/types/exception-result.type';
 
@@ -82,8 +80,6 @@ export class PostsService {
     return {
       data: true,
       code: ExceptionCode.Success,
-      field: allFields,
-      message: success,
     };
   }
 
