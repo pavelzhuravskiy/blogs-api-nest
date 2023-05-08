@@ -1,19 +1,25 @@
 import { MailerService } from '@nestjs-modules/mailer';
 import { Injectable } from '@nestjs/common';
-import { UserCreateDto } from '../users/dto/user-create.dto';
 import { randomUUID } from 'crypto';
+import { UserCreateDto } from '../users/dto/user-create.dto';
 
 @Injectable()
 export class MailService {
   constructor(private mailerService: MailerService) {}
 
-  async sendMail(createUserDto: UserCreateDto) {
+  async sendUserConfirmation(userCreateDto: UserCreateDto) {
+    const code = randomUUID();
+    const url = `https://somesite.com/confirm-email?code=${code}`;
+
     await this.mailerService.sendMail({
-      to: createUserDto.email,
-      subject: 'Greeting from NestJS NodeMailer',
-      template: 'src/mail/templates/email',
+      to: userCreateDto.email,
+      // from: '"Support Team" <support@example.com>', // override default from
+      subject: 'Welcome to Nice App! Confirm your Email',
+      template: './confirmation', // `.hbs` extension is appended automatically
       context: {
-        name: randomUUID(),
+        // ✏️ filling curly brackets with content
+        login: userCreateDto.login,
+        url,
       },
     });
   }

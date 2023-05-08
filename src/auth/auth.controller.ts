@@ -33,7 +33,7 @@ export class AuthController {
 
   @Post('send')
   async sendEmail(@Body() createUserDto: UserCreateDto) {
-    return await this.mailService.sendMail(createUserDto);
+    return this.mailService.sendUserConfirmation(createUserDto);
   }
 
   @UseGuards(LocalAuthGuard)

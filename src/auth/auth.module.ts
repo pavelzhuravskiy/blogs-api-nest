@@ -10,9 +10,10 @@ import { JwtRefreshTokenStrategy } from './strategies/jwt-refresh.strategy';
 import { BasicStrategy } from './strategies/basic.strategy';
 import { DevicesModule } from '../devices/devices.module';
 import { MailService } from '../mail/mail.service';
+import { MailModule } from '../mail/mail.module';
 
 @Module({
-  imports: [UsersModule, PassportModule, DevicesModule],
+  imports: [UsersModule, PassportModule, DevicesModule, MailModule],
   providers: [
     AuthService,
     JwtService,
