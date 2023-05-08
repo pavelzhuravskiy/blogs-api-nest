@@ -29,6 +29,8 @@ export class AuthController {
     private usersRepository: UsersRepository,
   ) {}
 
+  //
+
   @Post('send')
   async sendEmail(@Body() createUserDto: UserCreateDto) {
     return await this.mailService.sendMail(createUserDto);
