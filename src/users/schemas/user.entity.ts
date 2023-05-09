@@ -4,6 +4,8 @@ import { UserAccountSchema } from './user-account.schema';
 import { UserEmailSchema } from './user-email.schema';
 import { UserPasswordSchema } from './user-password.schema';
 import { UserCreateDto } from '../dto/user-create.dto';
+import { randomUUID } from 'crypto';
+import { add } from 'date-fns';
 
 export type UserDocument = HydratedDocument<User>;
 
@@ -41,7 +43,14 @@ export class User {
   }
 
   confirm() {
+    this.emailConfirmation.confirmationCode = null;
+    this.emailConfirmation.expirationDate = null;
     this.emailConfirmation.isConfirmed = true;
+  }
+
+  updateConfirmationData() {
+    this.emailConfirmation.confirmationCode = randomUUID();
+    this.emailConfirmation.expirationDate = add(new Date(), { hours: 1 });
   }
 
   static createUser(
@@ -77,6 +86,7 @@ export const UserSchema = SchemaFactory.createForClass(User);
 UserSchema.methods = {
   canBeConfirmed: User.prototype.canBeConfirmed,
   confirm: User.prototype.confirm,
+  updateConfirmationData: User.prototype.updateConfirmationData,
 };
 
 const userStaticMethods: UserModelStaticType = {

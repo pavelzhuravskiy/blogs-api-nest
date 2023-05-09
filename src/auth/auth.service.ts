@@ -17,7 +17,8 @@ import { UserViewModel } from '../users/schemas/user.view';
 import { add } from 'date-fns';
 import { InjectModel } from '@nestjs/mongoose';
 import { MailService } from '../mail/mail.service';
-import { EmailConfirmDto } from './dto/email-confirm.dto';
+import { UserConfirmDto } from './dto/user-confirm.dto';
+import { EmailResendDto } from './dto/email-resend.dto';
 
 @Injectable()
 export class AuthService {
@@ -121,17 +122,30 @@ export class AuthService {
   }
 
   async confirmUser(
-    emailConfirmDto: EmailConfirmDto,
+    userConfirmDto: UserConfirmDto,
   ): Promise<UserDocument | null> {
-    const user = await this.usersRepository.findUserByCode(
-      emailConfirmDto.code,
-    );
+    const user = await this.usersRepository.findUserByCode(userConfirmDto.code);
 
     if (!user || !user.canBeConfirmed()) {
       return null;
     }
 
     await user.confirm();
+    return this.usersRepository.save(user);
+  }
+
+  async resendEmail(
+    emailResendDto: EmailResendDto,
+  ): Promise<UserDocument | null> {
+    const user = await this.usersRepository.findUserByLoginOrEmail(
+      emailResendDto.email,
+    );
+
+    if (!user || user.emailConfirmation.isConfirmed) {
+      return null;
+    }
+
+    await user.updateConfirmationData();
     return this.usersRepository.save(user);
   }
 }

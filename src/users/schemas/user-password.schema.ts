@@ -2,9 +2,9 @@ import { Prop, Schema } from '@nestjs/mongoose';
 
 @Schema()
 export class UserPasswordSchema {
-  @Prop()
-  recoveryCode: string;
+  @Prop({ type: String || null })
+  recoveryCode: string | null;
 
-  @Prop()
-  expirationDate: Date;
+  @Prop({ type: String || null })
+  expirationDate: Date | null;
 }

@@ -2,11 +2,11 @@ import { Prop, Schema } from '@nestjs/mongoose';
 
 @Schema()
 export class UserEmailSchema {
-  @Prop()
-  confirmationCode: string;
+  @Prop({ type: String || null })
+  confirmationCode: string | null;
 
-  @Prop()
-  expirationDate: Date;
+  @Prop({ type: String || null })
+  expirationDate: Date | null;
 
   @Prop({ required: true })
   isConfirmed: boolean;

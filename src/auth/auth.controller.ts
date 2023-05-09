@@ -18,10 +18,11 @@ import { JwtService } from '@nestjs/jwt';
 import { JwtBearerGuard } from './guards/jwt-bearer.guard';
 import { UserCreateDto } from '../users/dto/user-create.dto';
 import { UsersService } from '../users/users.service';
-import { EmailConfirmDto } from './dto/email-confirm.dto';
+import { UserConfirmDto } from './dto/user-confirm.dto';
 import { exceptionHandler } from '../exceptions/exception.handler';
 import { ExceptionCode } from '../exceptions/exception-codes.enum';
 import { codeField, codeIsIncorrect } from '../exceptions/exception.constants';
+import { EmailResendDto } from './dto/email-resend.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -38,10 +39,15 @@ export class AuthController {
     return this.authService.registerUser(createUserDto);
   }
 
-  @HttpCode(204)
+  @Post('registration-email-resending')
+  async resendEmail(@Body() emailResendDto: EmailResendDto) {
+    const result = this.authService.resendEmail(emailResendDto);
+  }
+
   @Post('registration-confirmation')
-  async confirmUser(@Body() emailConfirmDto: EmailConfirmDto) {
-    const result = await this.authService.confirmUser(emailConfirmDto);
+  @HttpCode(204)
+  async confirmUser(@Body() userConfirmDto: UserConfirmDto) {
+    const result = await this.authService.confirmUser(userConfirmDto);
 
     if (!result) {
       return exceptionHandler(
@@ -55,8 +61,8 @@ export class AuthController {
   }
 
   @UseGuards(LocalAuthGuard)
-  @HttpCode(200)
   @Post('login')
+  @HttpCode(200)
   async login(@Request() req, @Response() res) {
     const userId = req.user.id;
     const ip = req.ip;
@@ -75,8 +81,8 @@ export class AuthController {
   }
 
   @UseGuards(JwtRefreshGuard)
-  @HttpCode(200)
   @Post('refresh-token')
+  @HttpCode(200)
   async refreshTokens(@Request() req, @Response() res) {
     const userId = req.user.id;
     const ip = req.ip;
@@ -84,7 +90,7 @@ export class AuthController {
     const token = req.cookies.refreshToken;
 
     const decodedToken: any = await this.jwtService.decode(token);
-    const deviceId = decodedToken?.deviceId;
+    const deviceId = decodedToken.deviceId;
     const tokens = await this.authService.getTokens(userId, deviceId);
     const newToken = await this.jwtService.decode(tokens.refreshToken);
 

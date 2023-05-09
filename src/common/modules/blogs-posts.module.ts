@@ -10,12 +10,8 @@ import { PostsService } from '../../posts/posts.service';
 import { PostsRepository } from '../../posts/posts.repository';
 import { PostsQueryRepository } from '../../posts/posts.query.repository';
 import { Post, PostSchema } from '../../posts/schemas/post.entity';
-import { CommentsController } from '../../comments/comments.controller';
-import { CommentsQueryRepository } from '../../comments/comments.query.repository';
-import { CommentsRepository } from '../../comments/comments.repository';
 import { Comment, CommentSchema } from '../../comments/schemas/comment.entity';
-import { CommentsService } from '../../comments/comments.service';
-import { UsersModule } from '../../users/users.module';
+import { CommentsModule } from '../../comments/comments.module';
 
 @Module({
   imports: [
@@ -24,9 +20,9 @@ import { UsersModule } from '../../users/users.module';
       { name: Post.name, schema: PostSchema },
       { name: Comment.name, schema: CommentSchema },
     ]),
-    UsersModule,
+    CommentsModule,
   ],
-  controllers: [BlogsController, PostsController, CommentsController],
+  controllers: [BlogsController, PostsController],
   providers: [
     BlogsService,
     BlogsRepository,
@@ -34,10 +30,7 @@ import { UsersModule } from '../../users/users.module';
     PostsService,
     PostsRepository,
     PostsQueryRepository,
-    CommentsService,
-    CommentsRepository,
-    CommentsQueryRepository,
   ],
-  exports: [BlogsService, PostsService, CommentsService],
+  exports: [BlogsService, PostsService],
 })
-export class BloggersModule {}
+export class BlogsAndPostsModule {}
