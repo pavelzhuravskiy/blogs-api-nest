@@ -42,18 +42,30 @@ export class UsersRepository {
   async findUserByLoginOrEmail(
     loginOrEmail: string,
   ): Promise<UserDocument | null> {
-    const foundUser = await this.UserModel.findOne({
+    const user = await this.UserModel.findOne({
       $or: [
         { 'accountData.login': loginOrEmail },
         { 'accountData.email': loginOrEmail },
       ],
     });
 
-    if (!foundUser) {
+    if (!user) {
       return null;
     }
 
-    return foundUser;
+    return user;
+  }
+
+  async findUserByCode(code: string): Promise<UserDocument | null> {
+    const user = this.UserModel.findOne({
+      'emailConfirmation.confirmationCode': code,
+    });
+
+    if (!user) {
+      return null;
+    }
+
+    return user;
   }
 
   async deleteUser(id: string): Promise<boolean> {

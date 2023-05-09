@@ -18,6 +18,10 @@ import { JwtService } from '@nestjs/jwt';
 import { JwtBearerGuard } from './guards/jwt-bearer.guard';
 import { UserCreateDto } from '../users/dto/user-create.dto';
 import { UsersService } from '../users/users.service';
+import { EmailConfirmDto } from './dto/email-confirm.dto';
+import { exceptionHandler } from '../exceptions/exception.handler';
+import { ExceptionCode } from '../exceptions/exception-codes.enum';
+import { codeField, codeIsIncorrect } from '../exceptions/exception.constants';
 
 @Controller('auth')
 export class AuthController {
@@ -31,7 +35,23 @@ export class AuthController {
 
   @Post('registration')
   async registerUser(@Body() createUserDto: UserCreateDto) {
-    return this.usersService.registerUser(createUserDto);
+    return this.authService.registerUser(createUserDto);
+  }
+
+  @HttpCode(204)
+  @Post('registration-confirmation')
+  async confirmUser(@Body() emailConfirmDto: EmailConfirmDto) {
+    const result = await this.authService.confirmUser(emailConfirmDto);
+
+    if (!result) {
+      return exceptionHandler(
+        ExceptionCode.BadRequest,
+        codeIsIncorrect,
+        codeField,
+      );
+    }
+
+    return result;
   }
 
   @UseGuards(LocalAuthGuard)

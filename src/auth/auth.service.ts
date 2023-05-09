@@ -6,12 +6,25 @@ import { jwtConstants } from './constants';
 import { DevicesService } from '../devices/devices.service';
 import { DevicesRepository } from '../devices/devices.repository';
 import { DeviceDocument } from '../devices/schemas/device.entity';
-import { UserDocument } from '../users/schemas/user.entity';
+import {
+  User,
+  UserDocument,
+  UserModelType,
+} from '../users/schemas/user.entity';
 import { randomUUID } from 'crypto';
+import { UserCreateDto } from '../users/dto/user-create.dto';
+import { UserViewModel } from '../users/schemas/user.view';
+import { add } from 'date-fns';
+import { InjectModel } from '@nestjs/mongoose';
+import { MailService } from '../mail/mail.service';
+import { EmailConfirmDto } from './dto/email-confirm.dto';
 
 @Injectable()
 export class AuthService {
   constructor(
+    @InjectModel(User.name)
+    private UserModel: UserModelType,
+    private mailService: MailService,
     private jwtService: JwtService,
     private devicesService: DevicesService,
     private usersRepository: UsersRepository,
@@ -70,5 +83,55 @@ export class AuthService {
       accessToken: accessToken,
       refreshToken: refreshToken,
     };
+  }
+
+  async registerUser(
+    createUserDto: UserCreateDto,
+  ): Promise<UserViewModel | null> {
+    const hash = await bcrypt.hash(
+      createUserDto.password,
+      Number(process.env.HASH_ROUNDS),
+    );
+    const emailData = {
+      confirmationCode: randomUUID(),
+      expirationDate: add(new Date(), { hours: 1 }),
+      isConfirmed: false,
+    };
+    const user = this.UserModel.createUser(
+      createUserDto,
+      this.UserModel,
+      hash,
+      emailData,
+    );
+
+    const result = await this.usersRepository.createUser(user);
+
+    try {
+      await this.mailService.sendRegistrationMail(
+        createUserDto,
+        emailData.confirmationCode,
+      );
+    } catch (error) {
+      console.error(error);
+      await this.usersRepository.deleteUser(user.id);
+      return null;
+    }
+
+    return result;
+  }
+
+  async confirmUser(
+    emailConfirmDto: EmailConfirmDto,
+  ): Promise<UserDocument | null> {
+    const user = await this.usersRepository.findUserByCode(
+      emailConfirmDto.code,
+    );
+
+    if (!user || !user.canBeConfirmed()) {
+      return null;
+    }
+
+    await user.confirm();
+    return this.usersRepository.save(user);
   }
 }

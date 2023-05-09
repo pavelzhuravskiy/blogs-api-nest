@@ -11,7 +11,12 @@ export const postIDField = 'postId';
 export const commentIDField = 'commentId';
 export const userIDField = 'userId';
 export const deviceIDField = 'deviceId';
+export const codeField = 'code';
 
 // Unique user check
 export const loginNotUnique = 'Login already exists';
 export const emailNotUnique = 'Email already exists';
+
+// Email confirmation
+export const codeIsIncorrect =
+  'Confirmation code is incorrect, expired or user already confirmed';

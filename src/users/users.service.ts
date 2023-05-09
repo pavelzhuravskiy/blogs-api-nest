@@ -5,9 +5,6 @@ import { UsersRepository } from './users.repository';
 import { UserCreateDto } from './dto/user-create.dto';
 import { UserViewModel } from './schemas/user.view';
 import bcrypt from 'bcrypt';
-import { randomUUID } from 'crypto';
-import { MailService } from '../mail/mail.service';
-import { add } from 'date-fns';
 
 @Injectable()
 export class UsersService {
@@ -15,43 +12,7 @@ export class UsersService {
     @InjectModel(User.name)
     private UserModel: UserModelType,
     private usersRepository: UsersRepository,
-    private mailService: MailService,
   ) {}
-
-  async registerUser(
-    createUserDto: UserCreateDto,
-  ): Promise<UserViewModel | null> {
-    const hash = await bcrypt.hash(
-      createUserDto.password,
-      Number(process.env.HASH_ROUNDS),
-    );
-    const emailData = {
-      confirmationCode: randomUUID(),
-      expirationDate: add(new Date(), { hours: 1 }),
-      isConfirmed: false,
-    };
-    const user = this.UserModel.createUser(
-      createUserDto,
-      this.UserModel,
-      hash,
-      emailData,
-    );
-
-    const result = await this.usersRepository.createUser(user);
-
-    try {
-      await this.mailService.sendRegistrationMail(
-        createUserDto,
-        emailData.confirmationCode,
-      );
-    } catch (error) {
-      console.error(error);
-      await this.usersRepository.deleteUser(user.id);
-      return null;
-    }
-
-    return result;
-  }
 
   async createUser(
     createUserDto: UserCreateDto,

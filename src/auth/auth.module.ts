@@ -11,9 +11,17 @@ import { BasicStrategy } from './strategies/basic.strategy';
 import { DevicesModule } from '../devices/devices.module';
 import { MailService } from '../mail/mail.service';
 import { MailModule } from '../mail/mail.module';
+import { MongooseModule } from '@nestjs/mongoose';
+import { User, UserSchema } from '../users/schemas/user.entity';
 
 @Module({
-  imports: [UsersModule, PassportModule, DevicesModule, MailModule],
+  imports: [
+    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+    UsersModule,
+    PassportModule,
+    DevicesModule,
+    MailModule,
+  ],
   providers: [
     AuthService,
     JwtService,
