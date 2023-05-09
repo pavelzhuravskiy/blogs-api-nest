@@ -12,6 +12,7 @@ export type UserModelStaticType = {
     createUserDto: UserCreateDto,
     UserModel: UserModelType,
     hash: string,
+    emailData?: UserEmailSchema,
   ) => UserDocument;
 };
 
@@ -32,6 +33,7 @@ export class User {
     createUserDto: UserCreateDto,
     UserModel: UserModelType,
     hash: string,
+    emailData?: UserEmailSchema,
   ): UserDocument {
     const user = {
       accountData: {
@@ -42,9 +44,9 @@ export class User {
         isMembership: false,
       },
       emailConfirmation: {
-        confirmationCode: null,
-        expirationDate: null,
-        isConfirmed: true,
+        confirmationCode: emailData?.confirmationCode ?? null,
+        expirationDate: emailData?.expirationDate ?? null,
+        isConfirmed: emailData?.isConfirmed ?? true,
       },
       passwordRecovery: {
         recoveryCode: null,
