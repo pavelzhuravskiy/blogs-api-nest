@@ -27,6 +27,7 @@ import {
 } from '../exceptions/exception.constants';
 import { JwtBearerGuard } from '../auth/guards/jwt-bearer.guard';
 import { BasicAuthGuard } from '../auth/guards/basic-auth.guard';
+import { CurrentUserId } from '../auth/decorators/current-user-id.param.decorator';
 
 @Controller('posts')
 export class PostsController {
@@ -108,10 +109,15 @@ export class PostsController {
   @UseGuards(JwtBearerGuard)
   @Post(':id/comments')
   async createComment(
-    @Param('id') id: string,
+    @CurrentUserId() currentUserId: string,
+    @Param('id') postId: string,
     @Body() createCommentDto: CommentCreateDto,
   ) {
-    return this.postsService.createComment(id, createCommentDto);
+    return this.postsService.createComment(
+      currentUserId,
+      postId,
+      createCommentDto,
+    );
   }
 
   @Get(':id/comments')

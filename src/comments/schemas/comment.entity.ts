@@ -4,6 +4,7 @@ import { CommentatorInfoSchema } from './commentator-info.schema';
 import { LikesInfoSchema } from '../../common/schemas/likes-info.schema';
 import { CommentCreateDto } from '../dto/comment-create.dto';
 import { PostDocument } from '../../posts/schemas/post.entity';
+import { UserDocument } from '../../users/schemas/user.entity';
 
 export type CommentDocument = HydratedDocument<Comment>;
 
@@ -12,6 +13,7 @@ export type CommentModelStaticType = {
     createCommentDto: CommentCreateDto,
     CommentModel: CommentModelType,
     post: PostDocument,
+    user: UserDocument,
   ) => CommentDocument;
 };
 
@@ -34,16 +36,21 @@ export class Comment {
   @Prop({ required: true })
   extendedLikesInfo: LikesInfoSchema;
 
+  updateComment(updateCommentDto) {
+    this.content = updateCommentDto.content;
+  }
+
   static createComment(
     createCommentDto: CommentCreateDto,
     CommentModel: CommentModelType,
     post: PostDocument,
+    user: UserDocument,
   ): CommentDocument {
     const comment = {
       content: createCommentDto.content,
       commentatorInfo: {
-        userId: 'testUserId',
-        userLogin: 'testUserLogin',
+        userId: user.id,
+        userLogin: user.accountData.login,
       },
       postId: post._id.toString(),
       createdAt: new Date(),
@@ -58,6 +65,10 @@ export class Comment {
 }
 
 export const CommentSchema = SchemaFactory.createForClass(Comment);
+
+CommentSchema.methods = {
+  updateComment: Comment.prototype.updateComment,
+};
 
 const commentStaticMethods: CommentModelStaticType = {
   createComment: Comment.createComment,

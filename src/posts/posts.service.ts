@@ -18,6 +18,7 @@ import {
   postNotFound,
 } from '../exceptions/exception.constants';
 import { ExceptionResultType } from '../exceptions/types/exception-result.type';
+import { UsersRepository } from '../users/users.repository';
 
 @Injectable()
 export class PostsService {
@@ -29,6 +30,7 @@ export class PostsService {
     private readonly postsRepository: PostsRepository,
     private readonly commentsRepository: CommentsRepository,
     private readonly blogsRepository: BlogsRepository,
+    private readonly usersRepository: UsersRepository,
   ) {}
 
   async createPost(
@@ -51,7 +53,7 @@ export class PostsService {
   async updatePost(
     id: string,
     updatePostDto: PostUpdateDto,
-  ): Promise<ExceptionResultType<boolean | null>> {
+  ): Promise<ExceptionResultType<boolean>> {
     const post = await this.postsRepository.findPost(id);
 
     if (!post) {
@@ -94,19 +96,23 @@ export class PostsService {
   }
 
   async createComment(
-    id: string,
+    currentUserId: string,
+    postId: string,
     createCommentDto: CommentCreateDto,
   ): Promise<CommentViewModel | null> {
-    const post = await this.postsRepository.findPost(id);
+    const post = await this.postsRepository.findPost(postId);
 
     if (!post) {
       return null;
     }
 
+    const user = await this.usersRepository.findUserById(currentUserId);
+
     const comment = this.CommentModel.createComment(
       createCommentDto,
       this.CommentModel,
       post,
+      user,
     );
     return this.commentsRepository.createComment(comment);
   }

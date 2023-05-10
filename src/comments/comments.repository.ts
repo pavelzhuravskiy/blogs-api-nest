@@ -6,6 +6,7 @@ import {
   CommentModelType,
 } from './schemas/comment.entity';
 import { CommentViewModel } from './schemas/comment.view';
+import mongoose from 'mongoose';
 
 @Injectable()
 export class CommentsRepository {
@@ -33,5 +34,24 @@ export class CommentsRepository {
         myStatus: 'None',
       },
     };
+  }
+
+  async findComment(id: string): Promise<CommentDocument | null> {
+    if (!mongoose.isValidObjectId(id)) {
+      return null;
+    }
+
+    const comment = await this.CommentModel.findOne({ _id: id });
+
+    if (!comment) {
+      return null;
+    }
+
+    return comment;
+  }
+
+  async deleteComment(id: string): Promise<boolean> {
+    const comment = await this.CommentModel.deleteOne({ _id: id });
+    return comment.deletedCount === 1;
   }
 }

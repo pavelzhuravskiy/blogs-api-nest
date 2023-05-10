@@ -12,6 +12,8 @@ import { PostsQueryRepository } from '../../posts/posts.query.repository';
 import { Post, PostSchema } from '../../posts/schemas/post.entity';
 import { Comment, CommentSchema } from '../../comments/schemas/comment.entity';
 import { CommentsModule } from '../../comments/comments.module';
+import { UsersRepository } from '../../users/users.repository';
+import { User, UserSchema } from '../../users/schemas/user.entity';
 
 @Module({
   imports: [
@@ -19,6 +21,7 @@ import { CommentsModule } from '../../comments/comments.module';
       { name: Blog.name, schema: BlogSchema },
       { name: Post.name, schema: PostSchema },
       { name: Comment.name, schema: CommentSchema },
+      { name: User.name, schema: UserSchema },
     ]),
     CommentsModule,
   ],
@@ -30,6 +33,7 @@ import { CommentsModule } from '../../comments/comments.module';
     PostsService,
     PostsRepository,
     PostsQueryRepository,
+    UsersRepository,
   ],
   exports: [BlogsService, PostsService],
 })
