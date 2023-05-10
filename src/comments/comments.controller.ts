@@ -17,8 +17,8 @@ import {
 } from '../exceptions/exception.constants';
 import { JwtBearerGuard } from '../auth/guards/jwt-bearer.guard';
 import { CurrentUserId } from '../auth/decorators/current-user-id.param.decorator';
-import { CommentUpdateDto } from './dto/comment-update.dto';
 import { CommentsService } from './comments.service';
+import { CommentInputDto } from './dto/comment-input.dto';
 
 @Controller('comments')
 export class CommentsController {
@@ -48,12 +48,12 @@ export class CommentsController {
   async updateComment(
     @CurrentUserId() currentUserId: string,
     @Param('id') commentId: string,
-    @Body() updateCommentDto: CommentUpdateDto,
+    @Body() commentInputDto: CommentInputDto,
   ) {
     const result = await this.commentsService.updateComment(
       currentUserId,
       commentId,
-      updateCommentDto,
+      commentInputDto,
     );
 
     if (result.code !== ResultCode.Success) {
@@ -69,7 +69,7 @@ export class CommentsController {
   async updateLikeStatus(
     @CurrentUserId() currentUserId: string,
     @Param('id') commentId: string,
-    @Body() updateCommentDto: CommentUpdateDto,
+    @Body() commentInputDto: CommentInputDto,
   ) {
     /*const result = await this.commentsService.updateComment(
       currentUserId,

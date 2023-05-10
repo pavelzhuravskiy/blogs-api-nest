@@ -2,9 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Post, PostDocument, PostModelType } from './schemas/post.entity';
 import { PostsRepository } from './posts.repository';
-import { PostCreateDto } from './dto/post-create.dto';
-import { PostUpdateDto } from './dto/post-update.dto';
-import { CommentCreateDto } from '../comments/dto/comment-create.dto';
+import { PostInputDto } from './dto/post-input.dto';
+import { CommentInputDto } from '../comments/dto/comment-input.dto';
 import {
   Comment,
   CommentDocument,
@@ -36,10 +35,10 @@ export class PostsService {
   ) {}
 
   async createPost(
-    createPostDto: PostCreateDto,
+    postInputDto: PostInputDto,
     blogIdParam?: string,
   ): Promise<PostDocument | null> {
-    const blogId = createPostDto.blogId || blogIdParam;
+    const blogId = postInputDto.blogId || blogIdParam;
 
     const blog = await this.blogsRepository.findBlog(blogId);
 
@@ -47,14 +46,14 @@ export class PostsService {
       return null;
     }
 
-    const post = this.PostModel.createPost(createPostDto, this.PostModel, blog);
+    const post = this.PostModel.createPost(postInputDto, this.PostModel, blog);
 
     return this.postsRepository.save(post);
   }
 
   async updatePost(
     id: string,
-    updatePostDto: PostUpdateDto,
+    postInputDto: PostInputDto,
   ): Promise<ExceptionResultType<boolean>> {
     const post = await this.postsRepository.findPost(id);
 
@@ -67,7 +66,7 @@ export class PostsService {
       };
     }
 
-    const blog = await this.blogsRepository.findBlog(updatePostDto.blogId);
+    const blog = await this.blogsRepository.findBlog(postInputDto.blogId);
 
     if (!blog) {
       return {
@@ -78,7 +77,7 @@ export class PostsService {
       };
     }
 
-    await post.updatePost(updatePostDto);
+    await post.updatePost(postInputDto);
     await this.postsRepository.save(post);
 
     return {
@@ -100,7 +99,7 @@ export class PostsService {
   async createComment(
     currentUserId: string,
     postId: string,
-    createCommentDto: CommentCreateDto,
+    commentInputDto: CommentInputDto,
   ): Promise<CommentDocument | null> {
     const post = await this.postsRepository.findPost(postId);
 
@@ -111,7 +110,7 @@ export class PostsService {
     const user = await this.usersRepository.findUserById(currentUserId);
 
     const comment = this.CommentModel.createComment(
-      createCommentDto,
+      commentInputDto,
       this.CommentModel,
       post,
       user,

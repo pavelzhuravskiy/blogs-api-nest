@@ -2,13 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Comment, CommentModelType } from './schemas/comment.entity';
 import { CommentsRepository } from './comments.repository';
-import { CommentUpdateDto } from './dto/comment-update.dto';
 import { ExceptionResultType } from '../exceptions/types/exception-result.type';
 import { ResultCode } from '../exceptions/exception-codes.enum';
 import {
   commentIDField,
   commentNotFound,
 } from '../exceptions/exception.constants';
+import { CommentInputDto } from './dto/comment-input.dto';
 
 @Injectable()
 export class CommentsService {
@@ -21,7 +21,7 @@ export class CommentsService {
   async updateComment(
     currentUserId: string,
     commentId: string,
-    updateCommentDto: CommentUpdateDto,
+    commentInputDto: CommentInputDto,
   ): Promise<ExceptionResultType<boolean>> {
     const comment = await this.commentsRepository.findComment(commentId);
 
@@ -41,7 +41,7 @@ export class CommentsService {
       };
     }
 
-    await comment.updateComment(updateCommentDto);
+    await comment.updateComment(commentInputDto);
     await comment.save();
 
     return {

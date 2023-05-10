@@ -1,6 +1,6 @@
 import { IsString, IsUrl, Length } from 'class-validator';
 
-export class BlogUpdateDto {
+export class BlogInputDto {
   @IsString()
   @Length(1, 15)
   name: string;

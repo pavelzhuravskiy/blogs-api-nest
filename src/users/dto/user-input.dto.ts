@@ -5,7 +5,7 @@ import {
   loginNotUnique,
 } from '../../exceptions/exception.constants';
 
-export class UserCreateDto {
+export class UserInputDto {
   @IsString()
   @Length(3, 10)
   @Matches(/^[a-zA-Z0-9_-]*$/)

@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Model } from 'mongoose';
 import { CommentatorInfoSchema } from './commentator-info.schema';
 import { LikesInfoSchema } from '../../likes/schemas/likes-info.schema';
-import { CommentCreateDto } from '../dto/comment-create.dto';
+import { CommentInputDto } from '../dto/comment-input.dto';
 import { PostDocument } from '../../posts/schemas/post.entity';
 import { UserDocument } from '../../users/schemas/user.entity';
 
@@ -10,7 +10,7 @@ export type CommentDocument = HydratedDocument<Comment>;
 
 export type CommentModelStaticType = {
   createComment: (
-    createCommentDto: CommentCreateDto,
+    commentInputDto: CommentInputDto,
     CommentModel: CommentModelType,
     post: PostDocument,
     user: UserDocument,
@@ -41,13 +41,13 @@ export class Comment {
   }
 
   static createComment(
-    createCommentDto: CommentCreateDto,
+    commentInputDto: CommentInputDto,
     CommentModel: CommentModelType,
     post: PostDocument,
     user: UserDocument,
   ): CommentDocument {
     const comment = {
-      content: createCommentDto.content,
+      content: commentInputDto.content,
       commentatorInfo: {
         userId: user.id,
         userLogin: user.accountData.login,

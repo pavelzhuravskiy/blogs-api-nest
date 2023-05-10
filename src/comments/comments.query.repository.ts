@@ -8,7 +8,7 @@ import {
   CommentModelType,
 } from './schemas/comment.entity';
 import { CommentViewModel } from './schemas/comment.view';
-import { CommonQuery } from '../common/dto/common.query';
+import { CommonQueryDto } from '../common/dto/common-query.dto';
 import { PostsQueryRepository } from '../posts/posts.query.repository';
 import { LikeStatus } from '../likes/like-status.enum';
 
@@ -20,7 +20,7 @@ export class CommentsQueryRepository {
     private postsQueryRepository: PostsQueryRepository,
   ) {}
   async findComments(
-    query: CommonQuery,
+    query: CommonQueryDto,
     postId: string,
   ): Promise<Paginator<CommentViewModel[]>> {
     const filter: FilterQuery<CommentDocument> = {};

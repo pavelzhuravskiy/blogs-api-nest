@@ -10,15 +10,14 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { PostCreateDto } from './dto/post-create.dto';
+import { PostInputDto } from './dto/post-input.dto';
 import { PostsService } from './posts.service';
 import { PostsQueryRepository } from './posts.query.repository';
-import { PostUpdateDto } from './dto/post-update.dto';
-import { CommentCreateDto } from '../comments/dto/comment-create.dto';
+import { CommentInputDto } from '../comments/dto/comment-input.dto';
 import { CommentsQueryRepository } from '../comments/comments.query.repository';
 import { exceptionHandler } from '../exceptions/exception.handler';
 import { ResultCode } from '../exceptions/exception-codes.enum';
-import { CommonQuery } from '../common/dto/common.query';
+import { CommonQueryDto } from '../common/dto/common-query.dto';
 import {
   blogIDField,
   blogNotFound,
@@ -39,8 +38,8 @@ export class PostsController {
 
   @UseGuards(BasicAuthGuard)
   @Post()
-  async createPost(@Body() createPostDto: PostCreateDto) {
-    const result = await this.postsService.createPost(createPostDto);
+  async createPost(@Body() postInputDto: PostInputDto) {
+    const result = await this.postsService.createPost(postInputDto);
 
     if (!result) {
       return exceptionHandler(ResultCode.BadRequest, blogNotFound, blogIDField);
@@ -50,7 +49,7 @@ export class PostsController {
   }
 
   @Get()
-  async findPosts(@Query() query: CommonQuery) {
+  async findPosts(@Query() query: CommonQueryDto) {
     return this.postsQueryRepository.findPosts(query);
   }
 
@@ -70,9 +69,9 @@ export class PostsController {
   @HttpCode(204)
   async updatePost(
     @Param('id') id: string,
-    @Body() updatePostDto: PostUpdateDto,
+    @Body() postInputDto: PostInputDto,
   ) {
-    const result = await this.postsService.updatePost(id, updatePostDto);
+    const result = await this.postsService.updatePost(id, postInputDto);
 
     if (result.code !== ResultCode.Success) {
       return exceptionHandler(result.code, result.message, result.field);
@@ -99,17 +98,20 @@ export class PostsController {
   async createComment(
     @CurrentUserId() currentUserId: string,
     @Param('id') postId: string,
-    @Body() createCommentDto: CommentCreateDto,
+    @Body() commentInputDto: CommentInputDto,
   ) {
     return this.postsService.createComment(
       currentUserId,
       postId,
-      createCommentDto,
+      commentInputDto,
     );
   }
 
   @Get(':id/comments')
-  async findComments(@Query() query: CommonQuery, @Param('id') postId: string) {
+  async findComments(
+    @Query() query: CommonQueryDto,
+    @Param('id') postId: string,
+  ) {
     const result = await this.commentsQueryRepository.findComments(
       query,
       postId,

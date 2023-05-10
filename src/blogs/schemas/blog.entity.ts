@@ -1,12 +1,12 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Model } from 'mongoose';
-import { BlogCreateDto } from '../dto/blog-create.dto';
+import { BlogInputDto } from '../dto/blog-input.dto';
 
 export type BlogDocument = HydratedDocument<Blog>;
 
 export type BlogModelStaticType = {
   createBlog: (
-    createBlogDto: BlogCreateDto,
+    blogInputDto: BlogInputDto,
     BlogModel: BlogModelType,
   ) => BlogDocument;
 };
@@ -37,13 +37,13 @@ export class Blog {
   }
 
   static createBlog(
-    createBlogDto: BlogCreateDto,
+    blogInputDto: BlogInputDto,
     BlogModel: BlogModelType,
   ): BlogDocument {
     const blog = {
-      name: createBlogDto.name,
-      description: createBlogDto.description,
-      websiteUrl: createBlogDto.websiteUrl,
+      name: blogInputDto.name,
+      description: blogInputDto.description,
+      websiteUrl: blogInputDto.websiteUrl,
       createdAt: new Date(),
       isMembership: false,
     };

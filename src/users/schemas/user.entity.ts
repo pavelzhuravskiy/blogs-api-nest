@@ -3,14 +3,14 @@ import { HydratedDocument, Model } from 'mongoose';
 import { UserAccountSchema } from './user-account.schema';
 import { UserEmailSchema } from './user-email.schema';
 import { UserPasswordSchema } from './user-password.schema';
-import { UserCreateDto } from '../dto/user-create.dto';
+import { UserInputDto } from '../dto/user-input.dto';
 import { add } from 'date-fns';
 
 export type UserDocument = HydratedDocument<User>;
 
 export type UserModelStaticType = {
   createUser: (
-    createUserDto: UserCreateDto,
+    userInputDto: UserInputDto,
     UserModel: UserModelType,
     hash: string,
     emailData?: UserEmailSchema,
@@ -72,16 +72,16 @@ export class User {
   }
 
   static createUser(
-    createUserDto: UserCreateDto,
+    userInputDto: UserInputDto,
     UserModel: UserModelType,
     hash: string,
     emailData?: UserEmailSchema,
   ): UserDocument {
     const user = {
       accountData: {
-        login: createUserDto.login,
+        login: userInputDto.login,
         passwordHash: hash,
-        email: createUserDto.email,
+        email: userInputDto.email,
         createdAt: new Date(),
         isMembership: false,
       },

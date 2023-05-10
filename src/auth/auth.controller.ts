@@ -16,7 +16,7 @@ import { CurrentUserId } from './decorators/current-user-id.param.decorator';
 import { DevicesService } from '../devices/devices.service';
 import { JwtService } from '@nestjs/jwt';
 import { JwtBearerGuard } from './guards/jwt-bearer.guard';
-import { UserCreateDto } from '../users/dto/user-create.dto';
+import { UserInputDto } from '../users/dto/user-input.dto';
 import { UsersService } from '../users/users.service';
 import { UserConfirmDto } from './dto/user-confirm.dto';
 import { exceptionHandler } from '../exceptions/exception.handler';
@@ -44,8 +44,8 @@ export class AuthController {
   @UseGuards(ThrottlerGuard)
   @Throttle(5, 10)
   @Post('registration')
-  async registerUser(@Body() createUserDto: UserCreateDto) {
-    return this.authService.registerUser(createUserDto);
+  async registerUser(@Body() userInputDto: UserInputDto) {
+    return this.authService.registerUser(userInputDto);
   }
 
   @UseGuards(ThrottlerGuard)

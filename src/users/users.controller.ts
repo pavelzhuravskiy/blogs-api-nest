@@ -9,9 +9,9 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { UserCreateDto } from './dto/user-create.dto';
+import { UserInputDto } from './dto/user-input.dto';
 import { UsersService } from './users.service';
-import { UserQuery } from './dto/user.query';
+import { UserQueryDto } from './dto/user-query.dto';
 import { UsersQueryRepository } from './users.query.repository';
 import { exceptionHandler } from '../exceptions/exception.handler';
 import { ResultCode } from '../exceptions/exception-codes.enum';
@@ -27,13 +27,13 @@ export class UsersController {
 
   @UseGuards(BasicAuthGuard)
   @Post()
-  async createUser(@Body() createUserDto: UserCreateDto) {
-    return this.usersService.createUser(createUserDto);
+  async createUser(@Body() userInputDto: UserInputDto) {
+    return this.usersService.createUser(userInputDto);
   }
 
   @UseGuards(BasicAuthGuard)
   @Get()
-  async findUsers(@Query() query: UserQuery) {
+  async findUsers(@Query() query: UserQueryDto) {
     return this.usersQueryRepository.findUsers(query);
   }
 

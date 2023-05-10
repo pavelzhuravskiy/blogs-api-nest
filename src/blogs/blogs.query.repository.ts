@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Blog, BlogDocument, BlogModelType } from './schemas/blog.entity';
-import { BlogQuery } from './dto/blog.query';
+import { BlogQueryDto } from './dto/blog-query.dto';
 import mongoose, { FilterQuery, SortOrder } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Paginator } from '../common/schemas/paginator';
@@ -12,7 +12,7 @@ export class BlogsQueryRepository {
     @InjectModel(Blog.name)
     private BlogModel: BlogModelType,
   ) {}
-  async findBlogs(query: BlogQuery): Promise<Paginator<BlogViewModel[]>> {
+  async findBlogs(query: BlogQueryDto): Promise<Paginator<BlogViewModel[]>> {
     const filter: FilterQuery<BlogDocument> = {};
 
     if (query.searchNameTerm) {

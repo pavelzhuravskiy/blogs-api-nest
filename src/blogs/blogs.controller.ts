@@ -11,16 +11,15 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { BlogsService } from './blogs.service';
-import { BlogCreateDto } from './dto/blog-create.dto';
-import { BlogQuery } from './dto/blog.query';
+import { BlogInputDto } from './dto/blog-input.dto';
+import { BlogQueryDto } from './dto/blog-query.dto';
 import { BlogsQueryRepository } from './blogs.query.repository';
-import { BlogUpdateDto } from './dto/blog-update.dto';
 import { PostsService } from '../posts/posts.service';
-import { PostCreateDto } from '../posts/dto/post-create.dto';
+import { PostInputDto } from '../posts/dto/post-input.dto';
 import { PostsQueryRepository } from '../posts/posts.query.repository';
 import { ResultCode } from '../exceptions/exception-codes.enum';
 import { exceptionHandler } from '../exceptions/exception.handler';
-import { CommonQuery } from '../common/dto/common.query';
+import { CommonQueryDto } from '../common/dto/common-query.dto';
 import { blogIDField, blogNotFound } from '../exceptions/exception.constants';
 import { BasicAuthGuard } from '../auth/guards/basic-auth.guard';
 
@@ -35,12 +34,12 @@ export class BlogsController {
 
   @UseGuards(BasicAuthGuard)
   @Post()
-  async createBlog(@Body() createBlogDto: BlogCreateDto) {
-    return this.blogsService.createBlog(createBlogDto);
+  async createBlog(@Body() blogInputDto: BlogInputDto) {
+    return this.blogsService.createBlog(blogInputDto);
   }
 
   @Get()
-  async findBlogs(@Query() query: BlogQuery) {
+  async findBlogs(@Query() query: BlogQueryDto) {
     console.log(query);
     return this.blogsQueryRepository.findBlogs(query);
   }
@@ -61,9 +60,9 @@ export class BlogsController {
   @HttpCode(204)
   async updateBlog(
     @Param('id') id: string,
-    @Body() updateBlogDto: BlogUpdateDto,
+    @Body() blogInputDto: BlogInputDto,
   ) {
-    const result = await this.blogsService.updateBlog(id, updateBlogDto);
+    const result = await this.blogsService.updateBlog(id, blogInputDto);
 
     if (!result) {
       return exceptionHandler(ResultCode.NotFound, blogNotFound, blogIDField);
@@ -89,9 +88,9 @@ export class BlogsController {
   @Post(':id/posts')
   async createPost(
     @Param('id') id: string,
-    @Body() createPostDto: PostCreateDto,
+    @Body() postInputDto: PostInputDto,
   ) {
-    const result = await this.postsService.createPost(createPostDto, id);
+    const result = await this.postsService.createPost(postInputDto, id);
 
     if (!result) {
       return exceptionHandler(ResultCode.NotFound, blogNotFound, blogIDField);
@@ -101,7 +100,7 @@ export class BlogsController {
   }
 
   @Get(':id/posts')
-  async findPosts(@Query() query: CommonQuery, @Param('id') id: string) {
+  async findPosts(@Query() query: CommonQueryDto, @Param('id') id: string) {
     const result = await this.postsQueryRepository.findPosts(query, id);
     console.log(result);
 

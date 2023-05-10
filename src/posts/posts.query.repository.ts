@@ -5,7 +5,7 @@ import { Paginator } from '../common/schemas/paginator';
 import { Post, PostDocument, PostModelType } from './schemas/post.entity';
 import { PostViewModel } from './schemas/post.view';
 import { BlogsQueryRepository } from '../blogs/blogs.query.repository';
-import { CommonQuery } from '../common/dto/common.query';
+import { CommonQueryDto } from '../common/dto/common-query.dto';
 import { LikeStatus } from '../likes/like-status.enum';
 
 @Injectable()
@@ -16,7 +16,7 @@ export class PostsQueryRepository {
     private readonly blogsQueryRepository: BlogsQueryRepository,
   ) {}
   async findPosts(
-    query: CommonQuery,
+    query: CommonQueryDto,
     blogId?: string,
   ): Promise<Paginator<PostViewModel[]> | null> {
     const filter: FilterQuery<PostDocument> = {};

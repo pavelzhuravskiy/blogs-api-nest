@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Model } from 'mongoose';
-import { PostCreateDto } from '../dto/post-create.dto';
+import { PostInputDto } from '../dto/post-input.dto';
 import { LikesInfoSchema } from '../../likes/schemas/likes-info.schema';
 import { BlogDocument } from '../../blogs/schemas/blog.entity';
 
@@ -8,7 +8,7 @@ export type PostDocument = HydratedDocument<Post>;
 
 export type PostModelStaticType = {
   createPost: (
-    createPostDto: PostCreateDto,
+    postInputDto: PostInputDto,
     PostModel: PostModelType,
     blog: BlogDocument,
   ) => PostDocument;
@@ -47,14 +47,14 @@ export class Post {
   }
 
   static createPost(
-    createPostDto: PostCreateDto,
+    postInputDto: PostInputDto,
     PostModel: PostModelType,
     blog: BlogDocument,
   ): PostDocument {
     const post = {
-      title: createPostDto.title,
-      shortDescription: createPostDto.shortDescription,
-      content: createPostDto.content,
+      title: postInputDto.title,
+      shortDescription: postInputDto.shortDescription,
+      content: postInputDto.content,
       blogId: blog._id.toString(),
       blogName: blog.name,
       createdAt: new Date(),

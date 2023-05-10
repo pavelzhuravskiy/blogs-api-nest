@@ -3,7 +3,7 @@ import { FilterQuery, SortOrder } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Paginator } from '../common/schemas/paginator';
 import { User, UserDocument, UserModelType } from './schemas/user.entity';
-import { UserQuery } from './dto/user.query';
+import { UserQueryDto } from './dto/user-query.dto';
 import { UserViewModel } from './schemas/user.view';
 
 @Injectable()
@@ -12,7 +12,7 @@ export class UsersQueryRepository {
     @InjectModel(User.name)
     private UserModel: UserModelType,
   ) {}
-  async findUsers(query: UserQuery): Promise<Paginator<UserViewModel[]>> {
+  async findUsers(query: UserQueryDto): Promise<Paginator<UserViewModel[]>> {
     const filter: FilterQuery<UserDocument> = {};
 
     if (query.searchLoginTerm || query.searchEmailTerm) {
