@@ -93,11 +93,13 @@ export class AuthService {
       createUserDto.password,
       Number(process.env.HASH_ROUNDS),
     );
+
     const emailData = {
       confirmationCode: randomUUID(),
       expirationDate: add(new Date(), { hours: 1 }),
       isConfirmed: false,
     };
+
     const user = this.UserModel.createUser(
       createUserDto,
       this.UserModel,
@@ -109,12 +111,43 @@ export class AuthService {
 
     try {
       await this.mailService.sendRegistrationMail(
-        createUserDto,
+        createUserDto.login,
+        createUserDto.email,
         emailData.confirmationCode,
       );
     } catch (error) {
       console.error(error);
       await this.usersRepository.deleteUser(user.id);
+      return null;
+    }
+
+    return result;
+  }
+
+  async resendEmail(
+    emailResendDto: EmailResendDto,
+  ): Promise<UserDocument | null> {
+    const user = await this.usersRepository.findUserByLoginOrEmail(
+      emailResendDto.email,
+    );
+
+    if (!user || user.emailConfirmation.isConfirmed) {
+      return null;
+    }
+
+    const newConfirmationCode = randomUUID();
+
+    await user.updateConfirmationData(newConfirmationCode);
+    const result = await this.usersRepository.save(user);
+
+    try {
+      await this.mailService.sendRegistrationMail(
+        user.accountData.login,
+        user.accountData.email,
+        newConfirmationCode,
+      );
+    } catch (error) {
+      console.error(error);
       return null;
     }
 
@@ -131,21 +164,6 @@ export class AuthService {
     }
 
     await user.confirm();
-    return this.usersRepository.save(user);
-  }
-
-  async resendEmail(
-    emailResendDto: EmailResendDto,
-  ): Promise<UserDocument | null> {
-    const user = await this.usersRepository.findUserByLoginOrEmail(
-      emailResendDto.email,
-    );
-
-    if (!user || user.emailConfirmation.isConfirmed) {
-      return null;
-    }
-
-    await user.updateConfirmationData();
     return this.usersRepository.save(user);
   }
 }

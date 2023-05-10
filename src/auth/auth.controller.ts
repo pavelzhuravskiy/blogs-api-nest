@@ -21,7 +21,12 @@ import { UsersService } from '../users/users.service';
 import { UserConfirmDto } from './dto/user-confirm.dto';
 import { exceptionHandler } from '../exceptions/exception.handler';
 import { ExceptionCode } from '../exceptions/exception-codes.enum';
-import { codeField, codeIsIncorrect } from '../exceptions/exception.constants';
+import {
+  codeField,
+  codeIsIncorrect,
+  emailField,
+  userNotFoundOrConfirmed,
+} from '../exceptions/exception.constants';
 import { EmailResendDto } from './dto/email-resend.dto';
 
 @Controller('auth')
@@ -40,8 +45,19 @@ export class AuthController {
   }
 
   @Post('registration-email-resending')
+  @HttpCode(204)
   async resendEmail(@Body() emailResendDto: EmailResendDto) {
-    const result = this.authService.resendEmail(emailResendDto);
+    const result = await this.authService.resendEmail(emailResendDto);
+
+    if (!result) {
+      return exceptionHandler(
+        ExceptionCode.BadRequest,
+        userNotFoundOrConfirmed,
+        emailField,
+      );
+    }
+
+    return result;
   }
 
   @Post('registration-confirmation')

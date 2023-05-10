@@ -4,7 +4,6 @@ import { UserAccountSchema } from './user-account.schema';
 import { UserEmailSchema } from './user-email.schema';
 import { UserPasswordSchema } from './user-password.schema';
 import { UserCreateDto } from '../dto/user-create.dto';
-import { randomUUID } from 'crypto';
 import { add } from 'date-fns';
 
 export type UserDocument = HydratedDocument<User>;
@@ -48,8 +47,8 @@ export class User {
     this.emailConfirmation.isConfirmed = true;
   }
 
-  updateConfirmationData() {
-    this.emailConfirmation.confirmationCode = randomUUID();
+  updateConfirmationData(newConfirmationCode: string) {
+    this.emailConfirmation.confirmationCode = newConfirmationCode;
     this.emailConfirmation.expirationDate = add(new Date(), { hours: 1 });
   }
 

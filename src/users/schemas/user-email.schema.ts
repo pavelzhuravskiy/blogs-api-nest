@@ -5,7 +5,7 @@ export class UserEmailSchema {
   @Prop({ type: String || null })
   confirmationCode: string | null;
 
-  @Prop({ type: String || null })
+  @Prop({ type: Date || null })
   expirationDate: Date | null;
 
   @Prop({ required: true })
