@@ -31,6 +31,7 @@ import {
 import { EmailDto } from './dto/email.dto';
 import { NewPasswordDto } from './dto/new-password.dto';
 import { UserTransformInterceptor } from '../users/interceptors/user-transform.interceptor';
+import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 
 @Controller('auth')
 export class AuthController {
@@ -42,12 +43,16 @@ export class AuthController {
     private usersRepository: UsersRepository,
   ) {}
 
+  @UseGuards(ThrottlerGuard)
+  @Throttle(5, 10)
   @Post('registration')
   @UseInterceptors(UserTransformInterceptor)
   async registerUser(@Body() createUserDto: UserCreateDto) {
     return this.authService.registerUser(createUserDto);
   }
 
+  @UseGuards(ThrottlerGuard)
+  @Throttle(5, 10)
   @Post('registration-email-resending')
   @HttpCode(204)
   async resendEmail(@Body() emailDto: EmailDto) {
@@ -64,6 +69,8 @@ export class AuthController {
     return result;
   }
 
+  @UseGuards(ThrottlerGuard)
+  @Throttle(5, 10)
   @Post('registration-confirmation')
   @HttpCode(204)
   async confirmUser(@Body() userConfirmDto: UserConfirmDto) {
@@ -80,19 +87,24 @@ export class AuthController {
     return result;
   }
 
+  @UseGuards(ThrottlerGuard)
+  @Throttle(5, 10)
   @Post('password-recovery')
   @HttpCode(204)
   async recoverPassword(@Body() emailDto: EmailDto) {
     return this.authService.recoverPassword(emailDto);
   }
 
+  @UseGuards(ThrottlerGuard)
+  @Throttle(5, 10)
   @Post('new-password')
   @HttpCode(204)
   async updatePassword(@Body() newPasswordDto: NewPasswordDto) {
     return this.authService.updatePassword(newPasswordDto);
   }
 
-  @UseGuards(LocalAuthGuard)
+  @UseGuards(ThrottlerGuard, LocalAuthGuard)
+  @Throttle(5, 10)
   @Post('login')
   @HttpCode(200)
   async login(@Request() req, @Response() res) {

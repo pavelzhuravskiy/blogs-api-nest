@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Model } from 'mongoose';
 import { CommentatorInfoSchema } from './commentator-info.schema';
-import { LikesInfoSchema } from '../../common/schemas/likes-info.schema';
+import { LikesInfoSchema } from '../../likes/schemas/likes-info.schema';
 import { CommentCreateDto } from '../dto/comment-create.dto';
 import { PostDocument } from '../../posts/schemas/post.entity';
 import { UserDocument } from '../../users/schemas/user.entity';

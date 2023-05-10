@@ -38,8 +38,6 @@ export class BlogsQueryRepository {
     const totalCount = await this.BlogModel.countDocuments(filter);
     const pagesCount = Math.ceil(totalCount / +query.pageSize);
 
-    console.log(blogs);
-
     return {
       pagesCount: pagesCount,
       page: +query.pageNumber,

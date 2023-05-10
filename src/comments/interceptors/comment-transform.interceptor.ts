@@ -7,6 +7,7 @@ import {
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { CommentViewModel } from '../schemas/comment.view';
+import { LikeStatus } from '../../likes/like-status.enum';
 
 @Injectable()
 export class CommentTransformInterceptor<T>
@@ -29,7 +30,7 @@ export class CommentTransformInterceptor<T>
           likesInfo: {
             likesCount: comment.extendedLikesInfo.likesCount,
             dislikesCount: comment.extendedLikesInfo.dislikesCount,
-            myStatus: 'None',
+            myStatus: LikeStatus.None,
           },
         };
       }),

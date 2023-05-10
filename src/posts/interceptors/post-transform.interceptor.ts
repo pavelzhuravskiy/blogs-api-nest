@@ -7,6 +7,7 @@ import {
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { PostViewModel } from '../schemas/post.view';
+import { LikeStatus } from '../../likes/like-status.enum';
 
 @Injectable()
 export class PostTransformInterceptor<T>
@@ -29,7 +30,7 @@ export class PostTransformInterceptor<T>
           extendedLikesInfo: {
             likesCount: post.extendedLikesInfo.likesCount,
             dislikesCount: post.extendedLikesInfo.dislikesCount,
-            myStatus: 'None',
+            myStatus: LikeStatus.None,
             newestLikes: [],
           },
         };

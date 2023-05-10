@@ -13,9 +13,14 @@ import { MailService } from '../mail/mail.service';
 import { MailModule } from '../mail/mail.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from '../users/schemas/user.entity';
+import { ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
   imports: [
+    ThrottlerModule.forRoot({
+      ttl: 60,
+      limit: 10,
+    }),
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     UsersModule,
     PassportModule,
