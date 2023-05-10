@@ -9,7 +9,6 @@ import {
   Put,
   Query,
   UseGuards,
-  UseInterceptors,
 } from '@nestjs/common';
 import { BlogsService } from './blogs.service';
 import { BlogCreateDto } from './dto/blog-create.dto';
@@ -19,12 +18,11 @@ import { BlogUpdateDto } from './dto/blog-update.dto';
 import { PostsService } from '../posts/posts.service';
 import { PostCreateDto } from '../posts/dto/post-create.dto';
 import { PostsQueryRepository } from '../posts/posts.query.repository';
-import { ExceptionCode } from '../exceptions/exception-codes.enum';
+import { ResultCode } from '../exceptions/exception-codes.enum';
 import { exceptionHandler } from '../exceptions/exception.handler';
 import { CommonQuery } from '../common/dto/common.query';
 import { blogIDField, blogNotFound } from '../exceptions/exception.constants';
 import { BasicAuthGuard } from '../auth/guards/basic-auth.guard';
-import { BlogTransformInterceptor } from './interceptors/blog-transform.interceptor';
 
 @Controller('blogs')
 export class BlogsController {
@@ -37,27 +35,22 @@ export class BlogsController {
 
   @UseGuards(BasicAuthGuard)
   @Post()
-  @UseInterceptors(BlogTransformInterceptor)
   async createBlog(@Body() createBlogDto: BlogCreateDto) {
     return this.blogsService.createBlog(createBlogDto);
   }
 
   @Get()
   async findBlogs(@Query() query: BlogQuery) {
+    console.log(query);
     return this.blogsQueryRepository.findBlogs(query);
   }
 
   @Get(':id')
-  @UseInterceptors(BlogTransformInterceptor)
   async findBlog(@Param('id') id: string) {
     const result = await this.blogsQueryRepository.findBlog(id);
 
     if (!result) {
-      return exceptionHandler(
-        ExceptionCode.NotFound,
-        blogNotFound,
-        blogIDField,
-      );
+      return exceptionHandler(ResultCode.NotFound, blogNotFound, blogIDField);
     }
 
     return result;
@@ -73,11 +66,7 @@ export class BlogsController {
     const result = await this.blogsService.updateBlog(id, updateBlogDto);
 
     if (!result) {
-      return exceptionHandler(
-        ExceptionCode.NotFound,
-        blogNotFound,
-        blogIDField,
-      );
+      return exceptionHandler(ResultCode.NotFound, blogNotFound, blogIDField);
     }
 
     return result;
@@ -90,11 +79,7 @@ export class BlogsController {
     const result = await this.blogsService.deleteBlog(id);
 
     if (!result) {
-      return exceptionHandler(
-        ExceptionCode.NotFound,
-        blogNotFound,
-        blogIDField,
-      );
+      return exceptionHandler(ResultCode.NotFound, blogNotFound, blogIDField);
     }
 
     return result;
@@ -109,11 +94,7 @@ export class BlogsController {
     const result = await this.postsService.createPost(createPostDto, id);
 
     if (!result) {
-      return exceptionHandler(
-        ExceptionCode.NotFound,
-        blogNotFound,
-        blogIDField,
-      );
+      return exceptionHandler(ResultCode.NotFound, blogNotFound, blogIDField);
     }
 
     return result;
@@ -125,11 +106,7 @@ export class BlogsController {
     console.log(result);
 
     if (!result) {
-      return exceptionHandler(
-        ExceptionCode.NotFound,
-        blogNotFound,
-        blogIDField,
-      );
+      return exceptionHandler(ResultCode.NotFound, blogNotFound, blogIDField);
     }
 
     return result;

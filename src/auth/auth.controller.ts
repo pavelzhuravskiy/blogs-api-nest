@@ -7,7 +7,6 @@ import {
   Request,
   Response,
   UseGuards,
-  UseInterceptors,
 } from '@nestjs/common';
 import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
 import { LocalAuthGuard } from './guards/local-auth.guard';
@@ -21,7 +20,7 @@ import { UserCreateDto } from '../users/dto/user-create.dto';
 import { UsersService } from '../users/users.service';
 import { UserConfirmDto } from './dto/user-confirm.dto';
 import { exceptionHandler } from '../exceptions/exception.handler';
-import { ExceptionCode } from '../exceptions/exception-codes.enum';
+import { ResultCode } from '../exceptions/exception-codes.enum';
 import {
   codeField,
   codeIsIncorrect,
@@ -30,23 +29,21 @@ import {
 } from '../exceptions/exception.constants';
 import { EmailDto } from './dto/email.dto';
 import { NewPasswordDto } from './dto/new-password.dto';
-import { UserTransformInterceptor } from '../users/interceptors/user-transform.interceptor';
 import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 
 @Controller('auth')
 export class AuthController {
   constructor(
-    private usersService: UsersService,
-    private authService: AuthService,
-    private jwtService: JwtService,
-    private devicesService: DevicesService,
-    private usersRepository: UsersRepository,
+    private readonly usersService: UsersService,
+    private readonly authService: AuthService,
+    private readonly jwtService: JwtService,
+    private readonly devicesService: DevicesService,
+    private readonly usersRepository: UsersRepository,
   ) {}
 
   @UseGuards(ThrottlerGuard)
   @Throttle(5, 10)
   @Post('registration')
-  @UseInterceptors(UserTransformInterceptor)
   async registerUser(@Body() createUserDto: UserCreateDto) {
     return this.authService.registerUser(createUserDto);
   }
@@ -60,7 +57,7 @@ export class AuthController {
 
     if (!result) {
       return exceptionHandler(
-        ExceptionCode.BadRequest,
+        ResultCode.BadRequest,
         userNotFoundOrConfirmed,
         emailField,
       );
@@ -78,7 +75,7 @@ export class AuthController {
 
     if (!result) {
       return exceptionHandler(
-        ExceptionCode.BadRequest,
+        ResultCode.BadRequest,
         codeIsIncorrect,
         codeField,
       );

@@ -7,7 +7,7 @@ import {
   DeviceModelType,
 } from './schemas/device.entity';
 import { DevicesRepository } from './devices.repository';
-import { ExceptionCode } from '../exceptions/exception-codes.enum';
+import { ResultCode } from '../exceptions/exception-codes.enum';
 import {
   deviceIDField,
   deviceNotFound,
@@ -68,7 +68,7 @@ export class DevicesService {
     if (!device) {
       return {
         data: false,
-        code: ExceptionCode.NotFound,
+        code: ResultCode.NotFound,
         field: deviceIDField,
         message: deviceNotFound,
       };
@@ -77,13 +77,13 @@ export class DevicesService {
     if (device.userId !== currentUserId) {
       return {
         data: false,
-        code: ExceptionCode.Forbidden,
+        code: ResultCode.Forbidden,
       };
     }
 
     return {
       data: true,
-      code: ExceptionCode.Success,
+      code: ResultCode.Success,
     };
   }
 

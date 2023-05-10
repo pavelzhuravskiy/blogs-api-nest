@@ -25,11 +25,11 @@ export class AuthService {
   constructor(
     @InjectModel(User.name)
     private UserModel: UserModelType,
-    private mailService: MailService,
-    private jwtService: JwtService,
-    private devicesService: DevicesService,
-    private usersRepository: UsersRepository,
-    private devicesRepository: DevicesRepository,
+    private readonly mailService: MailService,
+    private readonly jwtService: JwtService,
+    private readonly devicesService: DevicesService,
+    private readonly usersRepository: UsersRepository,
+    private readonly devicesRepository: DevicesRepository,
   ) {}
 
   async validateUser(

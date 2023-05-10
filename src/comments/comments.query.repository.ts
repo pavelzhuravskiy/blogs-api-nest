@@ -10,6 +10,7 @@ import {
 import { CommentViewModel } from './schemas/comment.view';
 import { CommonQuery } from '../common/dto/common.query';
 import { PostsQueryRepository } from '../posts/posts.query.repository';
+import { LikeStatus } from '../likes/like-status.enum';
 
 @Injectable()
 export class CommentsQueryRepository {
@@ -42,19 +43,17 @@ export class CommentsQueryRepository {
 
     const comments = await this.CommentModel.find(filter)
       .sort(sortingObj)
-      .skip(
-        +query.pageNumber > 0 ? (+query.pageNumber - 1) * +query.pageSize : 0,
-      )
-      .limit(+query.pageSize > 0 ? +query.pageSize : 0)
+      .skip(query.pageNumber > 0 ? (query.pageNumber - 1) * query.pageSize : 0)
+      .limit(query.pageSize > 0 ? query.pageSize : 0)
       .lean();
 
     const totalCount = await this.CommentModel.countDocuments(filter);
-    const pagesCount = Math.ceil(totalCount / +query.pageSize);
+    const pagesCount = Math.ceil(totalCount / query.pageSize);
 
     return {
       pagesCount: pagesCount,
-      page: +query.pageNumber,
-      pageSize: +query.pageSize,
+      page: query.pageNumber,
+      pageSize: query.pageSize,
       totalCount,
       items: comments.map((comment) => {
         return {
@@ -75,7 +74,7 @@ export class CommentsQueryRepository {
     };
   }
 
-  async findComment(id: string): Promise<CommentDocument | null> {
+  async findComment(id: string): Promise<CommentViewModel | null> {
     if (!mongoose.isValidObjectId(id)) {
       return null;
     }
@@ -86,6 +85,19 @@ export class CommentsQueryRepository {
       return null;
     }
 
-    return comment;
+    return {
+      id: comment.id,
+      content: comment.content,
+      commentatorInfo: {
+        userId: comment.commentatorInfo.userId,
+        userLogin: comment.commentatorInfo.userLogin,
+      },
+      createdAt: comment.createdAt.toISOString(),
+      likesInfo: {
+        likesCount: comment.extendedLikesInfo.likesCount,
+        dislikesCount: comment.extendedLikesInfo.dislikesCount,
+        myStatus: LikeStatus.None,
+      },
+    };
   }
 }

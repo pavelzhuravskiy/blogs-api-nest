@@ -29,19 +29,17 @@ export class BlogsQueryRepository {
 
     const blogs = await this.BlogModel.find(filter)
       .sort(sortingObj)
-      .skip(
-        +query.pageNumber > 0 ? (+query.pageNumber - 1) * +query.pageSize : 0,
-      )
-      .limit(+query.pageSize > 0 ? +query.pageSize : 0)
+      .skip(query.pageNumber > 0 ? (query.pageNumber - 1) * query.pageSize : 0)
+      .limit(query.pageSize > 0 ? query.pageSize : 0)
       .lean();
 
     const totalCount = await this.BlogModel.countDocuments(filter);
-    const pagesCount = Math.ceil(totalCount / +query.pageSize);
+    const pagesCount = Math.ceil(totalCount / query.pageSize);
 
     return {
       pagesCount: pagesCount,
-      page: +query.pageNumber,
-      pageSize: +query.pageSize,
+      page: query.pageNumber,
+      pageSize: query.pageSize,
       totalCount,
       items: blogs.map((blog) => {
         return {
@@ -56,7 +54,7 @@ export class BlogsQueryRepository {
     };
   }
 
-  async findBlog(id: string): Promise<BlogDocument | null> {
+  async findBlog(id: string): Promise<BlogViewModel | null> {
     if (!mongoose.isValidObjectId(id)) {
       return null;
     }
@@ -67,6 +65,13 @@ export class BlogsQueryRepository {
       return null;
     }
 
-    return blog;
+    return {
+      id: blog.id,
+      name: blog.name,
+      description: blog.description,
+      websiteUrl: blog.websiteUrl,
+      createdAt: blog.createdAt.toISOString(),
+      isMembership: blog.isMembership,
+    };
   }
 }

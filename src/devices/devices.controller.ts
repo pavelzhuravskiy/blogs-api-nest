@@ -13,16 +13,16 @@ import { DevicesQueryRepository } from './devices.query.repository';
 import { DevicesService } from './devices.service';
 import { DevicesRepository } from './devices.repository';
 import { exceptionHandler } from '../exceptions/exception.handler';
-import { ExceptionCode } from '../exceptions/exception-codes.enum';
+import { ResultCode } from '../exceptions/exception-codes.enum';
 import { CurrentUserId } from '../auth/decorators/current-user-id.param.decorator';
 
 @Controller('security')
 export class DevicesController {
   constructor(
-    private devicesService: DevicesService,
-    private devicesRepository: DevicesRepository,
-    private devicesQueryRepository: DevicesQueryRepository,
-    private jwtService: JwtService,
+    private readonly devicesService: DevicesService,
+    private readonly devicesRepository: DevicesRepository,
+    private readonly devicesQueryRepository: DevicesQueryRepository,
+    private readonly jwtService: JwtService,
   ) {}
 
   @UseGuards(JwtBearerGuard)
@@ -56,7 +56,7 @@ export class DevicesController {
       deviceId,
     );
 
-    if (result.code !== ExceptionCode.Success) {
+    if (result.code !== ResultCode.Success) {
       return exceptionHandler(result.code, result.message, result.field);
     }
 

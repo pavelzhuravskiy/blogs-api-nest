@@ -9,7 +9,6 @@ import {
   Put,
   Query,
   UseGuards,
-  UseInterceptors,
 } from '@nestjs/common';
 import { PostCreateDto } from './dto/post-create.dto';
 import { PostsService } from './posts.service';
@@ -18,7 +17,7 @@ import { PostUpdateDto } from './dto/post-update.dto';
 import { CommentCreateDto } from '../comments/dto/comment-create.dto';
 import { CommentsQueryRepository } from '../comments/comments.query.repository';
 import { exceptionHandler } from '../exceptions/exception.handler';
-import { ExceptionCode } from '../exceptions/exception-codes.enum';
+import { ResultCode } from '../exceptions/exception-codes.enum';
 import { CommonQuery } from '../common/dto/common.query';
 import {
   blogIDField,
@@ -29,8 +28,6 @@ import {
 import { JwtBearerGuard } from '../auth/guards/jwt-bearer.guard';
 import { BasicAuthGuard } from '../auth/guards/basic-auth.guard';
 import { CurrentUserId } from '../auth/decorators/current-user-id.param.decorator';
-import { CommentTransformInterceptor } from '../comments/interceptors/comment-transform.interceptor';
-import { PostTransformInterceptor } from './interceptors/post-transform.interceptor';
 
 @Controller('posts')
 export class PostsController {
@@ -42,16 +39,11 @@ export class PostsController {
 
   @UseGuards(BasicAuthGuard)
   @Post()
-  @UseInterceptors(PostTransformInterceptor)
   async createPost(@Body() createPostDto: PostCreateDto) {
     const result = await this.postsService.createPost(createPostDto);
 
     if (!result) {
-      return exceptionHandler(
-        ExceptionCode.BadRequest,
-        blogNotFound,
-        blogIDField,
-      );
+      return exceptionHandler(ResultCode.BadRequest, blogNotFound, blogIDField);
     }
 
     return result;
@@ -63,16 +55,11 @@ export class PostsController {
   }
 
   @Get(':id')
-  @UseInterceptors(PostTransformInterceptor)
   async findPost(@Param('id') id: string) {
     const result = await this.postsQueryRepository.findPost(id);
 
     if (!result) {
-      return exceptionHandler(
-        ExceptionCode.NotFound,
-        postNotFound,
-        postIDField,
-      );
+      return exceptionHandler(ResultCode.NotFound, postNotFound, postIDField);
     }
 
     return result;
@@ -87,7 +74,7 @@ export class PostsController {
   ) {
     const result = await this.postsService.updatePost(id, updatePostDto);
 
-    if (result.code !== ExceptionCode.Success) {
+    if (result.code !== ResultCode.Success) {
       return exceptionHandler(result.code, result.message, result.field);
     }
 
@@ -101,11 +88,7 @@ export class PostsController {
     const result = await this.postsService.deletePost(id);
 
     if (!result) {
-      return exceptionHandler(
-        ExceptionCode.NotFound,
-        postNotFound,
-        postIDField,
-      );
+      return exceptionHandler(ResultCode.NotFound, postNotFound, postIDField);
     }
 
     return result;
@@ -113,7 +96,6 @@ export class PostsController {
 
   @UseGuards(JwtBearerGuard)
   @Post(':id/comments')
-  @UseInterceptors(CommentTransformInterceptor)
   async createComment(
     @CurrentUserId() currentUserId: string,
     @Param('id') postId: string,
@@ -134,11 +116,7 @@ export class PostsController {
     );
 
     if (!result) {
-      return exceptionHandler(
-        ExceptionCode.NotFound,
-        postNotFound,
-        postIDField,
-      );
+      return exceptionHandler(ResultCode.NotFound, postNotFound, postIDField);
     }
 
     return result;

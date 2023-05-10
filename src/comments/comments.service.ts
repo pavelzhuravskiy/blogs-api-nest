@@ -4,7 +4,7 @@ import { Comment, CommentModelType } from './schemas/comment.entity';
 import { CommentsRepository } from './comments.repository';
 import { CommentUpdateDto } from './dto/comment-update.dto';
 import { ExceptionResultType } from '../exceptions/types/exception-result.type';
-import { ExceptionCode } from '../exceptions/exception-codes.enum';
+import { ResultCode } from '../exceptions/exception-codes.enum';
 import {
   commentIDField,
   commentNotFound,
@@ -28,7 +28,7 @@ export class CommentsService {
     if (!comment) {
       return {
         data: false,
-        code: ExceptionCode.NotFound,
+        code: ResultCode.NotFound,
         field: commentIDField,
         message: commentNotFound,
       };
@@ -37,7 +37,7 @@ export class CommentsService {
     if (comment.commentatorInfo.userId !== currentUserId) {
       return {
         data: false,
-        code: ExceptionCode.Forbidden,
+        code: ResultCode.Forbidden,
       };
     }
 
@@ -46,7 +46,7 @@ export class CommentsService {
 
     return {
       data: true,
-      code: ExceptionCode.Success,
+      code: ResultCode.Success,
     };
   }
 
@@ -59,7 +59,7 @@ export class CommentsService {
     if (!comment) {
       return {
         data: false,
-        code: ExceptionCode.NotFound,
+        code: ResultCode.NotFound,
         field: commentIDField,
         message: commentNotFound,
       };
@@ -68,7 +68,7 @@ export class CommentsService {
     if (comment.commentatorInfo.userId !== currentUserId) {
       return {
         data: false,
-        code: ExceptionCode.Forbidden,
+        code: ResultCode.Forbidden,
       };
     }
 
@@ -76,7 +76,7 @@ export class CommentsService {
 
     return {
       data: true,
-      code: ExceptionCode.Success,
+      code: ResultCode.Success,
     };
   }
 }

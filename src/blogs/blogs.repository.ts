@@ -13,6 +13,13 @@ export class BlogsRepository {
     return blog.save();
   }
 
+  async createBlog(blog: BlogDocument) {
+    await blog.save();
+    return {
+      id: blog.id,
+    };
+  }
+
   async findBlog(id?: string): Promise<BlogDocument | null> {
     if (!mongoose.isValidObjectId(id)) {
       return null;

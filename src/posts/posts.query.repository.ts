@@ -6,6 +6,7 @@ import { Post, PostDocument, PostModelType } from './schemas/post.entity';
 import { PostViewModel } from './schemas/post.view';
 import { BlogsQueryRepository } from '../blogs/blogs.query.repository';
 import { CommonQuery } from '../common/dto/common.query';
+import { LikeStatus } from '../likes/like-status.enum';
 
 @Injectable()
 export class PostsQueryRepository {
@@ -40,19 +41,17 @@ export class PostsQueryRepository {
 
     const posts = await this.PostModel.find(filter)
       .sort(sortingObj)
-      .skip(
-        +query.pageNumber > 0 ? (+query.pageNumber - 1) * +query.pageSize : 0,
-      )
-      .limit(+query.pageSize > 0 ? +query.pageSize : 0)
+      .skip(query.pageNumber > 0 ? (query.pageNumber - 1) * query.pageSize : 0)
+      .limit(query.pageSize > 0 ? query.pageSize : 0)
       .lean();
 
     const totalCount = await this.PostModel.countDocuments(filter);
-    const pagesCount = Math.ceil(totalCount / +query.pageSize);
+    const pagesCount = Math.ceil(totalCount / query.pageSize);
 
     return {
       pagesCount: pagesCount,
-      page: +query.pageNumber,
-      pageSize: +query.pageSize,
+      page: query.pageNumber,
+      pageSize: query.pageSize,
       totalCount,
       items: posts.map((post) => {
         return {
@@ -74,7 +73,7 @@ export class PostsQueryRepository {
     };
   }
 
-  async findPost(id: string): Promise<PostDocument | null> {
+  async findPost(id: string): Promise<PostViewModel | null> {
     if (!mongoose.isValidObjectId(id)) {
       return null;
     }
@@ -85,6 +84,20 @@ export class PostsQueryRepository {
       return null;
     }
 
-    return post;
+    return {
+      id: post.id,
+      title: post.title,
+      shortDescription: post.shortDescription,
+      content: post.content,
+      blogId: post.blogId,
+      blogName: post.blogName,
+      createdAt: post.createdAt.toISOString(),
+      extendedLikesInfo: {
+        likesCount: post.extendedLikesInfo.likesCount,
+        dislikesCount: post.extendedLikesInfo.dislikesCount,
+        myStatus: LikeStatus.None,
+        newestLikes: [],
+      },
+    };
   }
 }

@@ -8,17 +8,15 @@ import {
   Post,
   Query,
   UseGuards,
-  UseInterceptors,
 } from '@nestjs/common';
 import { UserCreateDto } from './dto/user-create.dto';
 import { UsersService } from './users.service';
 import { UserQuery } from './dto/user.query';
 import { UsersQueryRepository } from './users.query.repository';
 import { exceptionHandler } from '../exceptions/exception.handler';
-import { ExceptionCode } from '../exceptions/exception-codes.enum';
+import { ResultCode } from '../exceptions/exception-codes.enum';
 import { userIDField, userNotFound } from '../exceptions/exception.constants';
 import { BasicAuthGuard } from '../auth/guards/basic-auth.guard';
-import { UserTransformInterceptor } from './interceptors/user-transform.interceptor';
 
 @Controller('users')
 export class UsersController {
@@ -29,7 +27,6 @@ export class UsersController {
 
   @UseGuards(BasicAuthGuard)
   @Post()
-  @UseInterceptors(UserTransformInterceptor)
   async createUser(@Body() createUserDto: UserCreateDto) {
     return this.usersService.createUser(createUserDto);
   }
@@ -47,11 +44,7 @@ export class UsersController {
     const result = await this.usersService.deleteUser(id);
 
     if (!result) {
-      return exceptionHandler(
-        ExceptionCode.NotFound,
-        userNotFound,
-        userIDField,
-      );
+      return exceptionHandler(ResultCode.NotFound, userNotFound, userIDField);
     }
 
     return result;

@@ -7,11 +7,10 @@ import {
   Param,
   Put,
   UseGuards,
-  UseInterceptors,
 } from '@nestjs/common';
 import { CommentsQueryRepository } from './comments.query.repository';
 import { exceptionHandler } from '../exceptions/exception.handler';
-import { ExceptionCode } from '../exceptions/exception-codes.enum';
+import { ResultCode } from '../exceptions/exception-codes.enum';
 import {
   commentIDField,
   commentNotFound,
@@ -20,7 +19,6 @@ import { JwtBearerGuard } from '../auth/guards/jwt-bearer.guard';
 import { CurrentUserId } from '../auth/decorators/current-user-id.param.decorator';
 import { CommentUpdateDto } from './dto/comment-update.dto';
 import { CommentsService } from './comments.service';
-import { CommentTransformInterceptor } from './interceptors/comment-transform.interceptor';
 
 @Controller('comments')
 export class CommentsController {
@@ -30,13 +28,12 @@ export class CommentsController {
   ) {}
 
   @Get(':id')
-  @UseInterceptors(CommentTransformInterceptor)
   async findComment(@Param('id') id: string) {
     const result = await this.commentsQueryRepository.findComment(id);
 
     if (!result) {
       return exceptionHandler(
-        ExceptionCode.NotFound,
+        ResultCode.NotFound,
         commentNotFound,
         commentIDField,
       );
@@ -59,7 +56,7 @@ export class CommentsController {
       updateCommentDto,
     );
 
-    if (result.code !== ExceptionCode.Success) {
+    if (result.code !== ResultCode.Success) {
       return exceptionHandler(result.code, result.message, result.field);
     }
 
@@ -99,7 +96,7 @@ export class CommentsController {
       commentId,
     );
 
-    if (result.code !== ExceptionCode.Success) {
+    if (result.code !== ResultCode.Success) {
       return exceptionHandler(result.code, result.message, result.field);
     }
 

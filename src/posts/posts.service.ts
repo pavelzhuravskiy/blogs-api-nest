@@ -12,7 +12,7 @@ import {
 } from '../comments/schemas/comment.entity';
 import { CommentsRepository } from '../comments/comments.repository';
 import { BlogsRepository } from '../blogs/blogs.repository';
-import { ExceptionCode } from '../exceptions/exception-codes.enum';
+import { ResultCode } from '../exceptions/exception-codes.enum';
 import {
   blogIDField,
   blogNotFound,
@@ -61,7 +61,7 @@ export class PostsService {
     if (!post) {
       return {
         data: false,
-        code: ExceptionCode.NotFound,
+        code: ResultCode.NotFound,
         field: postIDField,
         message: postNotFound,
       };
@@ -72,7 +72,7 @@ export class PostsService {
     if (!blog) {
       return {
         data: false,
-        code: ExceptionCode.NotFound,
+        code: ResultCode.NotFound,
         field: blogIDField,
         message: blogNotFound,
       };
@@ -83,7 +83,7 @@ export class PostsService {
 
     return {
       data: true,
-      code: ExceptionCode.Success,
+      code: ResultCode.Success,
     };
   }
 
