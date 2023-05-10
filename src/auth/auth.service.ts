@@ -18,7 +18,8 @@ import { add } from 'date-fns';
 import { InjectModel } from '@nestjs/mongoose';
 import { MailService } from '../mail/mail.service';
 import { UserConfirmDto } from './dto/user-confirm.dto';
-import { EmailResendDto } from './dto/email-resend.dto';
+import { EmailDto } from './dto/email.dto';
+import { NewPasswordDto } from './dto/new-password.dto';
 
 @Injectable()
 export class AuthService {
@@ -124,11 +125,9 @@ export class AuthService {
     return result;
   }
 
-  async resendEmail(
-    emailResendDto: EmailResendDto,
-  ): Promise<UserDocument | null> {
+  async resendEmail(emailDto: EmailDto): Promise<UserDocument | null> {
     const user = await this.usersRepository.findUserByLoginOrEmail(
-      emailResendDto.email,
+      emailDto.email,
     );
 
     if (!user || user.emailConfirmation.isConfirmed) {
@@ -137,7 +136,7 @@ export class AuthService {
 
     const newConfirmationCode = randomUUID();
 
-    await user.updateConfirmationData(newConfirmationCode);
+    await user.updateEmailConfirmationData(newConfirmationCode);
     const result = await this.usersRepository.save(user);
 
     try {
@@ -157,13 +156,63 @@ export class AuthService {
   async confirmUser(
     userConfirmDto: UserConfirmDto,
   ): Promise<UserDocument | null> {
-    const user = await this.usersRepository.findUserByCode(userConfirmDto.code);
+    const user = await this.usersRepository.findUserByEmailCode(
+      userConfirmDto.code,
+    );
 
-    if (!user || !user.canBeConfirmed()) {
+    if (!user || !user.userCanBeConfirmed()) {
       return null;
     }
 
-    await user.confirm();
+    await user.confirmUser();
+    return this.usersRepository.save(user);
+  }
+
+  async recoverPassword(emailDto: EmailDto): Promise<UserDocument | null> {
+    const user = await this.usersRepository.findUserByLoginOrEmail(
+      emailDto.email,
+    );
+
+    if (!user) {
+      return null;
+    }
+
+    const recoveryCode = randomUUID();
+
+    await user.updatePasswordRecoveryData(recoveryCode);
+    const result = await this.usersRepository.save(user);
+
+    try {
+      await this.mailService.sendPasswordRecoveryMail(
+        user.accountData.login,
+        user.accountData.email,
+        recoveryCode,
+      );
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
+
+    return result;
+  }
+
+  async updatePassword(
+    newPasswordDto: NewPasswordDto,
+  ): Promise<UserDocument | null> {
+    const user = await this.usersRepository.findUserByRecoveryCode(
+      newPasswordDto.recoveryCode,
+    );
+
+    if (!user || !user.passwordCanBeUpdated()) {
+      return null;
+    }
+
+    const hash = await bcrypt.hash(
+      newPasswordDto.newPassword,
+      Number(process.env.HASH_ROUNDS),
+    );
+
+    await user.updatePassword(hash);
     return this.usersRepository.save(user);
   }
 }

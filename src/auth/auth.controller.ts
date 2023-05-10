@@ -27,7 +27,8 @@ import {
   emailField,
   userNotFoundOrConfirmed,
 } from '../exceptions/exception.constants';
-import { EmailResendDto } from './dto/email-resend.dto';
+import { EmailDto } from './dto/email.dto';
+import { NewPasswordDto } from './dto/new-password.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -46,8 +47,8 @@ export class AuthController {
 
   @Post('registration-email-resending')
   @HttpCode(204)
-  async resendEmail(@Body() emailResendDto: EmailResendDto) {
-    const result = await this.authService.resendEmail(emailResendDto);
+  async resendEmail(@Body() emailDto: EmailDto) {
+    const result = await this.authService.resendEmail(emailDto);
 
     if (!result) {
       return exceptionHandler(
@@ -74,6 +75,18 @@ export class AuthController {
     }
 
     return result;
+  }
+
+  @Post('password-recovery')
+  @HttpCode(204)
+  async recoverPassword(@Body() emailDto: EmailDto) {
+    return this.authService.recoverPassword(emailDto);
+  }
+
+  @Post('new-password')
+  @HttpCode(204)
+  async updatePassword(@Body() newPasswordDto: NewPasswordDto) {
+    return this.authService.updatePassword(newPasswordDto);
   }
 
   @UseGuards(LocalAuthGuard)

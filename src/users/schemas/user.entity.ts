@@ -30,7 +30,7 @@ export class User {
   @Prop({ required: true })
   passwordRecovery: UserPasswordSchema;
 
-  canBeConfirmed() {
+  userCanBeConfirmed() {
     if (
       this.emailConfirmation.isConfirmed ||
       this.emailConfirmation.expirationDate < new Date()
@@ -41,15 +41,34 @@ export class User {
     return true;
   }
 
-  confirm() {
+  passwordCanBeUpdated() {
+    if (this.passwordRecovery.expirationDate < new Date()) {
+      return null;
+    }
+
+    return true;
+  }
+
+  confirmUser() {
     this.emailConfirmation.confirmationCode = null;
     this.emailConfirmation.expirationDate = null;
     this.emailConfirmation.isConfirmed = true;
   }
 
-  updateConfirmationData(newConfirmationCode: string) {
+  updateEmailConfirmationData(newConfirmationCode: string) {
     this.emailConfirmation.confirmationCode = newConfirmationCode;
     this.emailConfirmation.expirationDate = add(new Date(), { hours: 1 });
+  }
+
+  updatePasswordRecoveryData(recoveryCode: string) {
+    this.passwordRecovery.recoveryCode = recoveryCode;
+    this.passwordRecovery.expirationDate = add(new Date(), { hours: 1 });
+  }
+
+  updatePassword(hash: string) {
+    this.accountData.passwordHash = hash;
+    this.passwordRecovery.recoveryCode = null;
+    this.passwordRecovery.expirationDate = null;
   }
 
   static createUser(
@@ -83,9 +102,12 @@ export class User {
 export const UserSchema = SchemaFactory.createForClass(User);
 
 UserSchema.methods = {
-  canBeConfirmed: User.prototype.canBeConfirmed,
-  confirm: User.prototype.confirm,
-  updateConfirmationData: User.prototype.updateConfirmationData,
+  userCanBeConfirmed: User.prototype.userCanBeConfirmed,
+  confirmUser: User.prototype.confirmUser,
+  updateConfirmationData: User.prototype.updateEmailConfirmationData,
+  updatePasswordRecoveryData: User.prototype.updatePasswordRecoveryData,
+  passwordCanBeUpdated: User.prototype.passwordCanBeUpdated,
+  updatePassword: User.prototype.updatePassword,
 };
 
 const userStaticMethods: UserModelStaticType = {

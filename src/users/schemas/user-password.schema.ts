@@ -5,6 +5,6 @@ export class UserPasswordSchema {
   @Prop({ type: String || null })
   recoveryCode: string | null;
 
-  @Prop({ type: String || null })
+  @Prop({ type: Date || null })
   expirationDate: Date | null;
 }

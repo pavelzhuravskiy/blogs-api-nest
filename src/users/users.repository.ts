@@ -56,9 +56,21 @@ export class UsersRepository {
     return user;
   }
 
-  async findUserByCode(code: string): Promise<UserDocument | null> {
+  async findUserByEmailCode(code: string): Promise<UserDocument | null> {
     const user = this.UserModel.findOne({
       'emailConfirmation.confirmationCode': code,
+    });
+
+    if (!user) {
+      return null;
+    }
+
+    return user;
+  }
+
+  async findUserByRecoveryCode(code: string): Promise<UserDocument | null> {
+    const user = this.UserModel.findOne({
+      'passwordRecovery.recoveryCode': code,
     });
 
     if (!user) {
