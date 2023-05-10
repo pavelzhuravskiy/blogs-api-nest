@@ -66,6 +66,27 @@ export class CommentsController {
     return result;
   }
 
+  @UseGuards(JwtBearerGuard) // TODO
+  @Put(':id/like-status')
+  @HttpCode(204)
+  async updateLikeStatus(
+    @CurrentUserId() currentUserId: string,
+    @Param('id') commentId: string,
+    @Body() updateCommentDto: CommentUpdateDto,
+  ) {
+    /*const result = await this.commentsService.updateComment(
+      currentUserId,
+      commentId,
+      updateCommentDto,
+    );
+
+    if (result.code !== ExceptionCode.Success) {
+      return exceptionHandler(result.code, result.message, result.field);
+    }*/
+
+    return 1;
+  }
+
   @UseGuards(JwtBearerGuard)
   @Delete(':id')
   @HttpCode(204)

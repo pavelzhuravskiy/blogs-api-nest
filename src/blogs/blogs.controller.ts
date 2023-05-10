@@ -122,6 +122,7 @@ export class BlogsController {
   @Get(':id/posts')
   async findPosts(@Query() query: CommonQuery, @Param('id') id: string) {
     const result = await this.postsQueryRepository.findPosts(query, id);
+    console.log(result);
 
     if (!result) {
       return exceptionHandler(

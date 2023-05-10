@@ -127,7 +127,20 @@ export class PostsController {
   }
 
   @Get(':id/comments')
-  async findComments(@Query() query: CommonQuery, @Param('id') id: string) {
-    return this.commentsQueryRepository.findComments(query, id);
+  async findComments(@Query() query: CommonQuery, @Param('id') postId: string) {
+    const result = await this.commentsQueryRepository.findComments(
+      query,
+      postId,
+    );
+
+    if (!result) {
+      return exceptionHandler(
+        ExceptionCode.NotFound,
+        postNotFound,
+        postIDField,
+      );
+    }
+
+    return result;
   }
 }

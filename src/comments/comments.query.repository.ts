@@ -9,18 +9,28 @@ import {
 } from './schemas/comment.entity';
 import { CommentViewModel } from './schemas/comment.view';
 import { CommonQuery } from '../common/dto/common.query';
+import { PostsQueryRepository } from '../posts/posts.query.repository';
 
 @Injectable()
 export class CommentsQueryRepository {
   constructor(
     @InjectModel(Comment.name)
     private CommentModel: CommentModelType,
+    private postsQueryRepository: PostsQueryRepository,
   ) {}
   async findComments(
     query: CommonQuery,
     postId: string,
   ): Promise<Paginator<CommentViewModel[]>> {
-    const filter: FilterQuery<CommentDocument> = { postId };
+    const filter: FilterQuery<CommentDocument> = {};
+
+    const post = await this.postsQueryRepository.findPost(postId);
+
+    if (!post) {
+      return null;
+    }
+
+    filter.postId = postId;
 
     const sortingObj: { [key: string]: SortOrder } = {
       [query.sortBy]: query.sortDirection,
