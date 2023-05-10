@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { FilterQuery, SortOrder } from 'mongoose';
+import mongoose, { FilterQuery, SortOrder } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Paginator } from '../common/schemas/paginator';
 import { User, UserDocument, UserModelType } from './schemas/user.entity';
@@ -61,6 +61,25 @@ export class UsersQueryRepository {
           createdAt: user.accountData.createdAt.toISOString(),
         };
       }),
+    };
+  }
+
+  async findUser(id: string): Promise<UserViewModel | null> {
+    if (!mongoose.isValidObjectId(id)) {
+      return null;
+    }
+
+    const user = await this.UserModel.findOne({ _id: id });
+
+    if (!user) {
+      return null;
+    }
+
+    return {
+      id: user.id,
+      login: user.accountData.login,
+      email: user.accountData.email,
+      createdAt: user.accountData.createdAt.toISOString(),
     };
   }
 }

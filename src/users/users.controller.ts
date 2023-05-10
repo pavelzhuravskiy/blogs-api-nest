@@ -28,7 +28,8 @@ export class UsersController {
   @UseGuards(BasicAuthGuard)
   @Post()
   async createUser(@Body() userInputDto: UserInputDto) {
-    return this.usersService.createUser(userInputDto);
+    const userId = await this.usersService.createUser(userInputDto);
+    return this.usersQueryRepository.findUser(userId);
   }
 
   @UseGuards(BasicAuthGuard)

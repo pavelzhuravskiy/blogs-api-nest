@@ -35,12 +35,12 @@ export class BlogsController {
   @UseGuards(BasicAuthGuard)
   @Post()
   async createBlog(@Body() blogInputDto: BlogInputDto) {
-    return this.blogsService.createBlog(blogInputDto);
+    const blogId = await this.blogsService.createBlog(blogInputDto);
+    return this.blogsQueryRepository.findBlog(blogId);
   }
 
   @Get()
   async findBlogs(@Query() query: BlogQueryDto) {
-    console.log(query);
     return this.blogsQueryRepository.findBlogs(query);
   }
 
@@ -90,19 +90,18 @@ export class BlogsController {
     @Param('id') id: string,
     @Body() postInputDto: PostInputDto,
   ) {
-    const result = await this.postsService.createPost(postInputDto, id);
+    const postId = await this.postsService.createPost(postInputDto, id);
 
-    if (!result) {
+    if (!postId) {
       return exceptionHandler(ResultCode.NotFound, blogNotFound, blogIDField);
     }
 
-    return result;
+    return this.postsQueryRepository.findPost(postId);
   }
 
   @Get(':id/posts')
   async findPosts(@Query() query: CommonQueryDto, @Param('id') id: string) {
     const result = await this.postsQueryRepository.findPosts(query, id);
-    console.log(result);
 
     if (!result) {
       return exceptionHandler(ResultCode.NotFound, blogNotFound, blogIDField);

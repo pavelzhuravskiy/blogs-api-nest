@@ -39,13 +39,13 @@ export class PostsController {
   @UseGuards(BasicAuthGuard)
   @Post()
   async createPost(@Body() postInputDto: PostInputDto) {
-    const result = await this.postsService.createPost(postInputDto);
+    const postId = await this.postsService.createPost(postInputDto);
 
-    if (!result) {
+    if (!postId) {
       return exceptionHandler(ResultCode.BadRequest, blogNotFound, blogIDField);
     }
 
-    return result;
+    return this.postsQueryRepository.findPost(postId);
   }
 
   @Get()
@@ -100,11 +100,17 @@ export class PostsController {
     @Param('id') postId: string,
     @Body() commentInputDto: CommentInputDto,
   ) {
-    return this.postsService.createComment(
+    const commentId = await this.postsService.createComment(
       currentUserId,
       postId,
       commentInputDto,
     );
+
+    if (!commentId) {
+      return exceptionHandler(ResultCode.NotFound, postNotFound, postIDField);
+    }
+
+    return this.commentsQueryRepository.findComment(commentId);
   }
 
   @Get(':id/comments')

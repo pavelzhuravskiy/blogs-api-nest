@@ -1,14 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Post, PostDocument, PostModelType } from './schemas/post.entity';
+import { Post, PostModelType } from './schemas/post.entity';
 import { PostsRepository } from './posts.repository';
 import { PostInputDto } from './dto/post-input.dto';
 import { CommentInputDto } from '../comments/dto/comment-input.dto';
-import {
-  Comment,
-  CommentDocument,
-  CommentModelType,
-} from '../comments/schemas/comment.entity';
+import { Comment, CommentModelType } from '../comments/schemas/comment.entity';
 import { CommentsRepository } from '../comments/comments.repository';
 import { BlogsRepository } from '../blogs/blogs.repository';
 import { ResultCode } from '../exceptions/exception-codes.enum';
@@ -37,7 +33,7 @@ export class PostsService {
   async createPost(
     postInputDto: PostInputDto,
     blogIdParam?: string,
-  ): Promise<PostDocument | null> {
+  ): Promise<string | null> {
     const blogId = postInputDto.blogId || blogIdParam;
 
     const blog = await this.blogsRepository.findBlog(blogId);
@@ -48,7 +44,8 @@ export class PostsService {
 
     const post = this.PostModel.createPost(postInputDto, this.PostModel, blog);
 
-    return this.postsRepository.save(post);
+    await this.postsRepository.save(post);
+    return post.id;
   }
 
   async updatePost(
@@ -100,7 +97,7 @@ export class PostsService {
     currentUserId: string,
     postId: string,
     commentInputDto: CommentInputDto,
-  ): Promise<CommentDocument | null> {
+  ): Promise<string | null> {
     const post = await this.postsRepository.findPost(postId);
 
     if (!post) {
@@ -115,6 +112,7 @@ export class PostsService {
       post,
       user,
     );
-    return this.commentsRepository.save(comment);
+    await this.commentsRepository.save(comment);
+    return comment.id;
   }
 }
