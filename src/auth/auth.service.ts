@@ -13,7 +13,6 @@ import {
 } from '../users/schemas/user.entity';
 import { randomUUID } from 'crypto';
 import { UserCreateDto } from '../users/dto/user-create.dto';
-import { UserViewModel } from '../users/schemas/user.view';
 import { add } from 'date-fns';
 import { InjectModel } from '@nestjs/mongoose';
 import { MailService } from '../mail/mail.service';
@@ -89,7 +88,7 @@ export class AuthService {
 
   async registerUser(
     createUserDto: UserCreateDto,
-  ): Promise<UserViewModel | null> {
+  ): Promise<UserDocument | null> {
     const hash = await bcrypt.hash(
       createUserDto.password,
       Number(process.env.HASH_ROUNDS),
@@ -108,7 +107,7 @@ export class AuthService {
       emailData,
     );
 
-    const result = await this.usersRepository.createUser(user);
+    const result = await this.usersRepository.save(user);
 
     try {
       await this.mailService.sendRegistrationMail(

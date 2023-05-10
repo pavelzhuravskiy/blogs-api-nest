@@ -65,7 +65,7 @@ export class CommentsQueryRepository {
     };
   }
 
-  async findComment(id: string): Promise<CommentViewModel | null> {
+  async findComment(id: string): Promise<CommentDocument | null> {
     if (!mongoose.isValidObjectId(id)) {
       return null;
     }
@@ -76,19 +76,6 @@ export class CommentsQueryRepository {
       return null;
     }
 
-    return {
-      id: comment._id.toString(),
-      content: comment.content,
-      commentatorInfo: {
-        userId: comment.commentatorInfo.userId,
-        userLogin: comment.commentatorInfo.userLogin,
-      },
-      createdAt: comment.createdAt.toISOString(),
-      likesInfo: {
-        likesCount: comment.extendedLikesInfo.likesCount,
-        dislikesCount: comment.extendedLikesInfo.dislikesCount,
-        myStatus: 'None',
-      },
-    };
+    return comment;
   }
 }

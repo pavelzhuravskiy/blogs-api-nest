@@ -8,6 +8,7 @@ import {
   Post,
   Query,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { UserCreateDto } from './dto/user-create.dto';
 import { UsersService } from './users.service';
@@ -17,6 +18,7 @@ import { exceptionHandler } from '../exceptions/exception.handler';
 import { ExceptionCode } from '../exceptions/exception-codes.enum';
 import { userIDField, userNotFound } from '../exceptions/exception.constants';
 import { BasicAuthGuard } from '../auth/guards/basic-auth.guard';
+import { UserTransformInterceptor } from './interceptors/user-transform.interceptor';
 
 @Controller('users')
 export class UsersController {
@@ -27,6 +29,7 @@ export class UsersController {
 
   @UseGuards(BasicAuthGuard)
   @Post()
+  @UseInterceptors(UserTransformInterceptor)
   async createUser(@Body() createUserDto: UserCreateDto) {
     return this.usersService.createUser(createUserDto);
   }

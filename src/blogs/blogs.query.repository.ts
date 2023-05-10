@@ -38,6 +38,8 @@ export class BlogsQueryRepository {
     const totalCount = await this.BlogModel.countDocuments(filter);
     const pagesCount = Math.ceil(totalCount / +query.pageSize);
 
+    console.log(blogs);
+
     return {
       pagesCount: pagesCount,
       page: +query.pageNumber,
@@ -56,7 +58,7 @@ export class BlogsQueryRepository {
     };
   }
 
-  async findBlog(id: string): Promise<BlogViewModel | null> {
+  async findBlog(id: string): Promise<BlogDocument | null> {
     if (!mongoose.isValidObjectId(id)) {
       return null;
     }
@@ -67,13 +69,6 @@ export class BlogsQueryRepository {
       return null;
     }
 
-    return {
-      id: blog.id,
-      name: blog.name,
-      description: blog.description,
-      websiteUrl: blog.websiteUrl,
-      createdAt: blog.createdAt.toISOString(),
-      isMembership: blog.isMembership,
-    };
+    return blog;
   }
 }

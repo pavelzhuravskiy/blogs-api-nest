@@ -9,6 +9,7 @@ import {
   Put,
   Query,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { PostCreateDto } from './dto/post-create.dto';
 import { PostsService } from './posts.service';
@@ -28,6 +29,8 @@ import {
 import { JwtBearerGuard } from '../auth/guards/jwt-bearer.guard';
 import { BasicAuthGuard } from '../auth/guards/basic-auth.guard';
 import { CurrentUserId } from '../auth/decorators/current-user-id.param.decorator';
+import { CommentTransformInterceptor } from '../comments/interceptors/comment-transform.interceptor';
+import { PostTransformInterceptor } from './interceptors/post-transform.interceptor';
 
 @Controller('posts')
 export class PostsController {
@@ -39,6 +42,7 @@ export class PostsController {
 
   @UseGuards(BasicAuthGuard)
   @Post()
+  @UseInterceptors(PostTransformInterceptor)
   async createPost(@Body() createPostDto: PostCreateDto) {
     const result = await this.postsService.createPost(createPostDto);
 
@@ -59,6 +63,7 @@ export class PostsController {
   }
 
   @Get(':id')
+  @UseInterceptors(PostTransformInterceptor)
   async findPost(@Param('id') id: string) {
     const result = await this.postsQueryRepository.findPost(id);
 
@@ -108,6 +113,7 @@ export class PostsController {
 
   @UseGuards(JwtBearerGuard)
   @Post(':id/comments')
+  @UseInterceptors(CommentTransformInterceptor)
   async createComment(
     @CurrentUserId() currentUserId: string,
     @Param('id') postId: string,

@@ -1,13 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Post, PostModelType } from './schemas/post.entity';
+import { Post, PostDocument, PostModelType } from './schemas/post.entity';
 import { PostsRepository } from './posts.repository';
 import { PostCreateDto } from './dto/post-create.dto';
-import { PostViewModel } from './schemas/post.view';
 import { PostUpdateDto } from './dto/post-update.dto';
 import { CommentCreateDto } from '../comments/dto/comment-create.dto';
-import { CommentViewModel } from '../comments/schemas/comment.view';
-import { Comment, CommentModelType } from '../comments/schemas/comment.entity';
+import {
+  Comment,
+  CommentDocument,
+  CommentModelType,
+} from '../comments/schemas/comment.entity';
 import { CommentsRepository } from '../comments/comments.repository';
 import { BlogsRepository } from '../blogs/blogs.repository';
 import { ExceptionCode } from '../exceptions/exception-codes.enum';
@@ -36,7 +38,7 @@ export class PostsService {
   async createPost(
     createPostDto: PostCreateDto,
     blogIdParam?: string,
-  ): Promise<PostViewModel | null> {
+  ): Promise<PostDocument | null> {
     const blogId = createPostDto.blogId || blogIdParam;
 
     const blog = await this.blogsRepository.findBlog(blogId);
@@ -47,7 +49,7 @@ export class PostsService {
 
     const post = this.PostModel.createPost(createPostDto, this.PostModel, blog);
 
-    return this.postsRepository.createPost(post);
+    return this.postsRepository.save(post);
   }
 
   async updatePost(
@@ -99,7 +101,7 @@ export class PostsService {
     currentUserId: string,
     postId: string,
     createCommentDto: CommentCreateDto,
-  ): Promise<CommentViewModel | null> {
+  ): Promise<CommentDocument | null> {
     const post = await this.postsRepository.findPost(postId);
 
     if (!post) {
@@ -114,6 +116,6 @@ export class PostsService {
       post,
       user,
     );
-    return this.commentsRepository.createComment(comment);
+    return this.commentsRepository.save(comment);
   }
 }

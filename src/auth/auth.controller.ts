@@ -7,6 +7,7 @@ import {
   Request,
   Response,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
 import { LocalAuthGuard } from './guards/local-auth.guard';
@@ -29,6 +30,7 @@ import {
 } from '../exceptions/exception.constants';
 import { EmailDto } from './dto/email.dto';
 import { NewPasswordDto } from './dto/new-password.dto';
+import { UserTransformInterceptor } from '../users/interceptors/user-transform.interceptor';
 
 @Controller('auth')
 export class AuthController {
@@ -41,6 +43,7 @@ export class AuthController {
   ) {}
 
   @Post('registration')
+  @UseInterceptors(UserTransformInterceptor)
   async registerUser(@Body() createUserDto: UserCreateDto) {
     return this.authService.registerUser(createUserDto);
   }

@@ -9,6 +9,7 @@ import {
   Put,
   Query,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { BlogsService } from './blogs.service';
 import { BlogCreateDto } from './dto/blog-create.dto';
@@ -23,6 +24,7 @@ import { exceptionHandler } from '../exceptions/exception.handler';
 import { CommonQuery } from '../common/dto/common.query';
 import { blogIDField, blogNotFound } from '../exceptions/exception.constants';
 import { BasicAuthGuard } from '../auth/guards/basic-auth.guard';
+import { BlogTransformInterceptor } from './interceptors/blog-transform.interceptor';
 
 @Controller('blogs')
 export class BlogsController {
@@ -35,6 +37,7 @@ export class BlogsController {
 
   @UseGuards(BasicAuthGuard)
   @Post()
+  @UseInterceptors(BlogTransformInterceptor)
   async createBlog(@Body() createBlogDto: BlogCreateDto) {
     return this.blogsService.createBlog(createBlogDto);
   }
@@ -45,6 +48,7 @@ export class BlogsController {
   }
 
   @Get(':id')
+  @UseInterceptors(BlogTransformInterceptor)
   async findBlog(@Param('id') id: string) {
     const result = await this.blogsQueryRepository.findBlog(id);
 
