@@ -2,9 +2,10 @@ import {
   Body,
   Controller,
   Get,
+  Headers,
   HttpCode,
+  Ip,
   Post,
-  Request,
   Response,
   UseGuards,
 } from '@nestjs/common';
@@ -30,6 +31,7 @@ import {
 import { EmailDto } from './dto/email.dto';
 import { NewPasswordDto } from './dto/new-password.dto';
 import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
+import { RefreshToken } from './decorators/refresh-token.param.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -104,12 +106,14 @@ export class AuthController {
   @Throttle(5, 10)
   @Post('login')
   @HttpCode(200)
-  async login(@Request() req, @Response() res) {
-    const userId = req.user.id;
-    const ip = req.ip;
-    const userAgent = req.headers['user-agent'] || 'unknown';
-
-    const tokens = await this.authService.getTokens(userId);
+  async login(
+    @CurrentUserId() currentUserId,
+    @Ip() ip,
+    @Headers() headers,
+    @Response() res,
+  ) {
+    const userAgent = headers['user-agent'] || 'unknown';
+    const tokens = await this.authService.getTokens(currentUserId);
 
     await this.devicesService.createDevice(tokens.refreshToken, ip, userAgent);
 
@@ -124,16 +128,18 @@ export class AuthController {
   @UseGuards(JwtRefreshGuard)
   @Post('refresh-token')
   @HttpCode(200)
-  async refreshTokens(@Request() req, @Response() res) {
-    const userId = req.user.id;
-    const ip = req.ip;
-    const userAgent = req.headers['user-agent'] || 'unknown';
-    const token = req.cookies.refreshToken;
-
-    const decodedToken: any = await this.jwtService.decode(token);
+  async refreshTokens(
+    @CurrentUserId() currentUserId,
+    @Ip() ip,
+    @Headers() headers,
+    @RefreshToken() refreshToken,
+    @Response() res,
+  ) {
+    const userAgent = headers['user-agent'] || 'unknown';
+    const decodedToken: any = this.jwtService.decode(refreshToken);
     const deviceId = decodedToken.deviceId;
-    const tokens = await this.authService.getTokens(userId, deviceId);
-    const newToken = await this.jwtService.decode(tokens.refreshToken);
+    const tokens = await this.authService.getTokens(currentUserId, deviceId);
+    const newToken = this.jwtService.decode(tokens.refreshToken);
 
     await this.devicesService.updateDevice(newToken, ip, userAgent);
 
@@ -145,13 +151,12 @@ export class AuthController {
       .json({ accessToken: tokens.accessToken });
   }
 
-  @UseGuards(JwtBearerGuard)
+  @UseGuards(JwtRefreshGuard)
   @Post('logout')
   @HttpCode(204)
-  async logout(@Request() req) {
-    const token = req.cookies.refreshToken;
-    const decodedToken: any = await this.jwtService.decode(token);
-    const deviceId = decodedToken?.deviceId;
+  async logout(@RefreshToken() refreshToken) {
+    const decodedToken: any = this.jwtService.decode(refreshToken);
+    const deviceId = decodedToken.deviceId;
     return this.devicesService.logout(deviceId);
   }
 

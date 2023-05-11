@@ -19,6 +19,7 @@ import { JwtBearerGuard } from '../auth/guards/jwt-bearer.guard';
 import { CurrentUserId } from '../auth/decorators/current-user-id.param.decorator';
 import { CommentsService } from './comments.service';
 import { CommentInputDto } from './dto/comment-input.dto';
+import { LikeStatusInputDto } from '../likes/dto/like-status-input.dto';
 
 @Controller('comments')
 export class CommentsController {
@@ -63,27 +64,6 @@ export class CommentsController {
     return result;
   }
 
-  @UseGuards(JwtBearerGuard) // TODO
-  @Put(':id/like-status')
-  @HttpCode(204)
-  async updateLikeStatus(
-    @CurrentUserId() currentUserId: string,
-    @Param('id') commentId: string,
-    @Body() commentInputDto: CommentInputDto,
-  ) {
-    /*const result = await this.commentsService.updateComment(
-      currentUserId,
-      commentId,
-      updateCommentDto,
-    );
-
-    if (result.code !== ExceptionCode.Success) {
-      return exceptionHandler(result.code, result.message, result.field);
-    }*/
-
-    return 1;
-  }
-
   @UseGuards(JwtBearerGuard)
   @Delete(':id')
   @HttpCode(204)
@@ -101,5 +81,16 @@ export class CommentsController {
     }
 
     return result;
+  }
+
+  @UseGuards(JwtBearerGuard)
+  @Put(':id/like-status')
+  @HttpCode(204)
+  async updateLikeStatus(
+    @CurrentUserId() currentUserId,
+    @Param('id') commentId: string,
+    @Body() likeStatus: LikeStatusInputDto,
+  ) {
+    return 1;
   }
 }

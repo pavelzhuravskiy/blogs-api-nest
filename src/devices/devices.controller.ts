@@ -4,17 +4,17 @@ import {
   Get,
   HttpCode,
   Param,
-  Request,
   UseGuards,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { JwtBearerGuard } from '../auth/guards/jwt-bearer.guard';
 import { DevicesQueryRepository } from './devices.query.repository';
 import { DevicesService } from './devices.service';
 import { DevicesRepository } from './devices.repository';
 import { exceptionHandler } from '../exceptions/exception.handler';
 import { ResultCode } from '../exceptions/exception-codes.enum';
 import { CurrentUserId } from '../auth/decorators/current-user-id.param.decorator';
+import { JwtRefreshGuard } from '../auth/guards/jwt-refresh.guard';
+import { RefreshToken } from '../auth/decorators/refresh-token.param.decorator';
 
 @Controller('security')
 export class DevicesController {
@@ -25,31 +25,27 @@ export class DevicesController {
     private readonly jwtService: JwtService,
   ) {}
 
-  @UseGuards(JwtBearerGuard)
+  @UseGuards(JwtRefreshGuard)
   @Get('devices')
-  async getDevices(@Request() req) {
-    const token = req.cookies.refreshToken;
-    const decodedToken = await this.jwtService.decode(token);
-    const userId = decodedToken?.sub;
-    return this.devicesQueryRepository.findDevices(userId);
+  async getDevices(@CurrentUserId() currentUserId) {
+    return this.devicesQueryRepository.findDevices(currentUserId);
   }
 
-  @UseGuards(JwtBearerGuard)
+  @UseGuards(JwtRefreshGuard)
   @Delete('devices')
   @HttpCode(204)
-  async deleteOldDevices(@Request() req) {
-    const token = req.cookies.refreshToken;
-    const decodedToken: any = await this.jwtService.decode(token);
+  async deleteOldDevices(@RefreshToken() refreshToken) {
+    const decodedToken: any = this.jwtService.decode(refreshToken);
     const deviceId = decodedToken?.deviceId;
     return this.devicesService.deleteOldDevices(deviceId);
   }
 
-  @UseGuards(JwtBearerGuard)
+  @UseGuards(JwtRefreshGuard)
   @Delete('devices/:id')
   @HttpCode(204)
   async terminateSession(
     @CurrentUserId() currentUserId,
-    @Param('id') deviceId: string,
+    @Param('id') deviceId,
   ) {
     const result = await this.devicesService.terminateSession(
       currentUserId,
