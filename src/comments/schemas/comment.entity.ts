@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Model } from 'mongoose';
+import { HydratedDocument, Model, Types } from 'mongoose';
 import { CommentatorInfoSchema } from './commentator-info.schema';
 import { LikesInfoSchema } from '../../likes/schemas/likes-info.schema';
 import { CommentInputDto } from '../dto/comment-input.dto';
@@ -7,6 +7,7 @@ import { PostDocument } from '../../posts/schemas/post.entity';
 import { UserDocument } from '../../users/schemas/user.entity';
 
 export type CommentDocument = HydratedDocument<Comment>;
+export type CommentLeanType = Comment & { _id: Types.ObjectId };
 
 export type CommentModelStaticType = {
   createComment: (

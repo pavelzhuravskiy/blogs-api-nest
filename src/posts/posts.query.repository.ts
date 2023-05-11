@@ -1,12 +1,15 @@
 import { Injectable } from '@nestjs/common';
-import mongoose, { FilterQuery, SortOrder } from 'mongoose';
+import mongoose from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Paginator } from '../common/schemas/paginator';
-import { Post, PostDocument, PostModelType } from './schemas/post.entity';
+import { Post, PostLeanType, PostModelType } from './schemas/post.entity';
 import { PostViewModel } from './schemas/post.view';
 import { BlogsQueryRepository } from '../blogs/blogs.query.repository';
 import { CommonQueryDto } from '../common/dto/common-query.dto';
 import { LikeStatus } from '../likes/like-status.enum';
+import { pFind } from '../helpers/pagination/pagination-find';
+import { pSort } from '../helpers/pagination/pagination-sort';
+import { pFilterPosts } from '../helpers/pagination/pagination-filter-posts';
 
 @Injectable()
 export class PostsQueryRepository {
@@ -19,58 +22,32 @@ export class PostsQueryRepository {
     query: CommonQueryDto,
     blogId?: string,
   ): Promise<Paginator<PostViewModel[]> | null> {
-    const filter: FilterQuery<PostDocument> = {};
-
     if (blogId) {
       const blog = await this.blogsQueryRepository.findBlog(blogId);
 
       if (!blog) {
         return null;
       }
-
-      filter.blogId = blogId;
     }
 
-    const sortingObj: { [key: string]: SortOrder } = {
-      [query.sortBy]: query.sortDirection,
-    };
+    const posts = await pFind(
+      this.PostModel,
+      query.pageNumber,
+      query.pageSize,
+      pFilterPosts(blogId),
+      pSort(query.sortBy, query.sortDirection),
+    );
 
-    if (query.sortDirection === 'asc') {
-      sortingObj[query.sortBy] = 'asc';
-    }
+    const totalCount = await this.PostModel.countDocuments(
+      pFilterPosts(blogId),
+    );
 
-    const posts = await this.PostModel.find(filter)
-      .sort(sortingObj)
-      .skip(query.pageNumber > 0 ? (query.pageNumber - 1) * query.pageSize : 0)
-      .limit(query.pageSize > 0 ? query.pageSize : 0)
-      .lean();
-
-    const totalCount = await this.PostModel.countDocuments(filter);
-    const pagesCount = Math.ceil(totalCount / query.pageSize);
-
-    return {
-      pagesCount: pagesCount,
-      page: query.pageNumber,
+    return Paginator.paginate({
+      pageNumber: query.pageNumber,
       pageSize: query.pageSize,
-      totalCount,
-      items: posts.map((post) => {
-        return {
-          id: post._id.toString(),
-          title: post.title,
-          shortDescription: post.shortDescription,
-          content: post.content,
-          blogId: post.blogId,
-          blogName: post.blogName,
-          createdAt: post.createdAt.toISOString(),
-          extendedLikesInfo: {
-            likesCount: post.extendedLikesInfo.likesCount,
-            dislikesCount: post.extendedLikesInfo.dislikesCount,
-            myStatus: 'None',
-            newestLikes: [],
-          },
-        };
-      }),
-    };
+      totalCount: totalCount,
+      items: await this.postsMapping(posts),
+    });
   }
 
   async findPost(id: string): Promise<PostViewModel | null> {
@@ -99,5 +76,25 @@ export class PostsQueryRepository {
         newestLikes: [],
       },
     };
+  }
+
+  private async postsMapping(posts: PostLeanType[]): Promise<PostViewModel[]> {
+    return posts.map((p) => {
+      return {
+        id: p._id.toString(),
+        title: p.title,
+        shortDescription: p.shortDescription,
+        content: p.content,
+        blogId: p.blogId,
+        blogName: p.blogName,
+        createdAt: p.createdAt.toISOString(),
+        extendedLikesInfo: {
+          likesCount: p.extendedLikesInfo.likesCount,
+          dislikesCount: p.extendedLikesInfo.dislikesCount,
+          myStatus: LikeStatus.None,
+          newestLikes: [],
+        },
+      };
+    });
   }
 }

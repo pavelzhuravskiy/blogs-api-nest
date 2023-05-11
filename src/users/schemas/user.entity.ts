@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Model } from 'mongoose';
+import { HydratedDocument, Model, Types } from 'mongoose';
 import { UserAccountSchema } from './user-account.schema';
 import { UserEmailSchema } from './user-email.schema';
 import { UserPasswordSchema } from './user-password.schema';
@@ -7,6 +7,7 @@ import { UserInputDto } from '../dto/user-input.dto';
 import { add } from 'date-fns';
 
 export type UserDocument = HydratedDocument<User>;
+export type UserLeanType = User & { _id: Types.ObjectId };
 
 export type UserModelStaticType = {
   createUser: (

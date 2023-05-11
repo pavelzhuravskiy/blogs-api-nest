@@ -1,10 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import mongoose, { FilterQuery, SortOrder } from 'mongoose';
+import mongoose from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Paginator } from '../common/schemas/paginator';
-import { User, UserDocument, UserModelType } from './schemas/user.entity';
+import { User, UserLeanType, UserModelType } from './schemas/user.entity';
 import { UserQueryDto } from './dto/user-query.dto';
 import { UserViewModel } from './schemas/user.view';
+import { pFind } from '../helpers/pagination/pagination-find';
+import { pSort } from '../helpers/pagination/pagination-sort';
+import { pFilterUsers } from '../helpers/pagination/pagination-filter-users';
 
 @Injectable()
 export class UsersQueryRepository {
@@ -13,55 +16,24 @@ export class UsersQueryRepository {
     private UserModel: UserModelType,
   ) {}
   async findUsers(query: UserQueryDto): Promise<Paginator<UserViewModel[]>> {
-    const filter: FilterQuery<UserDocument> = {};
+    const users = await pFind(
+      this.UserModel,
+      query.pageNumber,
+      query.pageSize,
+      pFilterUsers(query.searchLoginTerm, query.searchEmailTerm),
+      pSort(`accountData.${query.sortBy}`, query.sortDirection),
+    );
 
-    if (query.searchLoginTerm || query.searchEmailTerm) {
-      filter.$or = [];
+    const totalCount = await this.UserModel.countDocuments(
+      pFilterUsers(query.searchLoginTerm, query.searchEmailTerm),
+    );
 
-      if (query.searchLoginTerm) {
-        filter.$or.push({
-          'accountData.login': { $regex: query.searchLoginTerm, $options: 'i' },
-        });
-      }
-
-      if (query.searchEmailTerm) {
-        filter.$or.push({
-          'accountData.email': { $regex: query.searchEmailTerm, $options: 'i' },
-        });
-      }
-    }
-
-    const sortingObj: { [key: string]: SortOrder } = {
-      [`accountData.${query.sortBy}`]: query.sortDirection,
-    };
-
-    if (query.sortDirection === 'asc') {
-      sortingObj[`accountData.${query.sortBy}`] = 'asc';
-    }
-
-    const users = await this.UserModel.find(filter)
-      .sort(sortingObj)
-      .skip(query.pageNumber > 0 ? (query.pageNumber - 1) * query.pageSize : 0)
-      .limit(query.pageSize > 0 ? query.pageSize : 0)
-      .lean();
-
-    const totalCount = await this.UserModel.countDocuments(filter);
-    const pagesCount = Math.ceil(totalCount / query.pageSize);
-
-    return {
-      pagesCount: pagesCount,
-      page: query.pageNumber,
+    return Paginator.paginate({
+      pageNumber: query.pageNumber,
       pageSize: query.pageSize,
-      totalCount,
-      items: users.map((user) => {
-        return {
-          id: user._id.toString(),
-          login: user.accountData.login,
-          email: user.accountData.email,
-          createdAt: user.accountData.createdAt.toISOString(),
-        };
-      }),
-    };
+      totalCount: totalCount,
+      items: await this.usersMapping(users),
+    });
   }
 
   async findUser(id: string): Promise<UserViewModel | null> {
@@ -81,5 +53,16 @@ export class UsersQueryRepository {
       email: user.accountData.email,
       createdAt: user.accountData.createdAt.toISOString(),
     };
+  }
+
+  private async usersMapping(users: UserLeanType[]): Promise<UserViewModel[]> {
+    return users.map((u) => {
+      return {
+        id: u._id.toString(),
+        login: u.accountData.login,
+        email: u.accountData.email,
+        createdAt: u.accountData.createdAt.toISOString(),
+      };
+    });
   }
 }

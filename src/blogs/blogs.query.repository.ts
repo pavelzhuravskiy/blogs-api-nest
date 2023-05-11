@@ -1,10 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { Blog, BlogDocument, BlogModelType } from './schemas/blog.entity';
+import { Blog, BlogLeanType, BlogModelType } from './schemas/blog.entity';
 import { BlogQueryDto } from './dto/blog-query.dto';
-import mongoose, { FilterQuery, SortOrder } from 'mongoose';
+import mongoose from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Paginator } from '../common/schemas/paginator';
 import { BlogViewModel } from './schemas/blog.view';
+import { pFind } from '../helpers/pagination/pagination-find';
+import { pSort } from '../helpers/pagination/pagination-sort';
+import { pFilterBlogs } from '../helpers/pagination/pagination-filter-blogs';
 
 @Injectable()
 export class BlogsQueryRepository {
@@ -13,45 +16,24 @@ export class BlogsQueryRepository {
     private BlogModel: BlogModelType,
   ) {}
   async findBlogs(query: BlogQueryDto): Promise<Paginator<BlogViewModel[]>> {
-    const filter: FilterQuery<BlogDocument> = {};
+    const blogs = await pFind(
+      this.BlogModel,
+      query.pageNumber,
+      query.pageSize,
+      pFilterBlogs(query.searchNameTerm),
+      pSort(query.sortBy, query.sortDirection),
+    );
 
-    if (query.searchNameTerm) {
-      filter.name = { $regex: query.searchNameTerm, $options: 'i' };
-    }
+    const totalCount = await this.BlogModel.countDocuments(
+      pFilterBlogs(query.searchNameTerm),
+    );
 
-    const sortingObj: { [key: string]: SortOrder } = {
-      [query.sortBy]: query.sortDirection,
-    };
-
-    if (query.sortDirection === 'asc') {
-      sortingObj[query.sortBy] = 'asc';
-    }
-
-    const blogs = await this.BlogModel.find(filter)
-      .sort(sortingObj)
-      .skip(query.pageNumber > 0 ? (query.pageNumber - 1) * query.pageSize : 0)
-      .limit(query.pageSize > 0 ? query.pageSize : 0)
-      .lean();
-
-    const totalCount = await this.BlogModel.countDocuments(filter);
-    const pagesCount = Math.ceil(totalCount / query.pageSize);
-
-    return {
-      pagesCount: pagesCount,
-      page: query.pageNumber,
+    return Paginator.paginate({
+      pageNumber: query.pageNumber,
       pageSize: query.pageSize,
-      totalCount,
-      items: blogs.map((blog) => {
-        return {
-          id: blog._id.toString(),
-          name: blog.name,
-          description: blog.description,
-          websiteUrl: blog.websiteUrl,
-          createdAt: blog.createdAt.toISOString(),
-          isMembership: blog.isMembership,
-        };
-      }),
-    };
+      totalCount: totalCount,
+      items: await this.blogsMapping(blogs),
+    });
   }
 
   async findBlog(id: string): Promise<BlogViewModel | null> {
@@ -73,5 +55,18 @@ export class BlogsQueryRepository {
       createdAt: blog.createdAt.toISOString(),
       isMembership: blog.isMembership,
     };
+  }
+
+  private async blogsMapping(blogs: BlogLeanType[]): Promise<BlogViewModel[]> {
+    return blogs.map((b) => {
+      return {
+        id: b._id.toString(),
+        name: b.name,
+        description: b.description,
+        websiteUrl: b.websiteUrl,
+        createdAt: b.createdAt.toISOString(),
+        isMembership: b.isMembership,
+      };
+    });
   }
 }

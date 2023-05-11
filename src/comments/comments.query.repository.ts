@@ -1,16 +1,19 @@
 import { Injectable } from '@nestjs/common';
-import mongoose, { FilterQuery, SortOrder } from 'mongoose';
+import mongoose from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Paginator } from '../common/schemas/paginator';
 import {
   Comment,
-  CommentDocument,
+  CommentLeanType,
   CommentModelType,
 } from './schemas/comment.entity';
 import { CommentViewModel } from './schemas/comment.view';
 import { CommonQueryDto } from '../common/dto/common-query.dto';
 import { PostsQueryRepository } from '../posts/posts.query.repository';
 import { LikeStatus } from '../likes/like-status.enum';
+import { pFind } from '../helpers/pagination/pagination-find';
+import { pSort } from '../helpers/pagination/pagination-sort';
+import { pFilterComments } from '../helpers/pagination/pagination-filter-comments';
 
 @Injectable()
 export class CommentsQueryRepository {
@@ -23,55 +26,30 @@ export class CommentsQueryRepository {
     query: CommonQueryDto,
     postId: string,
   ): Promise<Paginator<CommentViewModel[]>> {
-    const filter: FilterQuery<CommentDocument> = {};
-
     const post = await this.postsQueryRepository.findPost(postId);
 
     if (!post) {
       return null;
     }
 
-    filter.postId = postId;
+    const comments = await pFind(
+      this.CommentModel,
+      query.pageNumber,
+      query.pageSize,
+      pFilterComments(postId),
+      pSort(query.sortBy, query.sortDirection),
+    );
 
-    const sortingObj: { [key: string]: SortOrder } = {
-      [query.sortBy]: query.sortDirection,
-    };
+    const totalCount = await this.CommentModel.countDocuments(
+      pFilterComments(postId),
+    );
 
-    if (query.sortDirection === 'asc') {
-      sortingObj[query.sortBy] = 'asc';
-    }
-
-    const comments = await this.CommentModel.find(filter)
-      .sort(sortingObj)
-      .skip(query.pageNumber > 0 ? (query.pageNumber - 1) * query.pageSize : 0)
-      .limit(query.pageSize > 0 ? query.pageSize : 0)
-      .lean();
-
-    const totalCount = await this.CommentModel.countDocuments(filter);
-    const pagesCount = Math.ceil(totalCount / query.pageSize);
-
-    return {
-      pagesCount: pagesCount,
-      page: query.pageNumber,
+    return Paginator.paginate({
+      pageNumber: query.pageNumber,
       pageSize: query.pageSize,
-      totalCount,
-      items: comments.map((comment) => {
-        return {
-          id: comment._id.toString(),
-          content: comment.content,
-          commentatorInfo: {
-            userId: comment.commentatorInfo.userId,
-            userLogin: comment.commentatorInfo.userLogin,
-          },
-          createdAt: comment.createdAt.toISOString(),
-          likesInfo: {
-            likesCount: comment.extendedLikesInfo.likesCount,
-            dislikesCount: comment.extendedLikesInfo.dislikesCount,
-            myStatus: 'None',
-          },
-        };
-      }),
-    };
+      totalCount: totalCount,
+      items: await this.commentsMapping(comments),
+    });
   }
 
   async findComment(id: string): Promise<CommentViewModel | null> {
@@ -99,5 +77,26 @@ export class CommentsQueryRepository {
         myStatus: LikeStatus.None,
       },
     };
+  }
+
+  private async commentsMapping(
+    comments: CommentLeanType[],
+  ): Promise<CommentViewModel[]> {
+    return comments.map((c) => {
+      return {
+        id: c._id.toString(),
+        content: c.content,
+        commentatorInfo: {
+          userId: c.commentatorInfo.userId,
+          userLogin: c.commentatorInfo.userLogin,
+        },
+        createdAt: c.createdAt.toISOString(),
+        likesInfo: {
+          likesCount: c.extendedLikesInfo.likesCount,
+          dislikesCount: c.extendedLikesInfo.dislikesCount,
+          myStatus: LikeStatus.None,
+        },
+      };
+    });
   }
 }
