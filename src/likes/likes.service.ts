@@ -3,17 +3,11 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Comment, CommentModelType } from '../comments/schemas/comment.entity';
 import { CommentsRepository } from '../comments/comments.repository';
 import { PostsRepository } from '../posts/posts.repository';
-import { ResultCode } from '../exceptions/exception-codes.enum';
-import {
-  commentIDField,
-  commentNotFound,
-  postIDField,
-  postNotFound,
-} from '../exceptions/exception.constants';
-import { ExceptionResultType } from '../exceptions/types/exception-result.type';
 import { Post, PostModelType } from '../posts/schemas/post.entity';
 import { LikesRepository } from './likes.repository';
 import { LikeStatus } from './like-status.enum';
+import { LikesDataType } from './schemas/likes-data.type';
+import { UsersRepository } from '../users/users.repository';
 
 @Injectable()
 export class LikesService {
@@ -25,147 +19,114 @@ export class LikesService {
     private readonly commentsRepository: CommentsRepository,
     private readonly postsRepository: PostsRepository,
     private readonly likesRepository: LikesRepository,
+    private readonly usersRepository: UsersRepository,
   ) {}
 
-  async updateLikeStatus(
-    likeStatus: string,
+  async updateCommentLikes(
+    commentId: string,
     userId: string,
-    commentId?: string,
-    postId?: string,
-  ): Promise<ExceptionResultType<boolean>> {
-    let commentOrPostId;
-    let model;
-    let likesCount;
-    let dislikesCount;
+    likeStatus: string,
+  ): Promise<boolean | null> {
+    const comment = await this.commentsRepository.findComment(commentId);
 
-    if (commentId) {
-      const comment = await this.commentsRepository.findComment(commentId);
-
-      if (!comment) {
-        return {
-          data: false,
-          code: ResultCode.NotFound,
-          field: commentIDField,
-          message: commentNotFound,
-        };
-      }
-
-      commentOrPostId = comment.id;
-      model = this.CommentModel;
-      likesCount = comment.likesInfo.likesCount;
-      dislikesCount = comment.likesInfo.dislikesCount;
+    if (!comment) {
+      return null;
     }
 
-    if (postId) {
-      const post = await this.postsRepository.findPost(postId);
+    const data: LikesDataType = {
+      commentOrPostId: commentId,
+      userId: userId,
+      likeStatus: likeStatus,
+      likesCount: comment.likesInfo.likesCount,
+      dislikesCount: comment.likesInfo.dislikesCount,
+      model: this.CommentModel,
+    };
 
-      if (!post) {
-        return {
-          data: false,
-          code: ResultCode.NotFound,
-          field: postIDField,
-          message: postNotFound,
-        };
-      }
+    return this.updateLikesData(data);
+  }
 
-      commentOrPostId = post.id;
-      model = this.PostModel;
-      likesCount = post.likesInfo.likesCount;
-      dislikesCount = post.likesInfo.dislikesCount;
+  async updatePostLikes(
+    postId: string,
+    userId: string,
+    likeStatus: string,
+  ): Promise<boolean | null> {
+    const post = await this.postsRepository.findPost(postId);
+
+    if (!post) {
+      return null;
     }
 
-    const user = await this.likesRepository.findUserInLikesInfo(
-      model,
-      commentOrPostId,
-      userId,
+    const data: LikesDataType = {
+      commentOrPostId: postId,
+      userId: userId,
+      likeStatus: likeStatus,
+      likesCount: post.likesInfo.likesCount,
+      dislikesCount: post.likesInfo.dislikesCount,
+      model: this.PostModel,
+    };
+
+    return this.updateLikesData(data);
+  }
+
+  async updateLikesData(data: LikesDataType): Promise<boolean | null> {
+    const userInLikesInfo = await this.likesRepository.findUserInLikesInfo(
+      data,
     );
 
-    if (!user) {
-      await this.likesRepository.pushUserInLikesInfo(
-        model,
-        commentOrPostId,
-        userId,
-        likeStatus,
-      );
+    if (!userInLikesInfo) {
+      const user = await this.usersRepository.findUserById(data.userId);
+      const userLogin = user.accountData.login;
 
-      if (likeStatus === LikeStatus.Like) {
-        likesCount++;
+      await this.likesRepository.pushUserInLikesInfo(data, userLogin);
+
+      if (data.likeStatus === LikeStatus.Like) {
+        data.likesCount++;
       }
 
-      if (likeStatus === LikeStatus.Dislike) {
-        dislikesCount++;
+      if (data.likeStatus === LikeStatus.Dislike) {
+        data.dislikesCount++;
       }
 
-      await this.likesRepository.updateLikesCount(
-        model,
-        commentOrPostId,
-        likesCount,
-        dislikesCount,
-      );
-
-      return {
-        data: true,
-        code: ResultCode.Success,
-      };
+      return this.likesRepository.updateLikesCount(data);
     }
 
-    const userLikeDBStatus = await this.likesRepository.findUserLikeStatus(
-      model,
-      commentOrPostId,
-      userId,
-    );
+    const userLikeStatus = await this.likesRepository.findUserLikeStatus(data);
 
-    switch (userLikeDBStatus) {
+    switch (userLikeStatus) {
       case LikeStatus.None:
-        if (likeStatus === LikeStatus.Like) {
-          likesCount++;
+        if (data.likeStatus === LikeStatus.Like) {
+          data.likesCount++;
         }
 
-        if (likeStatus === LikeStatus.Dislike) {
-          dislikesCount++;
+        if (data.likeStatus === LikeStatus.Dislike) {
+          data.dislikesCount++;
         }
         break;
 
       case LikeStatus.Like:
-        if (likeStatus === LikeStatus.None) {
-          likesCount--;
+        if (data.likeStatus === LikeStatus.None) {
+          data.likesCount--;
         }
 
-        if (likeStatus === LikeStatus.Dislike) {
-          likesCount--;
-          dislikesCount++;
+        if (data.likeStatus === LikeStatus.Dislike) {
+          data.likesCount--;
+          data.dislikesCount++;
         }
         break;
 
       case LikeStatus.Dislike:
-        if (likeStatus === LikeStatus.None) {
-          dislikesCount--;
+        if (data.likeStatus === LikeStatus.None) {
+          data.dislikesCount--;
         }
 
-        if (likeStatus === LikeStatus.Like) {
-          dislikesCount--;
-          likesCount++;
+        if (data.likeStatus === LikeStatus.Like) {
+          data.dislikesCount--;
+          data.likesCount++;
         }
     }
 
-    await this.likesRepository.updateLikesCount(
-      model,
-      commentOrPostId,
-      likesCount,
-      dislikesCount,
-    );
-
-    await this.likesRepository.updateLikesStatus(
-      model,
-      commentOrPostId,
-      userId,
-      likeStatus,
-    );
-
-    return {
-      data: true,
-      code: ResultCode.Success,
-    };
+    await this.likesRepository.updateLikesCount(data);
+    return this.likesRepository.updateLikesStatus(data);
   }
 }
 

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import mongoose from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { Paginator } from '../common/schemas/paginator';
+import { Paginator } from '../helpers/pagination/_paginator';
 import { User, UserLeanType, UserModelType } from './schemas/user.entity';
 import { UserQueryDto } from './dto/user-query.dto';
 import { UserViewModel } from './schemas/user.view';

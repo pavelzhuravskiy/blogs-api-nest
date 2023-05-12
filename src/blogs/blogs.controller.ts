@@ -22,6 +22,7 @@ import { exceptionHandler } from '../exceptions/exception.handler';
 import { CommonQueryDto } from '../common/dto/common-query.dto';
 import { blogIDField, blogNotFound } from '../exceptions/exception.constants';
 import { BasicAuthGuard } from '../auth/guards/basic-auth.guard';
+import { UserIdFromHeaders } from '../auth/decorators/user-id-from-headers.param.decorator';
 
 @Controller('blogs')
 export class BlogsController {
@@ -45,7 +46,7 @@ export class BlogsController {
   }
 
   @Get(':id')
-  async findBlog(@Param('id') id: string) {
+  async findBlog(@Param('id') id) {
     const result = await this.blogsQueryRepository.findBlog(id);
 
     if (!result) {
@@ -58,10 +59,7 @@ export class BlogsController {
   @UseGuards(BasicAuthGuard)
   @Put(':id')
   @HttpCode(204)
-  async updateBlog(
-    @Param('id') id: string,
-    @Body() blogInputDto: BlogInputDto,
-  ) {
+  async updateBlog(@Param('id') id, @Body() blogInputDto: BlogInputDto) {
     const result = await this.blogsService.updateBlog(id, blogInputDto);
 
     if (!result) {
@@ -74,7 +72,7 @@ export class BlogsController {
   @UseGuards(BasicAuthGuard)
   @Delete(':id')
   @HttpCode(204)
-  async deleteBlog(@Param('id') id: string) {
+  async deleteBlog(@Param('id') id) {
     const result = await this.blogsService.deleteBlog(id);
 
     if (!result) {
@@ -86,10 +84,7 @@ export class BlogsController {
 
   @UseGuards(BasicAuthGuard)
   @Post(':id/posts')
-  async createPost(
-    @Param('id') id: string,
-    @Body() postInputDto: PostInputDto,
-  ) {
+  async createPost(@Param('id') id, @Body() postInputDto: PostInputDto) {
     const postId = await this.postsService.createPost(postInputDto, id);
 
     if (!postId) {
@@ -100,8 +95,16 @@ export class BlogsController {
   }
 
   @Get(':id/posts')
-  async findPosts(@Query() query: CommonQueryDto, @Param('id') id: string) {
-    const result = await this.postsQueryRepository.findPosts(query, id);
+  async findPosts(
+    @Query() query: CommonQueryDto,
+    @Param('id') blogId,
+    @UserIdFromHeaders() userId,
+  ) {
+    const result = await this.postsQueryRepository.findPosts(
+      query,
+      userId,
+      blogId,
+    );
 
     if (!result) {
       return exceptionHandler(ResultCode.NotFound, blogNotFound, blogIDField);

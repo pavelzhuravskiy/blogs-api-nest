@@ -16,23 +16,29 @@ import {
   commentNotFound,
 } from '../exceptions/exception.constants';
 import { JwtBearerGuard } from '../auth/guards/jwt-bearer.guard';
-import { CurrentUserId } from '../auth/decorators/current-user-id.param.decorator';
+import { UserIdFromGuard } from '../auth/decorators/user-id-from-guard.param.decorator';
 import { CommentsService } from './comments.service';
 import { CommentInputDto } from './dto/comment-input.dto';
 import { LikeStatusInputDto } from '../likes/dto/like-status-input.dto';
 import { LikesService } from '../likes/likes.service';
+import { JwtService } from '@nestjs/jwt';
+import { UserIdFromHeaders } from '../auth/decorators/user-id-from-headers.param.decorator';
 
 @Controller('comments')
 export class CommentsController {
   constructor(
     private readonly commentsService: CommentsService,
     private readonly likesService: LikesService,
+    private readonly jwtService: JwtService,
     private readonly commentsQueryRepository: CommentsQueryRepository,
   ) {}
 
   @Get(':id')
-  async findComment(@Param('id') id: string) {
-    const result = await this.commentsQueryRepository.findComment(id);
+  async findComment(@Param('id') commentId, @UserIdFromHeaders() userId) {
+    const result = await this.commentsQueryRepository.findComment(
+      commentId,
+      userId,
+    );
 
     if (!result) {
       return exceptionHandler(
@@ -49,12 +55,12 @@ export class CommentsController {
   @Put(':id')
   @HttpCode(204)
   async updateComment(
-    @CurrentUserId() currentUserId: string,
-    @Param('id') commentId: string,
+    @UserIdFromGuard() userId,
+    @Param('id') commentId,
     @Body() commentInputDto: CommentInputDto,
   ) {
     const result = await this.commentsService.updateComment(
-      currentUserId,
+      userId,
       commentId,
       commentInputDto,
     );
@@ -69,14 +75,8 @@ export class CommentsController {
   @UseGuards(JwtBearerGuard)
   @Delete(':id')
   @HttpCode(204)
-  async deleteComment(
-    @CurrentUserId() currentUserId: string,
-    @Param('id') commentId: string,
-  ) {
-    const result = await this.commentsService.deleteComment(
-      currentUserId,
-      commentId,
-    );
+  async deleteComment(@UserIdFromGuard() userId, @Param('id') commentId) {
+    const result = await this.commentsService.deleteComment(userId, commentId);
 
     if (result.code !== ResultCode.Success) {
       return exceptionHandler(result.code, result.message, result.field);
@@ -89,18 +89,22 @@ export class CommentsController {
   @Put(':id/like-status')
   @HttpCode(204)
   async updateLikeStatus(
-    @CurrentUserId() currentUserId,
-    @Param('id') commentId: string,
+    @UserIdFromGuard() userId,
+    @Param('id') commentId,
     @Body() likeStatusInputDto: LikeStatusInputDto,
   ) {
-    const result = await this.likesService.updateLikeStatus(
-      likeStatusInputDto.likeStatus,
-      currentUserId,
+    const result = await this.likesService.updateCommentLikes(
       commentId,
+      userId,
+      likeStatusInputDto.likeStatus,
     );
 
-    if (result.code !== ResultCode.Success) {
-      return exceptionHandler(result.code, result.message, result.field);
+    if (!result) {
+      return exceptionHandler(
+        ResultCode.NotFound,
+        commentNotFound,
+        commentIDField,
+      );
     }
 
     return result;

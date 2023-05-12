@@ -10,6 +10,7 @@ import {
   PostDocument,
   PostModelType,
 } from '../posts/schemas/post.entity';
+import { LikesDataType } from './schemas/likes-data.type';
 
 @Injectable()
 export class LikesRepository {
@@ -24,13 +25,11 @@ export class LikesRepository {
   }
 
   async findUserInLikesInfo(
-    model: any,
-    commentOrPostId: string,
-    userId: string,
+    data: LikesDataType,
   ): Promise<CommentDocument | PostDocument | null> {
-    const user = await model.findOne({
-      _id: commentOrPostId,
-      'likesInfo.users.userId': userId,
+    const user = await data.model.findOne({
+      _id: data.commentOrPostId,
+      'likesInfo.users.userId': data.userId,
     });
 
     if (!user) {
@@ -41,18 +40,18 @@ export class LikesRepository {
   }
 
   async pushUserInLikesInfo(
-    model: any,
-    commentOrPostId: string,
-    userId: string,
-    likeStatus: string,
+    data: LikesDataType,
+    userLogin: string,
   ): Promise<boolean> {
-    const result = await model.updateOne(
-      { _id: commentOrPostId },
+    const result = await data.model.updateOne(
+      { _id: data.commentOrPostId },
       {
         $push: {
           'likesInfo.users': {
-            userId,
-            likeStatus,
+            addedAt: new Date(),
+            userId: data.userId,
+            userLogin: userLogin,
+            likeStatus: data.likeStatus,
           },
         },
       },
@@ -60,18 +59,14 @@ export class LikesRepository {
     return result.matchedCount === 1;
   }
 
-  async findUserLikeStatus(
-    model: any,
-    commentOrPostId: string,
-    userId: string,
-  ): Promise<string | null> {
-    const user = await model.findOne(
-      { _id: commentOrPostId },
+  async findUserLikeStatus(data: LikesDataType): Promise<string | null> {
+    const user = await data.model.findOne(
+      { _id: data.commentOrPostId },
       {
         'likesInfo.users': {
           $filter: {
             input: '$likesInfo.users',
-            cond: { $eq: ['$$this.userId', userId.toString()] },
+            cond: { $eq: ['$$this.userId', data.userId] },
           },
         },
       },
@@ -84,35 +79,25 @@ export class LikesRepository {
     return user.likesInfo.users[0].likeStatus;
   }
 
-  async updateLikesCount(
-    model: any,
-    commentId: string,
-    likesCount: number,
-    dislikesCount: number,
-  ): Promise<boolean> {
-    const result = await model.updateOne(
-      { _id: commentId },
+  async updateLikesCount(data: LikesDataType): Promise<boolean> {
+    const result = await data.model.updateOne(
+      { _id: data.commentOrPostId },
       {
         $set: {
-          'likesInfo.likesCount': likesCount,
-          'likesInfo.dislikesCount': dislikesCount,
+          'likesInfo.likesCount': data.likesCount,
+          'likesInfo.dislikesCount': data.dislikesCount,
         },
       },
     );
     return result.matchedCount === 1;
   }
 
-  async updateLikesStatus(
-    model: any,
-    commentOrPostId: string,
-    userId: string,
-    likeStatus: string,
-  ): Promise<boolean> {
-    const result = await model.updateOne(
-      { _id: commentOrPostId, 'likesInfo.users.userId': userId },
+  async updateLikesStatus(data: LikesDataType): Promise<boolean> {
+    const result = await data.model.updateOne(
+      { _id: data.commentOrPostId, 'likesInfo.users.userId': data.userId },
       {
         $set: {
-          'likesInfo.users.$.likeStatus': likeStatus,
+          'likesInfo.users.$.likeStatus': data.likeStatus,
         },
       },
     );

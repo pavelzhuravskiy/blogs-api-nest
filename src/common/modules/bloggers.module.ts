@@ -1,4 +1,9 @@
-import { Module } from '@nestjs/common';
+import {
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  RequestMethod,
+} from '@nestjs/common';
 import { BlogsController } from '../../blogs/blogs.controller';
 import { BlogsService } from '../../blogs/blogs.service';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -19,6 +24,8 @@ import { CommentsQueryRepository } from '../../comments/comments.query.repositor
 import { CommentsController } from '../../comments/comments.controller';
 import { LikesService } from '../../likes/likes.service';
 import { LikesRepository } from '../../likes/likes.repository';
+import { JwtService } from '@nestjs/jwt';
+import { TokenParserMiddleware } from '../../middlewares/token-parser.middleware';
 
 @Module({
   imports: [
@@ -43,6 +50,7 @@ import { LikesRepository } from '../../likes/likes.repository';
     UsersRepository,
     LikesService,
     LikesRepository,
+    JwtService,
   ],
   exports: [
     BlogsService,
@@ -51,4 +59,16 @@ import { LikesRepository } from '../../likes/likes.repository';
     PostsQueryRepository,
   ],
 })
-export class BloggersModule {}
+export class BloggersModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(TokenParserMiddleware)
+      .forRoutes(
+        { path: 'blogs/:id/posts', method: RequestMethod.GET },
+        { path: 'posts', method: RequestMethod.GET },
+        { path: 'posts/:id', method: RequestMethod.GET },
+        { path: 'posts/:id/comments', method: RequestMethod.GET },
+        { path: 'comments/:id', method: RequestMethod.GET },
+      );
+  }
+}

@@ -3,7 +3,7 @@ import { Blog, BlogLeanType, BlogModelType } from './schemas/blog.entity';
 import { BlogQueryDto } from './dto/blog-query.dto';
 import mongoose from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { Paginator } from '../common/schemas/paginator';
+import { Paginator } from '../helpers/pagination/_paginator';
 import { BlogViewModel } from './schemas/blog.view';
 import { pFind } from '../helpers/pagination/pagination-find';
 import { pSort } from '../helpers/pagination/pagination-sort';

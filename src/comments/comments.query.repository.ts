@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import mongoose from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { Paginator } from '../common/schemas/paginator';
+import { Paginator } from '../helpers/pagination/_paginator';
 import {
   Comment,
   CommentLeanType,
@@ -9,24 +9,25 @@ import {
 } from './schemas/comment.entity';
 import { CommentViewModel } from './schemas/comment.view';
 import { CommonQueryDto } from '../common/dto/common-query.dto';
-import { PostsQueryRepository } from '../posts/posts.query.repository';
-import { LikeStatus } from '../likes/like-status.enum';
 import { pFind } from '../helpers/pagination/pagination-find';
 import { pSort } from '../helpers/pagination/pagination-sort';
 import { pFilterComments } from '../helpers/pagination/pagination-filter-comments';
+import { likeStatusFinder } from '../likes/like-status-finder';
+import { PostsRepository } from '../posts/posts.repository';
 
 @Injectable()
 export class CommentsQueryRepository {
   constructor(
     @InjectModel(Comment.name)
     private CommentModel: CommentModelType,
-    private postsQueryRepository: PostsQueryRepository,
+    private postsRepository: PostsRepository,
   ) {}
   async findComments(
     query: CommonQueryDto,
     postId: string,
+    userId: string,
   ): Promise<Paginator<CommentViewModel[]>> {
-    const post = await this.postsQueryRepository.findPost(postId);
+    const post = await this.postsRepository.findPost(postId);
 
     if (!post) {
       return null;
@@ -48,20 +49,25 @@ export class CommentsQueryRepository {
       pageNumber: query.pageNumber,
       pageSize: query.pageSize,
       totalCount: totalCount,
-      items: await this.commentsMapping(comments),
+      items: await this.commentsMapping(comments, userId),
     });
   }
 
-  async findComment(id: string): Promise<CommentViewModel | null> {
-    if (!mongoose.isValidObjectId(id)) {
+  async findComment(
+    commentId: string,
+    userId?: string,
+  ): Promise<CommentViewModel | null> {
+    if (!mongoose.isValidObjectId(commentId)) {
       return null;
     }
 
-    const comment = await this.CommentModel.findOne({ _id: id });
+    const comment = await this.CommentModel.findOne({ _id: commentId });
 
     if (!comment) {
       return null;
     }
+
+    const status = likeStatusFinder(comment, userId);
 
     return {
       id: comment.id,
@@ -74,29 +80,33 @@ export class CommentsQueryRepository {
       likesInfo: {
         likesCount: comment.likesInfo.likesCount,
         dislikesCount: comment.likesInfo.dislikesCount,
-        myStatus: LikeStatus.None,
+        myStatus: status,
       },
     };
   }
 
   private async commentsMapping(
     comments: CommentLeanType[],
+    userId: string,
   ): Promise<CommentViewModel[]> {
-    return comments.map((c) => {
-      return {
-        id: c._id.toString(),
-        content: c.content,
-        commentatorInfo: {
-          userId: c.commentatorInfo.userId,
-          userLogin: c.commentatorInfo.userLogin,
-        },
-        createdAt: c.createdAt.toISOString(),
-        likesInfo: {
-          likesCount: c.likesInfo.likesCount,
-          dislikesCount: c.likesInfo.dislikesCount,
-          myStatus: LikeStatus.None,
-        },
-      };
-    });
+    return Promise.all(
+      comments.map(async (c) => {
+        const status = likeStatusFinder(c, userId);
+        return {
+          id: c._id.toString(),
+          content: c.content,
+          commentatorInfo: {
+            userId: c.commentatorInfo.userId,
+            userLogin: c.commentatorInfo.userLogin,
+          },
+          createdAt: c.createdAt.toISOString(),
+          likesInfo: {
+            likesCount: c.likesInfo.likesCount,
+            dislikesCount: c.likesInfo.dislikesCount,
+            myStatus: status,
+          },
+        };
+      }),
+    );
   }
 }

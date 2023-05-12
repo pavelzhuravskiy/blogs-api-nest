@@ -13,7 +13,7 @@ import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { AuthService } from './auth.service';
 import { UsersRepository } from '../users/users.repository';
-import { CurrentUserId } from './decorators/current-user-id.param.decorator';
+import { UserIdFromGuard } from './decorators/user-id-from-guard.param.decorator';
 import { DevicesService } from '../devices/devices.service';
 import { JwtService } from '@nestjs/jwt';
 import { JwtBearerGuard } from './guards/jwt-bearer.guard';
@@ -107,13 +107,13 @@ export class AuthController {
   @Post('login')
   @HttpCode(200)
   async login(
-    @CurrentUserId() currentUserId,
+    @UserIdFromGuard() userId,
     @Ip() ip,
     @Headers() headers,
     @Response() res,
   ) {
     const userAgent = headers['user-agent'] || 'unknown';
-    const tokens = await this.authService.getTokens(currentUserId);
+    const tokens = await this.authService.getTokens(userId);
 
     await this.devicesService.createDevice(tokens.refreshToken, ip, userAgent);
 
@@ -129,7 +129,7 @@ export class AuthController {
   @Post('refresh-token')
   @HttpCode(200)
   async refreshTokens(
-    @CurrentUserId() currentUserId,
+    @UserIdFromGuard() userId,
     @Ip() ip,
     @Headers() headers,
     @RefreshToken() refreshToken,
@@ -138,7 +138,7 @@ export class AuthController {
     const userAgent = headers['user-agent'] || 'unknown';
     const decodedToken: any = this.jwtService.decode(refreshToken);
     const deviceId = decodedToken.deviceId;
-    const tokens = await this.authService.getTokens(currentUserId, deviceId);
+    const tokens = await this.authService.getTokens(userId, deviceId);
     const newToken = this.jwtService.decode(tokens.refreshToken);
 
     await this.devicesService.updateDevice(newToken, ip, userAgent);
@@ -162,13 +162,13 @@ export class AuthController {
 
   @UseGuards(JwtBearerGuard)
   @Get('me')
-  async getProfile(@CurrentUserId() currentUserId) {
-    const user = await this.usersRepository.findUserById(currentUserId);
+  async getProfile(@UserIdFromGuard() userId) {
+    const user = await this.usersRepository.findUserById(userId);
 
     return {
       email: user?.accountData.email,
       login: user?.accountData.login,
-      id: currentUserId,
+      id: userId,
     };
   }
 }

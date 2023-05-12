@@ -1,7 +1,7 @@
 import { Prop, Schema } from '@nestjs/mongoose';
 
 @Schema()
-class UsersLikesSchema {
+export class UsersLikesSchema {
   @Prop({ required: true })
   addedAt: Date;
 
@@ -13,10 +13,4 @@ class UsersLikesSchema {
 
   @Prop({ required: true })
   likeStatus: string;
-}
-
-@Schema()
-export class UsersLikesInfo {
-  @Prop([UsersLikesSchema])
-  users: UsersLikesSchema[];
 }

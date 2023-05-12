@@ -1,15 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import mongoose from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { Paginator } from '../common/schemas/paginator';
+import { Paginator } from '../helpers/pagination/_paginator';
 import { Post, PostLeanType, PostModelType } from './schemas/post.entity';
 import { PostViewModel } from './schemas/post.view';
 import { BlogsQueryRepository } from '../blogs/blogs.query.repository';
 import { CommonQueryDto } from '../common/dto/common-query.dto';
-import { LikeStatus } from '../likes/like-status.enum';
 import { pFind } from '../helpers/pagination/pagination-find';
 import { pSort } from '../helpers/pagination/pagination-sort';
 import { pFilterPosts } from '../helpers/pagination/pagination-filter-posts';
+import { likeStatusFinder } from '../likes/like-status-finder';
 
 @Injectable()
 export class PostsQueryRepository {
@@ -20,6 +20,7 @@ export class PostsQueryRepository {
   ) {}
   async findPosts(
     query: CommonQueryDto,
+    userId: string,
     blogId?: string,
   ): Promise<Paginator<PostViewModel[]> | null> {
     if (blogId) {
@@ -46,20 +47,25 @@ export class PostsQueryRepository {
       pageNumber: query.pageNumber,
       pageSize: query.pageSize,
       totalCount: totalCount,
-      items: await this.postsMapping(posts),
+      items: await this.postsMapping(posts, userId),
     });
   }
 
-  async findPost(id: string): Promise<PostViewModel | null> {
-    if (!mongoose.isValidObjectId(id)) {
+  async findPost(
+    postId: string,
+    userId?: string,
+  ): Promise<PostViewModel | null> {
+    if (!mongoose.isValidObjectId(postId)) {
       return null;
     }
 
-    const post = await this.PostModel.findOne({ _id: id });
+    const post = await this.PostModel.findOne({ _id: postId });
 
     if (!post) {
       return null;
     }
+
+    const status = likeStatusFinder(post, userId);
 
     return {
       id: post.id,
@@ -72,14 +78,18 @@ export class PostsQueryRepository {
       extendedLikesInfo: {
         likesCount: post.likesInfo.likesCount,
         dislikesCount: post.likesInfo.dislikesCount,
-        myStatus: LikeStatus.None,
+        myStatus: status,
         newestLikes: [],
       },
     };
   }
 
-  private async postsMapping(posts: PostLeanType[]): Promise<PostViewModel[]> {
+  private async postsMapping(
+    posts: PostLeanType[],
+    userId: string,
+  ): Promise<PostViewModel[]> {
     return posts.map((p) => {
+      const status = likeStatusFinder(p, userId);
       return {
         id: p._id.toString(),
         title: p.title,
@@ -91,7 +101,7 @@ export class PostsQueryRepository {
         extendedLikesInfo: {
           likesCount: p.likesInfo.likesCount,
           dislikesCount: p.likesInfo.dislikesCount,
-          myStatus: LikeStatus.None,
+          myStatus: status,
           newestLikes: [],
         },
       };

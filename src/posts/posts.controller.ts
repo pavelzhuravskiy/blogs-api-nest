@@ -26,9 +26,11 @@ import {
 } from '../exceptions/exception.constants';
 import { JwtBearerGuard } from '../auth/guards/jwt-bearer.guard';
 import { BasicAuthGuard } from '../auth/guards/basic-auth.guard';
-import { CurrentUserId } from '../auth/decorators/current-user-id.param.decorator';
+import { UserIdFromGuard } from '../auth/decorators/user-id-from-guard.param.decorator';
 import { LikeStatusInputDto } from '../likes/dto/like-status-input.dto';
 import { LikesService } from '../likes/likes.service';
+import { JwtService } from '@nestjs/jwt';
+import { UserIdFromHeaders } from '../auth/decorators/user-id-from-headers.param.decorator';
 
 @Controller('posts')
 export class PostsController {
@@ -36,6 +38,7 @@ export class PostsController {
     private readonly postsQueryRepository: PostsQueryRepository,
     private readonly postsService: PostsService,
     private readonly likesService: LikesService,
+    private readonly jwtService: JwtService,
     private readonly commentsQueryRepository: CommentsQueryRepository,
   ) {}
 
@@ -52,13 +55,13 @@ export class PostsController {
   }
 
   @Get()
-  async findPosts(@Query() query: CommonQueryDto) {
-    return this.postsQueryRepository.findPosts(query);
+  async findPosts(@Query() query: CommonQueryDto, @UserIdFromHeaders() userId) {
+    return this.postsQueryRepository.findPosts(query, userId);
   }
 
   @Get(':id')
-  async findPost(@Param('id') id: string) {
-    const result = await this.postsQueryRepository.findPost(id);
+  async findPost(@Param('id') id, @UserIdFromHeaders() userId) {
+    const result = await this.postsQueryRepository.findPost(id, userId);
 
     if (!result) {
       return exceptionHandler(ResultCode.NotFound, postNotFound, postIDField);
@@ -70,10 +73,7 @@ export class PostsController {
   @UseGuards(BasicAuthGuard)
   @Put(':id')
   @HttpCode(204)
-  async updatePost(
-    @Param('id') id: string,
-    @Body() postInputDto: PostInputDto,
-  ) {
+  async updatePost(@Param('id') id, @Body() postInputDto: PostInputDto) {
     const result = await this.postsService.updatePost(id, postInputDto);
 
     if (result.code !== ResultCode.Success) {
@@ -86,7 +86,7 @@ export class PostsController {
   @UseGuards(BasicAuthGuard)
   @Delete(':id')
   @HttpCode(204)
-  async deletePost(@Param('id') id: string) {
+  async deletePost(@Param('id') id) {
     const result = await this.postsService.deletePost(id);
 
     if (!result) {
@@ -99,12 +99,12 @@ export class PostsController {
   @UseGuards(JwtBearerGuard)
   @Post(':id/comments')
   async createComment(
-    @CurrentUserId() currentUserId: string,
-    @Param('id') postId: string,
+    @UserIdFromGuard() userId,
+    @Param('id') postId,
     @Body() commentInputDto: CommentInputDto,
   ) {
     const commentId = await this.postsService.createComment(
-      currentUserId,
+      userId,
       postId,
       commentInputDto,
     );
@@ -119,11 +119,13 @@ export class PostsController {
   @Get(':id/comments')
   async findComments(
     @Query() query: CommonQueryDto,
-    @Param('id') postId: string,
+    @Param('id') postId,
+    @UserIdFromHeaders() userId,
   ) {
     const result = await this.commentsQueryRepository.findComments(
       query,
       postId,
+      userId,
     );
 
     if (!result) {
@@ -137,19 +139,18 @@ export class PostsController {
   @Put(':id/like-status')
   @HttpCode(204)
   async updateLikeStatus(
-    @CurrentUserId() currentUserId,
-    @Param('id') postId: string,
+    @UserIdFromGuard() userId,
+    @Param('id') postId,
     @Body() likeStatusInputDto: LikeStatusInputDto,
   ) {
-    const result = await this.likesService.updateLikeStatus(
-      likeStatusInputDto.likeStatus,
-      currentUserId,
-      undefined,
+    const result = await this.likesService.updatePostLikes(
       postId,
+      userId,
+      likeStatusInputDto.likeStatus,
     );
 
-    if (result.code !== ResultCode.Success) {
-      return exceptionHandler(result.code, result.message, result.field);
+    if (!result) {
+      return exceptionHandler(ResultCode.NotFound, postNotFound, postIDField);
     }
 
     return result;
