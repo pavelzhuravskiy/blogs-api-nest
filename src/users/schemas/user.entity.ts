@@ -105,7 +105,7 @@ export const UserSchema = SchemaFactory.createForClass(User);
 UserSchema.methods = {
   userCanBeConfirmed: User.prototype.userCanBeConfirmed,
   confirmUser: User.prototype.confirmUser,
-  updateConfirmationData: User.prototype.updateEmailConfirmationData,
+  updateEmailConfirmationData: User.prototype.updateEmailConfirmationData,
   updatePasswordRecoveryData: User.prototype.updatePasswordRecoveryData,
   passwordCanBeUpdated: User.prototype.passwordCanBeUpdated,
   updatePassword: User.prototype.updatePassword,

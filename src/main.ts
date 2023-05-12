@@ -5,6 +5,7 @@ import { HttpExceptionFilter } from './exceptions/exception.filter';
 import { customExceptionFactory } from './exceptions/exception.factory';
 import { useContainer } from 'class-validator';
 import cookieParser from 'cookie-parser';
+import { TrimPipe } from './exceptions/pipes/trim.pipe';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -12,10 +13,11 @@ async function bootstrap() {
   app.enableCors();
   app.use(cookieParser());
   app.useGlobalPipes(
+    new TrimPipe(),
     new ValidationPipe({
       transform: true,
-      whitelist: true,
-      forbidNonWhitelisted: true,
+      // whitelist: true,
+      // forbidNonWhitelisted: true,
       transformOptions: {
         enableImplicitConversion: true,
       },
