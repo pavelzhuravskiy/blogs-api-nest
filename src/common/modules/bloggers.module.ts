@@ -17,6 +17,8 @@ import { CommentsService } from '../../comments/comments.service';
 import { CommentsRepository } from '../../comments/comments.repository';
 import { CommentsQueryRepository } from '../../comments/comments.query.repository';
 import { CommentsController } from '../../comments/comments.controller';
+import { LikesService } from '../../likes/likes.service';
+import { LikesRepository } from '../../likes/likes.repository';
 
 @Module({
   imports: [
@@ -39,6 +41,8 @@ import { CommentsController } from '../../comments/comments.controller';
     CommentsRepository,
     CommentsQueryRepository,
     UsersRepository,
+    LikesService,
+    LikesRepository,
   ],
   exports: [
     BlogsService,

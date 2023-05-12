@@ -38,7 +38,7 @@ export class Post {
   createdAt: Date;
 
   @Prop({ required: true })
-  extendedLikesInfo: LikesInfoSchema;
+  likesInfo: LikesInfoSchema;
 
   updatePost(updatePostDto) {
     this.title = updatePostDto.title;
@@ -59,7 +59,7 @@ export class Post {
       blogId: blog._id.toString(),
       blogName: blog.name,
       createdAt: new Date(),
-      extendedLikesInfo: {
+      likesInfo: {
         likesCount: 0,
         dislikesCount: 0,
         users: [],

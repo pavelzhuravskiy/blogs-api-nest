@@ -20,11 +20,13 @@ import { CurrentUserId } from '../auth/decorators/current-user-id.param.decorato
 import { CommentsService } from './comments.service';
 import { CommentInputDto } from './dto/comment-input.dto';
 import { LikeStatusInputDto } from '../likes/dto/like-status-input.dto';
+import { LikesService } from '../likes/likes.service';
 
 @Controller('comments')
 export class CommentsController {
   constructor(
     private readonly commentsService: CommentsService,
+    private readonly likesService: LikesService,
     private readonly commentsQueryRepository: CommentsQueryRepository,
   ) {}
 
@@ -89,8 +91,18 @@ export class CommentsController {
   async updateLikeStatus(
     @CurrentUserId() currentUserId,
     @Param('id') commentId: string,
-    @Body() likeStatus: LikeStatusInputDto,
+    @Body() likeStatusInputDto: LikeStatusInputDto,
   ) {
-    return 1;
+    const result = await this.likesService.updateLikeStatus(
+      likeStatusInputDto.likeStatus,
+      currentUserId,
+      commentId,
+    );
+
+    if (result.code !== ResultCode.Success) {
+      return exceptionHandler(result.code, result.message, result.field);
+    }
+
+    return result;
   }
 }

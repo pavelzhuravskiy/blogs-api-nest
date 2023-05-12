@@ -35,7 +35,7 @@ export class Comment {
   createdAt: Date;
 
   @Prop({ required: true })
-  extendedLikesInfo: LikesInfoSchema;
+  likesInfo: LikesInfoSchema;
 
   updateComment(updateCommentDto) {
     this.content = updateCommentDto.content;
@@ -55,7 +55,7 @@ export class Comment {
       },
       postId: post._id.toString(),
       createdAt: new Date(),
-      extendedLikesInfo: {
+      likesInfo: {
         likesCount: 0,
         dislikesCount: 0,
         users: [],

@@ -27,12 +27,15 @@ import {
 import { JwtBearerGuard } from '../auth/guards/jwt-bearer.guard';
 import { BasicAuthGuard } from '../auth/guards/basic-auth.guard';
 import { CurrentUserId } from '../auth/decorators/current-user-id.param.decorator';
+import { LikeStatusInputDto } from '../likes/dto/like-status-input.dto';
+import { LikesService } from '../likes/likes.service';
 
 @Controller('posts')
 export class PostsController {
   constructor(
     private readonly postsQueryRepository: PostsQueryRepository,
     private readonly postsService: PostsService,
+    private readonly likesService: LikesService,
     private readonly commentsQueryRepository: CommentsQueryRepository,
   ) {}
 
@@ -125,6 +128,28 @@ export class PostsController {
 
     if (!result) {
       return exceptionHandler(ResultCode.NotFound, postNotFound, postIDField);
+    }
+
+    return result;
+  }
+
+  @UseGuards(JwtBearerGuard)
+  @Put(':id/like-status')
+  @HttpCode(204)
+  async updateLikeStatus(
+    @CurrentUserId() currentUserId,
+    @Param('id') postId: string,
+    @Body() likeStatusInputDto: LikeStatusInputDto,
+  ) {
+    const result = await this.likesService.updateLikeStatus(
+      likeStatusInputDto.likeStatus,
+      currentUserId,
+      undefined,
+      postId,
+    );
+
+    if (result.code !== ResultCode.Success) {
+      return exceptionHandler(result.code, result.message, result.field);
     }
 
     return result;

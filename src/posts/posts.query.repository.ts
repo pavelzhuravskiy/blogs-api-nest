@@ -70,8 +70,8 @@ export class PostsQueryRepository {
       blogName: post.blogName,
       createdAt: post.createdAt.toISOString(),
       extendedLikesInfo: {
-        likesCount: post.extendedLikesInfo.likesCount,
-        dislikesCount: post.extendedLikesInfo.dislikesCount,
+        likesCount: post.likesInfo.likesCount,
+        dislikesCount: post.likesInfo.dislikesCount,
         myStatus: LikeStatus.None,
         newestLikes: [],
       },
@@ -89,8 +89,8 @@ export class PostsQueryRepository {
         blogName: p.blogName,
         createdAt: p.createdAt.toISOString(),
         extendedLikesInfo: {
-          likesCount: p.extendedLikesInfo.likesCount,
-          dislikesCount: p.extendedLikesInfo.dislikesCount,
+          likesCount: p.likesInfo.likesCount,
+          dislikesCount: p.likesInfo.dislikesCount,
           myStatus: LikeStatus.None,
           newestLikes: [],
         },
