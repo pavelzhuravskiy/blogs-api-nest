@@ -10,6 +10,7 @@ import { pFind } from '../helpers/pagination/pagination-find';
 import { pSort } from '../helpers/pagination/pagination-sort';
 import { pFilterPosts } from '../helpers/pagination/pagination-filter-posts';
 import { likeStatusFinder } from '../likes/like-status-finder';
+import { LikeStatus } from '../likes/like-status.enum';
 
 @Injectable()
 export class PostsQueryRepository {
@@ -90,6 +91,8 @@ export class PostsQueryRepository {
   ): Promise<PostViewModel[]> {
     return posts.map((p) => {
       const status = likeStatusFinder(p, userId);
+      const usersLikes = p.likesInfo.users;
+
       return {
         id: p._id.toString(),
         title: p.title,
@@ -102,7 +105,20 @@ export class PostsQueryRepository {
           likesCount: p.likesInfo.likesCount,
           dislikesCount: p.likesInfo.dislikesCount,
           myStatus: status,
-          newestLikes: [],
+          newestLikes: usersLikes
+            .filter((p) => p.likeStatus === LikeStatus.Like)
+            .sort(
+              (a, b) =>
+                -a.addedAt.toISOString().localeCompare(b.addedAt.toISOString()),
+            )
+            .map((p) => {
+              return {
+                addedAt: p.addedAt.toISOString(),
+                userId: p.userId,
+                login: p.userLogin,
+              };
+            })
+            .splice(0, 3),
         },
       };
     });
