@@ -169,7 +169,7 @@ export class AuthController {
     return {
       email: user?.accountData.email,
       login: user?.accountData.login,
-      id: userId,
+      userId: userId,
     };
   }
 }
