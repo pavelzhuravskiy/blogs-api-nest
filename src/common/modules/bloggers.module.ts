@@ -26,6 +26,7 @@ import { LikesService } from '../../likes/likes.service';
 import { LikesRepository } from '../../likes/likes.repository';
 import { JwtService } from '@nestjs/jwt';
 import { TokenParserMiddleware } from '../../middlewares/token-parser.middleware';
+import { IsBlogExistConstraint } from '../../exceptions/decorators/blog-exists.decorator';
 
 @Module({
   imports: [
@@ -51,6 +52,7 @@ import { TokenParserMiddleware } from '../../middlewares/token-parser.middleware
     LikesService,
     LikesRepository,
     JwtService,
+    IsBlogExistConstraint,
   ],
   exports: [
     BlogsService,
