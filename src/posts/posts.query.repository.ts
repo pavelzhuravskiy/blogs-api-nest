@@ -80,7 +80,20 @@ export class PostsQueryRepository {
         likesCount: post.likesInfo.likesCount,
         dislikesCount: post.likesInfo.dislikesCount,
         myStatus: status,
-        newestLikes: [],
+        newestLikes: post.likesInfo.users
+          .filter((p) => p.likeStatus === LikeStatus.Like)
+          .sort(
+            (a, b) =>
+              -a.addedAt.toISOString().localeCompare(b.addedAt.toISOString()),
+          )
+          .map((p) => {
+            return {
+              addedAt: p.addedAt.toISOString(),
+              userId: p.userId,
+              login: p.userLogin,
+            };
+          })
+          .splice(0, 3),
       },
     };
   }
