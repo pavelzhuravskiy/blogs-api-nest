@@ -1,4 +1,4 @@
-import { IsEmail, IsString, Length, Matches } from 'class-validator';
+import { IsEmail, Length, Matches } from 'class-validator';
 import { IsUserAlreadyExist } from '../../exceptions/decorators/unique-user.decorator';
 import {
   emailNotUnique,
@@ -6,7 +6,6 @@ import {
 } from '../../exceptions/exception.constants';
 
 export class UserInputDto {
-  @IsString()
   @Length(3, 10)
   @Matches(/^[a-zA-Z0-9_-]*$/)
   @IsUserAlreadyExist({
@@ -14,7 +13,6 @@ export class UserInputDto {
   })
   login: string;
 
-  @IsString()
   @Length(6, 20)
   password: string;
 
