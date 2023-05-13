@@ -6,10 +6,16 @@ import { JwtService } from '@nestjs/jwt';
 export class TokenParserMiddleware implements NestMiddleware {
   constructor(private readonly jwtService: JwtService) {}
   use(req, res: Response, next: NextFunction) {
-    const accessToken = req.headers.authorization?.split(' ')[1];
+    const auth = req.headers.authorization?.split(' ')[1];
 
-    if (accessToken) {
-      const decodedToken = this.jwtService.decode(accessToken);
+    if (auth) {
+      const decodedToken = this.jwtService.decode(auth);
+
+      if (!decodedToken) {
+        next();
+        return;
+      }
+
       req.userId = decodedToken.sub;
     }
 
