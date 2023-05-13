@@ -81,6 +81,8 @@ export class DevicesService {
       };
     }
 
+    await this.devicesRepository.deleteDevice(deviceId);
+
     return {
       data: true,
       code: ResultCode.Success,
