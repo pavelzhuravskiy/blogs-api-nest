@@ -1,5 +1,5 @@
 import { FilterQuery } from 'mongoose';
-import { BlogDocument } from '../../blogs/schemas/blog.entity';
+import { BlogDocument } from '../../blogs/_common/blog.entity';
 
 export const pFilterUsers = (login: string, email: string) => {
   const filter: FilterQuery<BlogDocument> = {};

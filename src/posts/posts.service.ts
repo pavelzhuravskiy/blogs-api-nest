@@ -6,7 +6,7 @@ import { PostInputDto } from './dto/post-input.dto';
 import { CommentInputDto } from '../comments/dto/comment-input.dto';
 import { Comment, CommentModelType } from '../comments/schemas/comment.entity';
 import { CommentsRepository } from '../comments/comments.repository';
-import { BlogsRepository } from '../blogs/blogs.repository';
+import { BlogsRepository } from '../blogs/_common/infrastructure/blogs.repository';
 import { ResultCode } from '../exceptions/exception-codes.enum';
 import {
   blogIDField,

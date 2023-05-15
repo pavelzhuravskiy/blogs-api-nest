@@ -9,6 +9,7 @@ import { UsersModule } from './users/users.module';
 import { BloggersModule } from './common/modules/bloggers.module';
 import { TestingModule } from './testing/testing.module';
 import { MailModule } from './mail/mail.module';
+import { CqrsModule } from '@nestjs/cqrs';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { MailModule } from './mail/mail.module';
     TestingModule,
     UsersModule,
     MailModule,
+    CqrsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

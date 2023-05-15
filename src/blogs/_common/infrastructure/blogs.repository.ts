@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Blog, BlogDocument, BlogModelType } from './schemas/blog.entity';
+import { Blog, BlogDocument, BlogModelType } from '../blog.entity';
 import { InjectModel } from '@nestjs/mongoose';
 import mongoose from 'mongoose';
 

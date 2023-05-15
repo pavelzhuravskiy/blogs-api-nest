@@ -4,12 +4,11 @@ import {
   NestModule,
   RequestMethod,
 } from '@nestjs/common';
-import { BlogsController } from '../../blogs/blogs.controller';
-import { BlogsService } from '../../blogs/blogs.service';
+import { BlogsController } from '../../blogs/_common/blogs.controller';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Blog, BlogSchema } from '../../blogs/schemas/blog.entity';
-import { BlogsRepository } from '../../blogs/blogs.repository';
-import { BlogsQueryRepository } from '../../blogs/blogs.query.repository';
+import { Blog, BlogSchema } from '../../blogs/_common/blog.entity';
+import { BlogsRepository } from '../../blogs/_common/infrastructure/blogs.repository';
+import { BlogsQueryRepository } from '../../blogs/_common/infrastructure/blogs.query.repository';
 import { PostsController } from '../../posts/posts.controller';
 import { PostsService } from '../../posts/posts.service';
 import { PostsRepository } from '../../posts/posts.repository';
@@ -27,6 +26,32 @@ import { LikesRepository } from '../../likes/likes.repository';
 import { JwtService } from '@nestjs/jwt';
 import { TokenParserMiddleware } from '../../middlewares/token-parser.middleware';
 import { IsBlogExistConstraint } from '../../exceptions/decorators/blog-exists.decorator';
+import { BloggerBlogsController } from '../../blogs/blogger/blogger.blogs.controller';
+import { CqrsModule } from '@nestjs/cqrs';
+import { BloggerCreateBlogUseCase } from '../../blogs/blogger/application/use-cases/blogger.create-blog.use-case';
+import { BloggerUpdateBlogUseCase } from '../../blogs/blogger/application/use-cases/blogger.update-blog.use-case';
+
+const controllers = [
+  BloggerBlogsController,
+  BlogsController,
+  PostsController,
+  CommentsController,
+];
+
+const useCases = [BloggerCreateBlogUseCase, BloggerUpdateBlogUseCase];
+
+const repositories = [
+  BlogsRepository,
+  PostsRepository,
+  CommentsRepository,
+  UsersRepository,
+];
+
+const queryRepositories = [
+  BlogsQueryRepository,
+  PostsQueryRepository,
+  CommentsQueryRepository,
+];
 
 @Module({
   imports: [
@@ -36,30 +61,22 @@ import { IsBlogExistConstraint } from '../../exceptions/decorators/blog-exists.d
       { name: Comment.name, schema: CommentSchema },
       { name: User.name, schema: UserSchema },
     ]),
+    CqrsModule,
   ],
-  controllers: [BlogsController, PostsController, CommentsController],
+  controllers: [...controllers],
   providers: [
-    BlogsService,
-    BlogsRepository,
-    BlogsQueryRepository,
+    ...useCases,
+    ...repositories,
+    ...queryRepositories,
     PostsService,
-    PostsRepository,
-    PostsQueryRepository,
     CommentsService,
-    CommentsRepository,
-    CommentsQueryRepository,
-    UsersRepository,
+
     LikesService,
     LikesRepository,
     JwtService,
     IsBlogExistConstraint,
   ],
-  exports: [
-    BlogsService,
-    PostsService,
-    BlogsQueryRepository,
-    PostsQueryRepository,
-  ],
+  exports: [PostsService, BlogsQueryRepository, PostsQueryRepository],
 })
 export class BloggersModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

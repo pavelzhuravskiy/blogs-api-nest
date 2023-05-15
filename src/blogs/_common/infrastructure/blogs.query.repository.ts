@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { Blog, BlogLeanType, BlogModelType } from './schemas/blog.entity';
-import { BlogQueryDto } from './dto/blog-query.dto';
+import { Blog, BlogLeanType, BlogModelType } from '../blog.entity';
+import { BlogQueryDto } from '../dto/blog-query.dto';
 import mongoose from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { Paginator } from '../helpers/pagination/_paginator';
-import { BlogViewModel } from './schemas/blog.view';
-import { pFind } from '../helpers/pagination/pagination-find';
-import { pSort } from '../helpers/pagination/pagination-sort';
-import { pFilterBlogs } from '../helpers/pagination/pagination-filter-blogs';
+import { Paginator } from '../../../helpers/pagination/_paginator';
+import { BlogViewDto } from '../dto/blog-view.dto';
+import { pFind } from '../../../helpers/pagination/pagination-find';
+import { pSort } from '../../../helpers/pagination/pagination-sort';
+import { pFilterBlogs } from '../../../helpers/pagination/pagination-filter-blogs';
 
 @Injectable()
 export class BlogsQueryRepository {
@@ -15,17 +15,20 @@ export class BlogsQueryRepository {
     @InjectModel(Blog.name)
     private BlogModel: BlogModelType,
   ) {}
-  async findBlogs(query: BlogQueryDto): Promise<Paginator<BlogViewModel[]>> {
+  async findBlogs(
+    query: BlogQueryDto,
+    userId?: string,
+  ): Promise<Paginator<BlogViewDto[]>> {
     const blogs = await pFind(
       this.BlogModel,
       query.pageNumber,
       query.pageSize,
-      pFilterBlogs(query.searchNameTerm),
+      pFilterBlogs(query.searchNameTerm, userId),
       pSort(query.sortBy, query.sortDirection),
     );
 
     const totalCount = await this.BlogModel.countDocuments(
-      pFilterBlogs(query.searchNameTerm),
+      pFilterBlogs(query.searchNameTerm, userId),
     );
 
     return Paginator.paginate({
@@ -36,7 +39,7 @@ export class BlogsQueryRepository {
     });
   }
 
-  async findBlog(id: string): Promise<BlogViewModel | null> {
+  async findBlog(id: string): Promise<BlogViewDto | null> {
     if (!mongoose.isValidObjectId(id)) {
       return null;
     }
@@ -57,7 +60,7 @@ export class BlogsQueryRepository {
     };
   }
 
-  private async blogsMapping(blogs: BlogLeanType[]): Promise<BlogViewModel[]> {
+  private async blogsMapping(blogs: BlogLeanType[]): Promise<BlogViewDto[]> {
     return blogs.map((b) => {
       return {
         id: b._id.toString(),

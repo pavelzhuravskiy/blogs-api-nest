@@ -11,27 +11,27 @@ import {
   blogUpdatedName,
   blogUpdatedWebsite,
   blogWebsite,
-} from '../../test/constants/blogs.constants';
-import { testingURI } from '../../test/constants/testing.constants';
+} from '../../../../test/constants/blogs.constants';
+import { testingURI } from '../../../../test/constants/testing.constants';
 import {
   blogObject,
   updatedBlogObject,
-} from '../../test/objects/blogs.objects';
+} from '../../../../test/objects/blogs.objects';
 import {
   invalidURI,
   longString109,
   longString17,
   longString508,
-} from '../../test/constants/common.constants';
-import { customExceptionFactory } from '../exceptions/exception.factory';
-import { HttpExceptionFilter } from '../exceptions/exception.filter';
-import { exceptionObject } from '../../test/objects/common.objects';
+} from '../../../../test/constants/common.constants';
+import { customExceptionFactory } from '../../../exceptions/exception.factory';
+import { HttpExceptionFilter } from '../../../exceptions/exception.filter';
+import { exceptionObject } from '../../../../test/objects/common.objects';
 import {
   descriptionField,
   nameField,
   urlField,
-} from '../../test/constants/exceptions.constants';
-import { AppModule } from '../app.module';
+} from '../../../../test/constants/exceptions.constants';
+import { AppModule } from '../../../app.module';
 
 describe('Blogs testing', () => {
   let app: INestApplication;

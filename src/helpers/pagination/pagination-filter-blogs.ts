@@ -1,11 +1,23 @@
 import { FilterQuery } from 'mongoose';
-import { BlogDocument } from '../../blogs/schemas/blog.entity';
+import { BlogDocument } from '../../blogs/_common/blog.entity';
 
-export const pFilterBlogs = (name: string) => {
+export const pFilterBlogs = (name: string, userId: string) => {
   const filter: FilterQuery<BlogDocument> = {};
 
-  if (name) {
-    filter.name = { $regex: name, $options: 'i' };
+  if (name || userId) {
+    filter.$and = [];
+
+    if (name) {
+      filter.$and.push({
+        name: { $regex: name, $options: 'i' },
+      });
+    }
+
+    if (userId) {
+      filter.$and.push({
+        'blogOwnerInfo.userId': userId,
+      });
+    }
   }
 
   return filter;
