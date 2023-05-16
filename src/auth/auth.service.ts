@@ -6,22 +6,12 @@ import { jwtConstants } from './constants';
 import { DevicesService } from '../devices/devices.service';
 import { DevicesRepository } from '../devices/devices.repository';
 import { DeviceDocument } from '../devices/schemas/device.entity';
-import { User, UserDocument, UserModelType } from '../users/user.entity';
+import { UserDocument } from '../users/user.entity';
 import { randomUUID } from 'crypto';
-import { UserInputDto } from '../users/dto/user-input.dto';
-import { add } from 'date-fns';
-import { InjectModel } from '@nestjs/mongoose';
-import { MailService } from '../mail/mail.service';
-import { UserConfirmDto } from './dto/user-confirm.dto';
-import { EmailDto } from './dto/email.dto';
-import { NewPasswordDto } from './dto/new-password.dto';
 
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectModel(User.name)
-    private UserModel: UserModelType,
-    private readonly mailService: MailService,
     private readonly jwtService: JwtService,
     private readonly devicesService: DevicesService,
     private readonly usersRepository: UsersRepository,
@@ -80,132 +70,5 @@ export class AuthService {
       accessToken: accessToken,
       refreshToken: refreshToken,
     };
-  }
-
-  async registerUser(userInputDto: UserInputDto): Promise<UserDocument | null> {
-    const hash = await bcrypt.hash(
-      userInputDto.password,
-      Number(process.env.HASH_ROUNDS),
-    );
-
-    const emailData = {
-      confirmationCode: randomUUID(),
-      expirationDate: add(new Date(), { hours: 1 }),
-      isConfirmed: false,
-    };
-
-    const user = this.UserModel.createUser(
-      this.UserModel,
-      userInputDto,
-      hash,
-      emailData,
-    );
-
-    const result = await this.usersRepository.save(user);
-
-    try {
-      await this.mailService.sendRegistrationMail(
-        userInputDto.login,
-        userInputDto.email,
-        emailData.confirmationCode,
-      );
-    } catch (error) {
-      console.error(error);
-      await this.usersRepository.deleteUser(user.id);
-      return null;
-    }
-
-    return result;
-  }
-
-  async resendEmail(emailDto: EmailDto): Promise<UserDocument | null> {
-    const user = await this.usersRepository.findUserByLoginOrEmail(
-      emailDto.email,
-    );
-
-    if (!user || user.emailConfirmation.isConfirmed) {
-      return null;
-    }
-
-    const newConfirmationCode = randomUUID();
-
-    await user.updateEmailConfirmationData(newConfirmationCode);
-    const result = await this.usersRepository.save(user);
-
-    try {
-      await this.mailService.sendRegistrationMail(
-        user.accountData.login,
-        user.accountData.email,
-        newConfirmationCode,
-      );
-    } catch (error) {
-      console.error(error);
-      return null;
-    }
-
-    return result;
-  }
-
-  async confirmUser(
-    userConfirmDto: UserConfirmDto,
-  ): Promise<UserDocument | null> {
-    const user = await this.usersRepository.findUserByEmailCode(
-      userConfirmDto.code,
-    );
-
-    if (!user || !user.userCanBeConfirmed()) {
-      return null;
-    }
-
-    await user.confirmUser();
-    return this.usersRepository.save(user);
-  }
-
-  async recoverPassword(emailDto: EmailDto): Promise<UserDocument | null> {
-    const user = await this.usersRepository.findUserByLoginOrEmail(
-      emailDto.email,
-    );
-
-    if (!user) {
-      return null;
-    }
-
-    const recoveryCode = randomUUID();
-
-    await user.updatePasswordRecoveryData(recoveryCode);
-    const result = await this.usersRepository.save(user);
-
-    try {
-      await this.mailService.sendPasswordRecoveryMail(
-        user.accountData.login,
-        user.accountData.email,
-        recoveryCode,
-      );
-    } catch (error) {
-      console.error(error);
-      return null;
-    }
-
-    return result;
-  }
-
-  async updatePassword(
-    newPasswordDto: NewPasswordDto,
-  ): Promise<UserDocument | null> {
-    const user = await this.usersRepository.findUserByRecoveryCode(
-      newPasswordDto.recoveryCode,
-    );
-
-    if (!user || !user.passwordCanBeUpdated()) {
-      return null;
-    }
-
-    const hash = await bcrypt.hash(
-      newPasswordDto.newPassword,
-      Number(process.env.HASH_ROUNDS),
-    );
-
-    await user.updatePassword(hash);
-    return this.usersRepository.save(user);
   }
 }

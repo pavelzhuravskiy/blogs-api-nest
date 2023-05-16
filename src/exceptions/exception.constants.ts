@@ -11,7 +11,8 @@ export const postIDField = 'postId';
 export const commentIDField = 'commentId';
 export const userIDField = 'userId';
 export const deviceIDField = 'deviceId';
-export const codeField = 'code';
+export const confirmCodeField = 'code';
+export const recoveryCodeField = 'recoveryCode';
 export const emailField = 'email';
 
 // Unique user
@@ -19,8 +20,9 @@ export const loginNotUnique = 'Login already exists';
 export const emailNotUnique = 'Email already exists';
 
 // Email
-export const codeIsIncorrect =
+export const confirmCodeIsIncorrect =
   'Confirmation code is incorrect, expired or user already confirmed';
+export const recoveryCodeIsIncorrect = 'Recovery code is incorrect or expired';
 export const userNotFoundOrConfirmed =
   'User with provided email not found or already confirmed';
 

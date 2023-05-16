@@ -10,7 +10,7 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { BlogInputDto } from '../../dto/blog-input.dto';
+import { BlogInputDto } from '../../dto/blog.input.dto';
 import { CommandBus } from '@nestjs/cqrs';
 import { BloggerCreateBlogCommand } from './application/use-cases/blogs/blogger.create-blog.use-case';
 import { BlogsQueryRepository } from '../../infrastructure/blogs.query.repository';
@@ -22,13 +22,13 @@ import {
   userIDField,
   userNotFound,
 } from '../../../exceptions/exception.constants';
-import { BlogQueryDto } from '../../dto/blog-query.dto';
+import { BlogQueryDto } from '../../dto/blog.query.dto';
 import { BloggerUpdateBlogCommand } from './application/use-cases/blogs/blogger.update-blog.use-case';
 import { BloggerDeleteBlogCommand } from './application/use-cases/blogs/blogger.delete-blog.use-case';
 import { PostInputDto } from '../../../posts/dto/post-input.dto';
 import { PostsQueryRepository } from '../../../posts/posts.query.repository';
 import { PostsService } from '../../../posts/posts.service';
-import { Role } from '../../../auth/decorators/enum/roles.enum';
+import { Role } from '../../../enum/roles.enum';
 import { BloggerUpdatePostCommand } from './application/use-cases/posts/blogger.update-post.use-case';
 import { BloggerCreatePostCommand } from './application/use-cases/posts/blogger.create-post.use-case';
 import { BloggerDeletePostCommand } from './application/use-cases/posts/blogger.delete-post.use-case';

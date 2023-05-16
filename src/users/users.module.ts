@@ -11,7 +11,6 @@ import { SuperAdminCreateUserUseCase } from './api/superadmin/application/use-ca
 import { SuperAdminDeleteUserUseCase } from './api/superadmin/application/use-cases/sa.delete-user.use-case';
 
 const useCases = [SuperAdminCreateUserUseCase, SuperAdminDeleteUserUseCase];
-const services = [MailService];
 
 @Module({
   imports: [
@@ -21,7 +20,7 @@ const services = [MailService];
   controllers: [SuperAdminUsersController],
   providers: [
     ...useCases,
-    ...services,
+    MailService,
     UsersRepository,
     UsersQueryRepository,
     IsUserAlreadyExistConstraint,

@@ -8,7 +8,7 @@ import {
   CommentModelType,
 } from './schemas/comment.entity';
 import { CommentViewModel } from './schemas/comment.view';
-import { CommonQueryDto } from '../common/dto/common-query.dto';
+import { QueryDto } from '../api/dto/query.dto';
 import { pFind } from '../helpers/pagination/pagination-find';
 import { pSort } from '../helpers/pagination/pagination-sort';
 import { pFilterComments } from '../helpers/pagination/pagination-filter-comments';
@@ -23,7 +23,7 @@ export class CommentsQueryRepository {
     private postsRepository: PostsRepository,
   ) {}
   async findComments(
-    query: CommonQueryDto,
+    query: QueryDto,
     postId: string,
     userId: string,
   ): Promise<Paginator<CommentViewModel[]>> {

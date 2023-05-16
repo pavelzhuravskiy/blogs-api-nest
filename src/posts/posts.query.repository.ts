@@ -5,7 +5,7 @@ import { Paginator } from '../helpers/pagination/_paginator';
 import { Post, PostLeanType, PostModelType } from './schemas/post.entity';
 import { PostViewModel } from './schemas/post.view';
 import { BlogsQueryRepository } from '../blogs/infrastructure/blogs.query.repository';
-import { CommonQueryDto } from '../common/dto/common-query.dto';
+import { QueryDto } from '../api/dto/query.dto';
 import { pFind } from '../helpers/pagination/pagination-find';
 import { pSort } from '../helpers/pagination/pagination-sort';
 import { pFilterPosts } from '../helpers/pagination/pagination-filter-posts';
@@ -20,7 +20,7 @@ export class PostsQueryRepository {
     private readonly blogsQueryRepository: BlogsQueryRepository,
   ) {}
   async findPosts(
-    query: CommonQueryDto,
+    query: QueryDto,
     userId: string,
     blogId?: string,
   ): Promise<Paginator<PostViewModel[]> | null> {

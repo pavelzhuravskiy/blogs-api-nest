@@ -1,8 +1,8 @@
 import { Controller, Get, Param, Put, Query, UseGuards } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { BlogsQueryRepository } from '../../infrastructure/blogs.query.repository';
-import { BlogQueryDto } from '../../dto/blog-query.dto';
-import { Role } from '../../../auth/decorators/enum/roles.enum';
+import { BlogQueryDto } from '../../dto/blog.query.dto';
+import { Role } from '../../../enum/roles.enum';
 import { BasicAuthGuard } from '../../../auth/guards/basic-auth.guard';
 import { ResultCode } from '../../../exceptions/exception-codes.enum';
 import { exceptionHandler } from '../../../exceptions/exception.handler';

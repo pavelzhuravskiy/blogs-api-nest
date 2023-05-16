@@ -18,23 +18,32 @@ import { DevicesService } from '../devices/devices.service';
 import { JwtService } from '@nestjs/jwt';
 import { JwtBearerGuard } from './guards/jwt-bearer.guard';
 import { UserInputDto } from '../users/dto/user-input.dto';
-import { UserConfirmDto } from './dto/user-confirm.dto';
+import { ConfirmCodeInputDto } from './dto/confirm-code.input.dto';
 import { exceptionHandler } from '../exceptions/exception.handler';
 import { ResultCode } from '../exceptions/exception-codes.enum';
 import {
-  codeField,
-  codeIsIncorrect,
+  confirmCodeField,
+  confirmCodeIsIncorrect,
   emailField,
+  recoveryCodeIsIncorrect,
+  recoveryCodeField,
   userNotFoundOrConfirmed,
 } from '../exceptions/exception.constants';
-import { EmailDto } from './dto/email.dto';
-import { NewPasswordDto } from './dto/new-password.dto';
+import { EmailInputDto } from './dto/email.input.dto';
+import { NewPasswordInputDto } from './dto/new-password.input.dto';
 import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 import { RefreshToken } from './decorators/refresh-token.decorator';
+import { CommandBus } from '@nestjs/cqrs';
+import { RegisterUserCommand } from './application/use-cases/registration/reg.register-user.use-case';
+import { ResendEmailCommand } from './application/use-cases/registration/reg.resend-email.use-case';
+import { ConfirmUserCommand } from './application/use-cases/registration/reg.confirm-user.use-case';
+import { RecoverPasswordCommand } from './application/use-cases/password-recovery/pass.recover.use-case';
+import { UpdatePasswordCommand } from './application/use-cases/password-recovery/pass.update.use-case';
 
 @Controller('auth')
-export class AuthController {
+export class PublicAuthController {
   constructor(
+    private commandBus: CommandBus,
     private readonly authService: AuthService,
     private readonly jwtService: JwtService,
     private readonly devicesService: DevicesService,
@@ -46,15 +55,17 @@ export class AuthController {
   @Post('registration')
   @HttpCode(204)
   async registerUser(@Body() userInputDto: UserInputDto) {
-    return this.authService.registerUser(userInputDto);
+    return this.commandBus.execute(new RegisterUserCommand(userInputDto));
   }
 
   @UseGuards(ThrottlerGuard)
   @Throttle(5, 10)
   @Post('registration-email-resending')
   @HttpCode(204)
-  async resendEmail(@Body() emailDto: EmailDto) {
-    const result = await this.authService.resendEmail(emailDto);
+  async resendEmail(@Body() emailInputDto: EmailInputDto) {
+    const result = await this.commandBus.execute(
+      new ResendEmailCommand(emailInputDto),
+    );
 
     if (!result) {
       return exceptionHandler(
@@ -71,14 +82,16 @@ export class AuthController {
   @Throttle(5, 10)
   @Post('registration-confirmation')
   @HttpCode(204)
-  async confirmUser(@Body() userConfirmDto: UserConfirmDto) {
-    const result = await this.authService.confirmUser(userConfirmDto);
+  async confirmUser(@Body() confirmCodeInputDto: ConfirmCodeInputDto) {
+    const result = await this.commandBus.execute(
+      new ConfirmUserCommand(confirmCodeInputDto),
+    );
 
     if (!result) {
       return exceptionHandler(
         ResultCode.BadRequest,
-        codeIsIncorrect,
-        codeField,
+        confirmCodeIsIncorrect,
+        confirmCodeField,
       );
     }
 
@@ -89,16 +102,28 @@ export class AuthController {
   @Throttle(5, 10)
   @Post('password-recovery')
   @HttpCode(204)
-  async recoverPassword(@Body() emailDto: EmailDto) {
-    return this.authService.recoverPassword(emailDto);
+  async recoverPassword(@Body() emailInputDto: EmailInputDto) {
+    return this.commandBus.execute(new RecoverPasswordCommand(emailInputDto));
   }
 
   @UseGuards(ThrottlerGuard)
   @Throttle(5, 10)
   @Post('new-password')
   @HttpCode(204)
-  async updatePassword(@Body() newPasswordDto: NewPasswordDto) {
-    return this.authService.updatePassword(newPasswordDto);
+  async updatePassword(@Body() newPasswordDto: NewPasswordInputDto) {
+    const result = await this.commandBus.execute(
+      new UpdatePasswordCommand(newPasswordDto),
+    );
+
+    if (!result) {
+      return exceptionHandler(
+        ResultCode.BadRequest,
+        recoveryCodeIsIncorrect,
+        recoveryCodeField,
+      );
+    }
+
+    return result;
   }
 
   @UseGuards(ThrottlerGuard, LocalAuthGuard)

@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { Blog, BlogLeanType, BlogModelType } from '../blog.entity';
-import { BlogQueryDto } from '../dto/blog-query.dto';
+import { BlogQueryDto } from '../dto/blog.query.dto';
 import mongoose from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Paginator } from '../../helpers/pagination/_paginator';
-import { BlogViewDto } from '../dto/blog-view.dto';
+import { BlogViewDto } from '../dto/blog.view.dto';
 import { pFind } from '../../helpers/pagination/pagination-find';
 import { pSort } from '../../helpers/pagination/pagination-sort';
 import { pFilterBlogs } from '../../helpers/pagination/pagination-filter-blogs';
-import { Role } from '../../auth/decorators/enum/roles.enum';
+import { Role } from '../../enum/roles.enum';
 import { SuperAdminBlogViewDto } from '../api/superadmin/dto/sa.blog-view.dto';
 
 @Injectable()

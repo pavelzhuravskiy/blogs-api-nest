@@ -13,7 +13,7 @@ import { PostsQueryRepository } from './posts.query.repository';
 import { CommentsQueryRepository } from '../comments/comments.query.repository';
 import { exceptionHandler } from '../exceptions/exception.handler';
 import { ResultCode } from '../exceptions/exception-codes.enum';
-import { CommonQueryDto } from '../common/dto/common-query.dto';
+import { QueryDto } from '../api/dto/query.dto';
 import { postIDField, postNotFound } from '../exceptions/exception.constants';
 import { JwtBearerGuard } from '../auth/guards/jwt-bearer.guard';
 import { UserIdFromGuard } from '../auth/decorators/user-id-from-guard.decorator';
@@ -33,7 +33,7 @@ export class PostsController {
   ) {}
 
   @Get()
-  async findPosts(@Query() query: CommonQueryDto, @UserIdFromHeaders() userId) {
+  async findPosts(@Query() query: QueryDto, @UserIdFromHeaders() userId) {
     return this.postsQueryRepository.findPosts(query, userId);
   }
 
@@ -70,7 +70,7 @@ export class PostsController {
 
   @Get(':id/comments')
   async findComments(
-    @Query() query: CommonQueryDto,
+    @Query() query: QueryDto,
     @Param('id') postId,
     @UserIdFromHeaders() userId,
   ) {

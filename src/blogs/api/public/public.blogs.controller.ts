@@ -1,15 +1,18 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
-import { BlogsQueryRepository } from './infrastructure/blogs.query.repository';
-import { PostsService } from '../posts/posts.service';
-import { PostsQueryRepository } from '../posts/posts.query.repository';
-import { ResultCode } from '../exceptions/exception-codes.enum';
-import { exceptionHandler } from '../exceptions/exception.handler';
-import { CommonQueryDto } from '../common/dto/common-query.dto';
-import { blogIDField, blogNotFound } from '../exceptions/exception.constants';
-import { UserIdFromHeaders } from '../auth/decorators/user-id-from-headers.decorator';
+import { BlogsQueryRepository } from '../../infrastructure/blogs.query.repository';
+import { PostsService } from '../../../posts/posts.service';
+import { PostsQueryRepository } from '../../../posts/posts.query.repository';
+import { ResultCode } from '../../../exceptions/exception-codes.enum';
+import { exceptionHandler } from '../../../exceptions/exception.handler';
+import { QueryDto } from '../../../api/dto/query.dto';
+import {
+  blogIDField,
+  blogNotFound,
+} from '../../../exceptions/exception.constants';
+import { UserIdFromHeaders } from '../../../auth/decorators/user-id-from-headers.decorator';
 
 @Controller('blogs')
-export class BlogsController {
+export class PublicBlogsController {
   constructor(
     // private readonly blogsService: BlogsService,
     private readonly blogsQueryRepository: BlogsQueryRepository,
@@ -81,7 +84,7 @@ export class BlogsController {
 
   @Get(':id/posts')
   async findPosts(
-    @Query() query: CommonQueryDto,
+    @Query() query: QueryDto,
     @Param('id') blogId,
     @UserIdFromHeaders() userId,
   ) {

@@ -1,6 +1,6 @@
 import { IsOptional } from 'class-validator';
 
-export class CommonQueryDto {
+export class QueryDto {
   @IsOptional()
   sortBy = 'createdAt';
   @IsOptional()

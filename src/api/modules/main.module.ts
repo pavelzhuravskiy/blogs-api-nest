@@ -4,7 +4,7 @@ import {
   NestModule,
   RequestMethod,
 } from '@nestjs/common';
-import { BlogsController } from '../../blogs/blogs.controller';
+import { PublicBlogsController } from '../../blogs/api/public/public.blogs.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Blog, BlogSchema } from '../../blogs/blog.entity';
 import { BlogsRepository } from '../../blogs/infrastructure/blogs.repository';
@@ -40,7 +40,7 @@ import { SuperAdminBindBlogUseCase } from '../../blogs/api/superadmin/applicatio
 const controllers = [
   BloggerBlogsController,
   SuperAdminBlogsController,
-  BlogsController,
+  PublicBlogsController,
   PostsController,
   CommentsController,
 ];
@@ -83,8 +83,8 @@ const queryRepositories = [
   ],
   controllers: [...controllers],
   providers: [
-    ...useCases,
     ...services,
+    ...useCases,
     ...repositories,
     ...queryRepositories,
     IsBlogExistConstraint,
