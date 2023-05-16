@@ -1,18 +1,19 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Model, Types } from 'mongoose';
-import { UserAccountSchema } from './user-account.schema';
-import { UserEmailSchema } from './user-email.schema';
-import { UserPasswordSchema } from './user-password.schema';
-import { UserInputDto } from '../dto/user-input.dto';
+import { UserAccountSchema } from './_common/schemas/user-account.schema';
+import { UserEmailSchema } from './_common/schemas/user-email.schema';
+import { UserPasswordSchema } from './_common/schemas/user-password.schema';
+import { UserInputDto } from './_common/dto/user-input.dto';
 import { add } from 'date-fns';
+import { UserBanSchema } from './_common/schemas/user-ban.schema';
 
 export type UserDocument = HydratedDocument<User>;
 export type UserLeanType = User & { _id: Types.ObjectId };
 
 export type UserModelStaticType = {
   createUser: (
-    userInputDto: UserInputDto,
     UserModel: UserModelType,
+    userInputDto: UserInputDto,
     hash: string,
     emailData?: UserEmailSchema,
   ) => UserDocument;
@@ -30,6 +31,9 @@ export class User {
 
   @Prop({ required: true })
   passwordRecovery: UserPasswordSchema;
+
+  @Prop({ required: true })
+  banInfo: UserBanSchema;
 
   userCanBeConfirmed() {
     if (
@@ -73,8 +77,8 @@ export class User {
   }
 
   static createUser(
-    userInputDto: UserInputDto,
     UserModel: UserModelType,
+    userInputDto: UserInputDto,
     hash: string,
     emailData?: UserEmailSchema,
   ): UserDocument {
@@ -94,6 +98,11 @@ export class User {
       passwordRecovery: {
         recoveryCode: null,
         expirationDate: null,
+      },
+      banInfo: {
+        isBanned: false,
+        banDate: null,
+        banReason: null,
       },
     };
     return new UserModel(user);

@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { TestingController } from './testing.controller';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Blog, BlogSchema } from '../blogs/_common/blog.entity';
+import { Blog, BlogSchema } from '../blogs/blog.entity';
 import { Post, PostSchema } from '../posts/schemas/post.entity';
 import { Comment, CommentSchema } from '../comments/schemas/comment.entity';
-import { User, UserSchema } from '../users/schemas/user.entity';
+import { User, UserSchema } from '../users/user.entity';
 import { Device, DeviceSchema } from '../devices/schemas/device.entity';
 
 @Module({

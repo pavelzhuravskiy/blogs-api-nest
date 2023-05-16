@@ -1,5 +1,5 @@
 import { InjectModel } from '@nestjs/mongoose';
-import { Blog, BlogModelType } from '../../../../_common/blog.entity';
+import { Blog, BlogModelType } from '../../../../blog.entity';
 import { BlogsRepository } from '../../../../_common/infrastructure/blogs.repository';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { ExceptionResultType } from '../../../../../exceptions/types/exception-result.type';
@@ -13,7 +13,7 @@ import {
 import { PostInputDto } from '../../../../../posts/dto/post-input.dto';
 import { Post, PostModelType } from '../../../../../posts/schemas/post.entity';
 import { PostsRepository } from '../../../../../posts/posts.repository';
-import { UsersRepository } from '../../../../../users/users.repository';
+import { UsersRepository } from '../../../../../users/_common/users.repository';
 
 export class BloggerCreatePostCommand {
   constructor(

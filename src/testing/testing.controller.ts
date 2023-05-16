@@ -1,10 +1,10 @@
 import { Controller, Delete, HttpCode } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Device, DeviceModelType } from '../devices/schemas/device.entity';
-import { Blog, BlogModelType } from '../blogs/_common/blog.entity';
+import { Blog, BlogModelType } from '../blogs/blog.entity';
 import { Post, PostModelType } from '../posts/schemas/post.entity';
 import { Comment, CommentModelType } from '../comments/schemas/comment.entity';
-import { User, UserModelType } from '../users/schemas/user.entity';
+import { User, UserModelType } from '../users/user.entity';
 
 @Controller('testing')
 export class TestingController {

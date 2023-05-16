@@ -1,9 +1,9 @@
-export class SuperAdminViewDto {
+export class SuperAdminBlogViewDto {
   id: string;
   name: string;
   description: string;
   websiteUrl: string;
-  createdAt: string;
+  createdAt: Date;
   isMembership: boolean;
   blogOwnerInfo: {
     userId: string;

@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import mongoose from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { Paginator } from '../helpers/pagination/_paginator';
-import { User, UserLeanType, UserModelType } from './schemas/user.entity';
-import { UserQueryDto } from './dto/user-query.dto';
-import { UserViewModel } from './schemas/user.view';
-import { pFind } from '../helpers/pagination/pagination-find';
-import { pSort } from '../helpers/pagination/pagination-sort';
-import { pFilterUsers } from '../helpers/pagination/pagination-filter-users';
+import { Paginator } from '../../../helpers/pagination/_paginator';
+import { User, UserLeanType, UserModelType } from '../../user.entity';
+import { UserQueryDto } from '../../_common/dto/user-query.dto';
+import { SuperAdminUserViewDto } from '../dto/sa.user-view.dto';
+import { pFind } from '../../../helpers/pagination/pagination-find';
+import { pSort } from '../../../helpers/pagination/pagination-sort';
+import { pFilterUsers } from '../../../helpers/pagination/pagination-filter-users';
 
 @Injectable()
 export class UsersQueryRepository {
@@ -15,7 +15,9 @@ export class UsersQueryRepository {
     @InjectModel(User.name)
     private UserModel: UserModelType,
   ) {}
-  async findUsers(query: UserQueryDto): Promise<Paginator<UserViewModel[]>> {
+  async findUsers(
+    query: UserQueryDto,
+  ): Promise<Paginator<SuperAdminUserViewDto[]>> {
     const users = await pFind(
       this.UserModel,
       query.pageNumber,
@@ -36,7 +38,7 @@ export class UsersQueryRepository {
     });
   }
 
-  async findUser(id: string): Promise<UserViewModel | null> {
+  async findUser(id: string): Promise<SuperAdminUserViewDto | null> {
     if (!mongoose.isValidObjectId(id)) {
       return null;
     }
@@ -51,17 +53,29 @@ export class UsersQueryRepository {
       id: user.id,
       login: user.accountData.login,
       email: user.accountData.email,
-      createdAt: user.accountData.createdAt.toISOString(),
+      createdAt: user.accountData.createdAt,
+      banInfo: {
+        isBanned: user.banInfo.isBanned,
+        banDate: user.banInfo.banDate,
+        banReason: user.banInfo.banReason,
+      },
     };
   }
 
-  private async usersMapping(users: UserLeanType[]): Promise<UserViewModel[]> {
+  private async usersMapping(
+    users: UserLeanType[],
+  ): Promise<SuperAdminUserViewDto[]> {
     return users.map((u) => {
       return {
         id: u._id.toString(),
         login: u.accountData.login,
         email: u.accountData.email,
-        createdAt: u.accountData.createdAt.toISOString(),
+        createdAt: u.accountData.createdAt,
+        banInfo: {
+          isBanned: u.banInfo.isBanned,
+          banDate: u.banInfo.banDate,
+          banReason: u.banInfo.banReason,
+        },
       };
     });
   }

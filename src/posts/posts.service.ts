@@ -5,7 +5,7 @@ import { PostsRepository } from './posts.repository';
 import { CommentInputDto } from '../comments/dto/comment-input.dto';
 import { Comment, CommentModelType } from '../comments/schemas/comment.entity';
 import { CommentsRepository } from '../comments/comments.repository';
-import { UsersRepository } from '../users/users.repository';
+import { UsersRepository } from '../users/_common/users.repository';
 
 @Injectable()
 export class PostsService {

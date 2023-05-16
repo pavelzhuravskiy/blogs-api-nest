@@ -1,8 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Model, Types } from 'mongoose';
-import { BlogInputDto } from './dto/blog-input.dto';
-import { UserDocument } from '../../users/schemas/user.entity';
-import { BlogOwnerSchema } from './schemas/blog-owner.schema';
+import { BlogInputDto } from './_common/dto/blog-input.dto';
+import { UserDocument } from '../users/user.entity';
+import { BlogOwnerSchema } from './_common/schemas/blog-owner.schema';
 
 export type BlogDocument = HydratedDocument<Blog>;
 export type BlogLeanType = Blog & { _id: Types.ObjectId };

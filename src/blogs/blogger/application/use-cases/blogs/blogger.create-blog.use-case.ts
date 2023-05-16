@@ -1,9 +1,9 @@
 import { InjectModel } from '@nestjs/mongoose';
-import { Blog, BlogModelType } from '../../../../_common/blog.entity';
+import { Blog, BlogModelType } from '../../../../blog.entity';
 import { BlogInputDto } from '../../../../_common/dto/blog-input.dto';
 import { BlogsRepository } from '../../../../_common/infrastructure/blogs.repository';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { UsersRepository } from '../../../../../users/users.repository';
+import { UsersRepository } from '../../../../../users/_common/users.repository';
 
 export class BloggerCreateBlogCommand {
   constructor(public blogInputDto: BlogInputDto, public userId: string) {}

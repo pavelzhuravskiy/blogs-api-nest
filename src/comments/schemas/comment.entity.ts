@@ -4,7 +4,7 @@ import { CommentatorInfoSchema } from './commentator-info.schema';
 import { LikesInfoSchema } from '../../likes/schemas/likes-info.schema';
 import { CommentInputDto } from '../dto/comment-input.dto';
 import { PostDocument } from '../../posts/schemas/post.entity';
-import { UserDocument } from '../../users/schemas/user.entity';
+import { UserDocument } from '../../users/user.entity';
 
 export type CommentDocument = HydratedDocument<Comment>;
 export type CommentLeanType = Comment & { _id: Types.ObjectId };

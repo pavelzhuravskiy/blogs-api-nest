@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Blog, BlogLeanType, BlogModelType } from '../blog.entity';
+import { Blog, BlogLeanType, BlogModelType } from '../../blog.entity';
 import { BlogQueryDto } from '../dto/blog-query.dto';
 import mongoose from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
@@ -9,7 +9,7 @@ import { pFind } from '../../../helpers/pagination/pagination-find';
 import { pSort } from '../../../helpers/pagination/pagination-sort';
 import { pFilterBlogs } from '../../../helpers/pagination/pagination-filter-blogs';
 import { Role } from '../../../auth/decorators/enum/roles.enum';
-import { SuperAdminViewDto } from '../../superadmin/dto/sa.view.dto';
+import { SuperAdminBlogViewDto } from '../../superadmin/dto/sa.blog-view.dto';
 
 @Injectable()
 export class BlogsQueryRepository {
@@ -64,7 +64,7 @@ export class BlogsQueryRepository {
       name: blog.name,
       description: blog.description,
       websiteUrl: blog.websiteUrl,
-      createdAt: blog.createdAt.toISOString(),
+      createdAt: blog.createdAt,
       isMembership: blog.isMembership,
     };
   }
@@ -76,7 +76,7 @@ export class BlogsQueryRepository {
         name: b.name,
         description: b.description,
         websiteUrl: b.websiteUrl,
-        createdAt: b.createdAt.toISOString(),
+        createdAt: b.createdAt,
         isMembership: b.isMembership,
       };
     });
@@ -84,14 +84,14 @@ export class BlogsQueryRepository {
 
   private async blogsMappingForSA(
     blogs: BlogLeanType[],
-  ): Promise<SuperAdminViewDto[]> {
+  ): Promise<SuperAdminBlogViewDto[]> {
     return blogs.map((b) => {
       return {
         id: b._id.toString(),
         name: b.name,
         description: b.description,
         websiteUrl: b.websiteUrl,
-        createdAt: b.createdAt.toISOString(),
+        createdAt: b.createdAt,
         isMembership: b.isMembership,
         blogOwnerInfo: {
           userId: b.blogOwnerInfo.userId,

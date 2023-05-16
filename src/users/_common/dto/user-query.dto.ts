@@ -1,4 +1,4 @@
-import { CommonQueryDto } from '../../common/dto/common-query.dto';
+import { CommonQueryDto } from '../../../common/dto/common-query.dto';
 import { IsOptional } from 'class-validator';
 
 export class UserQueryDto extends CommonQueryDto {

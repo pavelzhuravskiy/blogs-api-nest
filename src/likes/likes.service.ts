@@ -7,7 +7,7 @@ import { Post, PostModelType } from '../posts/schemas/post.entity';
 import { LikesRepository } from './likes.repository';
 import { LikeStatus } from './like-status.enum';
 import { LikesDataType } from './schemas/likes-data.type';
-import { UsersRepository } from '../users/users.repository';
+import { UsersRepository } from '../users/_common/users.repository';
 
 @Injectable()
 export class LikesService {
