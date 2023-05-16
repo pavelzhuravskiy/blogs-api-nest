@@ -1,11 +1,11 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Model, Types } from 'mongoose';
-import { UserAccountSchema } from './_common/schemas/user-account.schema';
-import { UserEmailSchema } from './_common/schemas/user-email.schema';
-import { UserPasswordSchema } from './_common/schemas/user-password.schema';
-import { UserInputDto } from './_common/dto/user-input.dto';
+import { UserAccountSchema } from './schemas/user-account.schema';
+import { UserEmailSchema } from './schemas/user-email.schema';
+import { UserPasswordSchema } from './schemas/user-password.schema';
+import { UserInputDto } from './dto/user-input.dto';
 import { add } from 'date-fns';
-import { UserBanSchema } from './_common/schemas/user-ban.schema';
+import { UserBanSchema } from './schemas/user-ban.schema';
 
 export type UserDocument = HydratedDocument<User>;
 export type UserLeanType = User & { _id: Types.ObjectId };

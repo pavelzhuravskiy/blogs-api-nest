@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { UsersRepository } from '../users/_common/users.repository';
+import { UsersRepository } from '../users/infrastructure/users.repository';
 import bcrypt from 'bcrypt';
 import { jwtConstants } from './constants';
 import { DevicesService } from '../devices/devices.service';
@@ -8,7 +8,7 @@ import { DevicesRepository } from '../devices/devices.repository';
 import { DeviceDocument } from '../devices/schemas/device.entity';
 import { User, UserDocument, UserModelType } from '../users/user.entity';
 import { randomUUID } from 'crypto';
-import { UserInputDto } from '../users/_common/dto/user-input.dto';
+import { UserInputDto } from '../users/dto/user-input.dto';
 import { add } from 'date-fns';
 import { InjectModel } from '@nestjs/mongoose';
 import { MailService } from '../mail/mail.service';

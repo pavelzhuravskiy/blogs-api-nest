@@ -4,7 +4,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Paginator } from '../helpers/pagination/_paginator';
 import { Post, PostLeanType, PostModelType } from './schemas/post.entity';
 import { PostViewModel } from './schemas/post.view';
-import { BlogsQueryRepository } from '../blogs/_common/infrastructure/blogs.query.repository';
+import { BlogsQueryRepository } from '../blogs/infrastructure/blogs.query.repository';
 import { CommonQueryDto } from '../common/dto/common-query.dto';
 import { pFind } from '../helpers/pagination/pagination-find';
 import { pSort } from '../helpers/pagination/pagination-sort';
