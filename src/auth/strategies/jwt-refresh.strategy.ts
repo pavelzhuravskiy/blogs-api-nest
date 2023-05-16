@@ -1,16 +1,17 @@
 import { Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { jwtConstants } from '../constants';
-import { AuthService } from '../auth.service';
-import { cookieExtractor } from '../cookie-extractor';
+import { jwtConstants } from '../config/constants';
+import { cookieExtractor } from '../utils/cookie-extractor';
+import { ValidateRefreshTokenCommand } from '../application/use-cases/validations/val.refresh-token.use-case';
+import { CommandBus } from '@nestjs/cqrs';
 
 @Injectable()
 export class JwtRefreshTokenStrategy extends PassportStrategy(
   Strategy,
   'refresh',
 ) {
-  constructor(private authService: AuthService) {
+  constructor(private commandBus: CommandBus) {
     super({
       jwtFromRequest: cookieExtractor,
       ignoreExpiration: false,
@@ -19,7 +20,9 @@ export class JwtRefreshTokenStrategy extends PassportStrategy(
   }
 
   async validate(payload: any) {
-    const result = await this.authService.validateRefreshToken(payload);
+    const result = await this.commandBus.execute(
+      new ValidateRefreshTokenCommand(payload),
+    );
 
     if (!result) {
       throw new UnauthorizedException();

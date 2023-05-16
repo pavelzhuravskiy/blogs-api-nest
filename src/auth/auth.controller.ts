@@ -11,10 +11,9 @@ import {
 } from '@nestjs/common';
 import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
 import { LocalAuthGuard } from './guards/local-auth.guard';
-import { AuthService } from './auth.service';
+import { AuthService } from './application/auth.service';
 import { UsersRepository } from '../users/infrastructure/users.repository';
 import { UserIdFromGuard } from './decorators/user-id-from-guard.decorator';
-import { DevicesService } from '../devices/devices.service';
 import { JwtService } from '@nestjs/jwt';
 import { JwtBearerGuard } from './guards/jwt-bearer.guard';
 import { UserInputDto } from '../users/dto/user-input.dto';
@@ -28,6 +27,8 @@ import {
   recoveryCodeIsIncorrect,
   recoveryCodeField,
   userNotFoundOrConfirmed,
+  userNotFound,
+  userIDField,
 } from '../exceptions/exception.constants';
 import { EmailInputDto } from './dto/email.input.dto';
 import { NewPasswordInputDto } from './dto/new-password.input.dto';
@@ -39,14 +40,16 @@ import { ResendEmailCommand } from './application/use-cases/registration/reg.res
 import { ConfirmUserCommand } from './application/use-cases/registration/reg.confirm-user.use-case';
 import { RecoverPasswordCommand } from './application/use-cases/password-recovery/pass.recover.use-case';
 import { UpdatePasswordCommand } from './application/use-cases/password-recovery/pass.update.use-case';
+import { CreateDeviceCommand } from './application/use-cases/devices/device.create.use-case';
+import { UpdateDeviceCommand } from './application/use-cases/devices/device.update.use-case';
+import { DeleteDeviceCommand } from './application/use-cases/devices/device.delete.use-case';
 
 @Controller('auth')
-export class PublicAuthController {
+export class AuthController {
   constructor(
     private commandBus: CommandBus,
     private readonly authService: AuthService,
     private readonly jwtService: JwtService,
-    private readonly devicesService: DevicesService,
     private readonly usersRepository: UsersRepository,
   ) {}
 
@@ -139,7 +142,9 @@ export class PublicAuthController {
     const userAgent = headers['user-agent'] || 'unknown';
     const tokens = await this.authService.getTokens(userId);
 
-    await this.devicesService.createDevice(tokens.refreshToken, ip, userAgent);
+    await this.commandBus.execute(
+      new CreateDeviceCommand(tokens.refreshToken, ip, userAgent),
+    );
 
     res
       .cookie('refreshToken', tokens.refreshToken, {
@@ -165,7 +170,9 @@ export class PublicAuthController {
     const tokens = await this.authService.getTokens(userId, deviceId);
     const newToken = this.jwtService.decode(tokens.refreshToken);
 
-    await this.devicesService.updateDevice(newToken, ip, userAgent);
+    await this.commandBus.execute(
+      new UpdateDeviceCommand(newToken, ip, userAgent),
+    );
 
     res
       .cookie('refreshToken', tokens.refreshToken, {
@@ -181,13 +188,17 @@ export class PublicAuthController {
   async logout(@RefreshToken() refreshToken) {
     const decodedToken: any = this.jwtService.decode(refreshToken);
     const deviceId = decodedToken.deviceId;
-    return this.devicesService.logout(deviceId);
+    return this.commandBus.execute(new DeleteDeviceCommand(deviceId));
   }
 
   @UseGuards(JwtBearerGuard)
   @Get('me')
   async getProfile(@UserIdFromGuard() userId) {
     const user = await this.usersRepository.findUserById(userId);
+
+    if (!user) {
+      return exceptionHandler(ResultCode.NotFound, userNotFound, userIDField);
+    }
 
     return {
       email: user?.accountData.email,

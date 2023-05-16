@@ -1,18 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { JwtService } from '@nestjs/jwt';
-import {
-  Device,
-  DeviceDocument,
-  DeviceModelType,
-} from './schemas/device.entity';
-import { DevicesRepository } from './devices.repository';
-import { ResultCode } from '../exceptions/exception-codes.enum';
+import { Device, DeviceModelType } from '../schemas/device.entity';
+import { DevicesRepository } from '../infrastructure/devices.repository';
+import { ResultCode } from '../../exceptions/exception-codes.enum';
 import {
   deviceIDField,
   deviceNotFound,
-} from '../exceptions/exception.constants';
-import { ExceptionResultType } from '../exceptions/types/exception-result.type';
+} from '../../exceptions/exception.constants';
+import { ExceptionResultType } from '../../exceptions/types/exception-result.type';
 
 @Injectable()
 export class DevicesService {
@@ -23,7 +19,7 @@ export class DevicesService {
     private readonly devicesRepository: DevicesRepository,
   ) {}
 
-  async createDevice(
+  /*async createDevice(
     token: string,
     ip: string,
     userAgent: string,
@@ -38,9 +34,9 @@ export class DevicesService {
     );
 
     return this.devicesRepository.save(device);
-  }
+  }*/
 
-  async updateDevice(
+  /*async updateDevice(
     token: any,
     ip: string,
     userAgent: string,
@@ -53,11 +49,11 @@ export class DevicesService {
 
     await device.updateDevice(token, ip, userAgent);
     return this.devicesRepository.save(device);
-  }
+  }*/
 
-  async logout(deviceId: string): Promise<boolean> {
+  /*async logout(deviceId: string): Promise<boolean> {
     return this.devicesRepository.deleteDevice(deviceId);
-  }
+  }*/
 
   async terminateSession(
     currentUserId: string,

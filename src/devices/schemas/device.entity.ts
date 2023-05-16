@@ -5,10 +5,10 @@ export type DeviceDocument = HydratedDocument<Device>;
 
 export type DeviceModelStaticType = {
   createDevice: (
-    token: string | { [key: string]: any } | null,
+    DeviceModel: DeviceModelType,
+    token: any,
     ip: string,
     userAgent: string,
-    DeviceModel: DeviceModelType,
   ) => DeviceDocument;
 };
 
@@ -34,17 +34,17 @@ export class Device {
   @Prop({ required: true })
   expirationDate: number;
 
-  updateDevice(token: any, ip: string, userAgent: string) {
-    this.lastActiveDate = token.iat;
+  updateDevice(decodedToken: any, ip: string, userAgent: string) {
+    this.lastActiveDate = decodedToken.iat;
     this.ip = ip;
     this.title = userAgent;
   }
 
   static createDevice(
+    DeviceModel: DeviceModelType,
     token: any,
     ip: string,
     userAgent: string,
-    DeviceModel: DeviceModelType,
   ): DeviceDocument {
     const device = {
       ip: ip,

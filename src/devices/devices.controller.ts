@@ -7,9 +7,9 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { DevicesQueryRepository } from './devices.query.repository';
-import { DevicesService } from './devices.service';
-import { DevicesRepository } from './devices.repository';
+import { DevicesQueryRepository } from './infrastructure/devices.query.repository';
+import { DevicesService } from './application/devices.service';
+import { DevicesRepository } from './infrastructure/devices.repository';
 import { exceptionHandler } from '../exceptions/exception.handler';
 import { ResultCode } from '../exceptions/exception-codes.enum';
 import { UserIdFromGuard } from '../auth/decorators/user-id-from-guard.decorator';

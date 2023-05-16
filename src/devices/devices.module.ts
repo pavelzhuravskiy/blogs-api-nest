@@ -2,10 +2,10 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Device, DeviceSchema } from './schemas/device.entity';
 import { JwtService } from '@nestjs/jwt';
-import { DevicesService } from './devices.service';
-import { DevicesRepository } from './devices.repository';
+import { DevicesService } from './application/devices.service';
+import { DevicesRepository } from './infrastructure/devices.repository';
 import { DevicesController } from './devices.controller';
-import { DevicesQueryRepository } from './devices.query.repository';
+import { DevicesQueryRepository } from './infrastructure/devices.query.repository';
 
 @Module({
   imports: [
