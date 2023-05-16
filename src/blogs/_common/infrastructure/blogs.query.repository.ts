@@ -8,6 +8,8 @@ import { BlogViewDto } from '../dto/blog-view.dto';
 import { pFind } from '../../../helpers/pagination/pagination-find';
 import { pSort } from '../../../helpers/pagination/pagination-sort';
 import { pFilterBlogs } from '../../../helpers/pagination/pagination-filter-blogs';
+import { Role } from '../../../auth/decorators/enum/roles.enum';
+import { BlogSAViewDto } from '../../superadmin/dto/blog-sa-view.dto';
 
 @Injectable()
 export class BlogsQueryRepository {
@@ -17,6 +19,7 @@ export class BlogsQueryRepository {
   ) {}
   async findBlogs(
     query: BlogQueryDto,
+    role: string,
     userId?: string,
   ): Promise<Paginator<BlogViewDto[]>> {
     const blogs = await pFind(
@@ -31,11 +34,17 @@ export class BlogsQueryRepository {
       pFilterBlogs(query.searchNameTerm, userId),
     );
 
+    let items = await this.blogsMapping(blogs);
+
+    if (role === Role.SuperAdmin) {
+      items = await this.blogsMappingForSA(blogs);
+    }
+
     return Paginator.paginate({
       pageNumber: query.pageNumber,
       pageSize: query.pageSize,
       totalCount: totalCount,
-      items: await this.blogsMapping(blogs),
+      items: items,
     });
   }
 
@@ -69,6 +78,25 @@ export class BlogsQueryRepository {
         websiteUrl: b.websiteUrl,
         createdAt: b.createdAt.toISOString(),
         isMembership: b.isMembership,
+      };
+    });
+  }
+
+  private async blogsMappingForSA(
+    blogs: BlogLeanType[],
+  ): Promise<BlogSAViewDto[]> {
+    return blogs.map((b) => {
+      return {
+        id: b._id.toString(),
+        name: b.name,
+        description: b.description,
+        websiteUrl: b.websiteUrl,
+        createdAt: b.createdAt.toISOString(),
+        isMembership: b.isMembership,
+        blogOwnerInfo: {
+          userId: b.blogOwnerInfo.userId,
+          userLogin: b.blogOwnerInfo.userLogin,
+        },
       };
     });
   }

@@ -1,13 +1,13 @@
 import { InjectModel } from '@nestjs/mongoose';
-import { Blog, BlogModelType } from '../../../_common/blog.entity';
-import { BlogsRepository } from '../../../_common/infrastructure/blogs.repository';
+import { Blog, BlogModelType } from '../../../../_common/blog.entity';
+import { BlogsRepository } from '../../../../_common/infrastructure/blogs.repository';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { ExceptionResultType } from '../../../../exceptions/types/exception-result.type';
-import { ResultCode } from '../../../../exceptions/exception-codes.enum';
+import { ExceptionResultType } from '../../../../../exceptions/types/exception-result.type';
+import { ResultCode } from '../../../../../exceptions/exception-codes.enum';
 import {
   blogIDField,
   blogNotFound,
-} from '../../../../exceptions/exception.constants';
+} from '../../../../../exceptions/exception.constants';
 
 export class BloggerDeleteBlogCommand {
   constructor(public blogId: string, public userId: string) {}

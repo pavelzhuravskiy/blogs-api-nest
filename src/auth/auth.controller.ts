@@ -13,7 +13,7 @@ import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { AuthService } from './auth.service';
 import { UsersRepository } from '../users/users.repository';
-import { UserIdFromGuard } from './decorators/user-id-from-guard.param.decorator';
+import { UserIdFromGuard } from './decorators/user-id-from-guard.decorator';
 import { DevicesService } from '../devices/devices.service';
 import { JwtService } from '@nestjs/jwt';
 import { JwtBearerGuard } from './guards/jwt-bearer.guard';
@@ -31,7 +31,7 @@ import {
 import { EmailDto } from './dto/email.dto';
 import { NewPasswordDto } from './dto/new-password.dto';
 import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
-import { RefreshToken } from './decorators/refresh-token.param.decorator';
+import { RefreshToken } from './decorators/refresh-token.decorator';
 
 @Controller('auth')
 export class AuthController {

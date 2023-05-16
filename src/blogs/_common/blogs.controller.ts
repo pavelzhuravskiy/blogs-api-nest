@@ -1,15 +1,6 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  Post,
-  Query,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, Param, Query } from '@nestjs/common';
 import { BlogsQueryRepository } from './infrastructure/blogs.query.repository';
 import { PostsService } from '../../posts/posts.service';
-import { PostInputDto } from '../../posts/dto/post-input.dto';
 import { PostsQueryRepository } from '../../posts/posts.query.repository';
 import { ResultCode } from '../../exceptions/exception-codes.enum';
 import { exceptionHandler } from '../../exceptions/exception.handler';
@@ -18,8 +9,7 @@ import {
   blogIDField,
   blogNotFound,
 } from '../../exceptions/exception.constants';
-import { BasicAuthGuard } from '../../auth/guards/basic-auth.guard';
-import { UserIdFromHeaders } from '../../auth/decorators/user-id-from-headers.param.decorator';
+import { UserIdFromHeaders } from '../../auth/decorators/user-id-from-headers.decorator';
 
 @Controller('blogs')
 export class BlogsController {
@@ -79,7 +69,7 @@ export class BlogsController {
     return result;
   }*/
 
-  @UseGuards(BasicAuthGuard)
+  /*@UseGuards(BasicAuthGuard)
   @Post(':id/posts')
   async createPost(@Param('id') id, @Body() postInputDto: PostInputDto) {
     const postId = await this.postsService.createPost(postInputDto, id);
@@ -88,8 +78,9 @@ export class BlogsController {
       return exceptionHandler(ResultCode.NotFound, blogNotFound, blogIDField);
     }
 
-    return this.postsQueryRepository.findPost(postId);
-  }
+    return postId;
+    // return this.postsQueryRepository.findPost(postId);
+  }*/
 
   @Get(':id/posts')
   async findPosts(

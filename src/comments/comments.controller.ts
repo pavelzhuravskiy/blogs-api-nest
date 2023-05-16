@@ -16,13 +16,13 @@ import {
   commentNotFound,
 } from '../exceptions/exception.constants';
 import { JwtBearerGuard } from '../auth/guards/jwt-bearer.guard';
-import { UserIdFromGuard } from '../auth/decorators/user-id-from-guard.param.decorator';
+import { UserIdFromGuard } from '../auth/decorators/user-id-from-guard.decorator';
 import { CommentsService } from './comments.service';
 import { CommentInputDto } from './dto/comment-input.dto';
 import { LikeStatusInputDto } from '../likes/dto/like-status-input.dto';
 import { LikesService } from '../likes/likes.service';
 import { JwtService } from '@nestjs/jwt';
-import { UserIdFromHeaders } from '../auth/decorators/user-id-from-headers.param.decorator';
+import { UserIdFromHeaders } from '../auth/decorators/user-id-from-headers.decorator';
 
 @Controller('comments')
 export class CommentsController {

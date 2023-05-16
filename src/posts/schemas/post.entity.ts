@@ -9,8 +9,8 @@ export type PostLeanType = Post & { _id: Types.ObjectId };
 
 export type PostModelStaticType = {
   createPost: (
-    postInputDto: PostInputDto,
     PostModel: PostModelType,
+    postInputDto: PostInputDto,
     blog: BlogDocument,
   ) => PostDocument;
 };
@@ -44,12 +44,11 @@ export class Post {
     this.title = updatePostDto.title;
     this.shortDescription = updatePostDto.shortDescription;
     this.content = updatePostDto.content;
-    this.blogId = updatePostDto.blogId;
   }
 
   static createPost(
-    postInputDto: PostInputDto,
     PostModel: PostModelType,
+    postInputDto: PostInputDto,
     blog: BlogDocument,
   ): PostDocument {
     const post = {

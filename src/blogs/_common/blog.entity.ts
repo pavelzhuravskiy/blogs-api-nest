@@ -9,9 +9,9 @@ export type BlogLeanType = Blog & { _id: Types.ObjectId };
 
 export type BlogModelStaticType = {
   createBlog: (
+    BlogModel: BlogModelType,
     blogInputDto: BlogInputDto,
     user: UserDocument,
-    BlogModel: BlogModelType,
   ) => BlogDocument;
 };
 
@@ -44,9 +44,9 @@ export class Blog {
   }
 
   static createBlog(
+    BlogModel: BlogModelType,
     blogInputDto: BlogInputDto,
     user: UserDocument,
-    BlogModel: BlogModelType,
   ): BlogDocument {
     const blog = {
       name: blogInputDto.name,

@@ -1,6 +1,4 @@
-import { IsNotEmpty, IsOptional, MaxLength } from 'class-validator';
-import { blogNotFound } from '../../exceptions/exception.constants';
-import { isBlogExist } from '../../exceptions/decorators/blog-exists.decorator';
+import { IsNotEmpty, MaxLength } from 'class-validator';
 
 export class PostInputDto {
   @IsNotEmpty()
@@ -15,9 +13,9 @@ export class PostInputDto {
   @MaxLength(1000)
   content: string;
 
-  @IsOptional()
-  @isBlogExist({
+  // If blog ID is received from body
+  /*@isBlogExist({
     message: blogNotFound,
   })
-  blogId: string;
+  blogId: string;*/
 }

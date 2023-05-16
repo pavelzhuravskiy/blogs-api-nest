@@ -12,9 +12,9 @@ import { DevicesService } from './devices.service';
 import { DevicesRepository } from './devices.repository';
 import { exceptionHandler } from '../exceptions/exception.handler';
 import { ResultCode } from '../exceptions/exception-codes.enum';
-import { UserIdFromGuard } from '../auth/decorators/user-id-from-guard.param.decorator';
+import { UserIdFromGuard } from '../auth/decorators/user-id-from-guard.decorator';
 import { JwtRefreshGuard } from '../auth/guards/jwt-refresh.guard';
-import { RefreshToken } from '../auth/decorators/refresh-token.param.decorator';
+import { RefreshToken } from '../auth/decorators/refresh-token.decorator';
 
 @Controller('security')
 export class DevicesController {
