@@ -2,9 +2,9 @@ import { Prop, Schema } from '@nestjs/mongoose';
 
 @Schema()
 export class BlogOwnerSchema {
-  @Prop({ required: true })
-  userId: string;
+  @Prop({ type: String || null })
+  userId: string | null;
 
-  @Prop({ required: true })
-  userLogin: string;
+  @Prop({ type: String || null })
+  userLogin: string | null;
 }

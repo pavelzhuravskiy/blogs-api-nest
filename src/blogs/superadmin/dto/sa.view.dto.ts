@@ -1,4 +1,4 @@
-export class BlogSAViewDto {
+export class SuperAdminViewDto {
   id: string;
   name: string;
   description: string;

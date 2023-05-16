@@ -9,7 +9,7 @@ import { pFind } from '../../../helpers/pagination/pagination-find';
 import { pSort } from '../../../helpers/pagination/pagination-sort';
 import { pFilterBlogs } from '../../../helpers/pagination/pagination-filter-blogs';
 import { Role } from '../../../auth/decorators/enum/roles.enum';
-import { BlogSAViewDto } from '../../superadmin/dto/blog-sa-view.dto';
+import { SuperAdminViewDto } from '../../superadmin/dto/sa.view.dto';
 
 @Injectable()
 export class BlogsQueryRepository {
@@ -84,7 +84,7 @@ export class BlogsQueryRepository {
 
   private async blogsMappingForSA(
     blogs: BlogLeanType[],
-  ): Promise<BlogSAViewDto[]> {
+  ): Promise<SuperAdminViewDto[]> {
     return blogs.map((b) => {
       return {
         id: b._id.toString(),

@@ -43,6 +43,11 @@ export class Blog {
     this.websiteUrl = updateBlogDto.websiteUrl;
   }
 
+  bindUser(user: UserDocument) {
+    this.blogOwnerInfo.userId = user.id;
+    this.blogOwnerInfo.userLogin = user.accountData.login;
+  }
+
   static createBlog(
     BlogModel: BlogModelType,
     blogInputDto: BlogInputDto,
@@ -67,6 +72,7 @@ export const BlogSchema = SchemaFactory.createForClass(Blog);
 
 BlogSchema.methods = {
   updateBlog: Blog.prototype.updateBlog,
+  bindUser: Blog.prototype.bindUser,
 };
 
 const blogStaticMethods: BlogModelStaticType = {

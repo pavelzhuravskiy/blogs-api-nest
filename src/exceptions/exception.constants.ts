@@ -23,3 +23,6 @@ export const codeIsIncorrect =
   'Confirmation code is incorrect, expired or user already confirmed';
 export const userNotFoundOrConfirmed =
   'User with provided email not found or already confirmed';
+
+// Bind blog with user
+export const blogIsBound = 'Blog is already bound';

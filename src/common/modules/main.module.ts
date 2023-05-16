@@ -34,9 +34,12 @@ import { CommentsController } from '../../comments/comments.controller';
 import { BloggerUpdatePostUseCase } from '../../blogs/blogger/application/use-cases/posts/blogger.update-post.use-case';
 import { BloggerCreatePostUseCase } from '../../blogs/blogger/application/use-cases/posts/blogger.create-post.use-case';
 import { BloggerDeletePostUseCase } from '../../blogs/blogger/application/use-cases/posts/blogger.delete-post.use-case';
+import { SuperAdminBlogsController } from '../../blogs/superadmin/sa.blogs.controller';
+import { SuperAdminBindBlogUseCase } from '../../blogs/superadmin/application/use-cases/sa.bind-blog.use-case';
 
 const controllers = [
   BloggerBlogsController,
+  SuperAdminBlogsController,
   BlogsController,
   PostsController,
   CommentsController,
@@ -51,6 +54,7 @@ const useCases = [
   BloggerCreatePostUseCase,
   BloggerUpdatePostUseCase,
   BloggerDeletePostUseCase,
+  SuperAdminBindBlogUseCase,
 ];
 
 const repositories = [
