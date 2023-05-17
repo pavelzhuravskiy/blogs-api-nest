@@ -31,4 +31,9 @@ export class DevicesRepository {
     await this.DeviceModel.deleteMany({ deviceId: { $ne: currentDevice } });
     return (await this.DeviceModel.countDocuments()) === 1;
   }
+
+  async deleteAllUserDevices(userId: string): Promise<boolean> {
+    await this.DeviceModel.deleteMany({ userId: userId });
+    return (await this.DeviceModel.countDocuments({ userId: userId })) === 0;
+  }
 }

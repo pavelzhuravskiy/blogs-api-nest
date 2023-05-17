@@ -8,8 +8,13 @@ import { DevicesQueryRepository } from './infrastructure/devices.query.repositor
 import { DeviceDeleteForTerminateUseCase } from './api/public/application/use-cases/device-delete-for-terminate.use-case';
 import { DevicesDeleteOldUseCase } from './api/public/application/use-cases/devices-delete-old.use-case';
 import { CqrsModule } from '@nestjs/cqrs';
+import { DevicesDeleteForUserBanUseCase } from './api/public/application/use-cases/devices-delete-for-user-ban.use-case';
 
-const useCases = [DeviceDeleteForTerminateUseCase, DevicesDeleteOldUseCase];
+const useCases = [
+  DeviceDeleteForTerminateUseCase,
+  DevicesDeleteOldUseCase,
+  DevicesDeleteForUserBanUseCase,
+];
 const repositories = [DevicesRepository, DevicesQueryRepository];
 
 @Module({
