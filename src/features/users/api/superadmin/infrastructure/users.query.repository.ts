@@ -4,7 +4,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Paginator } from '../../../../../helpers/pagination/_paginator';
 import { User, UserLeanType, UserModelType } from '../../../user.entity';
 import { UserQueryDto } from '../../../dto/user-query.dto';
-import { SuperAdminUserViewDto } from '../dto/sa.user-view.dto';
+import { SuperAdminUserViewDto } from '../dto/user-view.dto';
 import { pFind } from '../../../../../helpers/pagination/pagination-find';
 import { pSort } from '../../../../../helpers/pagination/pagination-sort';
 import { pFilterUsers } from '../../../../../helpers/pagination/pagination-filter-users';

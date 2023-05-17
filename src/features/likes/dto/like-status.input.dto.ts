@@ -1,6 +1,7 @@
-import { IsIn } from 'class-validator';
+import { IsEnum } from 'class-validator';
+import { LikeStatus } from '../enum/like-status.enum';
 
 export class LikeStatusInputDto {
-  @IsIn(['None', 'Like', 'Dislike'])
+  @IsEnum(LikeStatus)
   likeStatus: string;
 }

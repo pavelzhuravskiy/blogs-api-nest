@@ -15,12 +15,6 @@ async function bootstrap() {
   app.useGlobalPipes(
     new TrimPipe(),
     new ValidationPipe({
-      transform: true,
-      // whitelist: true,
-      // forbidNonWhitelisted: true,
-      transformOptions: {
-        enableImplicitConversion: true,
-      },
       stopAtFirstError: true,
       exceptionFactory: customExceptionFactory,
     }),

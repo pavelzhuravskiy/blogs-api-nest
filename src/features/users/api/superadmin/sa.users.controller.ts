@@ -6,6 +6,7 @@ import {
   HttpCode,
   Param,
   Post,
+  Put,
   Query,
   UseGuards,
 } from '@nestjs/common';
@@ -22,6 +23,8 @@ import {
   userIDField,
   userNotFound,
 } from '../../../../exceptions/exception.constants';
+import { UserBanInputDto } from './dto/user-ban.input.dto';
+import { UserBanCommand } from './application/use-cases/user-ban.use-case';
 
 @Controller('sa/users')
 export class SuperAdminUsersController {
@@ -54,6 +57,21 @@ export class SuperAdminUsersController {
 
     if (!result) {
       return exceptionHandler(ResultCode.NotFound, userNotFound, userIDField);
+    }
+
+    return result;
+  }
+
+  @UseGuards(BasicAuthGuard)
+  @Put(':id/ban')
+  @HttpCode(204)
+  async banUser(@Body() userBanInputDto: UserBanInputDto, @Param('id') userId) {
+    const result = await this.commandBus.execute(
+      new UserBanCommand(userBanInputDto, userId),
+    );
+
+    if (result.code !== ResultCode.Success) {
+      return exceptionHandler(result.code, result.message, result.field);
     }
 
     return result;

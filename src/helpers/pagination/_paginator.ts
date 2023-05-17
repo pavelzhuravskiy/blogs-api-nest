@@ -13,8 +13,8 @@ export class Paginator<T> {
   }): Paginator<T> {
     return {
       pagesCount: Math.ceil(data.totalCount / data.pageSize),
-      page: data.pageNumber,
-      pageSize: data.pageSize,
+      page: Number(data.pageNumber),
+      pageSize: Number(data.pageSize),
       totalCount: data.totalCount,
       items: data.items,
     };

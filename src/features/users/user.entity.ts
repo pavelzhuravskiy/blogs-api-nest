@@ -6,6 +6,7 @@ import { UserPasswordSchema } from './schemas/user-password.schema';
 import { UserInputDto } from './dto/user-input.dto';
 import { add } from 'date-fns';
 import { UserBanSchema } from './schemas/user-ban.schema';
+import { UserBanInputDto } from './api/superadmin/dto/user-ban.input.dto';
 
 export type UserDocument = HydratedDocument<User>;
 export type UserLeanType = User & { _id: Types.ObjectId };
@@ -76,6 +77,18 @@ export class User {
     this.passwordRecovery.expirationDate = null;
   }
 
+  banUser(userBanInputDto: UserBanInputDto) {
+    this.banInfo.isBanned = true;
+    this.banInfo.banDate = new Date();
+    this.banInfo.banReason = userBanInputDto.banReason;
+  }
+
+  unbanUser() {
+    this.banInfo.isBanned = false;
+    this.banInfo.banDate = null;
+    this.banInfo.banReason = null;
+  }
+
   static createUser(
     UserModel: UserModelType,
     userInputDto: UserInputDto,
@@ -118,6 +131,8 @@ UserSchema.methods = {
   updatePasswordRecoveryData: User.prototype.updatePasswordRecoveryData,
   passwordCanBeUpdated: User.prototype.passwordCanBeUpdated,
   updatePassword: User.prototype.updatePassword,
+  banUser: User.prototype.banUser,
+  unbanUser: User.prototype.unbanUser,
 };
 
 const userStaticMethods: UserModelStaticType = {

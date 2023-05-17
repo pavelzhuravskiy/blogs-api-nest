@@ -8,8 +8,9 @@ import { SuperAdminUsersController } from './api/superadmin/sa.users.controller'
 import { CqrsModule } from '@nestjs/cqrs';
 import { UserCreateUseCase } from './api/superadmin/application/use-cases/user-create.use-case';
 import { UserDeleteUseCase } from './api/superadmin/application/use-cases/user-delete.use-case';
+import { UserBanUseCase } from './api/superadmin/application/use-cases/user-ban.use-case';
 
-const useCases = [UserCreateUseCase, UserDeleteUseCase];
+const useCases = [UserCreateUseCase, UserDeleteUseCase, UserBanUseCase];
 const repositories = [UsersRepository, UsersQueryRepository];
 
 @Module({
