@@ -5,7 +5,7 @@ import { HttpExceptionFilter } from './exceptions/exception.filter';
 import { customExceptionFactory } from './exceptions/exception.factory';
 import { useContainer } from 'class-validator';
 import cookieParser from 'cookie-parser';
-import { TrimPipe } from './exceptions/pipes/trim.pipe';
+import { TrimPipe } from './pipes/trim.pipe';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
