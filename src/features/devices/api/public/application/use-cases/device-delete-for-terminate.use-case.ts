@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { DevicesRepository } from '../../../../infrastructure/devices.repository';
-import { ResultCode } from '../../../../../../exceptions/enum/exception-codes.enum';
+import { ResultCode } from '../../../../../../enum/result-code.enum';
 import {
   deviceIDField,
   deviceNotFound,

@@ -1,4 +1,4 @@
-import { ResultCode } from './enum/exception-codes.enum';
+import { ResultCode } from '../enum/result-code.enum';
 import {
   BadRequestException,
   ForbiddenException,

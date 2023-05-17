@@ -18,7 +18,7 @@ import { JwtBearerGuard } from '../../guards/jwt-bearer.guard';
 import { UserInputDto } from '../../../users/dto/user-input.dto';
 import { ConfirmCodeInputDto } from '../../dto/confirm-code.input.dto';
 import { exceptionHandler } from '../../../../exceptions/exception.handler';
-import { ResultCode } from '../../../../exceptions/enum/exception-codes.enum';
+import { ResultCode } from '../../../../enum/result-code.enum';
 import {
   confirmCodeField,
   confirmCodeIsIncorrect,

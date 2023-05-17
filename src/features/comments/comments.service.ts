@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Comment, CommentModelType } from './comment.entity';
 import { CommentsRepository } from './infrastructure/comments.repository';
 import { ExceptionResultType } from '../../exceptions/types/exception-result.type';
-import { ResultCode } from '../../exceptions/enum/exception-codes.enum';
+import { ResultCode } from '../../enum/result-code.enum';
 import {
   commentIDField,
   commentNotFound,

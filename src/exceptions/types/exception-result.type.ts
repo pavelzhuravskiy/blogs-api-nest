@@ -1,4 +1,4 @@
-import { ResultCode } from '../enum/exception-codes.enum';
+import { ResultCode } from '../../enum/result-code.enum';
 
 export type ExceptionResultType<T> = {
   data: T;

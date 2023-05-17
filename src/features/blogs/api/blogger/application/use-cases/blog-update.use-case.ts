@@ -2,7 +2,7 @@ import { BlogInputDto } from '../../../../dto/blog.input.dto';
 import { BlogsRepository } from '../../../../infrastructure/blogs.repository';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { ExceptionResultType } from '../../../../../../exceptions/types/exception-result.type';
-import { ResultCode } from '../../../../../../exceptions/enum/exception-codes.enum';
+import { ResultCode } from '../../../../../../enum/result-code.enum';
 import {
   blogIDField,
   blogNotFound,

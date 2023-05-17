@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { CommentsQueryRepository } from '../../infrastructure/comments.query.repository';
 import { exceptionHandler } from '../../../../exceptions/exception.handler';
-import { ResultCode } from '../../../../exceptions/enum/exception-codes.enum';
+import { ResultCode } from '../../../../enum/result-code.enum';
 import {
   commentIDField,
   commentNotFound,

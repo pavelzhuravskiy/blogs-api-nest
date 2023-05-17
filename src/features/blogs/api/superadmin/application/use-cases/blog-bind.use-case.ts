@@ -1,7 +1,7 @@
 import { BlogsRepository } from '../../../../infrastructure/blogs.repository';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UsersRepository } from '../../../../../users/infrastructure/users.repository';
-import { ResultCode } from '../../../../../../exceptions/enum/exception-codes.enum';
+import { ResultCode } from '../../../../../../enum/result-code.enum';
 import {
   blogIDField,
   blogIsBound,

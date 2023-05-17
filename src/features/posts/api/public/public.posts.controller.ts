@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { PostsQueryRepository } from '../../infrastructure/posts.query.repository';
 import { exceptionHandler } from '../../../../exceptions/exception.handler';
-import { ResultCode } from '../../../../exceptions/enum/exception-codes.enum';
+import { ResultCode } from '../../../../enum/result-code.enum';
 import { QueryDto } from '../../../_shared/dto/query.dto';
 import {
   postIDField,

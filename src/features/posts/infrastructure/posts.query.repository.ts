@@ -10,7 +10,7 @@ import { pFind } from '../../../helpers/pagination/pagination-find';
 import { pSort } from '../../../helpers/pagination/pagination-sort';
 import { pFilterPosts } from '../../../helpers/pagination/pagination-filter-posts';
 import { likeStatusFinder } from '../../likes/like-status-finder';
-import { LikeStatus } from '../../likes/enum/like-status.enum';
+import { LikeStatus } from '../../../enum/like-status.enum';
 
 @Injectable()
 export class PostsQueryRepository {
