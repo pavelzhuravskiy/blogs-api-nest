@@ -1,9 +1,9 @@
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UsersRepository } from '../../../../../../users/infrastructure/users.repository';
 import { randomUUID } from 'crypto';
 import { UserDocument } from '../../../../../../users/user.entity';
-import { MailService } from '../../../../../../mail/application/mail.service';
 import { EmailInputDto } from '../../../../../dto/email.input.dto';
+import { SendPasswordRecoveryMailCommand } from '../../../../../../mail/application/use-cases/send-pass-recovery-mail.use-case';
 
 export class PasswordRecoveryCommand {
   constructor(public emailInputDto: EmailInputDto) {}
@@ -14,8 +14,8 @@ export class PasswordRecoveryUseCase
   implements ICommandHandler<PasswordRecoveryCommand>
 {
   constructor(
+    private commandBus: CommandBus,
     private readonly usersRepository: UsersRepository,
-    private readonly mailService: MailService,
   ) {}
 
   async execute(
@@ -35,10 +35,12 @@ export class PasswordRecoveryUseCase
     const result = await this.usersRepository.save(user);
 
     try {
-      await this.mailService.sendPasswordRecoveryMail(
-        user.accountData.login,
-        user.accountData.email,
-        recoveryCode,
+      await this.commandBus.execute(
+        new SendPasswordRecoveryMailCommand(
+          user.accountData.login,
+          user.accountData.email,
+          recoveryCode,
+        ),
       );
     } catch (error) {
       console.error(error);

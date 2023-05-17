@@ -1,5 +1,5 @@
 import { InjectModel } from '@nestjs/mongoose';
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UsersRepository } from '../../../../../../users/infrastructure/users.repository';
 import { UserInputDto } from '../../../../../../users/dto/user-input.dto';
 import bcrypt from 'bcrypt';
@@ -10,7 +10,7 @@ import {
   UserDocument,
   UserModelType,
 } from '../../../../../../users/user.entity';
-import { MailService } from '../../../../../../mail/application/mail.service';
+import { SendRegistrationMailCommand } from '../../../../../../mail/application/use-cases/send-registration-mail.use-case';
 
 export class RegistrationCommand {
   constructor(public userInputDto: UserInputDto) {}
@@ -23,7 +23,7 @@ export class RegistrationUseCase
   constructor(
     @InjectModel(User.name)
     private UserModel: UserModelType,
-    private readonly mailService: MailService,
+    private commandBus: CommandBus,
     private readonly usersRepository: UsersRepository,
   ) {}
 
@@ -49,10 +49,12 @@ export class RegistrationUseCase
     const result = await this.usersRepository.save(user);
 
     try {
-      await this.mailService.sendRegistrationMail(
-        command.userInputDto.login,
-        command.userInputDto.email,
-        emailData.confirmationCode,
+      await this.commandBus.execute(
+        new SendRegistrationMailCommand(
+          command.userInputDto.login,
+          command.userInputDto.email,
+          emailData.confirmationCode,
+        ),
       );
     } catch (error) {
       console.error(error);

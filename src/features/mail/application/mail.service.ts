@@ -5,7 +5,7 @@ import { Injectable } from '@nestjs/common';
 export class MailService {
   constructor(private mailerService: MailerService) {}
 
-  async sendRegistrationMail(
+  /*async sendRegistrationMail(
     login: string,
     email: string,
     confirmationCode: string,
@@ -22,7 +22,7 @@ export class MailService {
         url,
       },
     });
-  }
+  }*/
 
   async sendPasswordRecoveryMail(
     login: string,

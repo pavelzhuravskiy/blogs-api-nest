@@ -1,8 +1,9 @@
 import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { Module } from '@nestjs/common';
-import { MailService } from './application/mail.service';
 import { join } from 'path';
+import { SendRegistrationMailUseCase } from './application/use-cases/send-registration-mail.use-case';
+import { SendPasswordRecoveryUseCase } from './application/use-cases/send-pass-recovery-mail.use-case';
 
 @Module({
   imports: [
@@ -28,7 +29,6 @@ import { join } from 'path';
       },
     }),
   ],
-  providers: [MailService],
-  exports: [MailService], // 👈 export for DI
+  providers: [SendRegistrationMailUseCase, SendPasswordRecoveryUseCase],
 })
 export class MailModule {}

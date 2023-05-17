@@ -1,9 +1,9 @@
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UsersRepository } from '../../../../../../users/infrastructure/users.repository';
 import { randomUUID } from 'crypto';
 import { UserDocument } from '../../../../../../users/user.entity';
-import { MailService } from '../../../../../../mail/application/mail.service';
 import { EmailInputDto } from '../../../../../dto/email.input.dto';
+import { SendRegistrationMailCommand } from '../../../../../../mail/application/use-cases/send-registration-mail.use-case';
 
 export class RegistrationEmailResendCommand {
   constructor(public emailInputDto: EmailInputDto) {}
@@ -14,7 +14,7 @@ export class RegistrationEmailResendUseCase
   implements ICommandHandler<RegistrationEmailResendCommand>
 {
   constructor(
-    private readonly mailService: MailService,
+    private commandBus: CommandBus,
     private readonly usersRepository: UsersRepository,
   ) {}
 
@@ -35,10 +35,12 @@ export class RegistrationEmailResendUseCase
     const result = await this.usersRepository.save(user);
 
     try {
-      await this.mailService.sendRegistrationMail(
-        user.accountData.login,
-        user.accountData.email,
-        newConfirmationCode,
+      await this.commandBus.execute(
+        new SendRegistrationMailCommand(
+          user.accountData.login,
+          user.accountData.email,
+          newConfirmationCode,
+        ),
       );
     } catch (error) {
       console.error(error);

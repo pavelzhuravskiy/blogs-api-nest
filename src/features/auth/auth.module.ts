@@ -1,14 +1,11 @@
 import { Module } from '@nestjs/common';
 import { PublicAuthController } from './api/public/public.auth.controller';
-import { AuthService } from './api/public/application/auth.service';
 import { PassportModule } from '@nestjs/passport';
 import { LocalStrategy } from './strategies/local.strategy';
 import { JwtBearerStrategy } from './strategies/jwt-bearer.strategy';
 import { JwtService } from '@nestjs/jwt';
 import { JwtRefreshTokenStrategy } from './strategies/jwt-refresh.strategy';
 import { BasicStrategy } from './strategies/basic.strategy';
-import { MailService } from '../mail/application/mail.service';
-import { MailModule } from '../mail/mail.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from '../users/user.entity';
 import { ThrottlerModule } from '@nestjs/throttler';
@@ -17,7 +14,7 @@ import { Device, DeviceSchema } from '../devices/device.entity';
 import { DevicesRepository } from '../devices/infrastructure/devices.repository';
 import { UsersRepository } from '../users/infrastructure/users.repository';
 import { RegistrationUseCase } from './api/public/application/use-cases/registration/registration.use-case';
-import { RegistrationEmailResendUseCase } from './api/public/application/use-cases/registration/registration-email-resend';
+import { RegistrationEmailResendUseCase } from './api/public/application/use-cases/registration/registration-email-resend.use-case';
 import { RegistrationConfirmationUseCase } from './api/public/application/use-cases/registration/registration-confirmation.use-case';
 import { PasswordRecoveryUseCase } from './api/public/application/use-cases/password/password-recovery.use-case';
 import { PasswordUpdateUseCase } from './api/public/application/use-cases/password/password-update.use-case';
@@ -26,8 +23,9 @@ import { DeviceUpdateForTokensUseCase } from '../devices/api/public/application/
 import { DeviceDeleteForLogoutUseCase } from '../devices/api/public/application/use-cases/device-delete-for-logout.use-case';
 import { ValidateRefreshTokenUseCase } from './api/public/application/use-cases/validations/validate-refresh-token.use-case';
 import { ValidateLoginAndPasswordUseCase } from './api/public/application/use-cases/validations/validate-login-pass.use-case';
+import { TokensCreateUseCase } from './api/public/application/use-cases/tokens/tokens-create.use-case';
 
-const services = [AuthService, JwtService, MailService];
+const services = [JwtService];
 
 const useCases = [
   RegistrationUseCase,
@@ -40,6 +38,7 @@ const useCases = [
   DeviceCreateForLoginUseCase,
   DeviceUpdateForTokensUseCase,
   DeviceDeleteForLogoutUseCase,
+  TokensCreateUseCase,
 ];
 
 const repositories = [DevicesRepository, UsersRepository];
@@ -63,7 +62,6 @@ const strategies = [
     ]),
     CqrsModule,
     PassportModule,
-    MailModule,
   ],
   controllers: [PublicAuthController],
   providers: [...services, ...useCases, ...repositories, ...strategies],
