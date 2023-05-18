@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Paginator } from '../../../../../helpers/pagination/_paginator';
 import { User, UserLeanType, UserModelType } from '../../../user.entity';
-import { UserQueryDto } from '../../../dto/user-query.dto';
+import { UserQueryDto } from '../dto/user-query.dto';
 import { SuperAdminUserViewDto } from '../dto/user-view.dto';
 import { pFind } from '../../../../../helpers/pagination/pagination-find';
 import { pSort } from '../../../../../helpers/pagination/pagination-sort';
@@ -22,12 +22,20 @@ export class UsersQueryRepository {
       this.UserModel,
       query.pageNumber,
       query.pageSize,
-      pFilterUsers(query.searchLoginTerm, query.searchEmailTerm),
+      pFilterUsers(
+        query.banStatus,
+        query.searchLoginTerm,
+        query.searchEmailTerm,
+      ),
       pSort(`accountData.${query.sortBy}`, query.sortDirection),
     );
 
     const totalCount = await this.UserModel.countDocuments(
-      pFilterUsers(query.searchLoginTerm, query.searchEmailTerm),
+      pFilterUsers(
+        query.banStatus,
+        query.searchLoginTerm,
+        query.searchEmailTerm,
+      ),
     );
 
     return Paginator.paginate({
