@@ -43,7 +43,16 @@ export class PublicPostsController {
       new BlogsFindNotBannedCommand(),
     );
 
-    return this.postsQueryRepository.findPosts(blogsNotBanned, query, userId);
+    const usersNotBanned = await this.commandBus.execute(
+      new UsersFindNotBannedCommand(),
+    );
+
+    return this.postsQueryRepository.findPosts(
+      blogsNotBanned,
+      usersNotBanned,
+      query,
+      userId,
+    );
   }
 
   @Get(':id')
@@ -52,10 +61,15 @@ export class PublicPostsController {
       new BlogsFindNotBannedCommand(),
     );
 
+    const usersNotBanned = await this.commandBus.execute(
+      new UsersFindNotBannedCommand(),
+    );
+
     const result = await this.postsQueryRepository.findPost(
       postId,
       userId,
       blogsNotBanned,
+      usersNotBanned,
     );
 
     if (!result) {

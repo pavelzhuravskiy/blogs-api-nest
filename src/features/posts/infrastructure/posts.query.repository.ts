@@ -9,8 +9,9 @@ import { QueryDto } from '../../_shared/dto/query.dto';
 import { pFind } from '../../../helpers/pagination/pagination-find';
 import { pSort } from '../../../helpers/pagination/pagination-sort';
 import { pFilterPosts } from '../../../helpers/pagination/pagination-filter-posts';
-import { likeStatusFinder } from '../../likes/like-status-finder';
+import { likeStatusFinder } from '../../likes/helpers/like-status-finder';
 import { LikeStatus } from '../../../enums/like-status.enum';
+import { likesCounter } from '../../likes/helpers/likes-counter';
 
 @Injectable()
 export class PostsQueryRepository {
@@ -21,6 +22,7 @@ export class PostsQueryRepository {
   ) {}
   async findPosts(
     blogsNotBanned: string[],
+    usersNotBanned: string[],
     query: QueryDto,
     userId: string,
     blogId?: string,
@@ -49,7 +51,7 @@ export class PostsQueryRepository {
       pageNumber: query.pageNumber,
       pageSize: query.pageSize,
       totalCount: totalCount,
-      items: await this.postsMapping(posts, userId),
+      items: await this.postsMapping(usersNotBanned, posts, userId),
     });
   }
 
@@ -57,20 +59,31 @@ export class PostsQueryRepository {
     postId: string,
     userId?: string,
     blogsNotBanned?: string[],
+    usersNotBanned?: string[],
   ): Promise<PostViewModel | null> {
     if (!mongoose.isValidObjectId(postId)) {
       return null;
     }
 
-    const post = await this.PostModel.findOne({
-      $and: [{ blogId: { $in: blogsNotBanned } }, { _id: postId }],
-    });
+    let post = await this.PostModel.findOne({ _id: postId });
+
+    if (blogsNotBanned) {
+      post = await this.PostModel.findOne({
+        $and: [{ blogId: { $in: blogsNotBanned } }, { _id: postId }],
+      });
+    }
 
     if (!post) {
       return null;
     }
 
     const status = likeStatusFinder(post, userId);
+    const likesCount = likesCounter(post, usersNotBanned, LikeStatus.Like);
+    const dislikesCount = likesCounter(
+      post,
+      usersNotBanned,
+      LikeStatus.Dislike,
+    );
 
     return {
       id: post.id,
@@ -81,11 +94,15 @@ export class PostsQueryRepository {
       blogName: post.blogName,
       createdAt: post.createdAt,
       extendedLikesInfo: {
-        likesCount: post.likesInfo.likesCount,
-        dislikesCount: post.likesInfo.dislikesCount,
+        likesCount: likesCount,
+        dislikesCount: dislikesCount,
         myStatus: status,
         newestLikes: post.likesInfo.users
-          .filter((p) => p.likeStatus === LikeStatus.Like)
+          .filter(
+            (p) =>
+              p.likeStatus === LikeStatus.Like &&
+              usersNotBanned.includes(p.userId),
+          )
           .sort(
             (a, b) =>
               -a.addedAt.toISOString().localeCompare(b.addedAt.toISOString()),
@@ -103,12 +120,16 @@ export class PostsQueryRepository {
   }
 
   private async postsMapping(
+    usersNotBanned: string[],
     posts: PostLeanType[],
     userId: string,
   ): Promise<PostViewModel[]> {
     return posts.map((p) => {
-      const status = likeStatusFinder(p, userId);
       const usersLikes = p.likesInfo.users;
+
+      const likeStatus = likeStatusFinder(p, userId);
+      const likesCount = likesCounter(p, usersNotBanned, LikeStatus.Like);
+      const dislikesCount = likesCounter(p, usersNotBanned, LikeStatus.Dislike);
 
       return {
         id: p._id.toString(),
@@ -119,11 +140,15 @@ export class PostsQueryRepository {
         blogName: p.blogName,
         createdAt: p.createdAt,
         extendedLikesInfo: {
-          likesCount: p.likesInfo.likesCount,
-          dislikesCount: p.likesInfo.dislikesCount,
-          myStatus: status,
+          likesCount: likesCount,
+          dislikesCount: dislikesCount,
+          myStatus: likeStatus,
           newestLikes: usersLikes
-            .filter((p) => p.likeStatus === LikeStatus.Like)
+            .filter(
+              (p) =>
+                p.likeStatus === LikeStatus.Like &&
+                usersNotBanned.includes(p.userId),
+            )
             .sort(
               (a, b) =>
                 -a.addedAt.toISOString().localeCompare(b.addedAt.toISOString()),
