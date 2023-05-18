@@ -26,7 +26,8 @@ import { CommandBus } from '@nestjs/cqrs';
 import { CommentsQueryRepository } from '../../../comments/infrastructure/comments.query.repository';
 import { LikeStatusInputDto } from '../../../likes/dto/like-status.input.dto';
 import { LikeUpdateForPostCommand } from '../../../likes/api/public/application/use-cases/like-update-for-post-use.case';
-import { BlogsFindNotBannedCommand } from '../../../blogs/api/public/application/use-cases/blogs-find-not-banned-use.case';
+import { BlogsFindNotBannedCommand } from '../../../blogs/api/superadmin/application/use-cases/blogs-find-not-banned-use.case';
+import { UsersFindNotBannedCommand } from '../../../users/api/superadmin/application/use-cases/users-find-not-banned-use.case';
 
 @Controller('posts')
 export class PublicPostsController {
@@ -47,7 +48,15 @@ export class PublicPostsController {
 
   @Get(':id')
   async findPost(@Param('id') postId, @UserIdFromHeaders() userId) {
-    const result = await this.postsQueryRepository.findPost(postId, userId);
+    const blogsNotBanned = await this.commandBus.execute(
+      new BlogsFindNotBannedCommand(),
+    );
+
+    const result = await this.postsQueryRepository.findPost(
+      postId,
+      userId,
+      blogsNotBanned,
+    );
 
     if (!result) {
       return exceptionHandler(ResultCode.NotFound, postNotFound, postIDField);
@@ -80,7 +89,12 @@ export class PublicPostsController {
     @Param('id') postId,
     @UserIdFromHeaders() userId,
   ) {
+    const usersNotBanned = await this.commandBus.execute(
+      new UsersFindNotBannedCommand(),
+    );
+
     const result = await this.commentsQueryRepository.findComments(
+      usersNotBanned,
       query,
       postId,
       userId,

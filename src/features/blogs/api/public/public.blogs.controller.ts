@@ -11,7 +11,7 @@ import {
   blogNotFound,
 } from '../../../../exceptions/exception.constants';
 import { ResultCode } from '../../../../enums/result-code.enum';
-import { BlogsFindNotBannedCommand } from './application/use-cases/blogs-find-not-banned-use.case';
+import { BlogsFindNotBannedCommand } from '../superadmin/application/use-cases/blogs-find-not-banned-use.case';
 import { CommandBus } from '@nestjs/cqrs';
 
 @Controller('blogs')

@@ -65,8 +65,6 @@ export class UserBanUseCase implements ICommandHandler<UserBanCommand> {
       user.unbanUser();
     }
 
-    console.log(user);
-
     await this.usersRepository.save(user);
 
     return {

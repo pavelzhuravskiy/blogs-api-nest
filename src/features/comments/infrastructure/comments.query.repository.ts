@@ -19,6 +19,7 @@ export class CommentsQueryRepository {
     private postsRepository: PostsRepository,
   ) {}
   async findComments(
+    usersNotBanned: string[],
     query: QueryDto,
     postId: string,
     userId: string,
@@ -33,12 +34,12 @@ export class CommentsQueryRepository {
       this.CommentModel,
       query.pageNumber,
       query.pageSize,
-      pFilterComments(postId),
+      pFilterComments(usersNotBanned, postId),
       pSort(query.sortBy, query.sortDirection),
     );
 
     const totalCount = await this.CommentModel.countDocuments(
-      pFilterComments(postId),
+      pFilterComments(usersNotBanned, postId),
     );
 
     return Paginator.paginate({
@@ -52,12 +53,18 @@ export class CommentsQueryRepository {
   async findComment(
     commentId: string,
     userId?: string,
+    usersNotBanned?: string[],
   ): Promise<CommentViewDto | null> {
     if (!mongoose.isValidObjectId(commentId)) {
       return null;
     }
 
-    const comment = await this.CommentModel.findOne({ _id: commentId });
+    const comment = await this.CommentModel.findOne({
+      $and: [
+        { 'commentatorInfo.userId': { $in: usersNotBanned } },
+        { _id: commentId },
+      ],
+    });
 
     if (!comment) {
       return null;

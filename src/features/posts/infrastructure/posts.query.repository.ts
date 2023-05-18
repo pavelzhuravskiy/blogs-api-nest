@@ -56,12 +56,15 @@ export class PostsQueryRepository {
   async findPost(
     postId: string,
     userId?: string,
+    blogsNotBanned?: string[],
   ): Promise<PostViewModel | null> {
     if (!mongoose.isValidObjectId(postId)) {
       return null;
     }
 
-    const post = await this.PostModel.findOne({ _id: postId });
+    const post = await this.PostModel.findOne({
+      $and: [{ blogId: { $in: blogsNotBanned } }, { _id: postId }],
+    });
 
     if (!post) {
       return null;
