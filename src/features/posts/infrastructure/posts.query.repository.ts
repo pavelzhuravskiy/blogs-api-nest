@@ -10,7 +10,7 @@ import { pFind } from '../../../helpers/pagination/pagination-find';
 import { pSort } from '../../../helpers/pagination/pagination-sort';
 import { pFilterPosts } from '../../../helpers/pagination/pagination-filter-posts';
 import { likeStatusFinder } from '../../likes/like-status-finder';
-import { LikeStatus } from '../../../enum/like-status.enum';
+import { LikeStatus } from '../../../enums/like-status.enum';
 
 @Injectable()
 export class PostsQueryRepository {
@@ -20,6 +20,7 @@ export class PostsQueryRepository {
     private readonly blogsQueryRepository: BlogsQueryRepository,
   ) {}
   async findPosts(
+    blogsNotBanned: string[],
     query: QueryDto,
     userId: string,
     blogId?: string,
@@ -36,12 +37,12 @@ export class PostsQueryRepository {
       this.PostModel,
       query.pageNumber,
       query.pageSize,
-      pFilterPosts(blogId),
+      pFilterPosts(blogsNotBanned, blogId),
       pSort(query.sortBy, query.sortDirection),
     );
 
     const totalCount = await this.PostModel.countDocuments(
-      pFilterPosts(blogId),
+      pFilterPosts(blogsNotBanned, blogId),
     );
 
     return Paginator.paginate({

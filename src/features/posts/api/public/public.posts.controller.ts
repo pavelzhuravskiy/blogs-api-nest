@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { PostsQueryRepository } from '../../infrastructure/posts.query.repository';
 import { exceptionHandler } from '../../../../exceptions/exception.handler';
-import { ResultCode } from '../../../../enum/result-code.enum';
+import { ResultCode } from '../../../../enums/result-code.enum';
 import { QueryDto } from '../../../_shared/dto/query.dto';
 import {
   postIDField,
@@ -26,6 +26,7 @@ import { CommandBus } from '@nestjs/cqrs';
 import { CommentsQueryRepository } from '../../../comments/infrastructure/comments.query.repository';
 import { LikeStatusInputDto } from '../../../likes/dto/like-status.input.dto';
 import { LikeUpdateForPostCommand } from '../../../likes/api/public/application/use-cases/like-update-for-post-use.case';
+import { BlogsFindNotBannedCommand } from '../../../blogs/api/public/application/use-cases/blogs-find-not-banned-use.case';
 
 @Controller('posts')
 export class PublicPostsController {
@@ -37,7 +38,11 @@ export class PublicPostsController {
 
   @Get()
   async findPosts(@Query() query: QueryDto, @UserIdFromHeaders() userId) {
-    return this.postsQueryRepository.findPosts(query, userId);
+    const blogsNotBanned = await this.commandBus.execute(
+      new BlogsFindNotBannedCommand(),
+    );
+
+    return this.postsQueryRepository.findPosts(blogsNotBanned, query, userId);
   }
 
   @Get(':id')

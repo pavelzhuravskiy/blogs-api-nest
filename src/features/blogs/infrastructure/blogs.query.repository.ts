@@ -8,7 +8,7 @@ import { BlogViewDto } from '../dto/blog.view.dto';
 import { pFind } from '../../../helpers/pagination/pagination-find';
 import { pSort } from '../../../helpers/pagination/pagination-sort';
 import { pFilterBlogs } from '../../../helpers/pagination/pagination-filter-blogs';
-import { Role } from '../../../enum/role.enum';
+import { Role } from '../../../enums/role.enum';
 import { SuperAdminBlogViewDto } from '../api/superadmin/dto/sa.blog-view.dto';
 
 @Injectable()

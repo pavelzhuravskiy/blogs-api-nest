@@ -1,7 +1,7 @@
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UsersRepository } from '../../../../infrastructure/users.repository';
 import { UserBanInputDto } from '../../dto/user-ban.input.dto';
-import { ResultCode } from '../../../../../../enum/result-code.enum';
+import { ResultCode } from '../../../../../../enums/result-code.enum';
 import {
   userIDField,
   userIsBanned,

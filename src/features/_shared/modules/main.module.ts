@@ -39,6 +39,7 @@ import { CommentUpdateUseCase } from '../../comments/api/public/application/use-
 import { CommentDeleteUseCase } from '../../comments/api/public/application/use-cases/comment-delete.use-case';
 import { LikeUpdateForPostUseCase } from '../../likes/api/public/application/use-cases/like-update-for-post-use.case';
 import { LikeUpdateForCommentUseCase } from '../../likes/api/public/application/use-cases/like-update-for-comment-use.case';
+import { BlogsFindNotBannedUseCase } from '../../blogs/api/public/application/use-cases/blogs-find-not-banned-use.case';
 
 const controllers = [
   SuperAdminBlogsController,
@@ -63,6 +64,7 @@ const useCases = [
   CommentDeleteUseCase,
   LikeUpdateForPostUseCase,
   LikeUpdateForCommentUseCase,
+  BlogsFindNotBannedUseCase,
 ];
 
 const repositories = [

@@ -1,4 +1,4 @@
-import { LikeStatus } from '../../enum/like-status.enum';
+import { LikeStatus } from '../../enums/like-status.enum';
 import { CommentLeanType } from '../comments/comment.entity';
 import { PostLeanType } from '../posts/post.entity';
 

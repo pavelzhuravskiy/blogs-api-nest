@@ -18,7 +18,7 @@ import { UserCreateCommand } from './application/use-cases/user-create.use-case'
 import { UserQueryDto } from '../../dto/user-query.dto';
 import { UserDeleteCommand } from './application/use-cases/user-delete.use-case';
 import { exceptionHandler } from '../../../../exceptions/exception.handler';
-import { ResultCode } from '../../../../enum/result-code.enum';
+import { ResultCode } from '../../../../enums/result-code.enum';
 import {
   userIDField,
   userNotFound,

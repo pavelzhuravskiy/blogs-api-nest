@@ -1,7 +1,7 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
 import { BlogsQueryRepository } from '../../infrastructure/blogs.query.repository';
 import { BlogQueryDto } from '../../dto/blog.query.dto';
-import { Role } from '../../../../enum/role.enum';
+import { Role } from '../../../../enums/role.enum';
 import { QueryDto } from 'src/features/_shared/dto/query.dto';
 import { PostsQueryRepository } from '../../../posts/infrastructure/posts.query.repository';
 import { UserIdFromHeaders } from '../../../auth/decorators/user-id-from-headers.decorator';
@@ -10,11 +10,14 @@ import {
   blogIDField,
   blogNotFound,
 } from '../../../../exceptions/exception.constants';
-import { ResultCode } from '../../../../enum/result-code.enum';
+import { ResultCode } from '../../../../enums/result-code.enum';
+import { BlogsFindNotBannedCommand } from './application/use-cases/blogs-find-not-banned-use.case';
+import { CommandBus } from '@nestjs/cqrs';
 
 @Controller('blogs')
 export class PublicBlogsController {
   constructor(
+    private commandBus: CommandBus,
     private readonly blogsQueryRepository: BlogsQueryRepository,
     private readonly postsQueryRepository: PostsQueryRepository,
   ) {}
@@ -42,7 +45,12 @@ export class PublicBlogsController {
     @Param('id') blogId,
     @UserIdFromHeaders() userId,
   ) {
+    const blogsNotBanned = await this.commandBus.execute(
+      new BlogsFindNotBannedCommand(),
+    );
+
     const result = await this.postsQueryRepository.findPosts(
+      blogsNotBanned,
       query,
       userId,
       blogId,

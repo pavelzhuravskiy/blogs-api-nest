@@ -17,7 +17,7 @@ import { BlogsQueryRepository } from '../../infrastructure/blogs.query.repositor
 import { JwtBearerGuard } from '../../../auth/guards/jwt-bearer.guard';
 import { UserIdFromGuard } from '../../../auth/decorators/user-id-from-guard.decorator';
 import { exceptionHandler } from '../../../../exceptions/exception.handler';
-import { ResultCode } from '../../../../enum/result-code.enum';
+import { ResultCode } from '../../../../enums/result-code.enum';
 import {
   userIDField,
   userNotFound,
@@ -27,7 +27,7 @@ import { BlogUpdateCommand } from './application/use-cases/blog-update.use-case'
 import { BlogDeleteCommand } from './application/use-cases/blog-delete.use-case';
 import { PostInputDto } from '../../../posts/dto/post.input.dto';
 import { PostsQueryRepository } from '../../../posts/infrastructure/posts.query.repository';
-import { Role } from '../../../../enum/role.enum';
+import { Role } from '../../../../enums/role.enum';
 import { PostUpdateCommand } from '../../../posts/api/blogger/application/use-cases/post-update.use-case';
 import { PostCreateCommand } from '../../../posts/api/blogger/application/use-cases/post-create.use-case';
 import { PostDeleteCommand } from '../../../posts/api/blogger/application/use-cases/post-delete.use-case';
