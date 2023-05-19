@@ -13,13 +13,6 @@ export class BlogsRepository {
     return blog.save();
   }
 
-  async findNotBannedBlogs(users: any): Promise<BlogDocument[]> {
-    return this.BlogModel.find(
-      { 'blogOwnerInfo.userId': { $in: users } },
-      { _id: 1 },
-    );
-  }
-
   async findBlog(id?: string): Promise<BlogDocument | null> {
     if (!mongoose.isValidObjectId(id)) {
       return null;
