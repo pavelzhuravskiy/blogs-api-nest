@@ -40,6 +40,7 @@ export class LikeUpdateForCommentUseCase
     const data: LikesDataType = {
       commentOrPostId: command.commentId,
       userId: command.userId,
+      userIsBanned: comment.commentatorInfo.isBanned,
       likeStatus: command.likeStatusInputDto.likeStatus,
       likesCount: comment.likesInfo.likesCount,
       dislikesCount: comment.likesInfo.dislikesCount,

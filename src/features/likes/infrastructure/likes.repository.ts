@@ -47,6 +47,7 @@ export class LikesRepository {
             addedAt: new Date(),
             userId: data.userId,
             userLogin: userLogin,
+            isBanned: data.userIsBanned,
             likeStatus: data.likeStatus,
           },
         },
@@ -98,5 +99,21 @@ export class LikesRepository {
       },
     );
     return result.matchedCount === 1;
+  }
+
+  async setLikesBanStatus(
+    userId: string,
+    banStatus: boolean,
+    model: any,
+  ): Promise<boolean> {
+    const result = await model.updateMany(
+      { 'likesInfo.users.userId': userId },
+      {
+        $set: {
+          'likesInfo.users.$.isBanned': banStatus,
+        },
+      },
+    );
+    return result.acknowledged === true;
   }
 }

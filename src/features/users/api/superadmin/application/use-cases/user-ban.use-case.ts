@@ -13,6 +13,13 @@ import { DevicesDeleteForUserBanCommand } from '../../../../../devices/api/publi
 import { PostsRepository } from '../../../../../posts/infrastructure/posts.repository';
 import { BlogsRepository } from '../../../../../blogs/infrastructure/blogs.repository';
 import { CommentsRepository } from '../../../../../comments/infrastructure/comments.repository';
+import { LikesRepository } from '../../../../../likes/infrastructure/likes.repository';
+import { InjectModel } from '@nestjs/mongoose';
+import { Post, PostModelType } from '../../../../../posts/post.entity';
+import {
+  Comment,
+  CommentModelType,
+} from '../../../../../comments/comment.entity';
 
 export class UserBanCommand {
   constructor(public userBanInputDto: UserBanInputDto, public userId: string) {}
@@ -22,10 +29,15 @@ export class UserBanCommand {
 export class UserBanUseCase implements ICommandHandler<UserBanCommand> {
   constructor(
     private commandBus: CommandBus,
+    @InjectModel(Post.name)
+    private PostModel: PostModelType,
+    @InjectModel(Comment.name)
+    private CommentModel: CommentModelType,
     private readonly usersRepository: UsersRepository,
     private readonly blogsRepository: BlogsRepository,
     private readonly postsRepository: PostsRepository,
     private readonly commentsRepository: CommentsRepository,
+    private readonly likesRepository: LikesRepository,
   ) {}
 
   async execute(
@@ -72,11 +84,31 @@ export class UserBanUseCase implements ICommandHandler<UserBanCommand> {
       await this.blogsRepository.setBlogsBanStatus(command.userId, true);
       await this.postsRepository.setPostsBanStatus(command.userId, true);
       await this.commentsRepository.setCommentsBanStatus(command.userId, true);
+      await this.likesRepository.setLikesBanStatus(
+        command.userId,
+        true,
+        this.PostModel,
+      );
+      await this.likesRepository.setLikesBanStatus(
+        command.userId,
+        true,
+        this.CommentModel,
+      );
     } else {
       user.unbanUser();
       await this.blogsRepository.setBlogsBanStatus(command.userId, false);
       await this.postsRepository.setPostsBanStatus(command.userId, false);
       await this.commentsRepository.setCommentsBanStatus(command.userId, false);
+      await this.likesRepository.setLikesBanStatus(
+        command.userId,
+        false,
+        this.PostModel,
+      );
+      await this.likesRepository.setLikesBanStatus(
+        command.userId,
+        false,
+        this.CommentModel,
+      );
     }
 
     await this.usersRepository.save(user);

@@ -12,5 +12,8 @@ export class UsersLikesSchema {
   userLogin: string;
 
   @Prop({ required: true })
+  isBanned: boolean;
+
+  @Prop({ required: true })
   likeStatus: string;
 }

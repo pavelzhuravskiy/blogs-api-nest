@@ -15,6 +15,7 @@ import { Blog, BlogSchema } from '../blogs/blog.entity';
 import { Post, PostSchema } from '../posts/post.entity';
 import { CommentsRepository } from '../comments/infrastructure/comments.repository';
 import { Comment, CommentSchema } from '../comments/comment.entity';
+import { LikesRepository } from '../likes/infrastructure/likes.repository';
 
 const useCases = [UserCreateUseCase, UserDeleteUseCase, UserBanUseCase];
 
@@ -24,6 +25,7 @@ const repositories = [
   BlogsRepository,
   PostsRepository,
   CommentsRepository,
+  LikesRepository,
 ];
 
 @Module({

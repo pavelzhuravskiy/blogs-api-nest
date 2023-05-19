@@ -4,12 +4,11 @@ import { PostLeanType } from '../../posts/post.entity';
 
 export const likesCounter = (
   commentOrPost: CommentLeanType | PostLeanType,
-  usersNotBanned: string[],
   likeStatus: LikeStatus,
 ) => {
   const users = commentOrPost.likesInfo.users;
   const likesCount = users.filter(
-    (u) => usersNotBanned.includes(u.userId) && u.likeStatus === likeStatus,
+    (u) => u.likeStatus === likeStatus && !u.isBanned,
   );
   return likesCount.length;
 };

@@ -10,6 +10,8 @@ import { pSort } from '../../../helpers/pagination/pagination-sort';
 import { pFilterComments } from '../../../helpers/pagination/pagination-filter-comments';
 import { likeStatusFinder } from '../../likes/helpers/like-status-finder';
 import { PostsRepository } from '../../posts/infrastructure/posts.repository';
+import { likesCounter } from '../../likes/helpers/likes-counter';
+import { LikeStatus } from '../../../enums/like-status.enum';
 
 @Injectable()
 export class CommentsQueryRepository {
@@ -64,12 +66,8 @@ export class CommentsQueryRepository {
     }
 
     const status = likeStatusFinder(comment, userId);
-    /*const likesCount = likesCounter(comment, usersNotBanned, LikeStatus.Like);
-    const dislikesCount = likesCounter(
-      comment,
-      usersNotBanned,
-      LikeStatus.Dislike,
-    );*/
+    const likesCount = likesCounter(comment, LikeStatus.Like);
+    const dislikesCount = likesCounter(comment, LikeStatus.Dislike);
 
     return {
       id: comment.id,
@@ -80,8 +78,8 @@ export class CommentsQueryRepository {
       },
       createdAt: comment.createdAt.toISOString(),
       likesInfo: {
-        likesCount: 0,
-        dislikesCount: 0,
+        likesCount: likesCount,
+        dislikesCount: dislikesCount,
         myStatus: status,
       },
     };
@@ -94,12 +92,8 @@ export class CommentsQueryRepository {
     return Promise.all(
       comments.map(async (c) => {
         const likeStatus = likeStatusFinder(c, userId);
-        // const likesCount = likesCounter(c, usersNotBanned, LikeStatus.Like);
-        // const dislikesCount = likesCounter(
-        //   c,
-        //   usersNotBanned,
-        //   LikeStatus.Dislike,
-        // );
+        const likesCount = likesCounter(c, LikeStatus.Like);
+        const dislikesCount = likesCounter(c, LikeStatus.Dislike);
 
         return {
           id: c._id.toString(),
@@ -110,8 +104,8 @@ export class CommentsQueryRepository {
           },
           createdAt: c.createdAt.toISOString(),
           likesInfo: {
-            likesCount: 0,
-            dislikesCount: 0,
+            likesCount: likesCount,
+            dislikesCount: dislikesCount,
             myStatus: likeStatus,
           },
         };

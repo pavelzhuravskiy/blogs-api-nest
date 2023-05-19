@@ -10,6 +10,8 @@ import { pFind } from '../../../helpers/pagination/pagination-find';
 import { pSort } from '../../../helpers/pagination/pagination-sort';
 import { pFilterPosts } from '../../../helpers/pagination/pagination-filter-posts';
 import { likeStatusFinder } from '../../likes/helpers/like-status-finder';
+import { LikeStatus } from '../../../enums/like-status.enum';
+import { likesCounter } from '../../likes/helpers/likes-counter';
 
 @Injectable()
 export class PostsQueryRepository {
@@ -66,12 +68,8 @@ export class PostsQueryRepository {
     }
 
     const status = likeStatusFinder(post, userId);
-    /*const likesCount = likesCounter(post, usersNotBanned, LikeStatus.Like);
-    const dislikesCount = likesCounter(
-      post,
-      usersNotBanned,
-      LikeStatus.Dislike,
-    );*/
+    const likesCount = likesCounter(post, LikeStatus.Like);
+    const dislikesCount = likesCounter(post, LikeStatus.Dislike);
 
     return {
       id: post.id,
@@ -82,24 +80,20 @@ export class PostsQueryRepository {
       blogName: post.blogInfo.blogName,
       createdAt: post.createdAt,
       extendedLikesInfo: {
-        likesCount: 0,
-        dislikesCount: 0,
+        likesCount: likesCount,
+        dislikesCount: dislikesCount,
         myStatus: status,
         newestLikes: post.likesInfo.users
-          /*.filter(
-            (p) =>
-              p.likeStatus === LikeStatus.Like &&
-              usersNotBanned.includes(p.userId),
-          )*/
+          .filter((u) => u.likeStatus === LikeStatus.Like && !u.isBanned)
           .sort(
             (a, b) =>
               -a.addedAt.toISOString().localeCompare(b.addedAt.toISOString()),
           )
-          .map((p) => {
+          .map((u) => {
             return {
-              addedAt: p.addedAt.toISOString(),
-              userId: p.userId,
-              login: p.userLogin,
+              addedAt: u.addedAt.toISOString(),
+              userId: u.userId,
+              login: u.userLogin,
             };
           })
           .splice(0, 3),
@@ -115,8 +109,8 @@ export class PostsQueryRepository {
       const usersLikes = p.likesInfo.users;
 
       const likeStatus = likeStatusFinder(p, userId);
-      // const likesCount = likesCounter(p, usersNotBanned, LikeStatus.Like);
-      // const dislikesCount = likesCounter(p, usersNotBanned, LikeStatus.Dislike);
+      const likesCount = likesCounter(p, LikeStatus.Like);
+      const dislikesCount = likesCounter(p, LikeStatus.Dislike);
 
       return {
         id: p._id.toString(),
@@ -127,15 +121,11 @@ export class PostsQueryRepository {
         blogName: p.blogInfo.blogName,
         createdAt: p.createdAt,
         extendedLikesInfo: {
-          likesCount: 0, // TODO
-          dislikesCount: 0,
+          likesCount: likesCount,
+          dislikesCount: dislikesCount,
           myStatus: likeStatus,
           newestLikes: usersLikes
-            /*.filter(
-              (p) =>
-                p.likeStatus === LikeStatus.Like &&
-                usersNotBanned.includes(p.userId),
-            )*/
+            .filter((u) => u.likeStatus === LikeStatus.Like && !u.isBanned)
             .sort(
               (a, b) =>
                 -a.addedAt.toISOString().localeCompare(b.addedAt.toISOString()),
