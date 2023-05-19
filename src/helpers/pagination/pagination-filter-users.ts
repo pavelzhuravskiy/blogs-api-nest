@@ -25,16 +25,22 @@ export const pFilterUsers = (
     });
   }
 
-  if (login) {
-    filter.$and.push({
-      'accountData.login': { $regex: login, $options: 'i' },
-    });
-  }
+  if (login || email) {
+    filter.$or = [];
 
-  if (email) {
-    filter.$and.push({
-      'accountData.email': { $regex: email, $options: 'i' },
-    });
+    if (login) {
+      filter.$or.push({
+        'accountData.login': { $regex: login, $options: 'i' },
+      });
+    }
+
+    if (email) {
+      filter.$or.push({
+        'accountData.email': { $regex: email, $options: 'i' },
+      });
+    }
+
+    filter.$and.push({ $or: filter.$or });
   }
 
   return filter;

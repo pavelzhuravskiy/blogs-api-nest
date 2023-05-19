@@ -10,6 +10,9 @@ import {
 } from '../../../../../../exceptions/exception.constants';
 import { ExceptionResultType } from '../../../../../../exceptions/types/exception-result.type';
 import { DevicesDeleteForUserBanCommand } from '../../../../../devices/api/public/application/use-cases/devices-delete-for-user-ban.use-case';
+import { PostsRepository } from '../../../../../posts/infrastructure/posts.repository';
+import { BlogsRepository } from '../../../../../blogs/infrastructure/blogs.repository';
+import { CommentsRepository } from '../../../../../comments/infrastructure/comments.repository';
 
 export class UserBanCommand {
   constructor(public userBanInputDto: UserBanInputDto, public userId: string) {}
@@ -20,6 +23,9 @@ export class UserBanUseCase implements ICommandHandler<UserBanCommand> {
   constructor(
     private commandBus: CommandBus,
     private readonly usersRepository: UsersRepository,
+    private readonly blogsRepository: BlogsRepository,
+    private readonly postsRepository: PostsRepository,
+    private readonly commentsRepository: CommentsRepository,
   ) {}
 
   async execute(
@@ -58,11 +64,19 @@ export class UserBanUseCase implements ICommandHandler<UserBanCommand> {
 
     if (!banDBStatus) {
       user.banUser(command.userBanInputDto);
+
       await this.commandBus.execute(
         new DevicesDeleteForUserBanCommand(command.userId),
       );
+
+      await this.blogsRepository.setBlogsBanStatus(command.userId, true);
+      await this.postsRepository.setPostsBanStatus(command.userId, true);
+      await this.commentsRepository.setCommentsBanStatus(command.userId, true);
     } else {
       user.unbanUser();
+      await this.blogsRepository.setBlogsBanStatus(command.userId, false);
+      await this.postsRepository.setPostsBanStatus(command.userId, false);
+      await this.commentsRepository.setCommentsBanStatus(command.userId, false);
     }
 
     await this.usersRepository.save(user);

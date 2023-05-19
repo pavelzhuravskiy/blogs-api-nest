@@ -26,8 +26,6 @@ import { CommandBus } from '@nestjs/cqrs';
 import { CommentsQueryRepository } from '../../../comments/infrastructure/comments.query.repository';
 import { LikeStatusInputDto } from '../../../likes/dto/like-status.input.dto';
 import { LikeUpdateForPostCommand } from '../../../likes/api/public/application/use-cases/like-update-for-post-use.case';
-import { BlogsFindNotBannedCommand } from '../../../blogs/api/superadmin/application/use-cases/blogs-find-not-banned-use.case';
-import { UsersFindNotBannedCommand } from '../../../users/api/superadmin/application/use-cases/users-find-not-banned-use.case';
 
 @Controller('posts')
 export class PublicPostsController {
@@ -39,38 +37,12 @@ export class PublicPostsController {
 
   @Get()
   async findPosts(@Query() query: QueryDto, @UserIdFromHeaders() userId) {
-    const blogsNotBanned = await this.commandBus.execute(
-      new BlogsFindNotBannedCommand(),
-    );
-
-    const usersNotBanned = await this.commandBus.execute(
-      new UsersFindNotBannedCommand(),
-    );
-
-    return this.postsQueryRepository.findPosts(
-      blogsNotBanned,
-      usersNotBanned,
-      query,
-      userId,
-    );
+    return this.postsQueryRepository.findPosts(query, userId);
   }
 
   @Get(':id')
   async findPost(@Param('id') postId, @UserIdFromHeaders() userId) {
-    const blogsNotBanned = await this.commandBus.execute(
-      new BlogsFindNotBannedCommand(),
-    );
-
-    const usersNotBanned = await this.commandBus.execute(
-      new UsersFindNotBannedCommand(),
-    );
-
-    const result = await this.postsQueryRepository.findPost(
-      postId,
-      userId,
-      blogsNotBanned,
-      usersNotBanned,
-    );
+    const result = await this.postsQueryRepository.findPost(postId, userId);
 
     if (!result) {
       return exceptionHandler(ResultCode.NotFound, postNotFound, postIDField);
@@ -86,15 +58,15 @@ export class PublicPostsController {
     @Param('id') postId,
     @UserIdFromGuard() userId,
   ) {
-    const commentId = await this.commandBus.execute(
+    const result = await this.commandBus.execute(
       new CommentCreateCommand(commentInputDto, postId, userId),
     );
 
-    if (!commentId) {
-      return exceptionHandler(ResultCode.NotFound, postNotFound, postIDField);
+    if (result.code !== ResultCode.Success) {
+      return exceptionHandler(result.code, result.message, result.field);
     }
 
-    return this.commentsQueryRepository.findComment(commentId);
+    return this.commentsQueryRepository.findComment(result.response);
   }
 
   @Get(':id/comments')
@@ -103,12 +75,7 @@ export class PublicPostsController {
     @Param('id') postId,
     @UserIdFromHeaders() userId,
   ) {
-    const usersNotBanned = await this.commandBus.execute(
-      new UsersFindNotBannedCommand(),
-    );
-
     const result = await this.commentsQueryRepository.findComments(
-      usersNotBanned,
       query,
       postId,
       userId,

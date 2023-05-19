@@ -62,6 +62,7 @@ export class Blog {
       blogOwnerInfo: {
         userId: user.id,
         userLogin: user.accountData.login,
+        isBanned: false,
       },
     };
     return new BlogModel(blog);

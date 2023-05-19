@@ -11,9 +11,7 @@ import {
   blogNotFound,
 } from '../../../../exceptions/exception.constants';
 import { ResultCode } from '../../../../enums/result-code.enum';
-import { BlogsFindNotBannedCommand } from '../superadmin/application/use-cases/blogs-find-not-banned-use.case';
 import { CommandBus } from '@nestjs/cqrs';
-import { UsersFindNotBannedCommand } from '../../../users/api/superadmin/application/use-cases/users-find-not-banned-use.case';
 
 @Controller('blogs')
 export class PublicBlogsController {
@@ -46,17 +44,7 @@ export class PublicBlogsController {
     @Param('id') blogId,
     @UserIdFromHeaders() userId,
   ) {
-    const blogsNotBanned = await this.commandBus.execute(
-      new BlogsFindNotBannedCommand(),
-    );
-
-    const usersNotBanned = await this.commandBus.execute(
-      new UsersFindNotBannedCommand(),
-    );
-
     const result = await this.postsQueryRepository.findPosts(
-      blogsNotBanned,
-      usersNotBanned,
       query,
       userId,
       blogId,

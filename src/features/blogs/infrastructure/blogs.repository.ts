@@ -38,4 +38,19 @@ export class BlogsRepository {
     const blog = await this.BlogModel.deleteOne({ _id: id });
     return blog.deletedCount === 1;
   }
+
+  async setBlogsBanStatus(
+    userId: string,
+    banStatus: boolean,
+  ): Promise<boolean> {
+    const result = await this.BlogModel.updateMany(
+      { 'blogOwnerInfo.userId': userId },
+      {
+        $set: {
+          'blogOwnerInfo.isBanned': banStatus,
+        },
+      },
+    );
+    return result.acknowledged === true;
+  }
 }

@@ -7,7 +7,6 @@ import {
 } from '../../comments/comment.entity';
 import { Post, PostDocument, PostModelType } from '../../posts/post.entity';
 import { LikesDataType } from '../schemas/likes-data.type';
-import { LikeStatus } from '../../../enums/like-status.enum';
 
 @Injectable()
 export class LikesRepository {
@@ -99,13 +98,5 @@ export class LikesRepository {
       },
     );
     return result.matchedCount === 1;
-  }
-
-  async countLikesFromNotBannedUsers(usersNotBanned: string[]) {
-    const y = await this.PostModel.find({
-      'likesInfo.users.likeStatus': LikeStatus.Like,
-      'likesInfo.users.userId': { $in: usersNotBanned },
-    });
-    console.log(y);
   }
 }

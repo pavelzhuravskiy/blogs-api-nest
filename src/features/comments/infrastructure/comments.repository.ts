@@ -31,4 +31,19 @@ export class CommentsRepository {
     const comment = await this.CommentModel.deleteOne({ _id: id });
     return comment.deletedCount === 1;
   }
+
+  async setCommentsBanStatus(
+    userId: string,
+    banStatus: boolean,
+  ): Promise<boolean> {
+    const result = await this.CommentModel.updateMany(
+      { 'commentatorInfo.userId': userId },
+      {
+        $set: {
+          'commentatorInfo.isBanned': banStatus,
+        },
+      },
+    );
+    return result.acknowledged === true;
+  }
 }

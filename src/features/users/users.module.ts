@@ -9,13 +9,29 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { UserCreateUseCase } from './api/superadmin/application/use-cases/user-create.use-case';
 import { UserDeleteUseCase } from './api/superadmin/application/use-cases/user-delete.use-case';
 import { UserBanUseCase } from './api/superadmin/application/use-cases/user-ban.use-case';
+import { BlogsRepository } from '../blogs/infrastructure/blogs.repository';
+import { PostsRepository } from '../posts/infrastructure/posts.repository';
+import { Blog, BlogSchema } from '../blogs/blog.entity';
+import { Post, PostSchema } from '../posts/post.entity';
+import { CommentsRepository } from '../comments/infrastructure/comments.repository';
+import { Comment, CommentSchema } from '../comments/comment.entity';
 
 const useCases = [UserCreateUseCase, UserDeleteUseCase, UserBanUseCase];
-const repositories = [UsersRepository, UsersQueryRepository];
+
+const repositories = [
+  UsersRepository,
+  UsersQueryRepository,
+  BlogsRepository,
+  PostsRepository,
+  CommentsRepository,
+];
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+    MongooseModule.forFeature([{ name: Blog.name, schema: BlogSchema }]),
+    MongooseModule.forFeature([{ name: Post.name, schema: PostSchema }]),
+    MongooseModule.forFeature([{ name: Comment.name, schema: CommentSchema }]),
     CqrsModule,
   ],
   controllers: [SuperAdminUsersController],

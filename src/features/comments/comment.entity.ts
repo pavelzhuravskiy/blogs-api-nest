@@ -52,6 +52,7 @@ export class Comment {
       commentatorInfo: {
         userId: user.id,
         userLogin: user.accountData.login,
+        isBanned: user.banInfo.isBanned,
       },
       postId: post._id.toString(),
       createdAt: new Date(),

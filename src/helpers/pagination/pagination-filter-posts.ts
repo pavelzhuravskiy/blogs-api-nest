@@ -1,13 +1,15 @@
 import { FilterQuery } from 'mongoose';
 import { BlogDocument } from '../../features/blogs/blog.entity';
 
-export const pFilterPosts = (blogsNotBanned: string[], blogId?: string) => {
+export const pFilterPosts = (blogId?: string) => {
   const filter: FilterQuery<BlogDocument> = {
-    $and: [{ blogId: { $in: blogsNotBanned } }],
+    $and: [{ 'blogInfo.blogOwnerIsBanned': false }],
   };
 
   if (blogId) {
-    filter.blogId = blogId;
+    filter.$and.push({
+      'blogInfo.blogId': blogId,
+    });
   }
 
   return filter;

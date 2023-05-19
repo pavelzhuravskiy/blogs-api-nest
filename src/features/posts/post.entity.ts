@@ -3,6 +3,7 @@ import { HydratedDocument, Model, Types } from 'mongoose';
 import { PostInputDto } from './dto/post.input.dto';
 import { LikesInfoSchema } from '../likes/schemas/likes-info.schema';
 import { BlogDocument } from '../blogs/blog.entity';
+import { BlogInfoSchema } from './schemas/blog-info.schema';
 
 export type PostDocument = HydratedDocument<Post>;
 export type PostLeanType = Post & { _id: Types.ObjectId };
@@ -29,13 +30,10 @@ export class Post {
   content: string;
 
   @Prop({ required: true })
-  blogId: string;
-
-  @Prop({ required: true })
-  blogName: string;
-
-  @Prop({ required: true })
   createdAt: Date;
+
+  @Prop({ required: true })
+  blogInfo: BlogInfoSchema;
 
   @Prop({ required: true })
   likesInfo: LikesInfoSchema;
@@ -55,8 +53,13 @@ export class Post {
       title: postInputDto.title,
       shortDescription: postInputDto.shortDescription,
       content: postInputDto.content,
-      blogId: blog._id.toString(),
-      blogName: blog.name,
+      blogInfo: {
+        blogId: blog._id.toString(),
+        blogName: blog.name,
+        blogOwnerId: blog.blogOwnerInfo.userId,
+        blogOwnerLogin: blog.blogOwnerInfo.userLogin,
+        blogOwnerIsBanned: blog.blogOwnerInfo.isBanned,
+      },
       createdAt: new Date(),
       likesInfo: {
         likesCount: 0,

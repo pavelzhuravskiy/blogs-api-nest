@@ -10,8 +10,6 @@ import { pFind } from '../../../helpers/pagination/pagination-find';
 import { pSort } from '../../../helpers/pagination/pagination-sort';
 import { pFilterPosts } from '../../../helpers/pagination/pagination-filter-posts';
 import { likeStatusFinder } from '../../likes/helpers/like-status-finder';
-import { LikeStatus } from '../../../enums/like-status.enum';
-import { likesCounter } from '../../likes/helpers/likes-counter';
 
 @Injectable()
 export class PostsQueryRepository {
@@ -21,8 +19,6 @@ export class PostsQueryRepository {
     private readonly blogsQueryRepository: BlogsQueryRepository,
   ) {}
   async findPosts(
-    blogsNotBanned: string[],
-    usersNotBanned: string[],
     query: QueryDto,
     userId: string,
     blogId?: string,
@@ -39,70 +35,62 @@ export class PostsQueryRepository {
       this.PostModel,
       query.pageNumber,
       query.pageSize,
-      pFilterPosts(blogsNotBanned, blogId),
+      pFilterPosts(blogId),
       pSort(query.sortBy, query.sortDirection),
     );
 
     const totalCount = await this.PostModel.countDocuments(
-      pFilterPosts(blogsNotBanned, blogId),
+      pFilterPosts(blogId),
     );
 
     return Paginator.paginate({
       pageNumber: query.pageNumber,
       pageSize: query.pageSize,
       totalCount: totalCount,
-      items: await this.postsMapping(usersNotBanned, posts, userId),
+      items: await this.postsMapping(posts, userId),
     });
   }
 
   async findPost(
     postId: string,
     userId?: string,
-    blogsNotBanned?: string[],
-    usersNotBanned?: string[],
   ): Promise<PostViewModel | null> {
     if (!mongoose.isValidObjectId(postId)) {
       return null;
     }
 
-    let post = await this.PostModel.findOne({ _id: postId });
+    const post = await this.PostModel.findOne({ _id: postId });
 
-    if (blogsNotBanned) {
-      post = await this.PostModel.findOne({
-        $and: [{ blogId: { $in: blogsNotBanned } }, { _id: postId }],
-      });
-    }
-
-    if (!post) {
+    if (!post || post.blogInfo.blogOwnerIsBanned) {
       return null;
     }
 
     const status = likeStatusFinder(post, userId);
-    const likesCount = likesCounter(post, usersNotBanned, LikeStatus.Like);
+    /*const likesCount = likesCounter(post, usersNotBanned, LikeStatus.Like);
     const dislikesCount = likesCounter(
       post,
       usersNotBanned,
       LikeStatus.Dislike,
-    );
+    );*/
 
     return {
       id: post.id,
       title: post.title,
       shortDescription: post.shortDescription,
       content: post.content,
-      blogId: post.blogId,
-      blogName: post.blogName,
+      blogId: post.blogInfo.blogId,
+      blogName: post.blogInfo.blogName,
       createdAt: post.createdAt,
       extendedLikesInfo: {
-        likesCount: likesCount,
-        dislikesCount: dislikesCount,
+        likesCount: 0,
+        dislikesCount: 0,
         myStatus: status,
         newestLikes: post.likesInfo.users
-          .filter(
+          /*.filter(
             (p) =>
               p.likeStatus === LikeStatus.Like &&
               usersNotBanned.includes(p.userId),
-          )
+          )*/
           .sort(
             (a, b) =>
               -a.addedAt.toISOString().localeCompare(b.addedAt.toISOString()),
@@ -120,7 +108,6 @@ export class PostsQueryRepository {
   }
 
   private async postsMapping(
-    usersNotBanned: string[],
     posts: PostLeanType[],
     userId: string,
   ): Promise<PostViewModel[]> {
@@ -128,27 +115,27 @@ export class PostsQueryRepository {
       const usersLikes = p.likesInfo.users;
 
       const likeStatus = likeStatusFinder(p, userId);
-      const likesCount = likesCounter(p, usersNotBanned, LikeStatus.Like);
-      const dislikesCount = likesCounter(p, usersNotBanned, LikeStatus.Dislike);
+      // const likesCount = likesCounter(p, usersNotBanned, LikeStatus.Like);
+      // const dislikesCount = likesCounter(p, usersNotBanned, LikeStatus.Dislike);
 
       return {
         id: p._id.toString(),
         title: p.title,
         shortDescription: p.shortDescription,
         content: p.content,
-        blogId: p.blogId,
-        blogName: p.blogName,
+        blogId: p.blogInfo.blogId,
+        blogName: p.blogInfo.blogName,
         createdAt: p.createdAt,
         extendedLikesInfo: {
-          likesCount: likesCount,
-          dislikesCount: dislikesCount,
+          likesCount: 0, // TODO
+          dislikesCount: 0,
           myStatus: likeStatus,
           newestLikes: usersLikes
-            .filter(
+            /*.filter(
               (p) =>
                 p.likeStatus === LikeStatus.Like &&
                 usersNotBanned.includes(p.userId),
-            )
+            )*/
             .sort(
               (a, b) =>
                 -a.addedAt.toISOString().localeCompare(b.addedAt.toISOString()),

@@ -7,4 +7,7 @@ export class BlogOwnerSchema {
 
   @Prop({ type: String || null })
   userLogin: string | null;
+
+  @Prop({ required: true })
+  isBanned: boolean;
 }

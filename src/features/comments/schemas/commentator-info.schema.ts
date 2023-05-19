@@ -7,4 +7,7 @@ export class CommentatorInfoSchema {
 
   @Prop({ required: true })
   userLogin: string;
+
+  @Prop({ required: true })
+  isBanned: boolean;
 }

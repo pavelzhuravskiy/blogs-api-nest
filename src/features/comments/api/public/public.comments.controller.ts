@@ -24,7 +24,6 @@ import { CommandBus } from '@nestjs/cqrs';
 import { CommentDeleteCommand } from './application/use-cases/comment-delete.use-case';
 import { LikeStatusInputDto } from '../../../likes/dto/like-status.input.dto';
 import { LikeUpdateForCommentCommand } from '../../../likes/api/public/application/use-cases/like-update-for-comment-use.case';
-import { UsersFindNotBannedCommand } from '../../../users/api/superadmin/application/use-cases/users-find-not-banned-use.case';
 
 @Controller('comments')
 export class PublicCommentsController {
@@ -35,14 +34,9 @@ export class PublicCommentsController {
 
   @Get(':id')
   async findComment(@Param('id') commentId, @UserIdFromHeaders() userId) {
-    const usersNotBanned = await this.commandBus.execute(
-      new UsersFindNotBannedCommand(),
-    );
-
     const result = await this.commentsQueryRepository.findComment(
       commentId,
       userId,
-      usersNotBanned,
     );
 
     if (!result) {
