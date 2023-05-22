@@ -1,22 +1,32 @@
 import {
   blogDescription,
-  blogName,
+  blog01Name,
   blogUpdatedDescription,
   blogUpdatedName,
   blogUpdatedWebsite,
   blogWebsite,
+  blog02Name,
 } from '../constants/blogs.constants';
 
-export const publicBlogObject = {
+export const blog01Object = {
   id: expect.any(String),
-  name: blogName,
+  name: blog01Name,
   description: blogDescription,
   websiteUrl: blogWebsite,
   createdAt: expect.any(String),
   isMembership: false,
 };
 
-export const publicUpdatedBlogObject = {
+export const blog02Object = {
+  id: expect.any(String),
+  name: blog02Name,
+  description: blogDescription,
+  websiteUrl: blogWebsite,
+  createdAt: expect.any(String),
+  isMembership: false,
+};
+
+export const updatedBlogObject = {
   id: expect.any(String),
   name: blogUpdatedName,
   description: blogUpdatedDescription,

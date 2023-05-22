@@ -1,5 +1,5 @@
 // Posts URI
-export const postsURI = '/posts/';
+export const publicPostsURI = '/posts/';
 
 // Post creation strings
 export const postTitle = 'Test title';
