@@ -2,7 +2,7 @@ import { Controller, Get, Param, Query } from '@nestjs/common';
 import { BlogsQueryRepository } from '../../infrastructure/blogs.query.repository';
 import { BlogQueryDto } from '../../dto/blog.query.dto';
 import { Role } from '../../../../enums/role.enum';
-import { QueryDto } from 'src/features/_shared/dto/query.dto';
+import { QueryDto } from '../../../_shared/dto/query.dto';
 import { PostsQueryRepository } from '../../../posts/infrastructure/posts.query.repository';
 import { UserIdFromHeaders } from '../../../auth/decorators/user-id-from-headers.decorator';
 import { exceptionHandler } from '../../../../exceptions/exception.handler';

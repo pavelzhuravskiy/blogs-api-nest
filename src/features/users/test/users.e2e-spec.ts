@@ -4,8 +4,8 @@ import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { testingURI } from '../../../../test/constants/testing.constants';
 import { invalidURI } from '../../../../test/constants/common.constants';
 import {
-  userEmail,
-  userLogin,
+  user01Email,
+  user01Login,
   userPassword,
   usersURI,
 } from '../../../../test/constants/users.constants';
@@ -60,9 +60,9 @@ describe('Users testing', () => {
       return agent
         .post(usersURI)
         .send({
-          login: userLogin,
+          login: user01Login,
           password: userPassword,
-          email: userEmail,
+          email: user01Email,
         })
         .expect(201);
     });
@@ -93,9 +93,9 @@ describe('Users testing', () => {
         await agent
           .post(usersURI)
           .send({
-            login: `${userLogin}0${i}`,
+            login: `${user01Login}0${i}`,
             password: userPassword,
-            email: `${j}${userEmail}`,
+            email: `${j}${user01Email}`,
           })
           .expect(201);
       }
@@ -103,9 +103,9 @@ describe('Users testing', () => {
         await agent
           .post(usersURI)
           .send({
-            login: `${userLogin}1${i}`,
+            login: `${user01Login}1${i}`,
             password: userPassword,
-            email: `${j}${userEmail}`,
+            email: `${j}${user01Email}`,
           })
           .expect(201);
       }
@@ -119,8 +119,8 @@ describe('Users testing', () => {
         .expect(200);
 
       expect(users.body.items).toHaveLength(2);
-      expect(users.body.items[0].login).toBe(`${userLogin}13`);
-      expect(users.body.items[1].login).toBe(`${userLogin}03`);
+      expect(users.body.items[0].login).toBe(`${user01Login}13`);
+      expect(users.body.items[1].login).toBe(`${user01Login}03`);
     });
     it(`should filter users by email term`, async () => {
       const users = await agent
@@ -129,22 +129,22 @@ describe('Users testing', () => {
         .expect(200);
 
       expect(users.body.items).toHaveLength(2);
-      expect(users.body.items[0].email).toBe(`98${userEmail}`);
-      expect(users.body.items[1].email).toBe(`38${userEmail}`);
+      expect(users.body.items[0].email).toBe(`98${user01Email}`);
+      expect(users.body.items[1].email).toBe(`38${user01Email}`);
     });
     it(`should sort users by date (desc)`, async () => {
       const users = await agent.get(usersURI).expect(200);
 
-      expect(users.body.items[0].login).toBe(`${userLogin}17`);
-      expect(users.body.items[1].login).toBe(`${userLogin}16`);
-      expect(users.body.items[2].login).toBe(`${userLogin}15`);
-      expect(users.body.items[3].login).toBe(`${userLogin}14`);
-      expect(users.body.items[4].login).toBe(`${userLogin}13`);
-      expect(users.body.items[5].login).toBe(`${userLogin}05`);
-      expect(users.body.items[6].login).toBe(`${userLogin}04`);
-      expect(users.body.items[7].login).toBe(`${userLogin}03`);
-      expect(users.body.items[8].login).toBe(`${userLogin}02`);
-      expect(users.body.items[9].login).toBe(`${userLogin}01`);
+      expect(users.body.items[0].login).toBe(`${user01Login}17`);
+      expect(users.body.items[1].login).toBe(`${user01Login}16`);
+      expect(users.body.items[2].login).toBe(`${user01Login}15`);
+      expect(users.body.items[3].login).toBe(`${user01Login}14`);
+      expect(users.body.items[4].login).toBe(`${user01Login}13`);
+      expect(users.body.items[5].login).toBe(`${user01Login}05`);
+      expect(users.body.items[6].login).toBe(`${user01Login}04`);
+      expect(users.body.items[7].login).toBe(`${user01Login}03`);
+      expect(users.body.items[8].login).toBe(`${user01Login}02`);
+      expect(users.body.items[9].login).toBe(`${user01Login}01`);
     });
     it(`should sort blogs by email (asc)`, async () => {
       const users = await agent
@@ -152,16 +152,16 @@ describe('Users testing', () => {
         .query({ sortBy: 'email', sortDirection: 'asc' })
         .expect(200);
 
-      expect(users.body.items[0].email).toBe(`38${userEmail}`);
-      expect(users.body.items[1].email).toBe(`39${userEmail}`);
-      expect(users.body.items[2].email).toBe(`40${userEmail}`);
-      expect(users.body.items[3].email).toBe(`41${userEmail}`);
-      expect(users.body.items[4].email).toBe(`42${userEmail}`);
-      expect(users.body.items[5].email).toBe(`95${userEmail}`);
-      expect(users.body.items[6].email).toBe(`96${userEmail}`);
-      expect(users.body.items[7].email).toBe(`97${userEmail}`);
-      expect(users.body.items[8].email).toBe(`98${userEmail}`);
-      expect(users.body.items[9].email).toBe(`99${userEmail}`);
+      expect(users.body.items[0].email).toBe(`38${user01Email}`);
+      expect(users.body.items[1].email).toBe(`39${user01Email}`);
+      expect(users.body.items[2].email).toBe(`40${user01Email}`);
+      expect(users.body.items[3].email).toBe(`41${user01Email}`);
+      expect(users.body.items[4].email).toBe(`42${user01Email}`);
+      expect(users.body.items[5].email).toBe(`95${user01Email}`);
+      expect(users.body.items[6].email).toBe(`96${user01Email}`);
+      expect(users.body.items[7].email).toBe(`97${user01Email}`);
+      expect(users.body.items[8].email).toBe(`98${user01Email}`);
+      expect(users.body.items[9].email).toBe(`99${user01Email}`);
     });
     it(`should return correct pagination output`, async () => {
       const users = await agent
@@ -174,7 +174,7 @@ describe('Users testing', () => {
       expect(users.body.pageSize).toBe(5);
       expect(users.body.totalCount).toBe(10);
       expect(users.body.items).toHaveLength(5);
-      expect(users.body.items[0].login).toBe(`${userLogin}05`);
+      expect(users.body.items[0].login).toBe(`${user01Login}05`);
     });
   });
 

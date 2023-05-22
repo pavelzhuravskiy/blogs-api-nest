@@ -1,7 +1,7 @@
 import { Prop, Schema } from '@nestjs/mongoose';
 
 @Schema()
-export class UsersLikesSchema {
+export class LikesUsersSchema {
   @Prop({ required: true })
   addedAt: Date;
 

@@ -6,7 +6,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import {
   blogDescription,
   blogName,
-  blogsURI,
+  publicBlogsURI,
   blogWebsite,
 } from '../../../../test/constants/blogs.constants';
 import { testingURI } from '../../../../test/constants/testing.constants';
@@ -77,7 +77,7 @@ describe('Posts testing', () => {
     beforeAll(async () => await agent.delete(testingURI));
     it(`should create new blog`, async () => {
       return agent
-        .post(blogsURI)
+        .post(publicBlogsURI)
         .send({
           name: blogName,
           description: blogDescription,
@@ -86,7 +86,7 @@ describe('Posts testing', () => {
         .expect(201);
     });
     it(`should return 400 when trying to create post without title`, async () => {
-      const blogs = await agent.get(blogsURI).expect(200);
+      const blogs = await agent.get(publicBlogsURI).expect(200);
       firstBlogId = blogs.body.items[0].id;
 
       const response = await agent
@@ -265,7 +265,7 @@ describe('Posts testing', () => {
     beforeAll(async () => await agent.delete(testingURI));
     it(`should create new blog`, async () => {
       return agent
-        .post(blogsURI)
+        .post(publicBlogsURI)
         .send({
           name: blogName,
           description: blogDescription,
@@ -274,7 +274,7 @@ describe('Posts testing', () => {
         .expect(201);
     });
     it(`should create new post`, async () => {
-      const blogs = await agent.get(blogsURI).expect(200);
+      const blogs = await agent.get(publicBlogsURI).expect(200);
       firstBlogId = blogs.body.items[0].id;
 
       return agent
@@ -289,7 +289,7 @@ describe('Posts testing', () => {
     });
     it(`should create new post from blog`, async () => {
       return agent
-        .post(blogsURI + firstBlogId + postsURI)
+        .post(publicBlogsURI + firstBlogId + postsURI)
         .send({
           title: postTitle,
           shortDescription: postShortDescription,
@@ -341,7 +341,7 @@ describe('Posts testing', () => {
     it(`should create two blogs`, async () => {
       for (let i = 0; i < 2; i++) {
         await agent
-          .post(blogsURI)
+          .post(publicBlogsURI)
           .send({
             name: blogName,
             description: blogDescription,
@@ -351,7 +351,7 @@ describe('Posts testing', () => {
       }
     });
     it(`should create 10 posts`, async () => {
-      const blogs = await agent.get(blogsURI).expect(200);
+      const blogs = await agent.get(publicBlogsURI).expect(200);
       firstBlogId = blogs.body.items[0].id;
       secondBlogId = blogs.body.items[1].id;
 
@@ -382,7 +382,7 @@ describe('Posts testing', () => {
     });
     it(`should filter posts by blog`, async () => {
       const posts = await agent
-        .get(blogsURI + firstBlogId + postsURI)
+        .get(publicBlogsURI + firstBlogId + postsURI)
         .expect(200);
       expect(posts.body.items).toHaveLength(5);
     });

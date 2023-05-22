@@ -5,18 +5,15 @@ import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import {
   blogDescription,
+  bloggerBlogsURI,
   blogName,
-  blogsURI,
   blogUpdatedDescription,
   blogUpdatedName,
   blogUpdatedWebsite,
   blogWebsite,
+  publicBlogsURI,
 } from '../../../../test/constants/blogs.constants';
 import { testingURI } from '../../../../test/constants/testing.constants';
-import {
-  blogObject,
-  updatedBlogObject,
-} from '../../../../test/objects/blogs.objects';
 import {
   invalidURI,
   longString109,
@@ -32,6 +29,25 @@ import {
   urlField,
 } from '../../../../test/constants/exceptions.constants';
 import { AppModule } from '../../../app.module';
+import {
+  user01Email,
+  user01Login,
+  user02Email,
+  user02Login,
+  userPassword,
+  usersURI,
+} from '../../../../test/constants/users.constants';
+import {
+  basicAuthLogin,
+  basicAuthPassword,
+  loginUri,
+} from '../../../../test/constants/auth.constants';
+import { useContainer } from 'class-validator';
+import { randomUUID } from 'crypto';
+import {
+  publicBlogObject,
+  publicUpdatedBlogObject,
+} from '../../../../test/objects/blogs.objects';
 
 describe('Blogs testing', () => {
   let app: INestApplication;
@@ -47,6 +63,8 @@ describe('Blogs testing', () => {
     }).compile();
 
     app = moduleRef.createNestApplication();
+    useContainer(app.select(AppModule), { fallbackOnErrors: true });
+    app.enableCors();
     app.useGlobalPipes(
       new ValidationPipe({
         transform: true,
@@ -57,17 +75,97 @@ describe('Blogs testing', () => {
     app.useGlobalFilters(new HttpExceptionFilter());
 
     await app.init();
-
     agent = supertest.agent(app.getHttpServer());
   });
 
   let blogId;
+  let accessToken;
 
-  describe('Blogs status 400 checks', () => {
+  describe('Blogs CRUD operations', () => {
     beforeAll(async () => await agent.delete(testingURI));
+
+    // Create and login users
+    it(`should create two users`, async () => {
+      await agent
+        .post(usersURI)
+        .auth(basicAuthLogin, basicAuthPassword)
+        .send({
+          login: user01Login,
+          password: userPassword,
+          email: user01Email,
+        })
+        .expect(201);
+
+      return agent
+        .post(usersURI)
+        .auth(basicAuthLogin, basicAuthPassword)
+        .send({
+          login: user02Login,
+          password: userPassword,
+          email: user02Email,
+        })
+        .expect(201);
+    });
+    it(`should log in user 01`, async () => {
+      const response = await agent
+        .post(loginUri)
+        .send({
+          loginOrEmail: user01Login,
+          password: userPassword,
+        })
+        .expect(200);
+      accessToken = response.body.accessToken;
+    });
+
+    // Success (create, return all, return by ID, update by ID)
+    it(`should create new blog`, async () => {
+      return agent
+        .post(bloggerBlogsURI)
+        .auth(accessToken, { type: 'bearer' })
+        .send({
+          name: blogName,
+          description: blogDescription,
+          websiteUrl: blogWebsite,
+        })
+        .expect(201);
+    });
+    it(`should return all blogs`, async () => {
+      const blogs = await agent.get(publicBlogsURI).expect(200);
+      expect(blogs.body).toEqual({
+        pagesCount: 1,
+        page: 1,
+        pageSize: 10,
+        totalCount: 1,
+        items: [publicBlogObject],
+      });
+    });
+    it(`should return blog by ID`, async () => {
+      const blogs = await agent.get(publicBlogsURI).expect(200);
+      blogId = blogs.body.items[0].id;
+
+      const blog = await agent.get(publicBlogsURI + blogId).expect(200);
+      expect(blog.body).toEqual(publicBlogObject);
+    });
+    it(`should update blog by ID`, async () => {
+      await agent
+        .put(bloggerBlogsURI + blogId)
+        .auth(accessToken, { type: 'bearer' })
+        .send({
+          name: blogUpdatedName,
+          description: blogUpdatedDescription,
+          websiteUrl: blogUpdatedWebsite,
+        })
+        .expect(204);
+
+      const check = await agent.get(publicBlogsURI + blogId).expect(200);
+      expect(check.body).toEqual(publicUpdatedBlogObject);
+    });
+
+    // Validation errors [400]
     it(`should return 400 when trying to create blog without name`, async () => {
       const response = await agent
-        .post(blogsURI)
+        .post(bloggerBlogsURI)
+        .auth(accessToken, { type: 'bearer' })
         .send({
           description: blogDescription,
           websiteUrl: blogWebsite,
@@ -78,7 +176,8 @@ describe('Blogs testing', () => {
     });
     it(`should return 400 when trying to create blog with incorrect name type`, async () => {
       const response = await agent
-        .post(blogsURI)
+        .post(bloggerBlogsURI)
+        .auth(accessToken, { type: 'bearer' })
         .send({
           name: 123,
           description: blogDescription,
@@ -90,7 +189,8 @@ describe('Blogs testing', () => {
     });
     it(`should return 400 when trying to create blog with incorrect name length`, async () => {
       const response = await agent
-        .post(blogsURI)
+        .post(bloggerBlogsURI)
+        .auth(accessToken, { type: 'bearer' })
         .send({
           name: longString17,
           description: blogDescription,
@@ -102,7 +202,8 @@ describe('Blogs testing', () => {
     });
     it(`should return 400 when trying to create blog without description`, async () => {
       const response = await agent
-        .post(blogsURI)
+        .post(bloggerBlogsURI)
+        .auth(accessToken, { type: 'bearer' })
         .send({
           name: blogName,
           websiteUrl: blogWebsite,
@@ -113,7 +214,8 @@ describe('Blogs testing', () => {
     });
     it(`should return 400 when trying to create blog with incorrect description type`, async () => {
       const response = await agent
-        .post(blogsURI)
+        .post(bloggerBlogsURI)
+        .auth(accessToken, { type: 'bearer' })
         .send({
           name: blogName,
           description: 123,
@@ -125,7 +227,8 @@ describe('Blogs testing', () => {
     });
     it(`should return 400 when trying to create blog with incorrect description length`, async () => {
       const response = await agent
-        .post(blogsURI)
+        .post(bloggerBlogsURI)
+        .auth(accessToken, { type: 'bearer' })
         .send({
           name: blogName,
           description: longString508,
@@ -137,7 +240,8 @@ describe('Blogs testing', () => {
     });
     it(`should return 400 when trying to create blog without URL`, async () => {
       const response = await agent
-        .post(blogsURI)
+        .post(bloggerBlogsURI)
+        .auth(accessToken, { type: 'bearer' })
         .send({
           name: blogName,
           description: blogDescription,
@@ -148,7 +252,8 @@ describe('Blogs testing', () => {
     });
     it(`should return 400 when trying to create blog with incorrect URL type`, async () => {
       const response = await agent
-        .post(blogsURI)
+        .post(bloggerBlogsURI)
+        .auth(accessToken, { type: 'bearer' })
         .send({
           name: blogName,
           description: blogDescription,
@@ -160,7 +265,8 @@ describe('Blogs testing', () => {
     });
     it(`should return 400 when trying to create blog with incorrect URL length`, async () => {
       const response = await agent
-        .post(blogsURI)
+        .post(bloggerBlogsURI)
+        .auth(accessToken, { type: 'bearer' })
         .send({
           name: blogName,
           description: blogDescription,
@@ -172,7 +278,8 @@ describe('Blogs testing', () => {
     });
     it(`should return 400 when trying to create blog with incorrect URL format`, async () => {
       const response = await agent
-        .post(blogsURI)
+        .post(bloggerBlogsURI)
+        .auth(accessToken, { type: 'bearer' })
         .send({
           name: blogName,
           description: blogDescription,
@@ -182,15 +289,90 @@ describe('Blogs testing', () => {
 
       expect(response.body).toEqual(exceptionObject(urlField));
     });
-  });
-  describe('Blogs status 404 checks', () => {
-    beforeAll(async () => await agent.delete(testingURI));
-    it(`should return 404 when getting nonexistent blog`, async () => {
-      return agent.get(blogsURI + invalidURI).expect(404);
-    });
-    it(`should return 404 when updating nonexistent blog`, async () => {
+
+    // Auth errors [401]
+    it(`should return 401 when trying to get blogs with incorrect access token`, async () => {
       return agent
-        .put(blogsURI + invalidURI)
+        .get(bloggerBlogsURI)
+        .auth(randomUUID(), { type: 'bearer' })
+        .expect(401);
+    });
+    it(`should return 401 when trying to create blog with incorrect access token`, async () => {
+      return agent
+        .post(bloggerBlogsURI)
+        .auth(randomUUID(), { type: 'bearer' })
+        .send({
+          name: blogName,
+          description: blogDescription,
+          websiteUrl: blogWebsite,
+        })
+        .expect(401);
+    });
+    it(`should return 401 when trying to update blog with incorrect access token`, async () => {
+      return agent
+        .put(bloggerBlogsURI + blogId)
+        .auth(randomUUID(), { type: 'bearer' })
+        .send({
+          name: blogUpdatedName,
+          description: blogUpdatedDescription,
+          websiteUrl: blogUpdatedWebsite,
+        })
+        .expect(401);
+    });
+    it(`should return 401 when trying to delete blog with incorrect access token`, async () => {
+      return agent
+        .delete(bloggerBlogsURI + blogId)
+        .auth(randomUUID(), { type: 'bearer' })
+        .expect(401);
+    });
+
+    // Forbidden errors [403]
+    it(`should log in user 02`, async () => {
+      const response = await agent
+        .post(loginUri)
+        .send({
+          loginOrEmail: user02Login,
+          password: userPassword,
+        })
+        .expect(200);
+      accessToken = response.body.accessToken;
+    });
+    it(`should return 403 when trying to update blog of another user`, async () => {
+      await agent
+        .put(bloggerBlogsURI + blogId)
+        .auth(accessToken, { type: 'bearer' })
+        .send({
+          name: blogUpdatedName,
+          description: blogUpdatedDescription,
+          websiteUrl: blogUpdatedWebsite,
+        })
+        .expect(403);
+    });
+    it(`should return 403 when trying to delete blog of another user`, async () => {
+      await agent
+        .delete(bloggerBlogsURI + blogId)
+        .auth(accessToken, { type: 'bearer' })
+        .expect(403);
+    });
+
+    // Not found errors [404]
+    it(`should log in user 01`, async () => {
+      const response = await agent
+        .post(loginUri)
+        .send({
+          loginOrEmail: user01Login,
+          password: userPassword,
+        })
+        .expect(200);
+      accessToken = response.body.accessToken;
+    });
+    it(`should return 404 when trying to get nonexistent blog`, async () => {
+      return agent.get(publicBlogsURI + invalidURI).expect(404);
+    });
+    it(`should return 404 when trying to update nonexistent blog`, async () => {
+      await agent
+        .put(bloggerBlogsURI + invalidURI)
+        .auth(accessToken, { type: 'bearer' })
         .send({
           name: blogUpdatedName,
           description: blogUpdatedDescription,
@@ -198,66 +380,61 @@ describe('Blogs testing', () => {
         })
         .expect(404);
     });
-    it(`should return 404 when deleting nonexistent blog`, async () => {
-      return agent.delete(blogsURI + invalidURI).expect(404);
-    });
-  });
-  describe('Blogs CRUD operations', () => {
-    beforeAll(async () => await agent.delete(testingURI));
-    it(`should create new blog`, async () => {
-      return agent
-        .post(blogsURI)
-        .send({
-          name: blogName,
-          description: blogDescription,
-          websiteUrl: blogWebsite,
-        })
-        .expect(201);
-    });
-    it(`should return all blogs`, async () => {
-      const blogs = await agent.get(blogsURI).expect(200);
-      expect(blogs.body).toEqual({
-        pagesCount: 1,
-        page: 1,
-        pageSize: 10,
-        totalCount: 1,
-        items: [blogObject],
-      });
-    });
-
-    it(`should return blog by ID`, async () => {
-      const blogs = await agent.get(blogsURI).expect(200);
-      blogId = blogs.body.items[0].id;
-
-      const blog = await agent.get(blogsURI + blogId).expect(200);
-      expect(blog.body).toEqual(blogObject);
-    });
-    it(`should update blog by ID`, async () => {
+    it(`should return 404 when trying to delete nonexistent blog`, async () => {
       await agent
-        .put(blogsURI + blogId)
-        .send({
-          name: blogUpdatedName,
-          description: blogUpdatedDescription,
-          websiteUrl: blogUpdatedWebsite,
-        })
+        .delete(bloggerBlogsURI + invalidURI)
+        .auth(accessToken, { type: 'bearer' })
+        .expect(404);
+    });
+
+    // Success (delete by ID)
+    it(`should delete blog by ID`, async () => {
+      await agent
+        .delete(bloggerBlogsURI + blogId)
+        .auth(accessToken, { type: 'bearer' })
         .expect(204);
 
-      const check = await agent.get(blogsURI + blogId).expect(200);
-      expect(check.body).toEqual(updatedBlogObject);
-    });
-    it(`should delete blog by ID`, async () => {
-      await agent.delete(blogsURI + blogId).expect(204);
-
-      const check = await agent.get(blogsURI).expect(200);
-      expect(check.body.items).toHaveLength(0);
+      const blogs = await agent.get(publicBlogsURI).expect(200);
+      expect(blogs.body).toEqual({
+        pagesCount: 0,
+        page: 1,
+        pageSize: 10,
+        totalCount: 0,
+        items: [],
+      });
     });
   });
   describe('Blogs filtering, sorting, pagination', () => {
     beforeAll(async () => await agent.delete(testingURI));
+
+    // Create and login users
+    it(`should create user`, async () => {
+      await agent
+        .post(usersURI)
+        .auth(basicAuthLogin, basicAuthPassword)
+        .send({
+          login: user01Login,
+          password: userPassword,
+          email: user01Email,
+        })
+        .expect(201);
+    });
+    it(`should log in user`, async () => {
+      const response = await agent
+        .post(loginUri)
+        .send({
+          loginOrEmail: user01Login,
+          password: userPassword,
+        })
+        .expect(200);
+      accessToken = response.body.accessToken;
+    });
+
     it(`should create 10 blogs`, async () => {
       for (let i = 1, j = 42; i < 6; i++, j--) {
         await agent
-          .post(blogsURI)
+          .post(bloggerBlogsURI)
+          .auth(accessToken, { type: 'bearer' })
           .send({
             name: `${blogName} 0${i}`,
             description: `${j} ${blogDescription}`,
@@ -267,7 +444,8 @@ describe('Blogs testing', () => {
       }
       for (let i = 3, j = 99; i < 8; i++, j--) {
         await agent
-          .post(blogsURI)
+          .post(bloggerBlogsURI)
+          .auth(accessToken, { type: 'bearer' })
           .send({
             name: `${blogName} 1${i}`,
             description: `${j} ${blogDescription}`,
@@ -275,12 +453,12 @@ describe('Blogs testing', () => {
           })
           .expect(201);
       }
-      const check = await agent.get(blogsURI).expect(200);
+      const check = await agent.get(publicBlogsURI).expect(200);
       expect(check.body.items).toHaveLength(10);
     });
     it(`should filter blogs by term`, async () => {
       const blogs = await agent
-        .get(blogsURI)
+        .get(publicBlogsURI)
         .query({ searchNameTerm: '3' })
         .expect(200);
 
@@ -289,7 +467,7 @@ describe('Blogs testing', () => {
       expect(blogs.body.items[1].name).toBe(`${blogName} 03`);
     });
     it(`should sort blogs by date (desc)`, async () => {
-      const blogs = await agent.get(blogsURI).expect(200);
+      const blogs = await agent.get(publicBlogsURI).expect(200);
 
       expect(blogs.body.items[0].name).toBe(`${blogName} 17`);
       expect(blogs.body.items[1].name).toBe(`${blogName} 16`);
@@ -304,7 +482,7 @@ describe('Blogs testing', () => {
     });
     it(`should sort blogs by description (asc)`, async () => {
       const blogs = await agent
-        .get(blogsURI)
+        .get(publicBlogsURI)
         .query({ sortBy: 'description', sortDirection: 'asc' })
         .expect(200);
 
@@ -321,7 +499,7 @@ describe('Blogs testing', () => {
     });
     it(`should return correct pagination output`, async () => {
       const blogs = await agent
-        .get(blogsURI)
+        .get(publicBlogsURI)
         .query({ pageNumber: '2', pageSize: '5' })
         .expect(200);
 

@@ -1,8 +1,8 @@
-import { userEmail, userLogin } from '../constants/users.constants';
+import { user01Email, user01Login } from '../constants/users.constants';
 
 export const userObject = {
   id: expect.any(String),
-  login: userLogin,
-  email: userEmail,
+  login: user01Login,
+  email: user01Email,
   createdAt: expect.any(String),
 };

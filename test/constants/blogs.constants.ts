@@ -1,5 +1,6 @@
 // Blogs URI
-export const blogsURI = '/blogs/';
+export const bloggerBlogsURI = '/blogger/blogs/';
+export const publicBlogsURI = '/blogs/';
 
 // Blog creation strings
 export const blogName = 'Test name';

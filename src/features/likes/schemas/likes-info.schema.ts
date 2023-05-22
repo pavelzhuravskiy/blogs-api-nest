@@ -1,5 +1,5 @@
 import { Prop, Schema } from '@nestjs/mongoose';
-import { UsersLikesSchema } from './likes-users.schema';
+import { LikesUsersSchema } from './likes-users.schema';
 
 @Schema()
 export class LikesInfoSchema {
@@ -10,5 +10,5 @@ export class LikesInfoSchema {
   dislikesCount: number;
 
   @Prop({ default: [] })
-  users: [UsersLikesSchema];
+  users: [LikesUsersSchema];
 }
