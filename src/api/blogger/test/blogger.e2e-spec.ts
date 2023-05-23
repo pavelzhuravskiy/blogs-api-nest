@@ -658,7 +658,7 @@ describe('Blogger testing', () => {
       });
 
       // Forbidden errors [403]
-      it(`should return 401 when trying to update post of another user's blog`, async () => {
+      it(`should return 403 when trying to update post of another user's blog`, async () => {
         return agent
           .put(bloggerBlogsURI + blog01Id + publicPostsURI + postId)
           .auth(aTokenUser02, { type: 'bearer' })
@@ -671,9 +671,20 @@ describe('Blogger testing', () => {
       });
 
       // Not found errors [404]
-      it(`should return 401 when trying to update post of nonexistent blog`, async () => {
+      it(`should return 404 when trying to update post of nonexistent blog`, async () => {
         return agent
-          .put(bloggerBlogsURI + invalidURI + publicPostsURI + invalidURI)
+          .put(bloggerBlogsURI + invalidURI + publicPostsURI + postId)
+          .auth(aTokenUser01, { type: 'bearer' })
+          .send({
+            title: postUpdatedTitle,
+            shortDescription: postUpdatedShortDescription,
+            content: postUpdatedContent,
+          })
+          .expect(404);
+      });
+      it(`should return 404 when trying to update nonexistent post`, async () => {
+        return agent
+          .put(bloggerBlogsURI + blog01Id + publicPostsURI + invalidURI)
           .auth(aTokenUser01, { type: 'bearer' })
           .send({
             title: postUpdatedTitle,
@@ -697,6 +708,54 @@ describe('Blogger testing', () => {
 
         const check = await agent.get(publicPostsURI + postId).expect(200);
         expect(check.body).toEqual(updatedPostObject);
+      });
+    });
+    describe('Delete post', () => {
+      // Auth errors [401]
+      it(`should return 401 when trying to delete post with incorrect access token`, async () => {
+        return agent
+          .delete(bloggerBlogsURI + blog01Id + publicPostsURI + postId)
+          .auth(randomUUID(), { type: 'bearer' })
+          .expect(401);
+      });
+
+      // Forbidden errors [403]
+      it(`should return 403 when trying to delete post of another user's blog`, async () => {
+        return agent
+          .delete(bloggerBlogsURI + blog01Id + publicPostsURI + postId)
+          .auth(aTokenUser02, { type: 'bearer' })
+          .expect(403);
+      });
+
+      // Not found errors [404]
+      it(`should return 404 when trying to delete post of nonexistent blog`, async () => {
+        return agent
+          .delete(bloggerBlogsURI + invalidURI + publicPostsURI + postId)
+          .auth(aTokenUser01, { type: 'bearer' })
+          .expect(404);
+      });
+      it(`should return 404 when trying to delete nonexistent post`, async () => {
+        return agent
+          .delete(bloggerBlogsURI + blog01Id + publicPostsURI + invalidURI)
+          .auth(aTokenUser01, { type: 'bearer' })
+          .expect(404);
+      });
+
+      // Success
+      it(`should delete post by ID`, async () => {
+        await agent
+          .delete(bloggerBlogsURI + blog01Id + publicPostsURI + postId)
+          .auth(aTokenUser01, { type: 'bearer' })
+          .expect(204);
+
+        const posts = await agent.get(publicPostsURI).expect(200);
+        expect(posts.body).toEqual({
+          pagesCount: 0,
+          page: 1,
+          pageSize: 10,
+          totalCount: 0,
+          items: [],
+        });
       });
     });
   });
