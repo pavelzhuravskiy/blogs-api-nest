@@ -41,7 +41,7 @@ import {
   user02Email,
   user02Login,
   userPassword,
-  usersURI,
+  saUsersURI,
 } from '../../../../test/constants/users.constants';
 import {
   basicAuthLogin,
@@ -69,7 +69,7 @@ import {
   updatedPostObject,
 } from '../../../../test/objects/posts.objects';
 
-describe('Blogger testing', () => {
+describe('Blogger blogs and posts testing', () => {
   let app: INestApplication;
   let agent: SuperAgentTest;
 
@@ -112,7 +112,7 @@ describe('Blogger testing', () => {
     describe('User creation and authentication', () => {
       it(`should create two users`, async () => {
         await agent
-          .post(usersURI)
+          .post(saUsersURI)
           .auth(basicAuthLogin, basicAuthPassword)
           .send({
             login: user01Login,
@@ -122,7 +122,7 @@ describe('Blogger testing', () => {
           .expect(201);
 
         return agent
-          .post(usersURI)
+          .post(saUsersURI)
           .auth(basicAuthLogin, basicAuthPassword)
           .send({
             login: user02Login,

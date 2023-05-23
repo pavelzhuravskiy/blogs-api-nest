@@ -1,4 +1,12 @@
-import { Controller, Get, Param, Put, Query, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  HttpCode,
+  Param,
+  Put,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { BlogsQueryRepository } from '../../public/blogs/infrastructure/blogs.query.repository';
 import { BlogQueryDto } from '../../public/blogs/dto/blog.query.dto';
@@ -24,6 +32,7 @@ export class SuperAdminBlogsController {
 
   @UseGuards(BasicAuthGuard)
   @Put(':blogId/bind-with-user/:userId')
+  @HttpCode(204)
   async bindBlog(@Param() params) {
     const result = await this.commandBus.execute(
       new BlogBindCommand(params.blogId, params.userId),

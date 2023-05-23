@@ -26,6 +26,19 @@ export const blog02Object = {
   isMembership: false,
 };
 
+export const saBlogObject = {
+  id: expect.any(String),
+  name: blog01Name,
+  description: blogDescription,
+  websiteUrl: blogWebsite,
+  createdAt: expect.any(String),
+  isMembership: false,
+  blogOwnerInfo: {
+    userId: expect.any(String),
+    userLogin: expect.any(String),
+  },
+};
+
 export const updatedBlogObject = {
   id: expect.any(String),
   name: blogUpdatedName,

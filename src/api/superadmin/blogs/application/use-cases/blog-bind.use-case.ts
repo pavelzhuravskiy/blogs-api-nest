@@ -47,7 +47,10 @@ export class BlogBindUseCase implements ICommandHandler<BlogBindCommand> {
       };
     }
 
-    if (blog.blogOwnerInfo.userId) {
+    const blogOwnerId = blog.blogOwnerInfo.userId;
+    const blogOwner = await this.usersRepository.findUserById(blogOwnerId);
+
+    if (blogOwner) {
       return {
         data: false,
         code: ResultCode.BadRequest,

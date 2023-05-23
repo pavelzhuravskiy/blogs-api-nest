@@ -1,6 +1,8 @@
 // Blogs URI
+export const saBlogsURI = '/sa/blogs/';
 export const bloggerBlogsURI = '/blogger/blogs/';
 export const publicBlogsURI = '/blogs/';
+export const blogBindURI = '/bind-with-user/';
 
 // Blog creation strings
 export const blog01Name = 'Test 01 name';
@@ -12,3 +14,5 @@ export const blogWebsite = 'https://someurl.com/test';
 export const blogUpdatedName = 'New name';
 export const blogUpdatedDescription = 'New description';
 export const blogUpdatedWebsite = 'https://someurl.com/new';
+
+// Blog bind strings

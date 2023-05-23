@@ -1,5 +1,5 @@
 // Users URI
-export const usersURI = '/sa/users/';
+export const saUsersURI = '/sa/users/';
 
 // User creation strings
 export const user01Login = 'login01';

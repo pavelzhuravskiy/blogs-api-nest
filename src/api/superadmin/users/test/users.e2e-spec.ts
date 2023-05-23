@@ -7,7 +7,7 @@ import {
   user01Email,
   user01Login,
   userPassword,
-  usersURI,
+  saUsersURI,
 } from '../../../../../test/constants/users.constants';
 import { userObject } from '../../../../../test/objects/users.objects';
 import { customExceptionFactory } from '../../../../exceptions/exception.factory';
@@ -51,14 +51,14 @@ describe('Users testing', () => {
   describe('Users status 404 checks', () => {
     beforeAll(async () => await agent.delete(testingURI));
     it(`should return 404 when deleting nonexistent user`, async () => {
-      return agent.delete(usersURI + invalidURI).expect(404);
+      return agent.delete(saUsersURI + invalidURI).expect(404);
     });
   });
   describe('Users CRUD operations', () => {
     beforeAll(async () => await agent.delete(testingURI));
     it(`should create new user`, async () => {
       return agent
-        .post(usersURI)
+        .post(saUsersURI)
         .send({
           login: user01Login,
           password: userPassword,
@@ -67,7 +67,7 @@ describe('Users testing', () => {
         .expect(201);
     });
     it(`should return all users`, async () => {
-      const users = await agent.get(usersURI).expect(200);
+      const users = await agent.get(saUsersURI).expect(200);
       expect(users.body).toEqual({
         pagesCount: 1,
         page: 1,
@@ -77,12 +77,12 @@ describe('Users testing', () => {
       });
     });
     it(`should delete user by ID`, async () => {
-      const users = await agent.get(usersURI).expect(200);
+      const users = await agent.get(saUsersURI).expect(200);
       userId = users.body.items[0].id;
 
-      await agent.delete(usersURI + userId).expect(204);
+      await agent.delete(saUsersURI + userId).expect(204);
 
-      const check = await agent.get(usersURI).expect(200);
+      const check = await agent.get(saUsersURI).expect(200);
       expect(check.body.items).toHaveLength(0);
     });
   });
@@ -91,7 +91,7 @@ describe('Users testing', () => {
     it(`should create 10 users`, async () => {
       for (let i = 1, j = 42; i < 6; i++, j--) {
         await agent
-          .post(usersURI)
+          .post(saUsersURI)
           .send({
             login: `${user01Login}0${i}`,
             password: userPassword,
@@ -101,7 +101,7 @@ describe('Users testing', () => {
       }
       for (let i = 3, j = 99; i < 8; i++, j--) {
         await agent
-          .post(usersURI)
+          .post(saUsersURI)
           .send({
             login: `${user01Login}1${i}`,
             password: userPassword,
@@ -109,12 +109,12 @@ describe('Users testing', () => {
           })
           .expect(201);
       }
-      const check = await agent.get(usersURI).expect(200);
+      const check = await agent.get(saUsersURI).expect(200);
       expect(check.body.items).toHaveLength(10);
     });
     it(`should filter users by login term`, async () => {
       const users = await agent
-        .get(usersURI)
+        .get(saUsersURI)
         .query({ searchLoginTerm: '3' })
         .expect(200);
 
@@ -124,7 +124,7 @@ describe('Users testing', () => {
     });
     it(`should filter users by email term`, async () => {
       const users = await agent
-        .get(usersURI)
+        .get(saUsersURI)
         .query({ searchEmailTerm: '8' })
         .expect(200);
 
@@ -133,7 +133,7 @@ describe('Users testing', () => {
       expect(users.body.items[1].email).toBe(`38${user01Email}`);
     });
     it(`should sort users by date (desc)`, async () => {
-      const users = await agent.get(usersURI).expect(200);
+      const users = await agent.get(saUsersURI).expect(200);
 
       expect(users.body.items[0].login).toBe(`${user01Login}17`);
       expect(users.body.items[1].login).toBe(`${user01Login}16`);
@@ -148,7 +148,7 @@ describe('Users testing', () => {
     });
     it(`should sort blogs by email (asc)`, async () => {
       const users = await agent
-        .get(usersURI)
+        .get(saUsersURI)
         .query({ sortBy: 'email', sortDirection: 'asc' })
         .expect(200);
 
@@ -165,7 +165,7 @@ describe('Users testing', () => {
     });
     it(`should return correct pagination output`, async () => {
       const users = await agent
-        .get(usersURI)
+        .get(saUsersURI)
         .query({ pageNumber: '2', pageSize: '5' })
         .expect(200);
 

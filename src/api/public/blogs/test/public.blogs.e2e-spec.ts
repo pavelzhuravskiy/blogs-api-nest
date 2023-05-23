@@ -18,7 +18,7 @@ import {
   user01Email,
   user01Login,
   userPassword,
-  usersURI,
+  saUsersURI,
 } from '../../../../../test/constants/users.constants';
 import {
   basicAuthLogin,
@@ -67,7 +67,7 @@ describe('Blogs testing', () => {
       // Create and login users
       it(`should create user`, async () => {
         await agent
-          .post(usersURI)
+          .post(saUsersURI)
           .auth(basicAuthLogin, basicAuthPassword)
           .send({
             login: user01Login,

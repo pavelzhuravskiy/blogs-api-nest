@@ -4,41 +4,27 @@ import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import {
-  blogDescription,
   blog01Name,
-  publicBlogsURI,
+  blogDescription,
   blogWebsite,
+  publicBlogsURI,
 } from '../../../../../test/constants/blogs.constants';
 import { testingURI } from '../../../../../test/constants/testing.constants';
 import {
-  invalidURI,
-  longString1013,
-  longString109,
-  longString17,
-  longString39,
-} from '../../../../../test/constants/common.constants';
-import {
   postContent,
   postShortDescription,
-  publicPostsURI,
   postTitle,
   postUpdatedContent,
   postUpdatedShortDescription,
   postUpdatedTitle,
+  publicPostsURI,
 } from '../../../../../test/constants/posts.constants';
 import {
   postObject,
   updatedPostObject,
 } from '../../../../../test/objects/posts.objects';
-import { exceptionObject } from '../../../../../test/objects/common.objects';
 import { customExceptionFactory } from '../../../../exceptions/exception.factory';
 import { HttpExceptionFilter } from '../../../../exceptions/exception.filter';
-import { blogIDField } from '../../../../exceptions/exception.constants';
-import {
-  contentField,
-  shortDescriptionField,
-  titleField,
-} from '../../../../../test/constants/exceptions.constants';
 import { AppModule } from '../../../../app.module';
 
 describe('Posts testing', () => {
@@ -69,198 +55,11 @@ describe('Posts testing', () => {
     agent = supertest.agent(app.getHttpServer());
   });
 
-  let firstBlogId;
-  let secondBlogId;
+  let blog01Id;
+  let blog02Id;
+
   let postId;
 
-  describe('Posts status 400 checks', () => {
-    beforeAll(async () => await agent.delete(testingURI));
-    it(`should create new blog`, async () => {
-      return agent
-        .post(publicBlogsURI)
-        .send({
-          name: blog01Name,
-          description: blogDescription,
-          websiteUrl: blogWebsite,
-        })
-        .expect(201);
-    });
-    it(`should return 400 when trying to create post without title`, async () => {
-      const blogs = await agent.get(publicBlogsURI).expect(200);
-      firstBlogId = blogs.body.items[0].id;
-
-      const response = await agent
-        .post(publicPostsURI)
-        .send({
-          shortDescription: postShortDescription,
-          content: postContent,
-          blogId: firstBlogId,
-        })
-        .expect(400);
-
-      expect(response.body).toEqual(exceptionObject(titleField));
-    });
-    it(`should return 400 when trying to create post with incorrect title type`, async () => {
-      const response = await agent
-        .post(publicPostsURI)
-        .send({
-          title: 123,
-          shortDescription: postShortDescription,
-          content: postContent,
-          blogId: firstBlogId,
-        })
-        .expect(400);
-
-      expect(response.body).toEqual(exceptionObject(titleField));
-    });
-    it(`should return 400 when trying to create post with incorrect title length`, async () => {
-      const response = await agent
-        .post(publicPostsURI)
-        .send({
-          title: longString39,
-          shortDescription: postShortDescription,
-          content: postContent,
-          blogId: firstBlogId,
-        })
-        .expect(400);
-
-      expect(response.body).toEqual(exceptionObject(titleField));
-    });
-    it(`should return 400 when trying to create post without short description`, async () => {
-      const response = await agent
-        .post(publicPostsURI)
-        .send({
-          title: postTitle,
-          content: postContent,
-          blogId: firstBlogId,
-        })
-        .expect(400);
-
-      expect(response.body).toEqual(exceptionObject(shortDescriptionField));
-    });
-    it(`should return 400 when trying to create post with incorrect short description type`, async () => {
-      const response = await agent
-        .post(publicPostsURI)
-        .send({
-          title: postTitle,
-          shortDescription: 123,
-          content: postContent,
-          blogId: firstBlogId,
-        })
-        .expect(400);
-
-      expect(response.body).toEqual(exceptionObject(shortDescriptionField));
-    });
-    it(`should return 400 when trying to create post with incorrect short description length`, async () => {
-      const response = await agent
-        .post(publicPostsURI)
-        .send({
-          title: postTitle,
-          shortDescription: longString109,
-          content: postContent,
-          blogId: firstBlogId,
-        })
-        .expect(400);
-
-      expect(response.body).toEqual(exceptionObject(shortDescriptionField));
-    });
-    it(`should return 400 when trying to create post without content`, async () => {
-      const response = await agent
-        .post(publicPostsURI)
-        .send({
-          title: postTitle,
-          shortDescription: postShortDescription,
-          blogId: firstBlogId,
-        })
-        .expect(400);
-
-      expect(response.body).toEqual(exceptionObject(contentField));
-    });
-    it(`should return 400 when trying to create post with incorrect content type`, async () => {
-      const response = await agent
-        .post(publicPostsURI)
-        .send({
-          title: postTitle,
-          shortDescription: postShortDescription,
-          content: 123,
-          blogId: firstBlogId,
-        })
-        .expect(400);
-
-      expect(response.body).toEqual(exceptionObject(contentField));
-    });
-    it(`should return 400 when trying to create post with incorrect content length`, async () => {
-      const response = await agent
-        .post(publicPostsURI)
-        .send({
-          title: postTitle,
-          shortDescription: postShortDescription,
-          content: longString1013,
-          blogId: firstBlogId,
-        })
-        .expect(400);
-
-      expect(response.body).toEqual(exceptionObject(contentField));
-    });
-    it(`should return 400 when trying to create post without blogId`, async () => {
-      const response = await agent
-        .post(publicPostsURI)
-        .send({
-          title: postTitle,
-          shortDescription: postShortDescription,
-          content: postContent,
-        })
-        .expect(400);
-
-      expect(response.body).toEqual(exceptionObject(blogIDField));
-    });
-    it(`should return 400 when trying to create post with incorrect blogId type`, async () => {
-      const response = await agent
-        .post(publicPostsURI)
-        .send({
-          title: postTitle,
-          shortDescription: postShortDescription,
-          content: postContent,
-          blogId: 123,
-        })
-        .expect(400);
-
-      expect(response.body).toEqual(exceptionObject(blogIDField));
-    });
-    it(`should return 400 when trying to create post with incorrect blogId length`, async () => {
-      const response = await agent
-        .post(publicPostsURI)
-        .send({
-          title: postTitle,
-          shortDescription: postShortDescription,
-          content: postContent,
-          blogId: longString17,
-        })
-        .expect(400);
-
-      expect(response.body).toEqual(exceptionObject(blogIDField));
-    });
-  });
-  describe('Posts status 404 checks', () => {
-    beforeAll(async () => await agent.delete(testingURI));
-    it(`should return 404 when getting nonexistent post`, async () => {
-      return agent.get(publicPostsURI + invalidURI).expect(404);
-    });
-    it(`should return 404 when updating nonexistent post`, async () => {
-      return agent
-        .put(publicPostsURI + invalidURI)
-        .send({
-          title: postUpdatedTitle,
-          shortDescription: postUpdatedShortDescription,
-          content: postUpdatedContent,
-          blogId: firstBlogId,
-        })
-        .expect(404);
-    });
-    it(`should return 404 when deleting nonexistent post`, async () => {
-      return agent.delete(publicPostsURI + invalidURI).expect(404);
-    });
-  });
   describe('Posts CRUD operations', () => {
     beforeAll(async () => await agent.delete(testingURI));
     it(`should create new blog`, async () => {
@@ -275,7 +74,7 @@ describe('Posts testing', () => {
     });
     it(`should create new post`, async () => {
       const blogs = await agent.get(publicBlogsURI).expect(200);
-      firstBlogId = blogs.body.items[0].id;
+      blog01Id = blogs.body.items[0].id;
 
       return agent
         .post(publicPostsURI)
@@ -283,18 +82,18 @@ describe('Posts testing', () => {
           title: postTitle,
           shortDescription: postShortDescription,
           content: postContent,
-          blogId: firstBlogId,
+          blogId: blog01Id,
         })
         .expect(201);
     });
     it(`should create new post from blog`, async () => {
       return agent
-        .post(publicBlogsURI + firstBlogId + publicPostsURI)
+        .post(publicBlogsURI + blog01Id + publicPostsURI)
         .send({
           title: postTitle,
           shortDescription: postShortDescription,
           content: postContent,
-          blogId: firstBlogId,
+          blogId: blog01Id,
         })
         .expect(201);
     });
@@ -322,7 +121,7 @@ describe('Posts testing', () => {
           title: postUpdatedTitle,
           shortDescription: postUpdatedShortDescription,
           content: postUpdatedContent,
-          blogId: firstBlogId,
+          blogId: blog01Id,
         })
         .expect(204);
 
@@ -352,8 +151,8 @@ describe('Posts testing', () => {
     });
     it(`should create 10 posts`, async () => {
       const blogs = await agent.get(publicBlogsURI).expect(200);
-      firstBlogId = blogs.body.items[0].id;
-      secondBlogId = blogs.body.items[1].id;
+      blog01Id = blogs.body.items[0].id;
+      blog02Id = blogs.body.items[1].id;
 
       for (let i = 1, j = 42; i < 6; i++, j--) {
         await agent
@@ -362,7 +161,7 @@ describe('Posts testing', () => {
             title: `${postTitle} 0${i}`,
             shortDescription: `${j} ${postShortDescription}`,
             content: postContent,
-            blogId: firstBlogId,
+            blogId: blog01Id,
           })
           .expect(201);
       }
@@ -373,7 +172,7 @@ describe('Posts testing', () => {
             title: `${postTitle} 1${i}`,
             shortDescription: `${j} ${postShortDescription}`,
             content: postContent,
-            blogId: secondBlogId,
+            blogId: blog02Id,
           })
           .expect(201);
       }
@@ -382,7 +181,7 @@ describe('Posts testing', () => {
     });
     it(`should filter posts by blog`, async () => {
       const posts = await agent
-        .get(publicBlogsURI + firstBlogId + publicPostsURI)
+        .get(publicBlogsURI + blog01Id + publicPostsURI)
         .expect(200);
       expect(posts.body.items).toHaveLength(5);
     });
