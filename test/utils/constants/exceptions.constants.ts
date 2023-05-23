@@ -7,3 +7,8 @@ export const urlField = 'websiteUrl';
 export const titleField = 'title';
 export const shortDescriptionField = 'shortDescription';
 export const contentField = 'content';
+
+// Users exception fields strings
+export const loginField = 'login';
+export const passwordField = 'password';
+export const emailField = 'email';

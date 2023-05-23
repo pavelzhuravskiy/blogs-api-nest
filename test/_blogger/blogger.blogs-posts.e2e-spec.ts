@@ -13,8 +13,8 @@ import {
   blogWebsite,
   publicBlogsURI,
   blog02Name,
-} from '../../../../test/constants/blogs.constants';
-import { testingURI } from '../../../../test/constants/testing.constants';
+} from '../utils/constants/blogs.constants';
+import { testingURI } from '../utils/constants/testing.constants';
 import {
   invalidURI,
   longString1013,
@@ -22,10 +22,10 @@ import {
   longString17,
   longString39,
   longString508,
-} from '../../../../test/constants/common.constants';
-import { customExceptionFactory } from '../../../exceptions/exception.factory';
-import { HttpExceptionFilter } from '../../../exceptions/exception.filter';
-import { exceptionObject } from '../../../../test/objects/common.objects';
+} from '../utils/constants/common.constants';
+import { customExceptionFactory } from '../../src/exceptions/exception.factory';
+import { HttpExceptionFilter } from '../../src/exceptions/exception.filter';
+import { exceptionObject } from '../utils/objects/common.objects';
 import {
   contentField,
   descriptionField,
@@ -33,8 +33,8 @@ import {
   shortDescriptionField,
   titleField,
   urlField,
-} from '../../../../test/constants/exceptions.constants';
-import { AppModule } from '../../../app.module';
+} from '../utils/constants/exceptions.constants';
+import { AppModule } from '../../src/app.module';
 import {
   user01Email,
   user01Login,
@@ -42,19 +42,19 @@ import {
   user02Login,
   userPassword,
   saUsersURI,
-} from '../../../../test/constants/users.constants';
+} from '../utils/constants/users.constants';
 import {
   basicAuthLogin,
   basicAuthPassword,
   loginUri,
-} from '../../../../test/constants/auth.constants';
+} from '../utils/constants/auth.constants';
 import { useContainer } from 'class-validator';
 import { randomUUID } from 'crypto';
 import {
   blog01Object,
   blog02Object,
   updatedBlogObject,
-} from '../../../../test/objects/blogs.objects';
+} from '../utils/objects/blogs.objects';
 import {
   postContent,
   postShortDescription,
@@ -63,11 +63,8 @@ import {
   postUpdatedShortDescription,
   postUpdatedTitle,
   publicPostsURI,
-} from '../../../../test/constants/posts.constants';
-import {
-  postObject,
-  updatedPostObject,
-} from '../../../../test/objects/posts.objects';
+} from '../utils/constants/posts.constants';
+import { postObject, updatedPostObject } from '../utils/objects/posts.objects';
 
 describe('Blogger blogs and posts testing', () => {
   let app: INestApplication;
@@ -109,7 +106,7 @@ describe('Blogger blogs and posts testing', () => {
   describe('Blogger operations and errors checks', () => {
     beforeAll(async () => await agent.delete(testingURI));
 
-    describe('User creation and authentication', () => {
+    describe('Users creation and authentication', () => {
       it(`should create two users`, async () => {
         await agent
           .post(saUsersURI)
