@@ -12,3 +12,6 @@ export const contentField = 'content';
 export const loginField = 'login';
 export const passwordField = 'password';
 export const emailField = 'email';
+
+// Ban exception fields strings
+export const isBannedField = 'isBanned';
