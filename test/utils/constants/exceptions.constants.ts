@@ -18,3 +18,4 @@ export const likeStatusField = 'likeStatus';
 
 // Ban exception fields strings
 export const isBannedField = 'isBanned';
+export const banReasonField = 'banReason';

@@ -17,6 +17,9 @@ import {
   user02Login,
   user03Email,
   user03Login,
+  user04Email,
+  user04Login,
+  userBanURI,
   userPassword,
 } from '../utils/constants/users.constants';
 import {
@@ -31,12 +34,15 @@ import {
 } from '../utils/constants/common.constants';
 import { randomUUID } from 'crypto';
 import {
+  banReasonField,
   emailField,
+  isBannedField,
   loginField,
   passwordField,
 } from '../utils/constants/exceptions.constants';
 import {
   blog01Name,
+  blog02Name,
   blogDescription,
   bloggerBlogsURI,
   blogWebsite,
@@ -47,7 +53,12 @@ import {
   postTitle,
   publicPostsURI,
 } from '../utils/constants/posts.constants';
-import { postObject } from '../utils/objects/posts.objects';
+import {
+  commentContent,
+  publicCommentsURI,
+} from '../utils/constants/comments.constants';
+import { publicLikesURI } from '../utils/constants/likes.constants';
+import { LikeStatus } from '../../src/enums/like-status.enum';
 
 describe('Super admin users testing', () => {
   let app: INestApplication;
@@ -80,14 +91,18 @@ describe('Super admin users testing', () => {
     await agent.delete(testingURI);
   });
 
-  let blogId;
-  let postId;
+  let blog01Id;
+  let blog02Id;
+
+  let post02Id;
+
+  let comment03Id;
 
   let user01Id;
-  let user02Id;
 
   let aTokenUser01;
   let aTokenUser02;
+  let aTokenUser03;
 
   describe('Users create and authenticate', () => {
     // Validation errors [400]
@@ -207,7 +222,7 @@ describe('Super admin users testing', () => {
     });
 
     // Success
-    it(`should create two users`, async () => {
+    it(`should create three users`, async () => {
       const user01 = await agent
         .post(saUsersURI)
         .auth(basicAuthLogin, basicAuthPassword)
@@ -220,7 +235,7 @@ describe('Super admin users testing', () => {
 
       user01Id = user01.body.id;
 
-      const user02 = await agent
+      await agent
         .post(saUsersURI)
         .auth(basicAuthLogin, basicAuthPassword)
         .send({
@@ -230,7 +245,15 @@ describe('Super admin users testing', () => {
         })
         .expect(201);
 
-      user02Id = user02.body.id;
+      await agent
+        .post(saUsersURI)
+        .auth(basicAuthLogin, basicAuthPassword)
+        .send({
+          login: user03Login,
+          password: userPassword,
+          email: user03Email,
+        })
+        .expect(201);
     });
     it(`should log in user 01`, async () => {
       const response = await agent
@@ -240,12 +263,6 @@ describe('Super admin users testing', () => {
           password: userPassword,
         })
         .expect(200);
-
-      const users = await agent
-        .get(saUsersURI)
-        .auth(basicAuthLogin, basicAuthPassword);
-
-      user01Id = users.body.items[1].id;
       aTokenUser01 = response.body.accessToken;
     });
     it(`should log in user 02`, async () => {
@@ -258,6 +275,16 @@ describe('Super admin users testing', () => {
         .expect(200);
       aTokenUser02 = response.body.accessToken;
     });
+    it(`should log in user 03`, async () => {
+      const response = await agent
+        .post(loginUri)
+        .send({
+          loginOrEmail: user03Login,
+          password: userPassword,
+        })
+        .expect(200);
+      aTokenUser03 = response.body.accessToken;
+    });
 
     // Unique values validation errors [400]
     it(`should return 400 when trying to create user with login that already exists`, async () => {
@@ -267,7 +294,7 @@ describe('Super admin users testing', () => {
         .send({
           login: user01Login,
           password: userPassword,
-          email: user03Email,
+          email: user04Email,
         })
         .expect(400);
 
@@ -278,7 +305,7 @@ describe('Super admin users testing', () => {
         .post(saUsersURI)
         .auth(basicAuthLogin, basicAuthPassword)
         .send({
-          login: user03Login,
+          login: user04Login,
           password: userPassword,
           email: user01Email,
         })
@@ -287,7 +314,6 @@ describe('Super admin users testing', () => {
       expect(response.body).toEqual(exceptionObject(emailField));
     });
   });
-
   describe('Ban user', () => {
     it(`should create blog by user 01`, async () => {
       const blog = await agent
@@ -300,11 +326,11 @@ describe('Super admin users testing', () => {
         })
         .expect(201);
 
-      blogId = blog.body.id;
+      blog01Id = blog.body.id;
     });
     it(`should create post by user 01`, async () => {
       await agent
-        .post(bloggerBlogsURI + blogId + publicPostsURI)
+        .post(bloggerBlogsURI + blog01Id + publicPostsURI)
         .auth(aTokenUser01, { type: 'bearer' })
         .send({
           title: postTitle,
@@ -312,25 +338,107 @@ describe('Super admin users testing', () => {
           content: postContent,
         })
         .expect(201);
+    });
+    it(`should create blog by user 02`, async () => {
+      const blog = await agent
+        .post(bloggerBlogsURI)
+        .auth(aTokenUser02, { type: 'bearer' })
+        .send({
+          name: blog02Name,
+          description: blogDescription,
+          websiteUrl: blogWebsite,
+        })
+        .expect(201);
 
+      blog02Id = blog.body.id;
+    });
+    it(`should create post by user 02`, async () => {
+      const post = await agent
+        .post(bloggerBlogsURI + blog02Id + publicPostsURI)
+        .auth(aTokenUser02, { type: 'bearer' })
+        .send({
+          title: postTitle,
+          shortDescription: postShortDescription,
+          content: postContent,
+        })
+        .expect(201);
+      post02Id = post.body.id;
+    });
+    it('should like post of user 02 by user 01', async () => {
+      return agent
+        .put(publicPostsURI + post02Id + publicLikesURI)
+        .auth(aTokenUser01, { type: 'bearer' })
+        .send({
+          likeStatus: LikeStatus.Like,
+        })
+        .expect(204);
+    });
+    it('should like post of user 02 by user 03', async () => {
+      return agent
+        .put(publicPostsURI + post02Id + publicLikesURI)
+        .auth(aTokenUser03, { type: 'bearer' })
+        .send({
+          likeStatus: LikeStatus.Like,
+        })
+        .expect(204);
+    });
+    it('should return two posts and count user 02 post likes', async () => {
       const posts = await agent.get(publicPostsURI).expect(200);
+      expect(posts.body.items).toHaveLength(2);
+      expect(posts.body.items[0].extendedLikesInfo.newestLikes).toHaveLength(2);
+    });
+    it(`should create comment by user 01 for post 02`, async () => {
+      await agent
+        .post(publicPostsURI + post02Id + publicCommentsURI)
+        .auth(aTokenUser01, { type: 'bearer' })
+        .send({
+          content: commentContent,
+        })
+        .expect(201);
+    });
+    it(`should create comment by user 03 for post 02`, async () => {
+      const comment = await agent
+        .post(publicPostsURI + post02Id + publicCommentsURI)
+        .auth(aTokenUser03, { type: 'bearer' })
+        .send({
+          content: commentContent,
+        })
+        .expect(201);
+      comment03Id = comment.body.id;
+    });
+    it('should dislike comment of user 03 by user 01', async () => {
+      return agent
+        .put(publicCommentsURI + comment03Id + publicLikesURI)
+        .auth(aTokenUser01, { type: 'bearer' })
+        .send({
+          likeStatus: LikeStatus.Dislike,
+        })
+        .expect(204);
+    });
+    it('should return two comments and count user 03 comment dislikes', async () => {
+      const comments = await agent
+        .get(publicPostsURI + post02Id + publicCommentsURI)
+        .expect(200);
 
-      postId = posts.body.items[0].id;
-
-      expect(posts.body).toEqual({
-        pagesCount: 1,
-        page: 1,
-        pageSize: 10,
-        totalCount: 1,
-        items: [postObject],
-      });
+      expect(comments.body.items).toHaveLength(2);
+      expect(comments.body.items[0].likesInfo.dislikesCount).toBe(1);
     });
 
     // Validation errors [400]
-    it(`should return 400 when trying to ban user with incorrect isBanned type`, async () => {
-      /*
+    it(`should return 400 when trying to ban user without isBanned`, async () => {
       const response = await agent
-        .post(saUsersURI + user01Id + userBanURI)
+        .put(saUsersURI + user01Id + userBanURI)
+        .auth(basicAuthLogin, basicAuthPassword)
+        .send({
+          banReason: randomUUID(),
+        })
+        .expect(400);
+
+      expect(response.body).toEqual(exceptionObject(isBannedField));
+    });
+    it(`should return 400 when trying to ban user with incorrect isBanned type`, async () => {
+      const response = await agent
+        .put(saUsersURI + user01Id + userBanURI)
         .auth(basicAuthLogin, basicAuthPassword)
         .send({
           isBanned: randomUUID(),
@@ -338,7 +446,77 @@ describe('Super admin users testing', () => {
         })
         .expect(400);
 
-      expect(response.body).toEqual(exceptionObject(isBannedField));*/
+      expect(response.body).toEqual(exceptionObject(isBannedField));
+    });
+    it(`should return 400 when trying to ban user without banReason`, async () => {
+      const response = await agent
+        .put(saUsersURI + user01Id + userBanURI)
+        .auth(basicAuthLogin, basicAuthPassword)
+        .send({
+          isBanned: true,
+        })
+        .expect(400);
+
+      expect(response.body).toEqual(exceptionObject(banReasonField));
+    });
+    it(`should return 400 when trying to ban user with incorrect banReason length`, async () => {
+      const response = await agent
+        .put(saUsersURI + user01Id + userBanURI)
+        .auth(basicAuthLogin, basicAuthPassword)
+        .send({
+          isBanned: true,
+          banReason: longString17,
+        })
+        .expect(400);
+
+      expect(response.body).toEqual(exceptionObject(banReasonField));
+    });
+
+    // Success
+    it(`should ban user 01`, async () => {
+      await agent
+        .put(saUsersURI + user01Id + userBanURI)
+        .auth(basicAuthLogin, basicAuthPassword)
+        .send({
+          isBanned: true,
+          banReason: randomUUID(),
+        })
+        .expect(204);
+    });
+    it(`should return 401 when banned user is trying to log in`, async () => {
+      await agent
+        .post(loginUri)
+        .send({
+          loginOrEmail: user01Login,
+          password: userPassword,
+        })
+        .expect(401);
+    });
+    it('should hide post of banned user and hide like for post of user 03', async () => {
+      const posts = await agent.get(publicPostsURI).expect(200);
+      expect(posts.body.items).toHaveLength(1);
+      expect(posts.body.items[0].extendedLikesInfo.newestLikes).toHaveLength(1);
+      expect(posts.body.items[0].extendedLikesInfo.likesCount).toBe(1);
+      expect(posts.body.items[0].extendedLikesInfo.newestLikes[0].login).toBe(
+        user03Login,
+      );
+    });
+    it('should hide comment of banned user for post of user 02', async () => {
+      const comments = await agent
+        .get(publicPostsURI + post02Id + publicCommentsURI)
+        .expect(200);
+
+      expect(comments.body.items).toHaveLength(1);
+      expect(comments.body.items[0].commentatorInfo.userLogin).toBe(
+        user03Login,
+      );
+    });
+    it('should hide dislike of banned user for comment of user 03', async () => {
+      const comment = await agent
+        .get(publicCommentsURI + comment03Id)
+        .expect(200);
+
+      expect(comment.body.likesInfo.dislikesCount).toBe(0);
     });
   });
 
