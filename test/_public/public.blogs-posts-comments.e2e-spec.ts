@@ -39,12 +39,16 @@ import {
 import { postObject } from '../utils/objects/posts.objects';
 import {
   commentContent,
+  commentUpdatedContent,
   publicCommentsURI,
 } from '../utils/constants/comments.constants';
 import { exceptionObject } from '../utils/objects/common.objects';
 import { contentField } from '../utils/constants/exceptions.constants';
 import { invalidURI, longString508 } from '../utils/constants/common.constants';
-import { commentObject } from '../utils/objects/comment.objects';
+import {
+  commentObject,
+  updatedCommentObject,
+} from '../utils/objects/comment.objects';
 
 describe('Public blogs, posts, comments testing', () => {
   let app: INestApplication;
@@ -148,7 +152,7 @@ describe('Public blogs, posts, comments testing', () => {
       return agent.get(publicBlogsURI + randomUUID()).expect(404);
     });
 
-    // Success [200]
+    // Success
     it(`should return created blogs`, async () => {
       const blogs = await agent.get(publicBlogsURI).expect(200);
       expect(blogs.body).toEqual({
@@ -191,7 +195,7 @@ describe('Public blogs, posts, comments testing', () => {
         .expect(404);
     });
 
-    // Success [200]
+    // Success
     it(`should return created posts`, async () => {
       const posts = await agent.get(publicPostsURI).expect(200);
 
@@ -272,7 +276,7 @@ describe('Public blogs, posts, comments testing', () => {
         .expect(404);
     });
 
-    // Success [201]
+    // Success
     it(`should create new comment for created post`, async () => {
       await agent
         .post(publicPostsURI + postId + publicCommentsURI)
@@ -289,7 +293,7 @@ describe('Public blogs, posts, comments testing', () => {
       return agent.get(publicCommentsURI + randomUUID()).expect(404);
     });
 
-    // Success [200]
+    // Success
     it(`should return created comments`, async () => {
       const comments = await agent
         .get(publicPostsURI + postId + publicCommentsURI)
@@ -311,6 +315,89 @@ describe('Public blogs, posts, comments testing', () => {
         .expect(200);
 
       expect(comment.body).toEqual(commentObject);
+    });
+  });
+  describe('Update comment', () => {
+    // Auth errors [401]
+    it(`should return 401 when trying to update comment with incorrect access token`, async () => {
+      return agent
+        .put(publicCommentsURI + commentId)
+        .send({
+          content: commentUpdatedContent,
+        })
+        .auth(randomUUID(), { type: 'bearer' })
+        .expect(401);
+    });
+
+    // Forbidden errors [403]
+    it(`should return 403 when trying to update another user's comment`, async () => {
+      return agent
+        .put(publicCommentsURI + commentId)
+        .send({
+          content: commentUpdatedContent,
+        })
+        .auth(aTokenUser02, { type: 'bearer' })
+        .expect(403);
+    });
+
+    // Not found errors [404]
+    it(`should return 404 when trying to update nonexistent comment`, async () => {
+      return agent
+        .put(publicCommentsURI + commentId)
+        .send({
+          content: commentContent,
+        })
+        .auth(aTokenUser02, { type: 'bearer' })
+        .expect(403);
+    });
+
+    // Success
+    it(`should update comment by ID`, async () => {
+      await agent
+        .put(publicCommentsURI + commentId)
+        .send({
+          content: commentUpdatedContent,
+        })
+        .auth(aTokenUser01, { type: 'bearer' })
+        .expect(204);
+
+      const check = await agent.get(publicCommentsURI + commentId).expect(200);
+      expect(check.body).toEqual(updatedCommentObject);
+    });
+  });
+  describe('Delete comment', () => {
+    // Auth errors [401]
+    it(`should return 401 when trying to delete comment with incorrect access token`, async () => {
+      return agent
+        .delete(publicCommentsURI + commentId)
+        .auth(randomUUID(), { type: 'bearer' })
+        .expect(401);
+    });
+
+    // Forbidden errors [403]
+    it(`should return 403 when trying to delete another user's comment`, async () => {
+      return agent
+        .delete(publicCommentsURI + commentId)
+        .auth(aTokenUser02, { type: 'bearer' })
+        .expect(403);
+    });
+
+    // Not found errors [404]
+    it(`should return 404 when trying to delete nonexistent comment`, async () => {
+      return agent
+        .delete(publicCommentsURI + invalidURI)
+        .auth(aTokenUser01, { type: 'bearer' })
+        .expect(404);
+    });
+
+    // Success
+    it(`should delete comment by ID`, async () => {
+      await agent
+        .delete(publicCommentsURI + commentId)
+        .auth(aTokenUser01, { type: 'bearer' })
+        .expect(204);
+
+      return agent.get(publicCommentsURI + commentId).expect(404);
     });
   });
 

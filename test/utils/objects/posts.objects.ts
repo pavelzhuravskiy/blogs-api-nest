@@ -6,6 +6,7 @@ import {
   postUpdatedShortDescription,
   postUpdatedTitle,
 } from '../constants/posts.constants';
+import { LikeStatus } from '../../../src/enums/like-status.enum';
 
 export const postObject = {
   id: expect.any(String),
@@ -18,7 +19,7 @@ export const postObject = {
   extendedLikesInfo: {
     likesCount: 0,
     dislikesCount: 0,
-    myStatus: 'None',
+    myStatus: LikeStatus.None,
     newestLikes: [],
   },
 };
@@ -34,7 +35,7 @@ export const updatedPostObject = {
   extendedLikesInfo: {
     likesCount: 0,
     dislikesCount: 0,
-    myStatus: 'None',
+    myStatus: LikeStatus.None,
     newestLikes: [],
   },
 };
