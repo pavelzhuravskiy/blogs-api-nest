@@ -206,7 +206,7 @@ describe('Super admin users testing', () => {
         .expect(401);
     });
 
-    // Success [201]
+    // Success
     it(`should create two users`, async () => {
       const user01 = await agent
         .post(saUsersURI)

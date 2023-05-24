@@ -13,5 +13,8 @@ export const loginField = 'login';
 export const passwordField = 'password';
 export const emailField = 'email';
 
+// Likes exception fields strings
+export const likeStatusField = 'likeStatus';
+
 // Ban exception fields strings
 export const isBannedField = 'isBanned';

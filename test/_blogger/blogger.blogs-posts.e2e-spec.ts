@@ -292,7 +292,7 @@ describe('Blogger blogs and posts testing', () => {
         .expect(401);
     });
 
-    // Success [201]
+    // Success
     it(`should create new blog of user 01`, async () => {
       return agent
         .post(bloggerBlogsURI)
@@ -614,7 +614,7 @@ describe('Blogger blogs and posts testing', () => {
         .expect(404);
     });
 
-    // Success [201]
+    // Success
     it(`should create new post`, async () => {
       await agent
         .post(bloggerBlogsURI + blog01Id + publicPostsURI)

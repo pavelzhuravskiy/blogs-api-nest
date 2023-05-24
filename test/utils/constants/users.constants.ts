@@ -9,4 +9,6 @@ export const user02Login = 'login02';
 export const user02Email = 'login02@test.com';
 export const user03Login = 'login03';
 export const user03Email = 'login03@test.com';
+export const user04Login = 'login04';
+export const user04Email = 'login04@test.com';
 export const userPassword = 'qwerty';

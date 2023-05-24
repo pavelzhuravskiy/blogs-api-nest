@@ -161,7 +161,7 @@ describe('Super admin blogs testing', () => {
       .expect(401);
   });
 
-  // Success [204]
+  // Success
   it(`should delete user 01`, async () => {
     return agent
       .delete(saUsersURI + user01Id)
