@@ -73,12 +73,12 @@ describe('Users filtering, sorting, pagination', () => {
         })
         .expect(201);
     }
-    const check = await agent
+    const users = await agent
       .get(saUsersURI)
       .auth(basicAuthLogin, basicAuthPassword)
       .auth(basicAuthLogin, basicAuthPassword)
       .expect(200);
-    expect(check.body.items).toHaveLength(10);
+    expect(users.body.items).toHaveLength(10);
   });
   it(`should filter users by login term`, async () => {
     const users = await agent
