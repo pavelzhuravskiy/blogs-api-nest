@@ -1,0 +1,1474 @@
+{
+	"info": {
+		"_postman_id": "93cb3570-a996-45dc-83a4-1606bb27c7c7",
+		"name": "Blogs API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "25596062"
+	},
+	"item": [
+		{
+			"name": "PUBLIC",
+			"item": [
+				{
+					"name": "AUTH",
+					"item": [
+						{
+							"name": "AUTH -- REG",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"login\": \"Zhur\",\n  \"password\": \"qwerty\",\n  \"email\": \"alex.crane99@protonmail.com\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/auth/registration",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"auth",
+										"registration"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "AUTH -- REG RESEND",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"alex.crane99@protonmail.com\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/auth/registration-email-resending",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"auth",
+										"registration-email-resending"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "AUTH -- REG CONFIRM",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"code\": \"5de7ec81-797a-4073-ad58-d7dd2f329b1e\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/auth/registration-confirmation",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"auth",
+										"registration-confirmation"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "AUTH -- PASS RECOVERY",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.request.headers.add({key: 'User-Agent', value: 'BB'});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"alex.crane99@protonmail.com\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/auth/password-recovery",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"auth",
+										"password-recovery"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "AUTH -- PASS UPDATE",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.request.headers.add({key: 'User-Agent', value: 'BB'});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"recoveryCode\": \"c9a5ef2a-919b-4fd7-80aa-e733e39041b3\",\n    \"newPassword\": \"123456\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/auth/new-password",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"auth",
+										"new-password"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "AUTH -- LOGIN",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.request.headers.add({key: 'User-Agent', value: 'BB'});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"loginOrEmail\": \"login01\",\n    \"password\": \"qwerty\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/auth/login",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"auth",
+										"login"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "AUTH -- REFRESH TOKEN",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Cookie",
+										"value": "",
+										"type": "text",
+										"disabled": true
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/auth/refresh-token",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"auth",
+										"refresh-token"
+									],
+									"query": [
+										{
+											"key": "refreshToken",
+											"value": null,
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "AUTH -- LOGOUT",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"loginOrEmail\": \"login\",\n    \"password\": \"qwerty\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/auth/logout",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"auth",
+										"logout"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "AUTH -- ACCOUNT",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/auth/me",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"auth",
+										"me"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "BLOGS",
+					"item": [
+						{
+							"name": "BLOGS -- GET ALL",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{URL}}/blogs",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"blogs"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "BLOGS -- GET ONE",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{URL}}/blogs/646494a46f7e53056dfb7a40",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"blogs",
+										"646494a46f7e53056dfb7a40"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "POSTS",
+					"item": [
+						{
+							"name": "POSTS -- GET ALL",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{URL}}/posts",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"posts"
+									],
+									"query": [
+										{
+											"key": "sortBy",
+											"value": "createdAt",
+											"disabled": true
+										},
+										{
+											"key": "sortDirection",
+											"value": "asc",
+											"disabled": true
+										},
+										{
+											"key": "pageSize",
+											"value": "5",
+											"disabled": true
+										},
+										{
+											"key": "pageNumber",
+											"value": "1",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "POSTS -- GET ONE",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{URL}}/posts/64674b8d6d04502dd6e8586d",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"posts",
+										"64674b8d6d04502dd6e8586d"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "POSTS -- GET BY BLOG ID",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"title\": \"123\",\n  \"shortDescription\": \"string\",\n  \"content\": \"string\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/blogs/64673288e2df0688b7ed88bf/posts",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"blogs",
+										"64673288e2df0688b7ed88bf",
+										"posts"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "POST LIKES -- UPDATE",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2NDY1ZDQ4NDhlNTYwM2UyNzZjNjI1M2YiLCJpYXQiOjE2ODQ0MTIxMzEsImV4cCI6MTY4NDQ0ODEzMX0.0XX209xl58OyIfs9KKQidGe2hVR-wz5fOVMGT2ZTVTM",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"likeStatus\":\"Like\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/posts/64672e248099e9fdb2333577/like-status",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"posts",
+										"64672e248099e9fdb2333577",
+										"like-status"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "COMMENTS",
+					"item": [
+						{
+							"name": "COMMENTS -- GET ALL",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{URL}}/posts/646750521b1e84ecc9a747c1/comments",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"posts",
+										"646750521b1e84ecc9a747c1",
+										"comments"
+									],
+									"query": [
+										{
+											"key": "sortBy",
+											"value": "content",
+											"disabled": true
+										},
+										{
+											"key": "sortDirection",
+											"value": "asc",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "COMMENTS -- GET ONE",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{URL}}/comments/6467541cbedf4dd8a51d29fd",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"comments",
+										"6467541cbedf4dd8a51d29fd"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "COMMENTS -- CREATE",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"content\": \"comment 01 test test test\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/posts/64672e248099e9fdb2333577/comments",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"posts",
+										"64672e248099e9fdb2333577",
+										"comments"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "COMMENTS -- UPDATE",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2NDViNmQwZWNhNDA3MmU1NDcwNjVmMDMiLCJkZXZpY2VJZCI6ImFmODZlNjEyLTA2ZTAtNDhhOC05MjUyLTVhZTZmNTgyMTdhMyIsImlhdCI6MTY4MzcxNTE2OCwiZXhwIjoxNjgzNzIyMzY4fQ.ge88CVxkVYY4fHxgaGjk8zQTHQQf2rcfbEKmLTcIVSI",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"content\": \"some NEW very big content 5\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/comments/645b6e6f6c88292186d336aa",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"comments",
+										"645b6e6f6c88292186d336aa"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "COMMENTS -- DELETE",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2NDViNmQwZWNhNDA3MmU1NDcwNjVmMDMiLCJkZXZpY2VJZCI6IjE4NDlhOTQxLTZjZDMtNDU5OC1hNDFkLWM4ZmMwM2E0MzQ3MiIsImlhdCI6MTY4MzcxNTQ1NSwiZXhwIjoxNjgzNzIyNjU1fQ.pVaUBgDTB6s4NmQ6sRnx4a9dmMZSRlq0zS2hLohgqVA",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{URL}}/comments/645b6e6f6c88292186d336aa",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"comments",
+										"645b6e6f6c88292186d336aa"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "COMMENT LIKES -- UPDATE",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"likeStatus\": \"Like\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/comments/646615a90aa859bbfa069358/like-status",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"comments",
+										"646615a90aa859bbfa069358",
+										"like-status"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "DEVICES",
+					"item": [
+						{
+							"name": "DEVICES -- GET ALL",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{URL}}/security/devices",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"security",
+										"devices"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "DEVICES -- DELETE",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{URL}}/security/devices/ed6ebd7f-49b2-435f-af05-c5058b0f52bb",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"security",
+										"devices",
+										"ed6ebd7f-49b2-435f-af05-c5058b0f52bb"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "DEVICES -- DELETE OLD",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{URL}}/security/devices",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"security",
+										"devices"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "TESTING",
+					"item": [
+						{
+							"name": "TESTING -- DELETE ALL",
+							"request": {
+								"auth": {
+									"type": "basic",
+									"basic": [
+										{
+											"key": "username",
+											"value": "admin",
+											"type": "string"
+										},
+										{
+											"key": "password",
+											"value": "qwerty",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{URL}}/testing/all-data",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"testing",
+										"all-data"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "BLOGGER",
+			"item": [
+				{
+					"name": "BLOGS",
+					"item": [
+						{
+							"name": "BLOGS -- CREATE",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"u01 b01\",\n  \"description\": \"Test description\",\n  \"websiteUrl\": \"http://fwef.com\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{BLOGGER_URL}}/blogs",
+									"host": [
+										"{{BLOGGER_URL}}"
+									],
+									"path": [
+										"blogs"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "BLOGS -- GET ALL",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{BLOGGER_URL}}/blogs/",
+									"host": [
+										"{{BLOGGER_URL}}"
+									],
+									"path": [
+										"blogs",
+										""
+									],
+									"query": [
+										{
+											"key": "searchNameTerm",
+											"value": "05",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "BLOGS -- UPDATE",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"newName\",\n  \"description\": \"newString\",\n  \"websiteUrl\": \"https://github.com/newurl\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{BLOGGER_URL}}/blogs/6463675ce3611064e1eb30dd",
+									"host": [
+										"{{BLOGGER_URL}}"
+									],
+									"path": [
+										"blogs",
+										"6463675ce3611064e1eb30dd"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "BLOGS -- DELETE",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2NDYzNjcyY2UzNjExMDY0ZTFlYjMwZDMiLCJpYXQiOjE2ODQyMzYxNDAsImV4cCI6MTY4NDI3MjE0MH0.Va_plPDQTQq-IjKRoJoh9HEu-PEwNmKlgZiA-00d1WY",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{BLOGGER_URL}}/blogs/6463683be3611064e1eb3100",
+									"host": [
+										"{{BLOGGER_URL}}"
+									],
+									"path": [
+										"blogs",
+										"6463683be3611064e1eb3100"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "POSTS",
+					"item": [
+						{
+							"name": "POSTS -- CREATE",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"title\": \"post 06\",\n  \"shortDescription\": \"string\",\n  \"content\": \"string\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{BLOGGER_URL}}/blogs/646cabc5b3f871cdd31c6643/posts",
+									"host": [
+										"{{BLOGGER_URL}}"
+									],
+									"path": [
+										"blogs",
+										"646cabc5b3f871cdd31c6643",
+										"posts"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "POSTS -- UPDATE",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"title\":\"valid123\",\n    \"content\":\"valid123\",\n    \"shortDescription\":\"length_101123123123123\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{BLOGGER_URL}}/blogs/6463685ee3611064e1eb3106/posts/646368bce3611064e1eb3110",
+									"host": [
+										"{{BLOGGER_URL}}"
+									],
+									"path": [
+										"blogs",
+										"6463685ee3611064e1eb3106",
+										"posts",
+										"646368bce3611064e1eb3110"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "POSTS -- DELETE",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{BLOGGER_URL}}/blogs/6463685ee3611064e1eb3106/posts/646368bce3611064e1eb3110",
+									"host": [
+										"{{BLOGGER_URL}}"
+									],
+									"path": [
+										"blogs",
+										"6463685ee3611064e1eb3106",
+										"posts",
+										"646368bce3611064e1eb3110"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "SUPERADMIN",
+			"item": [
+				{
+					"name": "BLOGS",
+					"item": [
+						{
+							"name": "BLOGS -- GET ALL",
+							"request": {
+								"auth": {
+									"type": "basic",
+									"basic": [
+										{
+											"key": "password",
+											"value": "qwerty",
+											"type": "string"
+										},
+										{
+											"key": "username",
+											"value": "admin",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{SA_URL}}/blogs/",
+									"host": [
+										"{{SA_URL}}"
+									],
+									"path": [
+										"blogs",
+										""
+									],
+									"query": [
+										{
+											"key": "searchNameTerm",
+											"value": "05",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "BLOGS -- BIND OWNER",
+							"request": {
+								"auth": {
+									"type": "basic",
+									"basic": [
+										{
+											"key": "password",
+											"value": "qwerty",
+											"type": "string"
+										},
+										{
+											"key": "username",
+											"value": "admin",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"url": {
+									"raw": "{{SA_URL}}/blogs/646c8a494c1c2a87674eeda5/bind-with-user/646c8a574c1c2a87674eedab",
+									"host": [
+										"{{SA_URL}}"
+									],
+									"path": [
+										"blogs",
+										"646c8a494c1c2a87674eeda5",
+										"bind-with-user",
+										"646c8a574c1c2a87674eedab"
+									],
+									"query": [
+										{
+											"key": "searchNameTerm",
+											"value": "05",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "USERS",
+					"item": [
+						{
+							"name": "USERS -- GET ALL",
+							"request": {
+								"auth": {
+									"type": "basic",
+									"basic": [
+										{
+											"key": "password",
+											"value": "qwerty",
+											"type": "string"
+										},
+										{
+											"key": "username",
+											"value": "admin",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{SA_URL}}/users",
+									"host": [
+										"{{SA_URL}}"
+									],
+									"path": [
+										"users"
+									],
+									"query": [
+										{
+											"key": "searchNameTerm",
+											"value": "v",
+											"disabled": true
+										},
+										{
+											"key": "sortBy",
+											"value": "login",
+											"disabled": true
+										},
+										{
+											"key": "sortDirection",
+											"value": "aswefwef",
+											"disabled": true
+										},
+										{
+											"key": "pageSize",
+											"value": "5",
+											"disabled": true
+										},
+										{
+											"key": "searchLoginTerm",
+											"value": "5",
+											"disabled": true
+										},
+										{
+											"key": "searchEmailTerm",
+											"value": "addr9",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "USERS -- CREATE",
+							"request": {
+								"auth": {
+									"type": "basic",
+									"basic": [
+										{
+											"key": "username",
+											"value": "admin",
+											"type": "string"
+										},
+										{
+											"key": "password",
+											"value": "qwerty",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"login\": \"login01\",\n  \"password\": \"qwerty\",\n  \"email\": \"login01@test.com\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{SA_URL}}/users",
+									"host": [
+										"{{SA_URL}}"
+									],
+									"path": [
+										"users"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "USERS -- DELETE",
+							"request": {
+								"auth": {
+									"type": "basic",
+									"basic": [
+										{
+											"key": "username",
+											"value": "admin",
+											"type": "string"
+										},
+										{
+											"key": "password",
+											"value": "qwerty",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{SA_URL}}/users/646386e08d01b4a7aea5b6a5",
+									"host": [
+										"{{SA_URL}}"
+									],
+									"path": [
+										"users",
+										"646386e08d01b4a7aea5b6a5"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "USERS -- BAN",
+							"request": {
+								"auth": {
+									"type": "basic",
+									"basic": [
+										{
+											"key": "password",
+											"value": "qwerty",
+											"type": "string"
+										},
+										{
+											"key": "username",
+											"value": "admin",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"isBanned\": false,\n  \"banReason\": \"This is a test ban reason\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{SA_URL}}/users/64673253e2df0688b7ed88aa/ban",
+									"host": [
+										"{{SA_URL}}"
+									],
+									"path": [
+										"users",
+										"64673253e2df0688b7ed88aa",
+										"ban"
+									],
+									"query": [
+										{
+											"key": "searchNameTerm",
+											"value": "v",
+											"disabled": true
+										},
+										{
+											"key": "sortBy",
+											"value": "login",
+											"disabled": true
+										},
+										{
+											"key": "sortDirection",
+											"value": "aswefwef",
+											"disabled": true
+										},
+										{
+											"key": "pageSize",
+											"value": "5",
+											"disabled": true
+										},
+										{
+											"key": "searchLoginTerm",
+											"value": "5",
+											"disabled": true
+										},
+										{
+											"key": "searchEmailTerm",
+											"value": "addr9",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		}
+	]
+}
