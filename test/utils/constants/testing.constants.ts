@@ -1,2 +1,3 @@
 // Testing URI
-export const testingURI = '/testing/all-data/';
+
+export const testingAllDataURI = '/testing/all-data/';

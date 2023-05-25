@@ -8,7 +8,7 @@ import { useContainer } from 'class-validator';
 import { AppModule } from '../../src/app.module';
 import { customExceptionFactory } from '../../src/exceptions/exception.factory';
 import { HttpExceptionFilter } from '../../src/exceptions/exception.filter';
-import { testingURI } from '../utils/constants/testing.constants';
+import { testingAllDataURI } from '../utils/constants/testing.constants';
 import {
   saUsersURI,
   user01Email,
@@ -20,7 +20,7 @@ import {
 import {
   basicAuthLogin,
   basicAuthPassword,
-  loginUri,
+  publicLoginUri,
 } from '../utils/constants/auth.constants';
 import {
   blog01Name,
@@ -67,7 +67,7 @@ describe('Super admin blogs testing', () => {
     await app.init();
     agent = supertest.agent(app.getHttpServer());
 
-    await agent.delete(testingURI);
+    await agent.delete(testingAllDataURI);
   });
 
   let blogId;
@@ -104,7 +104,7 @@ describe('Super admin blogs testing', () => {
   });
   it(`should log in user 01`, async () => {
     const response = await agent
-      .post(loginUri)
+      .post(publicLoginUri)
       .send({
         loginOrEmail: user01Login,
         password: userPassword,

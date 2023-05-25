@@ -3,7 +3,7 @@ import { Test } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
-import { testingURI } from '../utils/constants/testing.constants';
+import { testingAllDataURI } from '../utils/constants/testing.constants';
 import { customExceptionFactory } from '../../src/exceptions/exception.factory';
 import { HttpExceptionFilter } from '../../src/exceptions/exception.filter';
 import { AppModule } from '../../src/app.module';
@@ -47,7 +47,7 @@ describe('Users filtering, sorting, pagination', () => {
     await app.init();
     agent = supertest.agent(app.getHttpServer());
 
-    await agent.delete(testingURI);
+    await agent.delete(testingAllDataURI);
   });
 
   it(`should create 10 users`, async () => {

@@ -10,7 +10,7 @@ import {
   blogWebsite,
   publicBlogsURI,
 } from '../utils/constants/blogs.constants';
-import { testingURI } from '../utils/constants/testing.constants';
+import { testingAllDataURI } from '../utils/constants/testing.constants';
 import { customExceptionFactory } from '../../src/exceptions/exception.factory';
 import { HttpExceptionFilter } from '../../src/exceptions/exception.filter';
 import { AppModule } from '../../src/app.module';
@@ -30,7 +30,7 @@ import {
 import {
   basicAuthLogin,
   basicAuthPassword,
-  loginUri,
+  publicLoginUri,
 } from '../utils/constants/auth.constants';
 
 describe('Posts filtering, sorting, pagination', () => {
@@ -61,7 +61,7 @@ describe('Posts filtering, sorting, pagination', () => {
     await app.init();
     agent = supertest.agent(app.getHttpServer());
 
-    await agent.delete(testingURI);
+    await agent.delete(testingAllDataURI);
   });
 
   let aTokenUser01;
@@ -81,7 +81,7 @@ describe('Posts filtering, sorting, pagination', () => {
   });
   it(`should log in user`, async () => {
     const response = await agent
-      .post(loginUri)
+      .post(publicLoginUri)
       .send({
         loginOrEmail: user01Login,
         password: userPassword,

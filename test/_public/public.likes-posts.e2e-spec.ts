@@ -9,7 +9,7 @@ import {
   bloggerBlogsURI,
   blogWebsite,
 } from '../utils/constants/blogs.constants';
-import { testingURI } from '../utils/constants/testing.constants';
+import { testingAllDataURI } from '../utils/constants/testing.constants';
 import { customExceptionFactory } from '../../src/exceptions/exception.factory';
 import { HttpExceptionFilter } from '../../src/exceptions/exception.filter';
 import { AppModule } from '../../src/app.module';
@@ -28,7 +28,7 @@ import {
 import {
   basicAuthLogin,
   basicAuthPassword,
-  loginUri,
+  publicLoginUri,
 } from '../utils/constants/auth.constants';
 import { useContainer } from 'class-validator';
 import { randomUUID } from 'crypto';
@@ -71,7 +71,7 @@ describe('Public likes for posts testing', () => {
     await app.init();
     agent = supertest.agent(app.getHttpServer());
 
-    await agent.delete(testingURI);
+    await agent.delete(testingAllDataURI);
   });
 
   let blogId;
@@ -132,7 +132,7 @@ describe('Public likes for posts testing', () => {
     });
     it(`should log in user 01`, async () => {
       const response = await agent
-        .post(loginUri)
+        .post(publicLoginUri)
         .send({
           loginOrEmail: user01Login,
           password: userPassword,
@@ -142,7 +142,7 @@ describe('Public likes for posts testing', () => {
     });
     it(`should log in user 02`, async () => {
       const response = await agent
-        .post(loginUri)
+        .post(publicLoginUri)
         .send({
           loginOrEmail: user02Login,
           password: userPassword,
@@ -152,7 +152,7 @@ describe('Public likes for posts testing', () => {
     });
     it(`should log in user 03`, async () => {
       const response = await agent
-        .post(loginUri)
+        .post(publicLoginUri)
         .send({
           loginOrEmail: user03Login,
           password: userPassword,
@@ -162,7 +162,7 @@ describe('Public likes for posts testing', () => {
     });
     it(`should log in user 04`, async () => {
       const response = await agent
-        .post(loginUri)
+        .post(publicLoginUri)
         .send({
           loginOrEmail: user04Login,
           password: userPassword,

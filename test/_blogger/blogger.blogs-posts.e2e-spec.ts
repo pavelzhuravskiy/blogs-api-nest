@@ -14,7 +14,7 @@ import {
   publicBlogsURI,
   blog02Name,
 } from '../utils/constants/blogs.constants';
-import { testingURI } from '../utils/constants/testing.constants';
+import { testingAllDataURI } from '../utils/constants/testing.constants';
 import {
   invalidURI,
   longString1013,
@@ -46,7 +46,7 @@ import {
 import {
   basicAuthLogin,
   basicAuthPassword,
-  loginUri,
+  publicLoginUri,
 } from '../utils/constants/auth.constants';
 import { useContainer } from 'class-validator';
 import { randomUUID } from 'crypto';
@@ -94,7 +94,7 @@ describe('Blogger blogs and posts testing', () => {
     await app.init();
     agent = supertest.agent(app.getHttpServer());
 
-    await agent.delete(testingURI);
+    await agent.delete(testingAllDataURI);
   });
 
   let blog01Id;
@@ -129,7 +129,7 @@ describe('Blogger blogs and posts testing', () => {
     });
     it(`should log in user 01`, async () => {
       const response = await agent
-        .post(loginUri)
+        .post(publicLoginUri)
         .send({
           loginOrEmail: user01Login,
           password: userPassword,
@@ -139,7 +139,7 @@ describe('Blogger blogs and posts testing', () => {
     });
     it(`should log in user 02`, async () => {
       const response = await agent
-        .post(loginUri)
+        .post(publicLoginUri)
         .send({
           loginOrEmail: user02Login,
           password: userPassword,
