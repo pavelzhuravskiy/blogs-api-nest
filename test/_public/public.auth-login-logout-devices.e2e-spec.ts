@@ -18,15 +18,18 @@ import {
 import {
   basicAuthLogin,
   basicAuthPassword,
+  publicDevicesURI,
   publicLoginUri,
   publicLogoutUri,
+  publicMeURI,
+  publicRefreshTokenURI,
 } from '../utils/constants/auth.constants';
 import { useContainer } from 'class-validator';
 import { randomUUID } from 'crypto';
-import { publicDevicesURI } from '../utils/constants/devices.constants';
 import cookieParser from 'cookie-parser';
-import { deviceObject } from '../utils/objects/devices.objects';
+import { deviceObject, userProfileObject } from '../utils/objects/auth.objects';
 import { invalidURI } from '../utils/constants/common.constants';
+import { sleep } from '../utils/functions/sleep';
 
 describe('Public login, logout, devices testing', () => {
   let app: INestApplication;
@@ -142,6 +145,54 @@ describe('Public login, logout, devices testing', () => {
         .expect(200);
 
       rTokenUser02 = response.headers['set-cookie'][0];
+    });
+  });
+  describe('Update tokens', () => {
+    // Auth errors [401]
+    it(`should return 401 when trying to update tokens with incorrect refresh token`, async () => {
+      await agent
+        .post(publicRefreshTokenURI)
+        .set('Cookie', randomUUID())
+        .expect(401);
+    });
+
+    // Success
+    it(`should update tokens and return 401 when trying to update tokens one more time with old refresh token`, async () => {
+      await sleep(1000);
+      const response = await agent
+        .post(publicRefreshTokenURI)
+        .set('Cookie', rTokenUser01)
+        .expect(200);
+
+      expect(rTokenUser01).not.toBe(response.headers['set-cookie'][0]);
+      expect(aTokenUser01).not.toBe(response.body.accessToken);
+
+      // Trying to update tokens with revoked refresh token, expect 401
+      await agent
+        .post(publicRefreshTokenURI)
+        .set('Cookie', rTokenUser01)
+        .expect(401);
+
+      rTokenUser01 = response.headers['set-cookie'][0];
+      aTokenUser01 = response.body.accessToken;
+    });
+  });
+  describe('Get user profile', () => {
+    // Auth errors [401]
+    it(`should return 401 when trying to get profile with incorrect access token`, async () => {
+      await agent
+        .get(publicMeURI)
+        .auth(randomUUID(), { type: 'bearer' })
+        .expect(401);
+    });
+
+    // Success
+    it(`should return current user profile`, async () => {
+      const userProfile = await agent
+        .get(publicMeURI)
+        .auth(aTokenUser01, { type: 'bearer' })
+        .expect(200);
+      expect(userProfile.body).toEqual(userProfileObject);
     });
   });
   describe('Get devices', () => {
