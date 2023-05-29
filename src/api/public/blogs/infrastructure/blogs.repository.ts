@@ -50,7 +50,7 @@ export class BlogsRepository {
   async findUserIdInBannedBlog(blogId: string, userId: string): Promise<any> {
     const user = await this.BlogModel.findOne({
       _id: blogId,
-      bannedUsers: userId,
+      'bannedUsers.id': userId,
     });
 
     if (!user) {
@@ -63,12 +63,22 @@ export class BlogsRepository {
   async pushUserInBannedUsersArray(
     blogId: string,
     userId: string,
+    userLogin: string,
+    banReason: string,
   ): Promise<boolean> {
     const result = await this.BlogModel.updateOne(
       { _id: blogId },
       {
         $push: {
-          bannedUsers: userId,
+          bannedUsers: {
+            id: userId,
+            login: userLogin,
+            banInfo: {
+              isBanned: true,
+              banDate: new Date(),
+              banReason: banReason,
+            },
+          },
         },
       },
     );
@@ -83,7 +93,9 @@ export class BlogsRepository {
       { _id: blogId },
       {
         $pull: {
-          bannedUsers: userId,
+          bannedUsers: {
+            id: userId,
+          },
         },
       },
     );

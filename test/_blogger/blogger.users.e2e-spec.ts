@@ -39,8 +39,9 @@ import {
   blogIDField,
   userIDField,
 } from '../../src/exceptions/exception.constants';
+import { bannedUserInBlogObject } from '../utils/objects/users.objects';
 
-describe('Blogger users testing', () => {
+describe('Blogger users ban testing', () => {
   let app: INestApplication;
   let agent: SuperAgentTest;
   let blogsRepository: BlogsRepository;
@@ -211,7 +212,7 @@ describe('Blogger users testing', () => {
     });
 
     // Success
-    it(`should add banned user ID in blog's banned users array`, async () => {
+    it(`should add banned user object in blog's banned users array`, async () => {
       await agent
         .put(bloggerUsersURI + userId + userBanURI)
         .auth(aTokenUser01, { type: 'bearer' })
@@ -223,7 +224,7 @@ describe('Blogger users testing', () => {
         .expect(204);
 
       blog = await blogsRepository.findBlog(blogId);
-      expect(blog.bannedUsers[0]).toBe(userId);
+      expect(blog.bannedUsers[0]).toEqual(bannedUserInBlogObject);
     });
 
     // Validation errors [400]
@@ -271,7 +272,7 @@ describe('Blogger users testing', () => {
         })
         .expect(400);
 
-      // expect(response.body).toEqual(exceptionObject(userIDField));
+      expect(response.body).toEqual(exceptionObject(userIDField));
     });
   });
 

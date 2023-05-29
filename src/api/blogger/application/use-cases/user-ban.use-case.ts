@@ -80,6 +80,8 @@ export class BloggerUserBanUseCase
       await this.blogsRepository.pushUserInBannedUsersArray(
         blog.id,
         command.userId,
+        user.accountData.login,
+        command.bloggerUserBanInputDto.banReason,
       );
     } else {
       if (!isAlreadyBanned) {

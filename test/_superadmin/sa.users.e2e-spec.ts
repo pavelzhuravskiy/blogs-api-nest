@@ -59,6 +59,7 @@ import {
 } from '../utils/constants/comments.constants';
 import { publicLikesURI } from '../utils/constants/likes.constants';
 import { LikeStatus } from '../../src/enums/like-status.enum';
+import { userObject } from '../utils/objects/users.objects';
 
 describe('Super admin users testing', () => {
   let app: INestApplication;
@@ -232,6 +233,8 @@ describe('Super admin users testing', () => {
           email: user01Email,
         })
         .expect(201);
+
+      expect(user01.body).toEqual(userObject);
 
       user01Id = user01.body.id;
 

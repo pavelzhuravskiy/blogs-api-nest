@@ -3,6 +3,7 @@ import { HydratedDocument, Model, Types } from 'mongoose';
 import { BlogInputDto } from '../../blogger/dto/blog.input.dto';
 import { UserDocument } from '../../superadmin/users/user.entity';
 import { BlogOwnerSchema } from './dto/schemas/blog-owner.schema';
+import { BlogBannedUsersSchema } from './dto/schemas/blog-banned-users.schema';
 
 export type BlogDocument = HydratedDocument<Blog>;
 export type BlogLeanType = Blog & { _id: Types.ObjectId };
@@ -38,7 +39,7 @@ export class Blog {
   blogOwnerInfo: BlogOwnerSchema;
 
   @Prop({ default: [] })
-  bannedUsers: [string];
+  bannedUsers: [BlogBannedUsersSchema];
 
   updateBlog(updateBlogDto) {
     this.name = updateBlogDto.name;
