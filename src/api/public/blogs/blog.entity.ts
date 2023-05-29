@@ -37,6 +37,9 @@ export class Blog {
   @Prop({ required: true })
   blogOwnerInfo: BlogOwnerSchema;
 
+  @Prop({ default: [] })
+  bannedUsers: [string];
+
   updateBlog(updateBlogDto) {
     this.name = updateBlogDto.name;
     this.description = updateBlogDto.description;
@@ -64,6 +67,7 @@ export class Blog {
         userLogin: user.accountData.login,
         isBanned: false,
       },
+      bannedUsers: [],
     };
     return new BlogModel(blog);
   }

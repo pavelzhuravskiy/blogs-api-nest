@@ -6,7 +6,7 @@ import { UserPasswordSchema } from './schemas/user-password.schema';
 import { UserInputDto } from './dto/user-input.dto';
 import { add } from 'date-fns';
 import { UserBanSchema } from './schemas/user-ban.schema';
-import { UserBanInputDto } from './dto/user-ban.input.dto';
+import { SAUserBanInputDto } from './dto/user-ban.input.dto';
 
 export type UserDocument = HydratedDocument<User>;
 export type UserLeanType = User & { _id: Types.ObjectId };
@@ -77,13 +77,13 @@ export class User {
     this.passwordRecovery.expirationDate = null;
   }
 
-  banUser(userBanInputDto: UserBanInputDto) {
+  saBanUser(saUserBanInputDto: SAUserBanInputDto) {
     this.banInfo.isBanned = true;
     this.banInfo.banDate = new Date();
-    this.banInfo.banReason = userBanInputDto.banReason;
+    this.banInfo.banReason = saUserBanInputDto.banReason;
   }
 
-  unbanUser() {
+  saUnbanUser() {
     this.banInfo.isBanned = false;
     this.banInfo.banDate = null;
     this.banInfo.banReason = null;
@@ -131,8 +131,8 @@ UserSchema.methods = {
   updatePasswordRecoveryData: User.prototype.updatePasswordRecoveryData,
   passwordCanBeUpdated: User.prototype.passwordCanBeUpdated,
   updatePassword: User.prototype.updatePassword,
-  banUser: User.prototype.banUser,
-  unbanUser: User.prototype.unbanUser,
+  saBanUser: User.prototype.saBanUser,
+  saUnbanUser: User.prototype.saUnbanUser,
 };
 
 const userStaticMethods: UserModelStaticType = {

@@ -42,10 +42,13 @@ import { CommentUpdateUseCase } from '../../api/public/comments/application/use-
 import { CommentDeleteUseCase } from '../../api/public/comments/application/use-cases/comment-delete.use-case';
 import { LikeUpdateForPostUseCase } from '../../api/public/likes/application/use-cases/like-update-for-post-use.case';
 import { LikeUpdateForCommentUseCase } from '../../api/public/likes/application/use-cases/like-update-for-comment-use.case';
+import { BloggerUserBanUseCase } from '../../api/blogger/application/use-cases/user-ban.use-case';
+import { BloggerUsersController } from '../../api/blogger/blogger.users.controller';
 
 const controllers = [
   SuperAdminBlogsController,
   BloggerBlogsController,
+  BloggerUsersController,
   PublicBlogsController,
   PublicPostsController,
   PublicCommentsController,
@@ -66,6 +69,7 @@ const useCases = [
   CommentDeleteUseCase,
   LikeUpdateForPostUseCase,
   LikeUpdateForCommentUseCase,
+  BloggerUserBanUseCase,
 ];
 
 const repositories = [

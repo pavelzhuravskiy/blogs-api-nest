@@ -1,6 +1,6 @@
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UsersRepository } from '../../infrastructure/users.repository';
-import { UserBanInputDto } from '../../dto/user-ban.input.dto';
+import { SAUserBanInputDto } from '../../dto/user-ban.input.dto';
 import { ResultCode } from '../../../../../enums/result-code.enum';
 import {
   userIDField,
@@ -21,12 +21,15 @@ import {
   CommentModelType,
 } from '../../../../public/comments/comment.entity';
 
-export class UserBanCommand {
-  constructor(public userBanInputDto: UserBanInputDto, public userId: string) {}
+export class SAUserBanCommand {
+  constructor(
+    public saUserBanInputDto: SAUserBanInputDto,
+    public userId: string,
+  ) {}
 }
 
-@CommandHandler(UserBanCommand)
-export class UserBanUseCase implements ICommandHandler<UserBanCommand> {
+@CommandHandler(SAUserBanCommand)
+export class UserBanUseCase implements ICommandHandler<SAUserBanCommand> {
   constructor(
     private commandBus: CommandBus,
     @InjectModel(Post.name)
@@ -41,7 +44,7 @@ export class UserBanUseCase implements ICommandHandler<UserBanCommand> {
   ) {}
 
   async execute(
-    command: UserBanCommand,
+    command: SAUserBanCommand,
   ): Promise<ExceptionResultType<boolean>> {
     const user = await this.usersRepository.findUserById(command.userId);
 
@@ -56,7 +59,7 @@ export class UserBanUseCase implements ICommandHandler<UserBanCommand> {
 
     const banDBStatus = user.banInfo.isBanned;
 
-    if (banDBStatus && command.userBanInputDto.isBanned) {
+    if (banDBStatus && command.saUserBanInputDto.isBanned) {
       return {
         data: false,
         code: ResultCode.BadRequest,
@@ -65,7 +68,7 @@ export class UserBanUseCase implements ICommandHandler<UserBanCommand> {
       };
     }
 
-    if (!banDBStatus && !command.userBanInputDto.isBanned) {
+    if (!banDBStatus && !command.saUserBanInputDto.isBanned) {
       return {
         data: false,
         code: ResultCode.BadRequest,
@@ -75,7 +78,7 @@ export class UserBanUseCase implements ICommandHandler<UserBanCommand> {
     }
 
     if (!banDBStatus) {
-      user.banUser(command.userBanInputDto);
+      user.saBanUser(command.saUserBanInputDto);
 
       await this.commandBus.execute(
         new DevicesDeleteForUserBanCommand(command.userId),
@@ -95,7 +98,7 @@ export class UserBanUseCase implements ICommandHandler<UserBanCommand> {
         this.CommentModel,
       );
     } else {
-      user.unbanUser();
+      user.saUnbanUser();
       await this.blogsRepository.setBlogsBanStatus(command.userId, false);
       await this.postsRepository.setPostsBanStatus(command.userId, false);
       await this.commentsRepository.setCommentsBanStatus(command.userId, false);

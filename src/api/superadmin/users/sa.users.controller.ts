@@ -23,8 +23,8 @@ import {
   userIDField,
   userNotFound,
 } from '../../../exceptions/exception.constants';
-import { UserBanInputDto } from './dto/user-ban.input.dto';
-import { UserBanCommand } from './application/use-cases/user-ban.use-case';
+import { SAUserBanInputDto } from './dto/user-ban.input.dto';
+import { SAUserBanCommand } from './application/use-cases/user-ban.use-case';
 
 @Controller('sa/users')
 export class SuperAdminUsersController {
@@ -65,9 +65,12 @@ export class SuperAdminUsersController {
   @UseGuards(BasicAuthGuard)
   @Put(':id/ban')
   @HttpCode(204)
-  async banUser(@Body() userBanInputDto: UserBanInputDto, @Param('id') userId) {
+  async banUser(
+    @Body() saUserBanInputDto: SAUserBanInputDto,
+    @Param('id') userId,
+  ) {
     const result = await this.commandBus.execute(
-      new UserBanCommand(userBanInputDto, userId),
+      new SAUserBanCommand(saUserBanInputDto, userId),
     );
 
     if (result.code !== ResultCode.Success) {

@@ -73,8 +73,4 @@ export class UsersRepository {
     const user = await this.UserModel.deleteOne({ _id: id });
     return user.deletedCount === 1;
   }
-
-  async findNotBannedUsersIDs(): Promise<UserDocument[]> {
-    return this.UserModel.find({ 'banInfo.isBanned': false }, { _id: 1 });
-  }
 }

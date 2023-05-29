@@ -46,4 +46,47 @@ export class BlogsRepository {
     );
     return result.acknowledged === true;
   }
+
+  async findUserIdInBannedBlog(blogId: string, userId: string): Promise<any> {
+    const user = await this.BlogModel.findOne({
+      _id: blogId,
+      bannedUsers: userId,
+    });
+
+    if (!user) {
+      return null;
+    }
+
+    return user;
+  }
+
+  async pushUserInBannedUsersArray(
+    blogId: string,
+    userId: string,
+  ): Promise<boolean> {
+    const result = await this.BlogModel.updateOne(
+      { _id: blogId },
+      {
+        $push: {
+          bannedUsers: userId,
+        },
+      },
+    );
+    return result.matchedCount === 1;
+  }
+
+  async pullUserFromBannedUsersArray(
+    blogId: string,
+    userId: string,
+  ): Promise<boolean> {
+    const result = await this.BlogModel.updateOne(
+      { _id: blogId },
+      {
+        $pull: {
+          bannedUsers: userId,
+        },
+      },
+    );
+    return result.matchedCount === 1;
+  }
 }

@@ -1,6 +1,6 @@
 import { IsBoolean, MinLength } from 'class-validator';
 
-export class UserBanInputDto {
+export class SAUserBanInputDto {
   @IsBoolean()
   isBanned: boolean;
 

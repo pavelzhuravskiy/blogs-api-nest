@@ -298,3 +298,5 @@ describe('Public login, logout, devices testing', () => {
     await app.close();
   });
 });
+
+// To test emails use .overrideProvider(SendRegistrationMailUseCase).useValue().compile(); in moduleRef
