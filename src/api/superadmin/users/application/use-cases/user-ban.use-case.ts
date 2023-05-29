@@ -4,8 +4,8 @@ import { SAUserBanInputDto } from '../../dto/user-ban.input.dto';
 import { ResultCode } from '../../../../../enums/result-code.enum';
 import {
   userIDField,
-  userIsBanned,
-  userIsUnbanned,
+  userIsAlreadyBanned,
+  userIsAlreadyUnbanned,
   userNotFound,
 } from '../../../../../exceptions/exception.constants';
 import { ExceptionResultType } from '../../../../../exceptions/types/exception-result.type';
@@ -64,7 +64,7 @@ export class UserBanUseCase implements ICommandHandler<SAUserBanCommand> {
         data: false,
         code: ResultCode.BadRequest,
         field: userIDField,
-        message: userIsBanned,
+        message: userIsAlreadyBanned,
       };
     }
 
@@ -73,7 +73,7 @@ export class UserBanUseCase implements ICommandHandler<SAUserBanCommand> {
         data: false,
         code: ResultCode.BadRequest,
         field: userIDField,
-        message: userIsUnbanned,
+        message: userIsAlreadyUnbanned,
       };
     }
 

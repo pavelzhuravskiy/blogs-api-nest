@@ -11,8 +11,10 @@ import {
   postIDField,
   postNotFound,
   userIDField,
+  userIsBanned,
   userNotFound,
 } from '../../../../../exceptions/exception.constants';
+import { BlogsRepository } from '../../../blogs/infrastructure/blogs.repository';
 
 export class CommentCreateCommand {
   constructor(
@@ -32,6 +34,7 @@ export class CommentCreateUseCase
     private readonly commentsRepository: CommentsRepository,
     private readonly postsRepository: PostsRepository,
     private readonly usersRepository: UsersRepository,
+    private readonly blogsRepository: BlogsRepository,
   ) {}
 
   async execute(
@@ -56,6 +59,20 @@ export class CommentCreateUseCase
         code: ResultCode.NotFound,
         field: userIDField,
         message: userNotFound,
+      };
+    }
+
+    const isUserBannedByBlogger =
+      await this.blogsRepository.findBannedUserInBlog(
+        post.blogInfo.blogId,
+        user.id,
+      );
+
+    if (isUserBannedByBlogger) {
+      return {
+        data: false,
+        code: ResultCode.Unauthorized,
+        message: userIsBanned,
       };
     }
 

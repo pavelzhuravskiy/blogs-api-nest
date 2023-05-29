@@ -30,5 +30,6 @@ export const userNotFoundOrConfirmed =
 export const blogIsBound = 'Blog is already bound';
 
 // Ban
-export const userIsBanned = 'User is already banned';
-export const userIsUnbanned = 'User is already unbanned';
+export const userIsBanned = 'User is banned';
+export const userIsAlreadyBanned = 'User is already banned';
+export const userIsAlreadyUnbanned = 'User is already unbanned';

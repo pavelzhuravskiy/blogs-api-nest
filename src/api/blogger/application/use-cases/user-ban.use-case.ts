@@ -1,23 +1,14 @@
-import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UsersRepository } from '../../../superadmin/users/infrastructure/users.repository';
 import { ResultCode } from '../../../../enums/result-code.enum';
 import {
   userIDField,
-  userIsBanned,
-  userIsUnbanned,
+  userIsAlreadyBanned,
+  userIsAlreadyUnbanned,
   userNotFound,
 } from '../../../../exceptions/exception.constants';
 import { ExceptionResultType } from '../../../../exceptions/types/exception-result.type';
-import { PostsRepository } from '../../../public/posts/infrastructure/posts.repository';
 import { BlogsRepository } from '../../../public/blogs/infrastructure/blogs.repository';
-import { CommentsRepository } from '../../../public/comments/infrastructure/comments.repository';
-import { LikesRepository } from '../../../public/likes/infrastructure/likes.repository';
-import { InjectModel } from '@nestjs/mongoose';
-import { Post, PostModelType } from '../../../public/posts/post.entity';
-import {
-  Comment,
-  CommentModelType,
-} from '../../../public/comments/comment.entity';
 import { BloggerUserBanInputDto } from '../../dto/user-ban.input.dto';
 
 export class BloggerUserBanCommand {
@@ -32,16 +23,8 @@ export class BloggerUserBanUseCase
   implements ICommandHandler<BloggerUserBanCommand>
 {
   constructor(
-    private commandBus: CommandBus,
-    @InjectModel(Post.name)
-    private PostModel: PostModelType,
-    @InjectModel(Comment.name)
-    private CommentModel: CommentModelType,
     private readonly usersRepository: UsersRepository,
     private readonly blogsRepository: BlogsRepository,
-    private readonly postsRepository: PostsRepository,
-    private readonly commentsRepository: CommentsRepository,
-    private readonly likesRepository: LikesRepository,
   ) {}
 
   async execute(
@@ -62,7 +45,7 @@ export class BloggerUserBanUseCase
       command.bloggerUserBanInputDto.blogId,
     );
 
-    const isAlreadyBanned = await this.blogsRepository.findUserIdInBannedBlog(
+    const isAlreadyBanned = await this.blogsRepository.findBannedUserInBlog(
       blog.id,
       command.userId,
     );
@@ -73,7 +56,7 @@ export class BloggerUserBanUseCase
           data: false,
           code: ResultCode.BadRequest,
           field: userIDField,
-          message: userIsBanned,
+          message: userIsAlreadyBanned,
         };
       }
 
@@ -89,7 +72,7 @@ export class BloggerUserBanUseCase
           data: false,
           code: ResultCode.BadRequest,
           field: userIDField,
-          message: userIsUnbanned,
+          message: userIsAlreadyUnbanned,
         };
       }
 

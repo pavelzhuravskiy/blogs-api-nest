@@ -40,6 +40,17 @@ import {
   userIDField,
 } from '../../src/exceptions/exception.constants';
 import { bannedUserInBlogObject } from '../utils/objects/users.objects';
+import {
+  postContent,
+  postShortDescription,
+  postTitle,
+  publicPostsURI,
+} from '../utils/constants/posts.constants';
+import { postObject } from '../utils/objects/posts.objects';
+import {
+  commentContent,
+  publicCommentsURI,
+} from '../utils/constants/comments.constants';
 
 describe('Blogger users ban testing', () => {
   let app: INestApplication;
@@ -79,6 +90,8 @@ describe('Blogger users ban testing', () => {
   let blogId;
   let blog;
 
+  let postId;
+
   let aTokenUser01;
 
   describe('Users creation and authentication', () => {
@@ -105,8 +118,7 @@ describe('Blogger users ban testing', () => {
       aTokenUser01 = response.body.accessToken;
     });
   });
-
-  describe('Ban user', () => {
+  describe('Blog, post and comment creation', () => {
     it(`should create blog`, async () => {
       const blog = await agent
         .post(bloggerBlogsURI)
@@ -119,7 +131,41 @@ describe('Blogger users ban testing', () => {
         .expect(201);
       blogId = blog.body.id;
     });
+    it(`should create post`, async () => {
+      await agent
+        .post(bloggerBlogsURI + blogId + publicPostsURI)
+        .auth(aTokenUser01, { type: 'bearer' })
+        .send({
+          title: postTitle,
+          shortDescription: postShortDescription,
+          content: postContent,
+        })
+        .expect(201);
 
+      const posts = await agent.get(publicPostsURI).expect(200);
+
+      postId = posts.body.items[0].id;
+
+      expect(posts.body).toEqual({
+        pagesCount: 1,
+        page: 1,
+        pageSize: 10,
+        totalCount: 1,
+        items: [postObject],
+      });
+    });
+    it(`should create comment`, async () => {
+      await agent
+        .post(publicPostsURI + postId + publicCommentsURI)
+        .auth(aTokenUser01, { type: 'bearer' })
+        .send({
+          content: commentContent,
+        })
+        .expect(201);
+    });
+  });
+
+  describe('Ban user', () => {
     // Validation errors [400]
     it(`should return 400 when trying to ban user without isBanned`, async () => {
       const response = await agent
@@ -242,6 +288,17 @@ describe('Blogger users ban testing', () => {
       expect(response.body).toEqual(exceptionObject(userIDField));
       expect(blog.bannedUsers).toHaveLength(1);
     });
+
+    // Auth errors [401]
+    it(`should return 401 when trying to create comment by banned user`, async () => {
+      await agent
+        .post(publicPostsURI + postId + publicCommentsURI)
+        .auth(aTokenUser01, { type: 'bearer' })
+        .send({
+          content: commentContent,
+        })
+        .expect(401);
+    });
   });
   describe('Unban user', () => {
     // Success
@@ -258,6 +315,15 @@ describe('Blogger users ban testing', () => {
 
       blog = await blogsRepository.findBlog(blogId);
       expect(blog.bannedUsers).toHaveLength(0);
+    });
+    it(`should create comment by unbanned user`, async () => {
+      await agent
+        .post(publicPostsURI + postId + publicCommentsURI)
+        .auth(aTokenUser01, { type: 'bearer' })
+        .send({
+          content: commentContent,
+        })
+        .expect(201);
     });
 
     // Validation errors [400]

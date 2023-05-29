@@ -47,7 +47,10 @@ export class BlogsRepository {
     return result.acknowledged === true;
   }
 
-  async findUserIdInBannedBlog(blogId: string, userId: string): Promise<any> {
+  async findBannedUserInBlog(
+    blogId: string,
+    userId: string,
+  ): Promise<BlogDocument | null> {
     const user = await this.BlogModel.findOne({
       _id: blogId,
       'bannedUsers.id': userId,

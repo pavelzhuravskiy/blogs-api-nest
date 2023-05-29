@@ -3,4 +3,5 @@ export enum ResultCode {
   BadRequest,
   NotFound,
   Forbidden,
+  Unauthorized,
 }
