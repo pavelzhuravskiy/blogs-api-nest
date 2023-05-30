@@ -36,6 +36,15 @@ export class BloggerUserBanUseCase
       };
     }
 
+    if (user.id !== command.userId) {
+      return {
+        data: false,
+        code: ResultCode.Forbidden,
+        field: userIDField,
+        message: userNotFound,
+      };
+    }
+
     const isAlreadyBanned = await this.usersRepository.findUserBanForBlog(
       command.userId,
       command.bloggerUserBanInputDto.blogId,

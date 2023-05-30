@@ -11,12 +11,14 @@ import { pFilterUsersSA } from '../../../helpers/pagination/pagination-filter-us
 import { BloggerUserBanQueryDto } from '../../dto/users/query/blogger/blogger.user-ban.query.dto';
 import { UsersBannedByBloggerViewDto } from '../../dto/users/view/blogger/blogger.user-ban.view.dto';
 import { pFilterUsersBannedByBlogger } from '../../../helpers/pagination/pagination-filter-users-banned-by-blogger';
+import { BlogsRepository } from '../blogs/blogs.repository';
 
 @Injectable()
 export class UsersQueryRepository {
   constructor(
     @InjectModel(User.name)
     private UserModel: UserModelType,
+    private readonly blogsRepository: BlogsRepository,
   ) {}
   async findUsersBySA(
     query: UserQueryDto,
@@ -53,6 +55,12 @@ export class UsersQueryRepository {
     query: BloggerUserBanQueryDto,
     blogId: string,
   ): Promise<Paginator<UsersBannedByBloggerViewDto[]>> {
+    const blog = await this.blogsRepository.findBlog(blogId);
+
+    if (!blog) {
+      return null;
+    }
+
     const users = await pFind(
       this.UserModel,
       query.pageNumber,

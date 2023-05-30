@@ -17,6 +17,10 @@ import { BloggerUserBanCommand } from './application/use-cases/user-ban.use-case
 import { BlogsQueryRepository } from '../infrastructure/blogs/blogs.query.repository';
 import { BloggerUserBanQueryDto } from '../dto/users/query/blogger/blogger.user-ban.query.dto';
 import { UsersQueryRepository } from '../infrastructure/users/users.query.repository';
+import {
+  blogIDField,
+  blogNotFound,
+} from '../../exceptions/exception.constants';
 
 @Controller('blogger/users')
 export class BloggerUsersController {
@@ -47,6 +51,15 @@ export class BloggerUsersController {
   @UseGuards(JwtBearerGuard)
   @Get('blog/:id')
   async findUsers(@Query() query: BloggerUserBanQueryDto, @Param('id') blogId) {
-    return this.usersQueryRepository.findUsersBannedByBlogger(query, blogId);
+    const result = await this.usersQueryRepository.findUsersBannedByBlogger(
+      query,
+      blogId,
+    );
+
+    if (!result) {
+      return exceptionHandler(ResultCode.NotFound, blogNotFound, blogIDField);
+    }
+
+    return result;
   }
 }
