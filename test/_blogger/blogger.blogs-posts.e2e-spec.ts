@@ -629,8 +629,6 @@ describe('Blogger blogs and posts testing', () => {
 
       const posts = await agent.get(publicPostsURI).expect(200);
 
-      console.log(posts.body.items);
-
       postId = posts.body.items[0].id;
 
       expect(posts.body).toEqual({

@@ -1,5 +1,6 @@
 // Comments URI
 export const publicCommentsURI = '/comments/';
+export const bloggerCommentsURI = 'comments/';
 
 // Comment creation strings
 export const commentContent = 'This is a test content';

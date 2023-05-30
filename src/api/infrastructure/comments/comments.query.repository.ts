@@ -16,6 +16,8 @@ import { likeStatusFinder } from '../../_public/likes/helpers/like-status-finder
 import { PostsRepository } from '../posts/posts.repository';
 import { likesCounter } from '../../_public/likes/helpers/likes-counter';
 import { LikeStatus } from '../../../enums/like-status.enum';
+import { pFilterCommentsForBlogger } from '../../../helpers/pagination/pagination-filter-comments-for-blogger';
+import { BloggerCommentViewDto } from '../../dto/comments/view/blogger/blogger.comment.view.dto';
 
 @Injectable()
 export class CommentsQueryRepository {
@@ -52,6 +54,30 @@ export class CommentsQueryRepository {
       pageSize: query.pageSize,
       totalCount: totalCount,
       items: await this.commentsMapping(comments, userId),
+    });
+  }
+
+  async findCommentsOfBloggersPosts(
+    query: QueryDto,
+    userId: string,
+  ): Promise<Paginator<BloggerCommentViewDto[]>> {
+    const comments = await pFind(
+      this.CommentModel,
+      query.pageNumber,
+      query.pageSize,
+      pFilterCommentsForBlogger(userId),
+      pSort(query.sortBy, query.sortDirection),
+    );
+
+    const totalCount = await this.CommentModel.countDocuments(
+      pFilterCommentsForBlogger(userId),
+    );
+
+    return Paginator.paginate({
+      pageNumber: query.pageNumber,
+      pageSize: query.pageSize,
+      totalCount: totalCount,
+      items: await this.commentsForBloggerMapping(comments),
     });
   }
 
@@ -115,5 +141,24 @@ export class CommentsQueryRepository {
         };
       }),
     );
+  }
+
+  private async commentsForBloggerMapping(
+    comments: CommentLeanType[],
+  ): Promise<BloggerCommentViewDto[]> {
+    return comments.map((c) => {
+      return {
+        id: c._id.toString(),
+        content: c.content,
+        commentatorInfo: c.commentatorInfo,
+        createdAt: c.createdAt,
+        postInfo: {
+          id: c.postInfo.id,
+          title: c.postInfo.title,
+          blogId: c.postInfo.blogId,
+          blogName: c.postInfo.blogName,
+        },
+      };
+    });
   }
 }

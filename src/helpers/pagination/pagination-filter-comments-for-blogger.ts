@@ -1,9 +1,12 @@
 import { FilterQuery } from 'mongoose';
 import { BlogDocument } from '../../api/entities/blog.entity';
 
-export const pFilterComments = (postId: string) => {
+export const pFilterCommentsForBlogger = (userId: string) => {
   const filter: FilterQuery<BlogDocument> = {
-    $and: [{ 'commentatorInfo.isBanned': false }, { 'postInfo.id': postId }],
+    $and: [
+      { 'commentatorInfo.isBanned': false },
+      { 'postInfo.blogOwnerId': userId },
+    ],
   };
 
   return filter;

@@ -5,6 +5,7 @@ import { LikesInfoSchema } from '../dto/likes/schemas/likes-info.schema';
 import { CommentInputDto } from '../dto/comments/input/comment.input.dto';
 import { PostDocument } from './post.entity';
 import { UserDocument } from './user.entity';
+import { PostInfoSchema } from '../dto/comments/schemas/post-info.schema';
 
 export type CommentDocument = HydratedDocument<Comment>;
 export type CommentLeanType = Comment & { _id: Types.ObjectId };
@@ -29,7 +30,7 @@ export class Comment {
   commentatorInfo: CommentatorInfoSchema;
 
   @Prop({ required: true })
-  postId: string;
+  postInfo: PostInfoSchema;
 
   @Prop({ required: true })
   createdAt: Date;
@@ -54,7 +55,13 @@ export class Comment {
         userLogin: user.accountData.login,
         isBanned: user.banInfo.isBanned,
       },
-      postId: post._id.toString(),
+      postInfo: {
+        id: post._id.toString(),
+        title: post.title,
+        blogId: post.blogInfo.blogId,
+        blogName: post.blogInfo.blogName,
+        blogOwnerId: post.blogInfo.blogOwnerId,
+      },
       createdAt: new Date(),
       likesInfo: {
         likesCount: 0,

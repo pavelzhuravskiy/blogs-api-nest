@@ -31,6 +31,8 @@ import { Role } from '../../enums/role.enum';
 import { PostUpdateCommand } from './application/use-cases/post-update.use-case';
 import { PostCreateCommand } from './application/use-cases/post-create.use-case';
 import { PostDeleteCommand } from './application/use-cases/post-delete.use-case';
+import { QueryDto } from '../dto/query.dto';
+import { CommentsQueryRepository } from '../infrastructure/comments/comments.query.repository';
 
 @Controller('blogger/blogs')
 export class BloggerBlogsController {
@@ -38,6 +40,7 @@ export class BloggerBlogsController {
     private commandBus: CommandBus,
     private readonly blogsQueryRepository: BlogsQueryRepository,
     private readonly postsQueryRepository: PostsQueryRepository,
+    private readonly commentsQueryRepository: CommentsQueryRepository,
   ) {}
 
   @UseGuards(JwtBearerGuard)
@@ -148,5 +151,14 @@ export class BloggerBlogsController {
     }
 
     return result;
+  }
+
+  @UseGuards(JwtBearerGuard)
+  @Get('comments')
+  async findComments(@Query() query: QueryDto, @UserIdFromGuard() userId) {
+    return this.commentsQueryRepository.findCommentsOfBloggersPosts(
+      query,
+      userId,
+    );
   }
 }
