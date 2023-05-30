@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Device, DeviceModelType } from '../../entities/device.entity';
-import { DeviceViewDto } from '../../dto/devices/device.view.dto';
+import { DeviceViewDto } from '../../dto/devices/view/device.view.dto';
 
 @Injectable()
 export class DevicesQueryRepository {

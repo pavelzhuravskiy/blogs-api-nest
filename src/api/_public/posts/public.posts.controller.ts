@@ -20,11 +20,11 @@ import {
 import { JwtBearerGuard } from '../../../auth/guards/jwt-bearer.guard';
 import { UserIdFromGuard } from '../../../auth/decorators/user-id-from-guard.decorator';
 import { UserIdFromHeaders } from '../../../auth/decorators/user-id-from-headers.decorator';
-import { CommentInputDto } from '../../dto/comments/comment.input.dto';
+import { CommentInputDto } from '../../dto/comments/input/comment.input.dto';
 import { CommentCreateCommand } from '../comments/application/use-cases/comment-create.use-case';
 import { CommandBus } from '@nestjs/cqrs';
 import { CommentsQueryRepository } from '../../infrastructure/comments/comments.query.repository';
-import { LikeStatusInputDto } from '../../dto/likes/like-status.input.dto';
+import { LikeStatusInputDto } from '../../dto/likes/input/like-status.input.dto';
 import { LikeUpdateForPostCommand } from '../likes/application/use-cases/like-update-for-post-use.case';
 
 @Controller('posts')

@@ -1,4 +1,4 @@
-import { BlogInputDto } from '../../../dto/blogs/blog.input.dto';
+import { BlogInputDto } from '../../../dto/blogs/input/blog.input.dto';
 import { BlogsRepository } from '../../../infrastructure/blogs/blogs.repository';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { ExceptionResultType } from '../../../../exceptions/types/exception-result.type';

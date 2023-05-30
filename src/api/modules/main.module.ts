@@ -41,6 +41,7 @@ import { LikeUpdateForPostUseCase } from '../_public/likes/application/use-cases
 import { LikeUpdateForCommentUseCase } from '../_public/likes/application/use-cases/like-update-for-comment-use.case';
 import { BloggerUserBanUseCase } from '../_blogger/application/use-cases/user-ban.use-case';
 import { BloggerUsersController } from '../_blogger/blogger.users.controller';
+import { UsersQueryRepository } from '../infrastructure/users/users.query.repository';
 
 const controllers = [
   SuperAdminBlogsController,
@@ -81,6 +82,7 @@ const queryRepositories = [
   BlogsQueryRepository,
   PostsQueryRepository,
   CommentsQueryRepository,
+  UsersQueryRepository,
 ];
 
 @Module({

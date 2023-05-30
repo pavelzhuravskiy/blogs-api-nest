@@ -8,7 +8,7 @@ import {
   userNotFound,
 } from '../../../../exceptions/exception.constants';
 import { ExceptionResultType } from '../../../../exceptions/types/exception-result.type';
-import { BloggerUserBanInputDto } from '../../../dto/users/blogger.user-ban.input.dto';
+import { BloggerUserBanInputDto } from '../../../dto/users/input/blogger/blogger.user-ban.input.dto';
 
 export class BloggerUserBanCommand {
   constructor(

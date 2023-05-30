@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Model, Types } from 'mongoose';
 import { CommentatorInfoSchema } from '../dto/comments/schemas/commentator-info.schema';
 import { LikesInfoSchema } from '../dto/likes/schemas/likes-info.schema';
-import { CommentInputDto } from '../dto/comments/comment.input.dto';
+import { CommentInputDto } from '../dto/comments/input/comment.input.dto';
 import { PostDocument } from './post.entity';
 import { UserDocument } from './user.entity';
 

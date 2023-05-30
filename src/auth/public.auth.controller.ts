@@ -15,7 +15,7 @@ import { UsersRepository } from '../api/infrastructure/users/users.repository';
 import { UserIdFromGuard } from './decorators/user-id-from-guard.decorator';
 import { JwtService } from '@nestjs/jwt';
 import { JwtBearerGuard } from './guards/jwt-bearer.guard';
-import { UserInputDto } from '../api/dto/users/user-input.dto';
+import { UserInputDto } from '../api/dto/users/input/user-input.dto';
 import { ConfirmCodeInputDto } from './dto/confirm-code.input.dto';
 import { exceptionHandler } from '../exceptions/exception.handler';
 import { ResultCode } from '../enums/result-code.enum';

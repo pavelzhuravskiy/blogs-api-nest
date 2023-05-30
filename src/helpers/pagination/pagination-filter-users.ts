@@ -2,7 +2,7 @@ import { FilterQuery } from 'mongoose';
 import { BlogDocument } from '../../api/entities/blog.entity';
 import { BanStatus } from '../../enums/ban-status.enum';
 
-export const pFilterUsers = (
+export const pFilterUsersSA = (
   banStatus: string,
   login: string,
   email: string,

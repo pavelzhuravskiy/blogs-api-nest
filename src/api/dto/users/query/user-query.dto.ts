@@ -1,6 +1,6 @@
-import { QueryDto } from '../query.dto';
+import { QueryDto } from '../../query.dto';
 import { IsEnum, IsOptional } from 'class-validator';
-import { BanStatus } from '../../../enums/ban-status.enum';
+import { BanStatus } from '../../../../enums/ban-status.enum';
 
 export class UserQueryDto extends QueryDto {
   @IsOptional()

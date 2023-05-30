@@ -9,7 +9,7 @@ import {
   userIDField,
   userNotFound,
 } from '../../../../exceptions/exception.constants';
-import { PostInputDto } from '../../../dto/posts/post.input.dto';
+import { PostInputDto } from '../../../dto/posts/input/post.input.dto';
 import { Post, PostModelType } from '../../../entities/post.entity';
 import { PostsRepository } from '../../../infrastructure/posts/posts.repository';
 import { UsersRepository } from '../../../infrastructure/users/users.repository';

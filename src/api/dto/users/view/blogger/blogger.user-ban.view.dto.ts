@@ -1,4 +1,4 @@
-export class BannedUsersViewDto {
+export class UsersBannedByBloggerViewDto {
   id: string;
   login: string;
   banInfo: {

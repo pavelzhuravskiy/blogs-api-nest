@@ -8,7 +8,7 @@ import {
   postIDField,
   postNotFound,
 } from '../../../../exceptions/exception.constants';
-import { PostInputDto } from '../../../dto/posts/post.input.dto';
+import { PostInputDto } from '../../../dto/posts/input/post.input.dto';
 import { PostsRepository } from '../../../infrastructure/posts/posts.repository';
 
 export class PostUpdateCommand {

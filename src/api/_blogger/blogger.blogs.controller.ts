@@ -10,7 +10,7 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { BlogInputDto } from '../dto/blogs/blog.input.dto';
+import { BlogInputDto } from '../dto/blogs/input/blog.input.dto';
 import { CommandBus } from '@nestjs/cqrs';
 import { BlogCreateCommand } from './application/use-cases/blog-create.use-case';
 import { BlogsQueryRepository } from '../infrastructure/blogs/blogs.query.repository';
@@ -22,10 +22,10 @@ import {
   userIDField,
   userNotFound,
 } from '../../exceptions/exception.constants';
-import { BlogQueryDto } from '../dto/blogs/blog.query.dto';
+import { BlogQueryDto } from '../dto/blogs/query/blog.query.dto';
 import { BlogUpdateCommand } from './application/use-cases/blog-update.use-case';
 import { BlogDeleteCommand } from './application/use-cases/blog-delete.use-case';
-import { PostInputDto } from '../dto/posts/post.input.dto';
+import { PostInputDto } from '../dto/posts/input/post.input.dto';
 import { PostsQueryRepository } from '../infrastructure/posts/posts.query.repository';
 import { Role } from '../../enums/role.enum';
 import { PostUpdateCommand } from './application/use-cases/post-update.use-case';

@@ -12,16 +12,18 @@ import { CommandBus } from '@nestjs/cqrs';
 import { exceptionHandler } from '../../exceptions/exception.handler';
 import { ResultCode } from '../../enums/result-code.enum';
 import { JwtBearerGuard } from '../../auth/guards/jwt-bearer.guard';
-import { BloggerUserBanInputDto } from '../dto/users/blogger.user-ban.input.dto';
+import { BloggerUserBanInputDto } from '../dto/users/input/blogger/blogger.user-ban.input.dto';
 import { BloggerUserBanCommand } from './application/use-cases/user-ban.use-case';
 import { BlogsQueryRepository } from '../infrastructure/blogs/blogs.query.repository';
-import { BloggerUserBanQueryDto } from '../dto/users/blogger.user-ban.query.dto';
+import { BloggerUserBanQueryDto } from '../dto/users/query/blogger/blogger.user-ban.query.dto';
+import { UsersQueryRepository } from '../infrastructure/users/users.query.repository';
 
 @Controller('blogger/users')
 export class BloggerUsersController {
   constructor(
     private commandBus: CommandBus,
     private readonly blogsQueryRepository: BlogsQueryRepository,
+    private readonly usersQueryRepository: UsersQueryRepository,
   ) {}
 
   @UseGuards(JwtBearerGuard)
@@ -45,6 +47,6 @@ export class BloggerUsersController {
   @UseGuards(JwtBearerGuard)
   @Get('blog/:id')
   async findUsers(@Query() query: BloggerUserBanQueryDto, @Param('id') blogId) {
-    return this.blogsQueryRepository.findBannedUsers(query, blogId);
+    return this.usersQueryRepository.findUsersBannedByBlogger(query, blogId);
   }
 }

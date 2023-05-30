@@ -2,7 +2,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UsersRepository } from '../../../../infrastructure/users/users.repository';
 import bcrypt from 'bcrypt';
-import { UserInputDto } from '../../../../dto/users/user-input.dto';
+import { UserInputDto } from '../../../../dto/users/input/user-input.dto';
 import { User, UserModelType } from '../../../../entities/user.entity';
 
 export class UserCreateCommand {

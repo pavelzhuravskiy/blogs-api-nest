@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Paginator } from '../../../helpers/pagination/_paginator';
 import { Post, PostLeanType, PostModelType } from '../../entities/post.entity';
-import { PostViewModel } from '../../dto/posts/post.view.dto';
+import { PostViewModel } from '../../dto/posts/view/post.view.dto';
 import { BlogsQueryRepository } from '../blogs/blogs.query.repository';
 import { QueryDto } from '../../dto/query.dto';
 import { pFind } from '../../../helpers/pagination/pagination-find';

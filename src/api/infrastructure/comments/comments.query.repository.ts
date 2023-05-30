@@ -7,7 +7,7 @@ import {
   CommentLeanType,
   CommentModelType,
 } from '../../entities/comment.entity';
-import { CommentViewDto } from '../../dto/comments/comment.view.dto';
+import { CommentViewDto } from '../../dto/comments/view/comment.view.dto';
 import { QueryDto } from '../../dto/query.dto';
 import { pFind } from '../../../helpers/pagination/pagination-find';
 import { pSort } from '../../../helpers/pagination/pagination-sort';

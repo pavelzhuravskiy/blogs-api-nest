@@ -4,7 +4,7 @@ import { Post, PostModelType } from '../../../../entities/post.entity';
 import { PostsRepository } from '../../../../infrastructure/posts/posts.repository';
 import { LikesDataType } from '../../../../dto/likes/schemas/likes-data.type';
 import { LikesService } from '../likes.service';
-import { LikeStatusInputDto } from '../../../../dto/likes/like-status.input.dto';
+import { LikeStatusInputDto } from '../../../../dto/likes/input/like-status.input.dto';
 
 export class LikeUpdateForPostCommand {
   constructor(

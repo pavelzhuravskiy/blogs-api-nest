@@ -1,6 +1,6 @@
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UsersRepository } from '../../../../infrastructure/users/users.repository';
-import { SAUserBanInputDto } from '../../../../dto/users/sa.user-ban.input.dto';
+import { SAUserBanInputDto } from '../../../../dto/users/input/superadmin/sa.user-ban.input.dto';
 import { ResultCode } from '../../../../../enums/result-code.enum';
 import {
   userIDField,

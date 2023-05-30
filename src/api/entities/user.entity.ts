@@ -3,10 +3,10 @@ import { HydratedDocument, Model, Types } from 'mongoose';
 import { UserAccountSchema } from '../dto/users/schemas/user-account.schema';
 import { UserEmailSchema } from '../dto/users/schemas/user-email.schema';
 import { UserPasswordSchema } from '../dto/users/schemas/user-password.schema';
-import { UserInputDto } from '../dto/users/user-input.dto';
+import { UserInputDto } from '../dto/users/input/user-input.dto';
 import { add } from 'date-fns';
 import { UserBanSchema } from '../dto/users/schemas/user-ban.schema';
-import { SAUserBanInputDto } from '../dto/users/sa.user-ban.input.dto';
+import { SAUserBanInputDto } from '../dto/users/input/superadmin/sa.user-ban.input.dto';
 import { UserBanForBlogSchema } from '../dto/users/schemas/user-ban-for-blog.schema';
 
 export type UserDocument = HydratedDocument<User>;

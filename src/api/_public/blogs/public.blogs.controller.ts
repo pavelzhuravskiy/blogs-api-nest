@@ -1,6 +1,6 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
 import { BlogsQueryRepository } from '../../infrastructure/blogs/blogs.query.repository';
-import { BlogQueryDto } from '../../dto/blogs/blog.query.dto';
+import { BlogQueryDto } from '../../dto/blogs/query/blog.query.dto';
 import { Role } from '../../../enums/role.enum';
 import { QueryDto } from '../../dto/query.dto';
 import { PostsQueryRepository } from '../../infrastructure/posts/posts.query.repository';

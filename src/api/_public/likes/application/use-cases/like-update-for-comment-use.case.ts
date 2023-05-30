@@ -2,7 +2,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { LikesDataType } from '../../../../dto/likes/schemas/likes-data.type';
 import { LikesService } from '../likes.service';
-import { LikeStatusInputDto } from '../../../../dto/likes/like-status.input.dto';
+import { LikeStatusInputDto } from '../../../../dto/likes/input/like-status.input.dto';
 import { CommentsRepository } from '../../../../infrastructure/comments/comments.repository';
 import { Comment, CommentModelType } from '../../../../entities/comment.entity';
 

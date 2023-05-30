@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { BlogsQueryRepository } from '../../infrastructure/blogs/blogs.query.repository';
-import { BlogQueryDto } from '../../dto/blogs/blog.query.dto';
+import { BlogQueryDto } from '../../dto/blogs/query/blog.query.dto';
 import { Role } from '../../../enums/role.enum';
 import { BasicAuthGuard } from '../../../auth/guards/basic-auth.guard';
 import { ResultCode } from '../../../enums/result-code.enum';

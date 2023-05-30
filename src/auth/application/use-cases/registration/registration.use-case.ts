@@ -1,7 +1,7 @@
 import { InjectModel } from '@nestjs/mongoose';
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UsersRepository } from '../../../../api/infrastructure/users/users.repository';
-import { UserInputDto } from '../../../../api/dto/users/user-input.dto';
+import { UserInputDto } from '../../../../api/dto/users/input/user-input.dto';
 import bcrypt from 'bcrypt';
 import { randomUUID } from 'crypto';
 import { add } from 'date-fns';

@@ -1,6 +1,6 @@
 import { IsBoolean, MinLength } from 'class-validator';
-import { blogNotFound } from '../../../exceptions/exception.constants';
-import { isBlogExist } from '../../../exceptions/decorators/blog-exists.decorator';
+import { blogNotFound } from '../../../../../exceptions/exception.constants';
+import { isBlogExist } from '../../../../../exceptions/decorators/blog-exists.decorator';
 
 export class BloggerUserBanInputDto {
   @IsBoolean()
