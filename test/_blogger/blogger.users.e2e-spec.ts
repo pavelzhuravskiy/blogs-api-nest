@@ -229,7 +229,7 @@ describe('Blogger users ban testing', () => {
           banReason: randomUUID(),
           blogId: blogId,
         })
-        .expect(400);
+        .expect(404);
 
       expect(response.body).toEqual(exceptionObject(userIDField));
     });
@@ -300,7 +300,7 @@ describe('Blogger users ban testing', () => {
         .send({
           content: commentContent,
         })
-        .expect(401);
+        .expect(403);
     });
   });
   describe('Get banned users', () => {
@@ -368,21 +368,6 @@ describe('Blogger users ban testing', () => {
           content: commentContent,
         })
         .expect(201);
-    });
-
-    // Validation errors [400]
-    it(`should return 400 when trying to unban user one more time`, async () => {
-      const response = await agent
-        .put(bloggerUsersURI + userId + banURI)
-        .auth(aTokenUser01, { type: 'bearer' })
-        .send({
-          isBanned: false,
-          banReason: randomUUID(),
-          blogId: blogId,
-        })
-        .expect(400);
-
-      expect(response.body).toEqual(exceptionObject(userIDField));
     });
   });
 

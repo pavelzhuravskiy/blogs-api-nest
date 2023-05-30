@@ -334,7 +334,6 @@ describe('Blogger blogs and posts testing', () => {
 
       blog01Id = blogs.body.items[0].id;
 
-      console.log(blogs.body);
       expect(blogs.body).toEqual({
         pagesCount: 1,
         page: 1,
