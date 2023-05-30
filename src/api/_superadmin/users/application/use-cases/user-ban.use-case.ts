@@ -81,30 +81,36 @@ export class UserBanUseCase implements ICommandHandler<SAUserBanCommand> {
         new DevicesDeleteForUserBanCommand(command.userId),
       );
 
-      await this.blogsRepository.setBlogsBanStatus(command.userId, true);
-      await this.postsRepository.setPostsBanStatus(command.userId, true);
-      await this.commentsRepository.setCommentsBanStatus(command.userId, true);
-      await this.likesRepository.setLikesBanStatus(
+      await this.blogsRepository.setBlogsOwnerBanStatus(command.userId, true);
+      await this.postsRepository.setPostsOwnerBanStatus(command.userId, true);
+      await this.commentsRepository.setCommentsOwnerBanStatus(
+        command.userId,
+        true,
+      );
+      await this.likesRepository.setLikesOwnerBanStatus(
         command.userId,
         true,
         this.PostModel,
       );
-      await this.likesRepository.setLikesBanStatus(
+      await this.likesRepository.setLikesOwnerBanStatus(
         command.userId,
         true,
         this.CommentModel,
       );
     } else {
       user.saUnbanUser();
-      await this.blogsRepository.setBlogsBanStatus(command.userId, false);
-      await this.postsRepository.setPostsBanStatus(command.userId, false);
-      await this.commentsRepository.setCommentsBanStatus(command.userId, false);
-      await this.likesRepository.setLikesBanStatus(
+      await this.blogsRepository.setBlogsOwnerBanStatus(command.userId, false);
+      await this.postsRepository.setPostsOwnerBanStatus(command.userId, false);
+      await this.commentsRepository.setCommentsOwnerBanStatus(
+        command.userId,
+        false,
+      );
+      await this.likesRepository.setLikesOwnerBanStatus(
         command.userId,
         false,
         this.PostModel,
       );
-      await this.likesRepository.setLikesBanStatus(
+      await this.likesRepository.setLikesOwnerBanStatus(
         command.userId,
         false,
         this.CommentModel,

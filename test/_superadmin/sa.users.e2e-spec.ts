@@ -19,7 +19,7 @@ import {
   user03Login,
   user04Email,
   user04Login,
-  userBanURI,
+  banURI,
   userPassword,
 } from '../utils/constants/users.constants';
 import {
@@ -430,7 +430,7 @@ describe('Super admin users testing', () => {
     // Validation errors [400]
     it(`should return 400 when trying to ban user without isBanned`, async () => {
       const response = await agent
-        .put(saUsersURI + user01Id + userBanURI)
+        .put(saUsersURI + user01Id + banURI)
         .auth(basicAuthLogin, basicAuthPassword)
         .send({
           banReason: randomUUID(),
@@ -441,7 +441,7 @@ describe('Super admin users testing', () => {
     });
     it(`should return 400 when trying to ban user with incorrect isBanned type`, async () => {
       const response = await agent
-        .put(saUsersURI + user01Id + userBanURI)
+        .put(saUsersURI + user01Id + banURI)
         .auth(basicAuthLogin, basicAuthPassword)
         .send({
           isBanned: randomUUID(),
@@ -453,7 +453,7 @@ describe('Super admin users testing', () => {
     });
     it(`should return 400 when trying to ban user without banReason`, async () => {
       const response = await agent
-        .put(saUsersURI + user01Id + userBanURI)
+        .put(saUsersURI + user01Id + banURI)
         .auth(basicAuthLogin, basicAuthPassword)
         .send({
           isBanned: true,
@@ -464,7 +464,7 @@ describe('Super admin users testing', () => {
     });
     it(`should return 400 when trying to ban user with incorrect banReason length`, async () => {
       const response = await agent
-        .put(saUsersURI + user01Id + userBanURI)
+        .put(saUsersURI + user01Id + banURI)
         .auth(basicAuthLogin, basicAuthPassword)
         .send({
           isBanned: true,
@@ -478,7 +478,7 @@ describe('Super admin users testing', () => {
     // Success
     it(`should ban user 01`, async () => {
       await agent
-        .put(saUsersURI + user01Id + userBanURI)
+        .put(saUsersURI + user01Id + banURI)
         .auth(basicAuthLogin, basicAuthPassword)
         .send({
           isBanned: true,

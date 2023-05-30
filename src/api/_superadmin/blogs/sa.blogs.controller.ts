@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   Get,
   HttpCode,
@@ -15,6 +16,8 @@ import { BasicAuthGuard } from '../../../auth/guards/basic-auth.guard';
 import { ResultCode } from '../../../enums/result-code.enum';
 import { exceptionHandler } from '../../../exceptions/exception.handler';
 import { BlogBindCommand } from './application/use-cases/blog-bind.use-case';
+import { SABlogBanInputDto } from '../../dto/users/input/superadmin/sa.blog-ban.input.dto';
+import { SABlogBanCommand } from './application/use-cases/blog-ban.use-case';
 
 @Controller('sa/blogs')
 export class SuperAdminBlogsController {
@@ -36,6 +39,24 @@ export class SuperAdminBlogsController {
   async bindBlog(@Param() params) {
     const result = await this.commandBus.execute(
       new BlogBindCommand(params.blogId, params.userId),
+    );
+
+    if (result.code !== ResultCode.Success) {
+      return exceptionHandler(result.code, result.message, result.field);
+    }
+
+    return result;
+  }
+
+  @UseGuards(BasicAuthGuard)
+  @Put(':id/ban')
+  @HttpCode(204)
+  async banBlog(
+    @Body() saBlogBanInputDto: SABlogBanInputDto,
+    @Param('id') blogId,
+  ) {
+    const result = await this.commandBus.execute(
+      new SABlogBanCommand(saBlogBanInputDto, blogId),
     );
 
     if (result.code !== ResultCode.Success) {

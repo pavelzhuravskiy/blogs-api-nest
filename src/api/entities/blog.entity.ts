@@ -37,6 +37,9 @@ export class Blog {
   @Prop({ required: true })
   blogOwnerInfo: BlogOwnerSchema;
 
+  @Prop({ required: true })
+  isBanned: boolean;
+
   updateBlog(updateBlogDto) {
     this.name = updateBlogDto.name;
     this.description = updateBlogDto.description;
@@ -46,6 +49,14 @@ export class Blog {
   bindUser(user: UserDocument) {
     this.blogOwnerInfo.userId = user.id;
     this.blogOwnerInfo.userLogin = user.accountData.login;
+  }
+
+  banBlog() {
+    this.isBanned = true;
+  }
+
+  unbanBlog() {
+    this.isBanned = false;
   }
 
   static createBlog(
@@ -64,6 +75,7 @@ export class Blog {
         userLogin: user.accountData.login,
         isBanned: false,
       },
+      isBanned: false,
     };
     return new BlogModel(blog);
   }
@@ -74,6 +86,8 @@ export const BlogSchema = SchemaFactory.createForClass(Blog);
 BlogSchema.methods = {
   updateBlog: Blog.prototype.updateBlog,
   bindUser: Blog.prototype.bindUser,
+  banBlog: Blog.prototype.banBlog,
+  unbanBlog: Blog.prototype.unbanBlog,
 };
 
 const blogStaticMethods: BlogModelStaticType = {

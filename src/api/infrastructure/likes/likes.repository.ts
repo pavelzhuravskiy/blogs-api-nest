@@ -101,7 +101,7 @@ export class LikesRepository {
     return result.matchedCount === 1;
   }
 
-  async setLikesBanStatus(
+  async setLikesOwnerBanStatus(
     userId: string,
     banStatus: boolean,
     model: any,

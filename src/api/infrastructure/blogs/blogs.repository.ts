@@ -32,7 +32,7 @@ export class BlogsRepository {
     return blog.deletedCount === 1;
   }
 
-  async setBlogsBanStatus(
+  async setBlogsOwnerBanStatus(
     userId: string,
     banStatus: boolean,
   ): Promise<boolean> {

@@ -1,7 +1,7 @@
 // Users URI
 export const saUsersURI = '/sa/users/';
 export const bloggerUsersURI = '/blogger/users/';
-export const userBanURI = '/ban/';
+export const banURI = '/ban/';
 
 // User creation strings
 export const user01Login = 'login01';

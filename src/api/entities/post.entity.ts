@@ -56,6 +56,7 @@ export class Post {
       blogInfo: {
         blogId: blog._id.toString(),
         blogName: blog.name,
+        blogIsBanned: false,
         blogOwnerId: blog.blogOwnerInfo.userId,
         blogOwnerLogin: blog.blogOwnerInfo.userLogin,
         blogOwnerIsBanned: blog.blogOwnerInfo.isBanned,

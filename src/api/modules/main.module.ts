@@ -42,6 +42,7 @@ import { LikeUpdateForCommentUseCase } from '../_public/likes/application/use-ca
 import { BloggerUserBanUseCase } from '../_blogger/application/use-cases/user-ban.use-case';
 import { BloggerUsersController } from '../_blogger/blogger.users.controller';
 import { UsersQueryRepository } from '../infrastructure/users/users.query.repository';
+import { BlogBanUseCase } from '../_superadmin/blogs/application/use-cases/blog-ban.use-case';
 
 const controllers = [
   SuperAdminBlogsController,
@@ -55,6 +56,7 @@ const controllers = [
 const services = [LikesService, JwtService];
 
 const useCases = [
+  BlogBanUseCase,
   BlogBindUseCase,
   BlogCreateUseCase,
   BlogUpdateUseCase,

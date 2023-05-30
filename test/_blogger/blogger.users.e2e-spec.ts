@@ -25,7 +25,7 @@ import {
   saUsersURI,
   user01Email,
   user01Login,
-  userBanURI,
+  banURI,
   userPassword,
 } from '../utils/constants/users.constants';
 import {
@@ -172,7 +172,7 @@ describe('Blogger users ban testing', () => {
     // Validation errors [400]
     it(`should return 400 when trying to ban user without isBanned`, async () => {
       const response = await agent
-        .put(bloggerUsersURI + userId + userBanURI)
+        .put(bloggerUsersURI + userId + banURI)
         .auth(aTokenUser01, { type: 'bearer' })
         .send({
           banReason: randomUUID(),
@@ -184,7 +184,7 @@ describe('Blogger users ban testing', () => {
     });
     it(`should return 400 when trying to ban user with incorrect isBanned type`, async () => {
       const response = await agent
-        .put(bloggerUsersURI + userId + userBanURI)
+        .put(bloggerUsersURI + userId + banURI)
         .auth(aTokenUser01, { type: 'bearer' })
         .send({
           isBanned: 123,
@@ -197,7 +197,7 @@ describe('Blogger users ban testing', () => {
     });
     it(`should return 400 when trying to ban user without banReason`, async () => {
       const response = await agent
-        .put(bloggerUsersURI + userId + userBanURI)
+        .put(bloggerUsersURI + userId + banURI)
         .auth(aTokenUser01, { type: 'bearer' })
         .send({
           isBanned: true,
@@ -209,7 +209,7 @@ describe('Blogger users ban testing', () => {
     });
     it(`should return 400 when trying to ban user with incorrect banReason length`, async () => {
       const response = await agent
-        .put(bloggerUsersURI + userId + userBanURI)
+        .put(bloggerUsersURI + userId + banURI)
         .auth(aTokenUser01, { type: 'bearer' })
         .send({
           isBanned: true,
@@ -222,7 +222,7 @@ describe('Blogger users ban testing', () => {
     });
     it(`should return 400 when trying to ban user with incorrect userId`, async () => {
       const response = await agent
-        .put(bloggerUsersURI + invalidURI + userBanURI)
+        .put(bloggerUsersURI + invalidURI + banURI)
         .auth(aTokenUser01, { type: 'bearer' })
         .send({
           isBanned: true,
@@ -235,7 +235,7 @@ describe('Blogger users ban testing', () => {
     });
     it(`should return 400 when trying to ban user with incorrect blogId`, async () => {
       const response = await agent
-        .put(bloggerUsersURI + userId + userBanURI)
+        .put(bloggerUsersURI + userId + banURI)
         .auth(aTokenUser01, { type: 'bearer' })
         .send({
           isBanned: true,
@@ -250,7 +250,7 @@ describe('Blogger users ban testing', () => {
     // Auth errors [401]
     it(`should return 401 when trying to ban user with incorrect token`, async () => {
       await agent
-        .put(bloggerUsersURI + userId + userBanURI)
+        .put(bloggerUsersURI + userId + banURI)
         .auth(randomUUID(), { type: 'bearer' })
         .send({
           isBanned: true,
@@ -263,7 +263,7 @@ describe('Blogger users ban testing', () => {
     // Success
     it(`should add banned user object in users array`, async () => {
       await agent
-        .put(bloggerUsersURI + userId + userBanURI)
+        .put(bloggerUsersURI + userId + banURI)
         .auth(aTokenUser01, { type: 'bearer' })
         .send({
           isBanned: true,
@@ -279,7 +279,7 @@ describe('Blogger users ban testing', () => {
     // Validation errors [400]
     it(`should return 400 when trying to ban user one more time`, async () => {
       const response = await agent
-        .put(bloggerUsersURI + userId + userBanURI)
+        .put(bloggerUsersURI + userId + banURI)
         .auth(aTokenUser01, { type: 'bearer' })
         .send({
           isBanned: true,
@@ -348,7 +348,7 @@ describe('Blogger users ban testing', () => {
     // Success
     it(`should remove banned user ID from banned users array`, async () => {
       await agent
-        .put(bloggerUsersURI + userId + userBanURI)
+        .put(bloggerUsersURI + userId + banURI)
         .auth(aTokenUser01, { type: 'bearer' })
         .send({
           isBanned: false,
@@ -373,7 +373,7 @@ describe('Blogger users ban testing', () => {
     // Validation errors [400]
     it(`should return 400 when trying to unban user one more time`, async () => {
       const response = await agent
-        .put(bloggerUsersURI + userId + userBanURI)
+        .put(bloggerUsersURI + userId + banURI)
         .auth(aTokenUser01, { type: 'bearer' })
         .send({
           isBanned: false,

@@ -36,7 +36,7 @@ export class CommentsRepository {
     return comment.deletedCount === 1;
   }
 
-  async setCommentsBanStatus(
+  async setCommentsOwnerBanStatus(
     userId: string,
     banStatus: boolean,
   ): Promise<boolean> {

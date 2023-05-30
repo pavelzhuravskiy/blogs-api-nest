@@ -35,7 +35,7 @@ export class PostsRepository {
     return post.deletedCount === 1;
   }
 
-  async setPostsBanStatus(
+  async setPostsOwnerBanStatus(
     userId: string,
     banStatus: boolean,
   ): Promise<boolean> {
@@ -44,6 +44,21 @@ export class PostsRepository {
       {
         $set: {
           'blogInfo.blogOwnerIsBanned': banStatus,
+        },
+      },
+    );
+    return result.acknowledged === true;
+  }
+
+  async setPostsBanStatus(
+    blogId: string,
+    banStatus: boolean,
+  ): Promise<boolean> {
+    const result = await this.PostModel.updateMany(
+      { 'blogInfo.blogId': blogId },
+      {
+        $set: {
+          'blogInfo.blogIsBanned': banStatus,
         },
       },
     );
