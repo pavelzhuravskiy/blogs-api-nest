@@ -3,7 +3,10 @@ import { BlogDocument } from '../../api/entities/blog.entity';
 
 export const pFilterPosts = (blogId?: string) => {
   const filter: FilterQuery<BlogDocument> = {
-    $and: [{ 'blogInfo.blogOwnerIsBanned': false }],
+    $and: [
+      { 'blogInfo.blogOwnerIsBanned': false },
+      { 'blogInfo.blogIsBanned': false },
+    ],
   };
 
   if (blogId) {

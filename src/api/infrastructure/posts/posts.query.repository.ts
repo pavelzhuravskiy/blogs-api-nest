@@ -63,7 +63,11 @@ export class PostsQueryRepository {
 
     const post = await this.PostModel.findOne({ _id: postId });
 
-    if (!post || post.blogInfo.blogOwnerIsBanned) {
+    if (
+      !post ||
+      post.blogInfo.blogOwnerIsBanned ||
+      post.blogInfo.blogIsBanned
+    ) {
       return null;
     }
 
