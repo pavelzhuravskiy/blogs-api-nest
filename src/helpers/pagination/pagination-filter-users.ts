@@ -1,5 +1,5 @@
 import { FilterQuery } from 'mongoose';
-import { BlogDocument } from '../../api/public/blogs/blog.entity';
+import { BlogDocument } from '../../api/entities/blog.entity';
 import { BanStatus } from '../../enums/ban-status.enum';
 
 export const pFilterUsers = (

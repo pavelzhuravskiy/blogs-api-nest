@@ -1,7 +1,7 @@
 import { InjectModel } from '@nestjs/mongoose';
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { UsersRepository } from '../../../../api/superadmin/users/infrastructure/users.repository';
-import { UserInputDto } from '../../../../api/superadmin/users/dto/user-input.dto';
+import { UsersRepository } from '../../../../api/infrastructure/users/users.repository';
+import { UserInputDto } from '../../../../api/dto/users/user-input.dto';
 import bcrypt from 'bcrypt';
 import { randomUUID } from 'crypto';
 import { add } from 'date-fns';
@@ -9,7 +9,7 @@ import {
   User,
   UserDocument,
   UserModelType,
-} from '../../../../api/superadmin/users/user.entity';
+} from '../../../../api/entities/user.entity';
 import { SendRegistrationMailCommand } from '../../../../mail/application/use-cases/send-registration-mail.use-case';
 
 export class RegistrationCommand {

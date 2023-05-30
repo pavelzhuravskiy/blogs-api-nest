@@ -1,5 +1,5 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { DevicesRepository } from '../../../../api/public/devices/infrastructure/devices.repository';
+import { DevicesRepository } from '../../../../api/infrastructure/devices/devices.repository';
 
 export class ValidateRefreshTokenCommand {
   constructor(public payload: any) {}

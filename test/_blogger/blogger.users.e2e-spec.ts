@@ -34,7 +34,7 @@ import {
 } from '../utils/constants/auth.constants';
 import { useContainer } from 'class-validator';
 import { randomUUID } from 'crypto';
-import { BlogsRepository } from '../../src/api/public/blogs/infrastructure/blogs.repository';
+import { BlogsRepository } from '../../src/api/infrastructure/blogs/blogs.repository';
 import {
   blogIDField,
   userIDField,

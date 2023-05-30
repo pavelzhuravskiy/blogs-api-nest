@@ -3,10 +3,10 @@ import {
   Device,
   DeviceDocument,
   DeviceModelType,
-} from '../../../../api/public/devices/device.entity';
+} from '../../../../api/entities/device.entity';
 import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/mongoose';
-import { DevicesRepository } from '../../../../api/public/devices/infrastructure/devices.repository';
+import { DevicesRepository } from '../../../../api/infrastructure/devices/devices.repository';
 
 export class DeviceCreateForLoginCommand {
   constructor(
