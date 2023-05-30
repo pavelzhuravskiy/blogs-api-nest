@@ -14,7 +14,6 @@ import {
   userIsBanned,
   userNotFound,
 } from '../../../../../exceptions/exception.constants';
-import { BlogsRepository } from '../../../../infrastructure/blogs/blogs.repository';
 
 export class CommentCreateCommand {
   constructor(
@@ -34,7 +33,6 @@ export class CommentCreateUseCase
     private readonly commentsRepository: CommentsRepository,
     private readonly postsRepository: PostsRepository,
     private readonly usersRepository: UsersRepository,
-    private readonly blogsRepository: BlogsRepository,
   ) {}
 
   async execute(
@@ -62,11 +60,10 @@ export class CommentCreateUseCase
       };
     }
 
-    const isUserBannedByBlogger =
-      await this.blogsRepository.findBannedUserInBlog(
-        post.blogInfo.blogId,
-        user.id,
-      );
+    const isUserBannedByBlogger = await this.usersRepository.findUserBanForBlog(
+      user.id,
+      post.blogInfo.blogId,
+    );
 
     if (isUserBannedByBlogger) {
       return {

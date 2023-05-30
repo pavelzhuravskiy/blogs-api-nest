@@ -48,7 +48,7 @@ export class UserBanUseCase implements ICommandHandler<SAUserBanCommand> {
     if (!user) {
       return {
         data: false,
-        code: ResultCode.NotFound,
+        code: ResultCode.BadRequest,
         field: userIDField,
         message: userNotFound,
       };

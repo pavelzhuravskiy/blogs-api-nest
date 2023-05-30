@@ -15,7 +15,7 @@ import { JwtBearerGuard } from '../../auth/guards/jwt-bearer.guard';
 import { BloggerUserBanInputDto } from '../dto/users/blogger.user-ban.input.dto';
 import { BloggerUserBanCommand } from './application/use-cases/user-ban.use-case';
 import { BlogsQueryRepository } from '../infrastructure/blogs/blogs.query.repository';
-import { BlogBannedUsersQueryDto } from '../dto/blogs/blog-banned-users.query.dto';
+import { BloggerUserBanQueryDto } from '../dto/users/blogger.user-ban.query.dto';
 
 @Controller('blogger/users')
 export class BloggerUsersController {
@@ -44,10 +44,7 @@ export class BloggerUsersController {
 
   @UseGuards(JwtBearerGuard)
   @Get('blog/:id')
-  async findUsers(
-    @Query() query: BlogBannedUsersQueryDto,
-    @Param('id') blogId,
-  ) {
+  async findUsers(@Query() query: BloggerUserBanQueryDto, @Param('id') blogId) {
     return this.blogsQueryRepository.findBannedUsers(query, blogId);
   }
 }

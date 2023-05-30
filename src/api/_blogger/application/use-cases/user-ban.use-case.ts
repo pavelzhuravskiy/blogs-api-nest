@@ -8,7 +8,6 @@ import {
   userNotFound,
 } from '../../../../exceptions/exception.constants';
 import { ExceptionResultType } from '../../../../exceptions/types/exception-result.type';
-import { BlogsRepository } from '../../../infrastructure/blogs/blogs.repository';
 import { BloggerUserBanInputDto } from '../../../dto/users/blogger.user-ban.input.dto';
 
 export class BloggerUserBanCommand {
@@ -22,10 +21,7 @@ export class BloggerUserBanCommand {
 export class BloggerUserBanUseCase
   implements ICommandHandler<BloggerUserBanCommand>
 {
-  constructor(
-    private readonly usersRepository: UsersRepository,
-    private readonly blogsRepository: BlogsRepository,
-  ) {}
+  constructor(private readonly usersRepository: UsersRepository) {}
 
   async execute(
     command: BloggerUserBanCommand,
@@ -41,13 +37,9 @@ export class BloggerUserBanUseCase
       };
     }
 
-    const blog = await this.blogsRepository.findBlog(
-      command.bloggerUserBanInputDto.blogId,
-    );
-
-    const isAlreadyBanned = await this.blogsRepository.findBannedUserInBlog(
-      blog.id,
+    const isAlreadyBanned = await this.usersRepository.findUserBanForBlog(
       command.userId,
+      command.bloggerUserBanInputDto.blogId,
     );
 
     if (command.bloggerUserBanInputDto.isBanned) {
@@ -60,8 +52,8 @@ export class BloggerUserBanUseCase
         };
       }
 
-      await this.blogsRepository.pushUserInBannedUsersArray(
-        blog.id,
+      await this.usersRepository.banUserForBlog(
+        command.bloggerUserBanInputDto.blogId,
         command.userId,
         user.accountData.login,
         command.bloggerUserBanInputDto.banReason,
@@ -76,8 +68,8 @@ export class BloggerUserBanUseCase
         };
       }
 
-      await this.blogsRepository.pullUserFromBannedUsersArray(
-        blog.id,
+      await this.usersRepository.unbanUserForBlog(
+        command.bloggerUserBanInputDto.blogId,
         command.userId,
       );
     }

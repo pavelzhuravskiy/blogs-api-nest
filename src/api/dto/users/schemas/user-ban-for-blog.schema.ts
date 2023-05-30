@@ -1,7 +1,7 @@
 import { Prop, Schema } from '@nestjs/mongoose';
 
 @Schema()
-export class BlogBannedUsersInfoSchema {
+export class UserBanForBlogSchema {
   @Prop({ required: true })
   isBanned: boolean;
 
@@ -10,4 +10,7 @@ export class BlogBannedUsersInfoSchema {
 
   @Prop({ required: true })
   banReason: string;
+
+  @Prop({ required: true })
+  blogId: string;
 }

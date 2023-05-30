@@ -10,7 +10,6 @@ import { pSort } from '../../../helpers/pagination/pagination-sort';
 import { pFilterBlogs } from '../../../helpers/pagination/pagination-filter-blogs';
 import { Role } from '../../../enums/role.enum';
 import { SuperAdminBlogViewDto } from '../../dto/blogs/sa.blog-view.dto';
-import { BlogBannedUsersQueryDto } from '../../dto/blogs/blog-banned-users.query.dto';
 
 @Injectable()
 export class BlogsQueryRepository {
@@ -68,28 +67,6 @@ export class BlogsQueryRepository {
       createdAt: blog.createdAt,
       isMembership: blog.isMembership,
     };
-  }
-
-  async findBannedUsers(
-    query: BlogBannedUsersQueryDto,
-    blogId: string,
-  ): Promise</*Paginator<BlogViewDto[]>*/ any> {
-    if (!mongoose.isValidObjectId(blogId)) {
-      return null;
-    }
-
-    const blog = await this.BlogModel.findOne({ _id: blogId });
-
-    if (!blog) {
-      return null;
-    }
-
-    return Paginator.paginate({
-      pageNumber: query.pageNumber,
-      pageSize: query.pageSize,
-      totalCount: blog.bannedUsers.length,
-      items: blog.bannedUsers,
-    });
   }
 
   private async blogsMapping(blogs: BlogLeanType[]): Promise<BlogViewDto[]> {

@@ -1,5 +1,5 @@
 import { QueryDto } from '../query.dto';
 
-export class BlogBannedUsersQueryDto extends QueryDto {
+export class BloggerUserBanQueryDto extends QueryDto {
   searchLoginTerm: string;
 }

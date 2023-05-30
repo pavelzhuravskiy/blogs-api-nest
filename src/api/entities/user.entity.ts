@@ -7,6 +7,7 @@ import { UserInputDto } from '../dto/users/user-input.dto';
 import { add } from 'date-fns';
 import { UserBanSchema } from '../dto/users/schemas/user-ban.schema';
 import { SAUserBanInputDto } from '../dto/users/sa.user-ban.input.dto';
+import { UserBanForBlogSchema } from '../dto/users/schemas/user-ban-for-blog.schema';
 
 export type UserDocument = HydratedDocument<User>;
 export type UserLeanType = User & { _id: Types.ObjectId };
@@ -35,6 +36,9 @@ export class User {
 
   @Prop({ required: true })
   banInfo: UserBanSchema;
+
+  @Prop({ default: [] })
+  bansForBlogs: [UserBanForBlogSchema];
 
   userCanBeConfirmed() {
     if (
@@ -117,6 +121,7 @@ export class User {
         banDate: null,
         banReason: null,
       },
+      bansForBlogs: [],
     };
     return new UserModel(user);
   }

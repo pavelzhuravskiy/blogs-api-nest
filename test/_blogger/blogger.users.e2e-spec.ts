@@ -34,7 +34,6 @@ import {
 } from '../utils/constants/auth.constants';
 import { useContainer } from 'class-validator';
 import { randomUUID } from 'crypto';
-import { BlogsRepository } from '../../src/api/infrastructure/blogs/blogs.repository';
 import {
   blogIDField,
   userIDField,
@@ -51,11 +50,12 @@ import {
   commentContent,
   publicCommentsURI,
 } from '../utils/constants/comments.constants';
+import { UsersRepository } from '../../src/api/infrastructure/users/users.repository';
 
 describe('Blogger users ban testing', () => {
   let app: INestApplication;
   let agent: SuperAgentTest;
-  let blogsRepository: BlogsRepository;
+  let usersRepository: UsersRepository;
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -77,7 +77,7 @@ describe('Blogger users ban testing', () => {
       }),
     );
     app.useGlobalFilters(new HttpExceptionFilter());
-    blogsRepository = app.get(BlogsRepository);
+    usersRepository = app.get(UsersRepository);
 
     await app.init();
     agent = supertest.agent(app.getHttpServer());
@@ -88,7 +88,7 @@ describe('Blogger users ban testing', () => {
   let userId;
 
   let blogId;
-  let blog;
+  let user;
 
   let postId;
 
@@ -258,7 +258,7 @@ describe('Blogger users ban testing', () => {
     });
 
     // Success
-    it(`should add banned user object in blog's banned users array`, async () => {
+    it(`should add banned user object in users`, async () => {
       await agent
         .put(bloggerUsersURI + userId + userBanURI)
         .auth(aTokenUser01, { type: 'bearer' })
@@ -269,8 +269,8 @@ describe('Blogger users ban testing', () => {
         })
         .expect(204);
 
-      blog = await blogsRepository.findBlog(blogId);
-      expect(blog.bannedUsers[0]).toEqual(bannedUserInBlogObject);
+      user = await usersRepository.findUserById(userId);
+      expect(user.bansForBlogs[0]).toEqual(bannedUserInBlogObject);
     });
 
     // Validation errors [400]
@@ -286,7 +286,7 @@ describe('Blogger users ban testing', () => {
         .expect(400);
 
       expect(response.body).toEqual(exceptionObject(userIDField));
-      expect(blog.bannedUsers).toHaveLength(1);
+      expect(user.bansForBlogs).toHaveLength(1);
     });
 
     // Auth errors [401]
@@ -302,7 +302,7 @@ describe('Blogger users ban testing', () => {
   });
   describe('Unban user', () => {
     // Success
-    it(`should remove banned user ID from blog's banned users array`, async () => {
+    it(`should remove banned user ID from banned users array`, async () => {
       await agent
         .put(bloggerUsersURI + userId + userBanURI)
         .auth(aTokenUser01, { type: 'bearer' })
@@ -313,8 +313,8 @@ describe('Blogger users ban testing', () => {
         })
         .expect(204);
 
-      blog = await blogsRepository.findBlog(blogId);
-      expect(blog.bannedUsers).toHaveLength(0);
+      user = await usersRepository.findUserById(userId);
+      expect(user.bansForBlogs).toHaveLength(0);
     });
     it(`should create comment by unbanned user`, async () => {
       await agent

@@ -11,8 +11,6 @@ export class Paginator<T> {
     totalCount: number;
     items: T;
   }): Paginator<T> {
-    console.log(data.totalCount);
-    console.log(data.pageSize);
     return {
       pagesCount: Math.ceil(data.totalCount / data.pageSize),
       page: Number(data.pageNumber),

@@ -19,5 +19,6 @@ export const bannedUserInBlogObject = {
     isBanned: true,
     banDate: expect.any(Date),
     banReason: expect.any(String),
+    blogId: expect.any(String),
   },
 };
