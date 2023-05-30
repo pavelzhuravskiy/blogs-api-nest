@@ -12,6 +12,12 @@ import { BloggerUserBanQueryDto } from '../../dto/users/query/blogger/blogger.us
 import { UsersBannedByBloggerViewDto } from '../../dto/users/view/blogger/blogger.user-ban.view.dto';
 import { pFilterUsersBannedByBlogger } from '../../../helpers/pagination/pagination-filter-users-banned-by-blogger';
 import { BlogsRepository } from '../blogs/blogs.repository';
+import { ResultCode } from '../../../enums/result-code.enum';
+import {
+  blogIDField,
+  blogNotFound,
+} from '../../../exceptions/exception.constants';
+import { ExceptionResultType } from '../../../exceptions/types/exception-result.type';
 
 @Injectable()
 export class UsersQueryRepository {
@@ -54,11 +60,26 @@ export class UsersQueryRepository {
   async findUsersBannedByBlogger(
     query: BloggerUserBanQueryDto,
     blogId: string,
-  ): Promise<Paginator<UsersBannedByBloggerViewDto[]>> {
+    userId: string,
+  ): Promise<ExceptionResultType<boolean>> {
     const blog = await this.blogsRepository.findBlog(blogId);
 
     if (!blog) {
-      return null;
+      return {
+        data: false,
+        code: ResultCode.NotFound,
+        field: blogIDField,
+        message: blogNotFound,
+      };
+    }
+
+    if (userId !== blog.blogOwnerInfo.userId) {
+      return {
+        data: false,
+        code: ResultCode.Forbidden,
+        field: blogIDField,
+        message: blogNotFound,
+      };
     }
 
     const users = await pFind(
@@ -75,12 +96,18 @@ export class UsersQueryRepository {
 
     const usersBannedByBlogger = users.map((u) => u.bansForBlogs[0]);
 
-    return Paginator.paginate({
+    const result = await Paginator.paginate({
       pageNumber: query.pageNumber,
       pageSize: query.pageSize,
       totalCount: totalCount,
       items: await this.usersBannedByBloggerMapping(usersBannedByBlogger),
     });
+
+    return {
+      data: true,
+      code: ResultCode.Success,
+      response: result,
+    };
   }
 
   async findUser(id: string): Promise<SuperAdminUserViewDto | null> {
