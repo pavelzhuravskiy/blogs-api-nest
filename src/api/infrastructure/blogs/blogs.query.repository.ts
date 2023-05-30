@@ -26,12 +26,12 @@ export class BlogsQueryRepository {
       this.BlogModel,
       query.pageNumber,
       query.pageSize,
-      pFilterBlogs(query.searchNameTerm, userId),
+      pFilterBlogs(query.searchNameTerm, userId, role),
       pSort(query.sortBy, query.sortDirection),
     );
 
     const totalCount = await this.BlogModel.countDocuments(
-      pFilterBlogs(query.searchNameTerm, userId),
+      pFilterBlogs(query.searchNameTerm, userId, role),
     );
 
     let items = await this.blogsMapping(blogs);
@@ -48,14 +48,14 @@ export class BlogsQueryRepository {
     });
   }
 
-  async findBlog(id: string): Promise<BlogViewDto | null> {
+  async findBlog(id: string, role?: string): Promise<BlogViewDto | null> {
     if (!mongoose.isValidObjectId(id)) {
       return null;
     }
 
     const blog = await this.BlogModel.findOne({ _id: id });
 
-    if (!blog) {
+    if (!blog || (blog.isBanned && role !== Role.SuperAdmin)) {
       return null;
     }
 

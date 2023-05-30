@@ -4,7 +4,6 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Paginator } from '../../../helpers/pagination/_paginator';
 import { Post, PostLeanType, PostModelType } from '../../entities/post.entity';
 import { PostViewModel } from '../../dto/posts/view/post.view.dto';
-import { BlogsQueryRepository } from '../blogs/blogs.query.repository';
 import { QueryDto } from '../../dto/query.dto';
 import { pFind } from '../../../helpers/pagination/pagination-find';
 import { pSort } from '../../../helpers/pagination/pagination-sort';
@@ -12,13 +11,14 @@ import { pFilterPosts } from '../../../helpers/pagination/pagination-filter-post
 import { likeStatusFinder } from '../../_public/likes/helpers/like-status-finder';
 import { LikeStatus } from '../../../enums/like-status.enum';
 import { likesCounter } from '../../_public/likes/helpers/likes-counter';
+import { BlogsRepository } from '../blogs/blogs.repository';
 
 @Injectable()
 export class PostsQueryRepository {
   constructor(
     @InjectModel(Post.name)
     private PostModel: PostModelType,
-    private readonly blogsQueryRepository: BlogsQueryRepository,
+    private readonly blogsRepository: BlogsRepository,
   ) {}
   async findPosts(
     query: QueryDto,
@@ -26,8 +26,7 @@ export class PostsQueryRepository {
     blogId?: string,
   ): Promise<Paginator<PostViewModel[]> | null> {
     if (blogId) {
-      const blog = await this.blogsQueryRepository.findBlog(blogId);
-
+      const blog = await this.blogsRepository.findBlog(blogId);
       if (!blog) {
         return null;
       }

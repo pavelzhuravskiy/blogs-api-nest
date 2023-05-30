@@ -1,10 +1,11 @@
 import { FilterQuery } from 'mongoose';
 import { BlogDocument } from '../../api/entities/blog.entity';
+import { Role } from '../../enums/role.enum';
 
-export const pFilterBlogs = (name: string, userId: string) => {
+export const pFilterBlogs = (name: string, userId: string, role: string) => {
   const filter: FilterQuery<BlogDocument> = {};
 
-  if (name || userId) {
+  if (name || userId || role === Role.User) {
     filter.$and = [];
 
     if (name) {
@@ -16,6 +17,12 @@ export const pFilterBlogs = (name: string, userId: string) => {
     if (userId) {
       filter.$and.push({
         'blogOwnerInfo.userId': userId,
+      });
+    }
+
+    if (role === Role.User) {
+      filter.$and.push({
+        isBanned: false,
       });
     }
   }

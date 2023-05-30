@@ -39,7 +39,7 @@ import {
   userIDField,
 } from '../../src/exceptions/exception.constants';
 import { randomUUID } from 'crypto';
-import { saBlogObject } from '../utils/objects/blogs.objects';
+import { blog01Object, saBlogObject } from '../utils/objects/blogs.objects';
 import { isBannedField } from '../utils/constants/exceptions.constants';
 import { BlogsRepository } from '../../src/api/infrastructure/blogs/blogs.repository';
 import {
@@ -284,6 +284,17 @@ describe('Super admin blogs testing', () => {
     });
 
     // Success
+    it(`should return created blogs`, async () => {
+      const blogs = await agent.get(publicBlogsURI).expect(200);
+
+      expect(blogs.body).toEqual({
+        pagesCount: 1,
+        page: 1,
+        pageSize: 10,
+        totalCount: 1,
+        items: [blog01Object],
+      });
+    });
     it(`should return created posts`, async () => {
       const posts = await agent.get(publicPostsURI).expect(200);
 
@@ -308,12 +319,17 @@ describe('Super admin blogs testing', () => {
         items: [postObject, postObject],
       });
     });
+    it(`should return created blog by ID`, async () => {
+      const blog = await agent.get(publicBlogsURI + blogId).expect(200);
+      expect(blog.body).toEqual(blog01Object);
+    });
     it(`should return created post by ID`, async () => {
       const post01 = await agent.get(publicPostsURI + post01Id).expect(200);
       const post02 = await agent.get(publicPostsURI + post02Id).expect(200);
       expect(post01.body).toEqual(postObject);
       expect(post02.body).toEqual(postObject);
     });
+
     it(`should ban blog`, async () => {
       await agent
         .put(saBlogsURI + blogId + banURI)
@@ -331,6 +347,49 @@ describe('Super admin blogs testing', () => {
 
       expect(post01Db.blogInfo.blogIsBanned).toBeTruthy();
       expect(post02Db.blogInfo.blogIsBanned).toBeTruthy();
+    });
+
+    it(`should return created blogs for blogger`, async () => {
+      const blogs = await agent
+        .get(bloggerBlogsURI)
+        .auth(aTokenUser02, { type: 'bearer' })
+        .expect(200);
+
+      expect(blogs.body).toEqual({
+        pagesCount: 1,
+        page: 1,
+        pageSize: 10,
+        totalCount: 1,
+        items: [blog01Object],
+      });
+    });
+    it(`should return created blogs for super admin`, async () => {
+      const blogs = await agent
+        .get(saBlogsURI)
+        .auth(basicAuthLogin, basicAuthPassword)
+        .expect(200);
+
+      expect(blogs.body).toEqual({
+        pagesCount: 1,
+        page: 1,
+        pageSize: 10,
+        totalCount: 1,
+        items: [saBlogObject],
+      });
+    });
+    it(`should NOT return created blogs for public user`, async () => {
+      const posts = await agent.get(publicBlogsURI).expect(200);
+
+      expect(posts.body).toEqual({
+        pagesCount: 0,
+        page: 1,
+        pageSize: 10,
+        totalCount: 0,
+        items: [],
+      });
+    });
+    it(`should NOT return created blog by ID`, async () => {
+      return agent.get(publicBlogsURI + blogId).expect(404);
     });
     it(`should NOT return created posts after blog ban`, async () => {
       const posts = await agent.get(publicPostsURI).expect(200);
@@ -393,6 +452,22 @@ describe('Super admin blogs testing', () => {
 
       expect(post01Db.blogInfo.blogIsBanned).toBeFalsy();
       expect(post02Db.blogInfo.blogIsBanned).toBeFalsy();
+    });
+
+    it(`should return created blogs for public user`, async () => {
+      const posts = await agent.get(publicBlogsURI).expect(200);
+
+      expect(posts.body).toEqual({
+        pagesCount: 1,
+        page: 1,
+        pageSize: 10,
+        totalCount: 1,
+        items: [blog01Object],
+      });
+    });
+    it(`should return created blog by ID`, async () => {
+      const blog = await agent.get(publicBlogsURI + blogId).expect(200);
+      expect(blog.body).toEqual(blog01Object);
     });
     it(`should return created posts`, async () => {
       const posts = await agent.get(publicPostsURI).expect(200);
