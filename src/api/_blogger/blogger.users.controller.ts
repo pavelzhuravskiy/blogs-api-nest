@@ -21,6 +21,7 @@ import {
   blogIDField,
   blogNotFound,
 } from '../../exceptions/exception.constants';
+import { UserIdFromGuard } from '../../auth/decorators/user-id-from-guard.decorator';
 
 @Controller('blogger/users')
 export class BloggerUsersController {
@@ -35,10 +36,11 @@ export class BloggerUsersController {
   @HttpCode(204)
   async banUser(
     @Body() bloggerUserBanInputDto: BloggerUserBanInputDto,
-    @Param('id') userId,
+    @Param('id') userToBanId,
+    @UserIdFromGuard() userId,
   ) {
     const result = await this.commandBus.execute(
-      new BloggerUserBanCommand(bloggerUserBanInputDto, userId),
+      new BloggerUserBanCommand(bloggerUserBanInputDto, userToBanId, userId),
     );
 
     if (result.code !== ResultCode.Success) {

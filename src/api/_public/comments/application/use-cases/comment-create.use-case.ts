@@ -68,7 +68,7 @@ export class CommentCreateUseCase
     if (isUserBannedByBlogger) {
       return {
         data: false,
-        code: ResultCode.Unauthorized,
+        code: ResultCode.Forbidden,
         message: userIsBanned,
       };
     }
