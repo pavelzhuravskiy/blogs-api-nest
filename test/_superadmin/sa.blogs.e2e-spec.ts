@@ -39,7 +39,11 @@ import {
   userIDField,
 } from '../../src/exceptions/exception.constants';
 import { randomUUID } from 'crypto';
-import { blog01Object, saBlogObject } from '../utils/objects/blogs.objects';
+import {
+  blog01Object,
+  saBannedBlogObject,
+  saUnbannedBlogObject,
+} from '../utils/objects/blogs.objects';
 import { isBannedField } from '../utils/constants/exceptions.constants';
 import { BlogsRepository } from '../../src/api/infrastructure/blogs/blogs.repository';
 import {
@@ -218,7 +222,7 @@ describe('Super admin blogs testing', () => {
         page: 1,
         pageSize: 10,
         totalCount: 1,
-        items: [saBlogObject],
+        items: [saUnbannedBlogObject],
       });
       expect(blogs.body.items[0].blogOwnerInfo.userId).toBe(user02Id);
       expect(blogs.body.items[0].blogOwnerInfo.userLogin).toBe(user02Login);
@@ -340,7 +344,7 @@ describe('Super admin blogs testing', () => {
         .expect(204);
 
       blog = await blogsRepository.findBlog(blogId);
-      expect(blog.isBanned).toBeTruthy();
+      expect(blog.banInfo.isBanned).toBeTruthy();
 
       post01Db = await postsRepository.findPost(post01Id);
       post02Db = await postsRepository.findPost(post02Id);
@@ -374,7 +378,7 @@ describe('Super admin blogs testing', () => {
         page: 1,
         pageSize: 10,
         totalCount: 1,
-        items: [saBlogObject],
+        items: [saBannedBlogObject],
       });
     });
     it(`should NOT return created blogs for public user`, async () => {

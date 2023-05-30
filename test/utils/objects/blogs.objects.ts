@@ -26,7 +26,7 @@ export const blog02Object = {
   isMembership: false,
 };
 
-export const saBlogObject = {
+export const saUnbannedBlogObject = {
   id: expect.any(String),
   name: blog01Name,
   description: blogDescription,
@@ -36,6 +36,27 @@ export const saBlogObject = {
   blogOwnerInfo: {
     userId: expect.any(String),
     userLogin: expect.any(String),
+  },
+  banInfo: {
+    isBanned: false,
+    banDate: null,
+  },
+};
+
+export const saBannedBlogObject = {
+  id: expect.any(String),
+  name: blog01Name,
+  description: blogDescription,
+  websiteUrl: blogWebsite,
+  createdAt: expect.any(String),
+  isMembership: false,
+  blogOwnerInfo: {
+    userId: expect.any(String),
+    userLogin: expect.any(String),
+  },
+  banInfo: {
+    isBanned: true,
+    banDate: expect.any(String),
   },
 };
 
