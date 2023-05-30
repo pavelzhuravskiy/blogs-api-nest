@@ -4,7 +4,6 @@ import { ResultCode } from '../../../../enums/result-code.enum';
 import {
   userIDField,
   userIsAlreadyBanned,
-  userIsAlreadyUnbanned,
   userNotFound,
 } from '../../../../exceptions/exception.constants';
 import { ExceptionResultType } from '../../../../exceptions/types/exception-result.type';
@@ -31,7 +30,7 @@ export class BloggerUserBanUseCase
     if (!user) {
       return {
         data: false,
-        code: ResultCode.BadRequest,
+        code: ResultCode.NotFound,
         field: userIDField,
         message: userNotFound,
       };
@@ -59,14 +58,14 @@ export class BloggerUserBanUseCase
         command.bloggerUserBanInputDto.banReason,
       );
     } else {
-      if (!isAlreadyBanned) {
+      /*if (!isAlreadyBanned) {
         return {
           data: false,
           code: ResultCode.BadRequest,
           field: userIDField,
           message: userIsAlreadyUnbanned,
         };
-      }
+      }*/
 
       await this.usersRepository.unbanUserForBlog(
         command.bloggerUserBanInputDto.blogId,
