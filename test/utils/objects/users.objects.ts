@@ -12,7 +12,17 @@ export const userObject = {
   },
 };
 
-export const bannedUserInBlogObject = {
+export const userBannedByBloggerObject = {
+  id: expect.any(String),
+  login: user01Login,
+  banInfo: {
+    isBanned: true,
+    banDate: expect.any(String),
+    banReason: expect.any(String),
+  },
+};
+
+export const userBannedByBloggerObjectWithBlogId = {
   id: expect.any(String),
   login: user01Login,
   banInfo: {

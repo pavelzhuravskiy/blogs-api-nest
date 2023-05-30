@@ -7,6 +7,7 @@ import {
   blog01Name,
   blogDescription,
   bloggerBlogsURI,
+  blogURI,
   blogWebsite,
 } from '../utils/constants/blogs.constants';
 import { testingAllDataURI } from '../utils/constants/testing.constants';
@@ -38,7 +39,10 @@ import {
   blogIDField,
   userIDField,
 } from '../../src/exceptions/exception.constants';
-import { bannedUserInBlogObject } from '../utils/objects/users.objects';
+import {
+  userBannedByBloggerObject,
+  userBannedByBloggerObjectWithBlogId,
+} from '../utils/objects/users.objects';
 import {
   postContent,
   postShortDescription,
@@ -164,7 +168,6 @@ describe('Blogger users ban testing', () => {
         .expect(201);
     });
   });
-
   describe('Ban user', () => {
     // Validation errors [400]
     it(`should return 400 when trying to ban user without isBanned`, async () => {
@@ -258,7 +261,7 @@ describe('Blogger users ban testing', () => {
     });
 
     // Success
-    it(`should add banned user object in users`, async () => {
+    it(`should add banned user object in users array`, async () => {
       await agent
         .put(bloggerUsersURI + userId + userBanURI)
         .auth(aTokenUser01, { type: 'bearer' })
@@ -270,7 +273,7 @@ describe('Blogger users ban testing', () => {
         .expect(204);
 
       user = await usersRepository.findUserById(userId);
-      expect(user.bansForBlogs[0]).toEqual(bannedUserInBlogObject);
+      expect(user.bansForBlogs[0]).toEqual(userBannedByBloggerObjectWithBlogId);
     });
 
     // Validation errors [400]
@@ -298,6 +301,47 @@ describe('Blogger users ban testing', () => {
           content: commentContent,
         })
         .expect(401);
+    });
+  });
+  describe('Get banned users', () => {
+    // Auth errors [401]
+    it(`should return 401 when trying to get banned users with incorrect token`, async () => {
+      await agent
+        .get(bloggerUsersURI + blogURI + blogId)
+        .auth(randomUUID(), { type: 'bearer' })
+        .expect(401);
+    });
+
+    // Success
+    it(`should return empty array with login filter 000`, async () => {
+      const users = await agent
+        .get(bloggerUsersURI + blogURI + blogId)
+        .query({ searchLoginTerm: '000' })
+        .auth(aTokenUser01, { type: 'bearer' })
+        .expect(200);
+
+      expect(users.body).toEqual({
+        pagesCount: 0,
+        page: 1,
+        pageSize: 10,
+        totalCount: 0,
+        items: [],
+      });
+    });
+    it(`should return banned users with login filter 1`, async () => {
+      const users = await agent
+        .get(bloggerUsersURI + blogURI + blogId)
+        .query({ searchLoginTerm: '1' })
+        .auth(aTokenUser01, { type: 'bearer' })
+        .expect(200);
+
+      expect(users.body).toEqual({
+        pagesCount: 1,
+        page: 1,
+        pageSize: 10,
+        totalCount: 1,
+        items: [userBannedByBloggerObject],
+      });
     });
   });
   describe('Unban user', () => {

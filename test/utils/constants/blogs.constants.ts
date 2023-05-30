@@ -2,6 +2,7 @@
 export const saBlogsURI = '/sa/blogs/';
 export const bloggerBlogsURI = '/blogger/blogs/';
 export const publicBlogsURI = '/blogs/';
+export const blogURI = 'blog/';
 export const blogBindURI = '/bind-with-user/';
 
 // Blog creation strings
