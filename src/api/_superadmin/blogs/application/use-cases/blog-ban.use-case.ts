@@ -39,7 +39,7 @@ export class BlogBanUseCase implements ICommandHandler<SABlogBanCommand> {
       };
     }
 
-    const banDBStatus = blog.isBanned;
+    const banDBStatus = blog.banInfo.isBanned;
 
     if (banDBStatus && command.saBlogBanInputDto.isBanned) {
       return {

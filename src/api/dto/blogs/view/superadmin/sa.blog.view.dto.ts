@@ -9,4 +9,8 @@ export class SuperAdminBlogViewDto {
     userId: string;
     userLogin: string;
   };
+  banInfo: {
+    isBanned: boolean;
+    banDate: Date;
+  };
 }

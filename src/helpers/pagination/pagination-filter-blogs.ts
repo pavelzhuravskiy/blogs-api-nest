@@ -22,7 +22,7 @@ export const pFilterBlogs = (name: string, userId: string, role: string) => {
 
     if (role === Role.User) {
       filter.$and.push({
-        isBanned: false,
+        'banInfo.isBanned': false,
       });
     }
   }

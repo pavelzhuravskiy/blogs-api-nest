@@ -3,6 +3,7 @@ import { HydratedDocument, Model, Types } from 'mongoose';
 import { BlogInputDto } from '../dto/blogs/input/blog.input.dto';
 import { UserDocument } from './user.entity';
 import { BlogOwnerSchema } from '../dto/blogs/schemas/blog-owner.schema';
+import { BlogBanInfoSchema } from '../dto/blogs/schemas/blog-ban-info.schema';
 
 export type BlogDocument = HydratedDocument<Blog>;
 export type BlogLeanType = Blog & { _id: Types.ObjectId };
@@ -38,7 +39,7 @@ export class Blog {
   blogOwnerInfo: BlogOwnerSchema;
 
   @Prop({ required: true })
-  isBanned: boolean;
+  banInfo: BlogBanInfoSchema;
 
   updateBlog(updateBlogDto) {
     this.name = updateBlogDto.name;
@@ -52,11 +53,13 @@ export class Blog {
   }
 
   banBlog() {
-    this.isBanned = true;
+    this.banInfo.isBanned = true;
+    this.banInfo.banDate = new Date();
   }
 
   unbanBlog() {
-    this.isBanned = false;
+    this.banInfo.isBanned = false;
+    this.banInfo.banDate = null;
   }
 
   static createBlog(
@@ -75,7 +78,10 @@ export class Blog {
         userLogin: user.accountData.login,
         isBanned: false,
       },
-      isBanned: false,
+      banInfo: {
+        isBanned: false,
+        banDate: null,
+      },
     };
     return new BlogModel(blog);
   }

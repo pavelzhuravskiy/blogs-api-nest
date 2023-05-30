@@ -55,7 +55,7 @@ export class BlogsQueryRepository {
 
     const blog = await this.BlogModel.findOne({ _id: id });
 
-    if (!blog || (blog.isBanned && role !== Role.SuperAdmin)) {
+    if (!blog || (blog.banInfo.isBanned && role !== Role.SuperAdmin)) {
       return null;
     }
 
@@ -97,14 +97,11 @@ export class BlogsQueryRepository {
           userId: b.blogOwnerInfo.userId,
           userLogin: b.blogOwnerInfo.userLogin,
         },
+        banInfo: {
+          isBanned: b.banInfo.isBanned,
+          banDate: b.banInfo.banDate,
+        },
       };
     });
   }
-
-  /*private async bannedUsersMapping(users: BlogLeanType[]): Promise<any> {
-    return users.map((b) => {
-
-      return (b = b.bannedUsers);
-    });
-  }*/
 }
