@@ -1,15 +1,20 @@
 export class BloggerCommentViewDto {
   id: string;
   content: string;
+  createdAt: Date;
   commentatorInfo: {
     userId: string;
     userLogin: string;
   };
-  createdAt: Date;
+  likesInfo: {
+    likesCount: number;
+    dislikesCount: number;
+    myStatus: string;
+  };
   postInfo: {
-    id: string;
-    title: string;
     blogId: string;
     blogName: string;
+    id: string;
+    title: string;
   };
 }

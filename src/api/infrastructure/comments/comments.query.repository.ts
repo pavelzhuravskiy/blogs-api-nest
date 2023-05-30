@@ -77,7 +77,7 @@ export class CommentsQueryRepository {
       pageNumber: query.pageNumber,
       pageSize: query.pageSize,
       totalCount: totalCount,
-      items: await this.commentsForBloggerMapping(comments),
+      items: await this.commentsForBloggerMapping(comments, userId),
     });
   }
 
@@ -145,20 +145,35 @@ export class CommentsQueryRepository {
 
   private async commentsForBloggerMapping(
     comments: CommentLeanType[],
+    userId: string,
   ): Promise<BloggerCommentViewDto[]> {
-    return comments.map((c) => {
-      return {
-        id: c._id.toString(),
-        content: c.content,
-        commentatorInfo: c.commentatorInfo,
-        createdAt: c.createdAt,
-        postInfo: {
-          id: c.postInfo.id,
-          title: c.postInfo.title,
-          blogId: c.postInfo.blogId,
-          blogName: c.postInfo.blogName,
-        },
-      };
-    });
+    return Promise.all(
+      comments.map(async (c) => {
+        const likeStatus = likeStatusFinder(c, userId);
+        const likesCount = likesCounter(c, LikeStatus.Like);
+        const dislikesCount = likesCounter(c, LikeStatus.Dislike);
+
+        return {
+          id: c._id.toString(),
+          content: c.content,
+          createdAt: c.createdAt,
+          commentatorInfo: {
+            userId: c.commentatorInfo.userId,
+            userLogin: c.commentatorInfo.userLogin,
+          },
+          likesInfo: {
+            likesCount: likesCount,
+            dislikesCount: dislikesCount,
+            myStatus: likeStatus,
+          },
+          postInfo: {
+            blogId: c.postInfo.blogId,
+            blogName: c.postInfo.blogName,
+            id: c.postInfo.id,
+            title: c.postInfo.title,
+          },
+        };
+      }),
+    );
   }
 }
