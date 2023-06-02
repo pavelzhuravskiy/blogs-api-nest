@@ -1,5 +1,5 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { DeviceDocument } from '../../../../api/entities/device.entity';
+import { DeviceDocument } from '../../../../api/entities/_mongoose/device.entity';
 import { DevicesRepository } from '../../../../api/infrastructure/devices/devices.repository';
 
 export class DeviceUpdateForTokensCommand {

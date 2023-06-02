@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UsersRepository } from '../../../../api/infrastructure/users/users.repository';
-import { UserDocument } from '../../../../api/entities/user.entity';
+import { UserDocument } from '../../../../api/entities/_mongoose/user.entity';
 import { NewPasswordInputDto } from '../../../dto/new-password.input.dto';
 import bcrypt from 'bcrypt';
 

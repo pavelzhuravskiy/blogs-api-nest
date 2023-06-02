@@ -1,10 +1,19 @@
 import { Controller, Delete, HttpCode } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Device, DeviceModelType } from '../../entities/device.entity';
-import { Blog, BlogModelType } from '../../entities/blog.entity';
-import { Post, PostModelType } from '../../entities/post.entity';
-import { Comment, CommentModelType } from '../../entities/comment.entity';
-import { User, UserModelType } from '../../entities/user.entity';
+import {
+  Device,
+  DeviceModelType,
+} from '../../entities/_mongoose/device.entity';
+import { Blog, BlogModelType } from '../../entities/_mongoose/blog.entity';
+import { Post, PostModelType } from '../../entities/_mongoose/post.entity';
+import {
+  Comment,
+  CommentModelType,
+} from '../../entities/_mongoose/comment.entity';
+import {
+  UserMongoose,
+  UserModelType,
+} from '../../entities/_mongoose/user.entity';
 
 @Controller('testing')
 export class TestingController {
@@ -15,7 +24,7 @@ export class TestingController {
     private PostModel: PostModelType,
     @InjectModel(Comment.name)
     private CommentModel: CommentModelType,
-    @InjectModel(User.name)
+    @InjectModel(UserMongoose.name)
     private UserModel: UserModelType,
     @InjectModel(Device.name)
     private DeviceModel: DeviceModelType,

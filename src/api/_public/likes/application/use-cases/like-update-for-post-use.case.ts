@@ -1,6 +1,9 @@
 import { InjectModel } from '@nestjs/mongoose';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { Post, PostModelType } from '../../../../entities/post.entity';
+import {
+  Post,
+  PostModelType,
+} from '../../../../entities/_mongoose/post.entity';
 import { PostsRepository } from '../../../../infrastructure/posts/posts.repository';
 import { LikesDataType } from '../../../../dto/likes/schemas/likes-data.type';
 import { LikesService } from '../likes.service';

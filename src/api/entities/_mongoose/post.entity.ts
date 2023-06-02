@@ -1,9 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Model, Types } from 'mongoose';
-import { PostInputDto } from '../dto/posts/input/post.input.dto';
-import { LikesInfoSchema } from '../dto/likes/schemas/likes-info.schema';
+import { PostInputDto } from '../../dto/posts/input/post.input.dto';
+import { LikesInfoSchema } from '../../dto/likes/schemas/likes-info.schema';
 import { BlogDocument } from './blog.entity';
-import { BlogInfoSchema } from '../dto/posts/schemas/blog-info.schema';
+import { BlogInfoSchema } from '../../dto/posts/schemas/blog-info.schema';
 
 export type PostDocument = HydratedDocument<Post>;
 export type PostLeanType = Post & { _id: Types.ObjectId };

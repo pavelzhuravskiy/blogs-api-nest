@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Device, DeviceSchema } from '../entities/device.entity';
+import { Device, DeviceSchema } from '../entities/_mongoose/device.entity';
 import { JwtService } from '@nestjs/jwt';
 import { DevicesRepository } from '../infrastructure/devices/devices.repository';
 import { PublicDevicesController } from '../_public/devices/public.devices.controller';

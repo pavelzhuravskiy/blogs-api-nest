@@ -3,7 +3,10 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UsersRepository } from '../../../../infrastructure/users/users.repository';
 import bcrypt from 'bcrypt';
 import { UserInputDto } from '../../../../dto/users/input/user-input.dto';
-import { User, UserModelType } from '../../../../entities/user.entity';
+import {
+  UserMongoose,
+  UserModelType,
+} from '../../../../entities/_mongoose/user.entity';
 
 export class UserCreateCommand {
   constructor(public userInputDto: UserInputDto) {}
@@ -12,7 +15,7 @@ export class UserCreateCommand {
 @CommandHandler(UserCreateCommand)
 export class UserCreateUseCase implements ICommandHandler<UserCreateCommand> {
   constructor(
-    @InjectModel(User.name)
+    @InjectModel(UserMongoose.name)
     private UserModel: UserModelType,
     private readonly usersRepository: UsersRepository,
   ) {}

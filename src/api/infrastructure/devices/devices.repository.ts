@@ -4,7 +4,7 @@ import {
   Device,
   DeviceDocument,
   DeviceModelType,
-} from '../../entities/device.entity';
+} from '../../entities/_mongoose/device.entity';
 
 @Injectable()
 export class DevicesRepository {

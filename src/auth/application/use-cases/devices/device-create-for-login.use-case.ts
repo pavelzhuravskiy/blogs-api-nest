@@ -3,7 +3,7 @@ import {
   Device,
   DeviceDocument,
   DeviceModelType,
-} from '../../../../api/entities/device.entity';
+} from '../../../../api/entities/_mongoose/device.entity';
 import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/mongoose';
 import { DevicesRepository } from '../../../../api/infrastructure/devices/devices.repository';

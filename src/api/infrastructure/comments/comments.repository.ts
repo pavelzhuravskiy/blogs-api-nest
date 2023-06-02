@@ -4,7 +4,7 @@ import {
   Comment,
   CommentDocument,
   CommentModelType,
-} from '../../entities/comment.entity';
+} from '../../entities/_mongoose/comment.entity';
 import mongoose from 'mongoose';
 
 @Injectable()

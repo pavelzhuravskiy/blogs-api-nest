@@ -1,16 +1,16 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Model, Types } from 'mongoose';
-import { UserAccountSchema } from '../dto/users/schemas/user-account.schema';
-import { UserEmailSchema } from '../dto/users/schemas/user-email.schema';
-import { UserPasswordSchema } from '../dto/users/schemas/user-password.schema';
-import { UserInputDto } from '../dto/users/input/user-input.dto';
+import { UserAccountSchema } from '../../dto/users/schemas/user-account.schema';
+import { UserEmailSchema } from '../../dto/users/schemas/user-email.schema';
+import { UserPasswordSchema } from '../../dto/users/schemas/user-password.schema';
+import { UserInputDto } from '../../dto/users/input/user-input.dto';
 import { add } from 'date-fns';
-import { UserBanSchema } from '../dto/users/schemas/user-ban.schema';
-import { SAUserBanInputDto } from '../dto/users/input/superadmin/sa.user-ban.input.dto';
-import { UserBanForBlogSchema } from '../dto/users/schemas/user-ban-for-blog.schema';
+import { UserBanSchema } from '../../dto/users/schemas/user-ban.schema';
+import { SAUserBanInputDto } from '../../dto/users/input/superadmin/sa.user-ban.input.dto';
+import { UserBanForBlogSchema } from '../../dto/users/schemas/user-ban-for-blog.schema';
 
-export type UserDocument = HydratedDocument<User>;
-export type UserLeanType = User & { _id: Types.ObjectId };
+export type UserDocument = HydratedDocument<UserMongoose>;
+export type UserLeanType = UserMongoose & { _id: Types.ObjectId };
 
 export type UserModelStaticType = {
   createUser: (
@@ -21,10 +21,10 @@ export type UserModelStaticType = {
   ) => UserDocument;
 };
 
-export type UserModelType = Model<User> & UserModelStaticType;
+export type UserModelType = Model<UserMongoose> & UserModelStaticType;
 
 @Schema()
-export class User {
+export class UserMongoose {
   @Prop({ required: true })
   accountData: UserAccountSchema;
 
@@ -127,21 +127,22 @@ export class User {
   }
 }
 
-export const UserSchema = SchemaFactory.createForClass(User);
+export const UserSchema = SchemaFactory.createForClass(UserMongoose);
 
 UserSchema.methods = {
-  userCanBeConfirmed: User.prototype.userCanBeConfirmed,
-  confirmUser: User.prototype.confirmUser,
-  updateEmailConfirmationData: User.prototype.updateEmailConfirmationData,
-  updatePasswordRecoveryData: User.prototype.updatePasswordRecoveryData,
-  passwordCanBeUpdated: User.prototype.passwordCanBeUpdated,
-  updatePassword: User.prototype.updatePassword,
-  saBanUser: User.prototype.saBanUser,
-  saUnbanUser: User.prototype.saUnbanUser,
+  userCanBeConfirmed: UserMongoose.prototype.userCanBeConfirmed,
+  confirmUser: UserMongoose.prototype.confirmUser,
+  updateEmailConfirmationData:
+    UserMongoose.prototype.updateEmailConfirmationData,
+  updatePasswordRecoveryData: UserMongoose.prototype.updatePasswordRecoveryData,
+  passwordCanBeUpdated: UserMongoose.prototype.passwordCanBeUpdated,
+  updatePassword: UserMongoose.prototype.updatePassword,
+  saBanUser: UserMongoose.prototype.saBanUser,
+  saUnbanUser: UserMongoose.prototype.saUnbanUser,
 };
 
 const userStaticMethods: UserModelStaticType = {
-  createUser: User.createUser,
+  createUser: UserMongoose.createUser,
 };
 
 UserSchema.statics = userStaticMethods;

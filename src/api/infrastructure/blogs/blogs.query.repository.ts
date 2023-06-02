@@ -1,5 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { Blog, BlogLeanType, BlogModelType } from '../../entities/blog.entity';
+import {
+  Blog,
+  BlogLeanType,
+  BlogModelType,
+} from '../../entities/_mongoose/blog.entity';
 import { BlogQueryDto } from '../../dto/blogs/query/blog.query.dto';
 import mongoose from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';

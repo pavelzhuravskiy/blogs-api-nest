@@ -1,6 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Device, DeviceModelType } from '../../entities/device.entity';
+import {
+  Device,
+  DeviceModelType,
+} from '../../entities/_mongoose/device.entity';
 import { DeviceViewDto } from '../../dto/devices/view/device.view.dto';
 
 @Injectable()

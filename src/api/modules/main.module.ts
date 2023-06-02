@@ -6,16 +6,16 @@ import {
 } from '@nestjs/common';
 import { PublicBlogsController } from '../_public/blogs/public.blogs.controller';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Blog, BlogSchema } from '../entities/blog.entity';
+import { Blog, BlogSchema } from '../entities/_mongoose/blog.entity';
 import { BlogsRepository } from '../infrastructure/blogs/blogs.repository';
 import { BlogsQueryRepository } from '../infrastructure/blogs/blogs.query.repository';
 import { PublicPostsController } from '../_public/posts/public.posts.controller';
 import { PostsRepository } from '../infrastructure/posts/posts.repository';
 import { PostsQueryRepository } from '../infrastructure/posts/posts.query.repository';
-import { Post, PostSchema } from '../entities/post.entity';
-import { Comment, CommentSchema } from '../entities/comment.entity';
+import { Post, PostSchema } from '../entities/_mongoose/post.entity';
+import { Comment, CommentSchema } from '../entities/_mongoose/comment.entity';
 import { UsersRepository } from '../infrastructure/users/users.repository';
-import { User, UserSchema } from '../entities/user.entity';
+import { UserMongoose, UserSchema } from '../entities/_mongoose/user.entity';
 import { CommentsRepository } from '../infrastructure/comments/comments.repository';
 import { CommentsQueryRepository } from '../infrastructure/comments/comments.query.repository';
 import { LikesService } from '../_public/likes/application/likes.service';
@@ -93,7 +93,7 @@ const queryRepositories = [
       { name: Blog.name, schema: BlogSchema },
       { name: Post.name, schema: PostSchema },
       { name: Comment.name, schema: CommentSchema },
-      { name: User.name, schema: UserSchema },
+      { name: UserMongoose.name, schema: UserSchema },
     ]),
     CqrsModule,
   ],

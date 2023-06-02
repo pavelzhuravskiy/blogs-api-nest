@@ -2,7 +2,11 @@ import { Injectable } from '@nestjs/common';
 import mongoose from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Paginator } from '../../../helpers/pagination/_paginator';
-import { User, UserLeanType, UserModelType } from '../../entities/user.entity';
+import {
+  UserMongoose,
+  UserLeanType,
+  UserModelType,
+} from '../../entities/_mongoose/user.entity';
 import { UserQueryDto } from '../../dto/users/query/user-query.dto';
 import { SuperAdminUserViewDto } from '../../dto/users/view/superadmin/sa.user.view.dto';
 import { pFind } from '../../../helpers/pagination/pagination-find';
@@ -22,7 +26,7 @@ import { ExceptionResultType } from '../../../exceptions/types/exception-result.
 @Injectable()
 export class UsersQueryRepository {
   constructor(
-    @InjectModel(User.name)
+    @InjectModel(UserMongoose.name)
     private UserModel: UserModelType,
     private readonly blogsRepository: BlogsRepository,
   ) {}

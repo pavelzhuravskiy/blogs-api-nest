@@ -7,10 +7,13 @@ import { JwtService } from '@nestjs/jwt';
 import { JwtRefreshTokenStrategy } from './strategies/jwt-refresh.strategy';
 import { BasicStrategy } from './strategies/basic.strategy';
 import { MongooseModule } from '@nestjs/mongoose';
-import { User, UserSchema } from '../api/entities/user.entity';
+import {
+  UserMongoose,
+  UserSchema,
+} from '../api/entities/_mongoose/user.entity';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { CqrsModule } from '@nestjs/cqrs';
-import { Device, DeviceSchema } from '../api/entities/device.entity';
+import { Device, DeviceSchema } from '../api/entities/_mongoose/device.entity';
 import { DevicesRepository } from '../api/infrastructure/devices/devices.repository';
 import { UsersRepository } from '../api/infrastructure/users/users.repository';
 import { RegistrationUseCase } from './application/use-cases/registration/registration.use-case';
@@ -58,7 +61,7 @@ const strategies = [
     }),
     MongooseModule.forFeature([
       { name: Device.name, schema: DeviceSchema },
-      { name: User.name, schema: UserSchema },
+      { name: UserMongoose.name, schema: UserSchema },
     ]),
     CqrsModule,
     PassportModule,

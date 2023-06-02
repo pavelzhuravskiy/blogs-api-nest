@@ -6,7 +6,7 @@ import {
   Comment,
   CommentLeanType,
   CommentModelType,
-} from '../../entities/comment.entity';
+} from '../../entities/_mongoose/comment.entity';
 import { CommentViewDto } from '../../dto/comments/view/comment.view.dto';
 import { QueryDto } from '../../dto/query.dto';
 import { pFind } from '../../../helpers/pagination/pagination-find';

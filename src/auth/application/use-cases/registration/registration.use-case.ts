@@ -6,10 +6,10 @@ import bcrypt from 'bcrypt';
 import { randomUUID } from 'crypto';
 import { add } from 'date-fns';
 import {
-  User,
+  UserMongoose,
   UserDocument,
   UserModelType,
-} from '../../../../api/entities/user.entity';
+} from '../../../../api/entities/_mongoose/user.entity';
 import { SendRegistrationMailCommand } from '../../../../mail/application/use-cases/send-registration-mail.use-case';
 
 export class RegistrationCommand {
@@ -21,7 +21,7 @@ export class RegistrationUseCase
   implements ICommandHandler<RegistrationCommand>
 {
   constructor(
-    @InjectModel(User.name)
+    @InjectModel(UserMongoose.name)
     private UserModel: UserModelType,
     private commandBus: CommandBus,
     private readonly usersRepository: UsersRepository,

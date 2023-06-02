@@ -15,8 +15,14 @@ import { BlogsRepository } from '../../../../infrastructure/blogs/blogs.reposito
 import { CommentsRepository } from '../../../../infrastructure/comments/comments.repository';
 import { LikesRepository } from '../../../../infrastructure/likes/likes.repository';
 import { InjectModel } from '@nestjs/mongoose';
-import { Post, PostModelType } from '../../../../entities/post.entity';
-import { Comment, CommentModelType } from '../../../../entities/comment.entity';
+import {
+  Post,
+  PostModelType,
+} from '../../../../entities/_mongoose/post.entity';
+import {
+  Comment,
+  CommentModelType,
+} from '../../../../entities/_mongoose/comment.entity';
 
 export class SAUserBanCommand {
   constructor(

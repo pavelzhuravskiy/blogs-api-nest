@@ -10,7 +10,7 @@ import {
   userNotFound,
 } from '../../../../exceptions/exception.constants';
 import { PostInputDto } from '../../../dto/posts/input/post.input.dto';
-import { Post, PostModelType } from '../../../entities/post.entity';
+import { Post, PostModelType } from '../../../entities/_mongoose/post.entity';
 import { PostsRepository } from '../../../infrastructure/posts/posts.repository';
 import { UsersRepository } from '../../../infrastructure/users/users.repository';
 

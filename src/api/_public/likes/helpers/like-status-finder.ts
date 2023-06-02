@@ -1,6 +1,6 @@
 import { LikeStatus } from '../../../../enums/like-status.enum';
-import { CommentLeanType } from '../../../entities/comment.entity';
-import { PostLeanType } from '../../../entities/post.entity';
+import { CommentLeanType } from '../../../entities/_mongoose/comment.entity';
+import { PostLeanType } from '../../../entities/_mongoose/post.entity';
 
 export const likeStatusFinder = (
   commentOrPost: CommentLeanType | PostLeanType,

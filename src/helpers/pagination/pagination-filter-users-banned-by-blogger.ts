@@ -1,5 +1,5 @@
 import { FilterQuery } from 'mongoose';
-import { UserDocument } from '../../api/entities/user.entity';
+import { UserDocument } from '../../api/entities/_mongoose/user.entity';
 
 export const pFilterUsersBannedByBlogger = (
   loginTerm: string,
