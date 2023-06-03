@@ -1,6 +1,6 @@
 import { InjectModel } from '@nestjs/mongoose';
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { UsersRepository } from '../../../../api/infrastructure/users/users.repository';
+import { UsersMongooseRepository } from '../../../../api/infrastructure/_mongoose/users/users.mongoose.repository';
 import { UserInputDto } from '../../../../api/dto/users/input/user-input.dto';
 import bcrypt from 'bcrypt';
 import { randomUUID } from 'crypto';
@@ -24,7 +24,7 @@ export class RegistrationUseCase
     @InjectModel(UserMongoose.name)
     private UserModel: UserModelType,
     private commandBus: CommandBus,
-    private readonly usersRepository: UsersRepository,
+    private readonly usersRepository: UsersMongooseRepository,
   ) {}
 
   async execute(command: RegistrationCommand): Promise<UserDocument | null> {

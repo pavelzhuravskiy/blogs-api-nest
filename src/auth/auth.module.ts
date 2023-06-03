@@ -15,7 +15,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
 import { CqrsModule } from '@nestjs/cqrs';
 import { Device, DeviceSchema } from '../api/entities/_mongoose/device.entity';
 import { DevicesRepository } from '../api/infrastructure/devices/devices.repository';
-import { UsersRepository } from '../api/infrastructure/users/users.repository';
+import { UsersMongooseRepository } from '../api/infrastructure/_mongoose/users/users.mongoose.repository';
 import { RegistrationUseCase } from './application/use-cases/registration/registration.use-case';
 import { RegistrationEmailResendUseCase } from './application/use-cases/registration/registration-email-resend.use-case';
 import { RegistrationConfirmationUseCase } from './application/use-cases/registration/registration-confirmation.use-case';
@@ -44,7 +44,7 @@ const useCases = [
   TokensCreateUseCase,
 ];
 
-const repositories = [DevicesRepository, UsersRepository];
+const repositories = [DevicesRepository, UsersMongooseRepository];
 
 const strategies = [
   BasicStrategy,

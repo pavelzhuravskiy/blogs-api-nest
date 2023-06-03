@@ -2,13 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { LikesRepository } from '../../../infrastructure/likes/likes.repository';
 import { LikeStatus } from '../../../../enums/like-status.enum';
 import { LikesDataType } from '../../../dto/likes/schemas/likes-data.type';
-import { UsersRepository } from '../../../infrastructure/users/users.repository';
+import { UsersMongooseRepository } from '../../../infrastructure/_mongoose/users/users.mongoose.repository';
 
 @Injectable()
 export class LikesService {
   constructor(
     private readonly likesRepository: LikesRepository,
-    private readonly usersRepository: UsersRepository,
+    private readonly usersRepository: UsersMongooseRepository,
   ) {}
 
   async updateLikesData(data: LikesDataType): Promise<boolean | null> {

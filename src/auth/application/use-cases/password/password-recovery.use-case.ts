@@ -1,5 +1,5 @@
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { UsersRepository } from '../../../../api/infrastructure/users/users.repository';
+import { UsersMongooseRepository } from '../../../../api/infrastructure/_mongoose/users/users.mongoose.repository';
 import { randomUUID } from 'crypto';
 import { UserDocument } from '../../../../api/entities/_mongoose/user.entity';
 import { EmailInputDto } from '../../../dto/email.input.dto';
@@ -15,7 +15,7 @@ export class PasswordRecoveryUseCase
 {
   constructor(
     private commandBus: CommandBus,
-    private readonly usersRepository: UsersRepository,
+    private readonly usersRepository: UsersMongooseRepository,
   ) {}
 
   async execute(

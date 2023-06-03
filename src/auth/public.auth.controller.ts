@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
 import { LocalAuthGuard } from './guards/local-auth.guard';
-import { UsersRepository } from '../api/infrastructure/users/users.repository';
+import { UsersMongooseRepository } from '../api/infrastructure/_mongoose/users/users.mongoose.repository';
 import { UserIdFromGuard } from './decorators/user-id-from-guard.decorator';
 import { JwtService } from '@nestjs/jwt';
 import { JwtBearerGuard } from './guards/jwt-bearer.guard';
@@ -49,7 +49,7 @@ export class PublicAuthController {
   constructor(
     private commandBus: CommandBus,
     private readonly jwtService: JwtService,
-    private readonly usersRepository: UsersRepository,
+    private readonly usersRepository: UsersMongooseRepository,
   ) {}
 
   // @UseGuards(ThrottlerGuard)

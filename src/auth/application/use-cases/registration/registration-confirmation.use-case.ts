@@ -1,5 +1,5 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { UsersRepository } from '../../../../api/infrastructure/users/users.repository';
+import { UsersMongooseRepository } from '../../../../api/infrastructure/_mongoose/users/users.mongoose.repository';
 import { UserDocument } from '../../../../api/entities/_mongoose/user.entity';
 import { ConfirmCodeInputDto } from '../../../dto/confirm-code.input.dto';
 
@@ -11,7 +11,7 @@ export class RegistrationConfirmationCommand {
 export class RegistrationConfirmationUseCase
   implements ICommandHandler<RegistrationConfirmationCommand>
 {
-  constructor(private readonly usersRepository: UsersRepository) {}
+  constructor(private readonly usersRepository: UsersMongooseRepository) {}
 
   async execute(
     command: RegistrationConfirmationCommand,

@@ -1,5 +1,5 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { UsersRepository } from '../../../infrastructure/users/users.repository';
+import { UsersMongooseRepository } from '../../../infrastructure/_mongoose/users/users.mongoose.repository';
 import { ResultCode } from '../../../../enums/result-code.enum';
 import {
   userIDField,
@@ -23,7 +23,7 @@ export class BloggerUserBanUseCase
   implements ICommandHandler<BloggerUserBanCommand>
 {
   constructor(
-    private readonly usersRepository: UsersRepository,
+    private readonly usersRepository: UsersMongooseRepository,
     private readonly blogsRepository: BlogsRepository,
   ) {}
 

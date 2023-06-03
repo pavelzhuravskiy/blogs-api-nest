@@ -14,7 +14,7 @@ import { PostsRepository } from '../infrastructure/posts/posts.repository';
 import { PostsQueryRepository } from '../infrastructure/posts/posts.query.repository';
 import { Post, PostSchema } from '../entities/_mongoose/post.entity';
 import { Comment, CommentSchema } from '../entities/_mongoose/comment.entity';
-import { UsersRepository } from '../infrastructure/users/users.repository';
+import { UsersMongooseRepository } from '../infrastructure/_mongoose/users/users.mongoose.repository';
 import { UserMongoose, UserSchema } from '../entities/_mongoose/user.entity';
 import { CommentsRepository } from '../infrastructure/comments/comments.repository';
 import { CommentsQueryRepository } from '../infrastructure/comments/comments.query.repository';
@@ -41,7 +41,7 @@ import { LikeUpdateForPostUseCase } from '../_public/likes/application/use-cases
 import { LikeUpdateForCommentUseCase } from '../_public/likes/application/use-cases/like-update-for-comment-use.case';
 import { BloggerUserBanUseCase } from '../_blogger/application/use-cases/user-ban.use-case';
 import { BloggerUsersController } from '../_blogger/blogger.users.controller';
-import { UsersQueryRepository } from '../infrastructure/users/users.query.repository';
+import { UsersMongooseQueryRepository } from '../infrastructure/_mongoose/users/users.mongoose.query.repository';
 import { BlogBanUseCase } from '../_superadmin/blogs/application/use-cases/blog-ban.use-case';
 
 const controllers = [
@@ -76,7 +76,7 @@ const repositories = [
   BlogsRepository,
   PostsRepository,
   CommentsRepository,
-  UsersRepository,
+  UsersMongooseRepository,
   LikesRepository,
 ];
 
@@ -84,7 +84,7 @@ const queryRepositories = [
   BlogsQueryRepository,
   PostsQueryRepository,
   CommentsQueryRepository,
-  UsersQueryRepository,
+  UsersMongooseQueryRepository,
 ];
 
 @Module({

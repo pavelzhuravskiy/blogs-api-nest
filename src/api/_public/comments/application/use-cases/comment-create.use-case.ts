@@ -1,6 +1,6 @@
 import { InjectModel } from '@nestjs/mongoose';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { UsersRepository } from '../../../../infrastructure/users/users.repository';
+import { UsersMongooseRepository } from '../../../../infrastructure/_mongoose/users/users.mongoose.repository';
 import { CommentInputDto } from '../../../../dto/comments/input/comment.input.dto';
 import {
   Comment,
@@ -35,7 +35,7 @@ export class CommentCreateUseCase
     private CommentModel: CommentModelType,
     private readonly commentsRepository: CommentsRepository,
     private readonly postsRepository: PostsRepository,
-    private readonly usersRepository: UsersRepository,
+    private readonly usersRepository: UsersMongooseRepository,
   ) {}
 
   async execute(

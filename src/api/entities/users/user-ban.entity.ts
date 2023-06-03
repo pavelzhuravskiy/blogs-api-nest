@@ -1,9 +1,4 @@
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class UserBan {
@@ -13,7 +8,7 @@ export class UserBan {
   @Column({ type: 'boolean', nullable: true })
   isBanned: boolean;
 
-  @CreateDateColumn({ type: 'timestamp', nullable: true })
+  @Column({ type: 'timestamp', nullable: true })
   banDate: Date;
 
   @Column({ type: 'varchar', nullable: true })

@@ -7,21 +7,17 @@ import {
 import { Injectable } from '@nestjs/common';
 import { UsersRepository } from '../../api/infrastructure/users/users.repository';
 
-@ValidatorConstraint({ name: 'isUserAlreadyExist', async: true })
+@ValidatorConstraint({ name: 'IsEmailExist', async: true })
 @Injectable()
-export class IsUserAlreadyExistConstraint
-  implements ValidatorConstraintInterface
-{
+export class IsEmailExistConstraint implements ValidatorConstraintInterface {
   constructor(private readonly usersRepository: UsersRepository) {}
-  async validate(loginOrEmail: string) {
-    const user = await this.usersRepository.findUserByLoginOrEmail(
-      loginOrEmail,
-    );
+  async validate(email: string) {
+    const user = await this.usersRepository.findExistingEmail(email);
     return !user;
   }
 }
 
-export const IsUserAlreadyExist =
+export const IsEmailExist =
   (validationOptions?: ValidationOptions) =>
   (object: object, propertyName: string) => {
     registerDecorator({
@@ -29,6 +25,6 @@ export const IsUserAlreadyExist =
       propertyName: propertyName,
       options: validationOptions,
       constraints: [],
-      validator: IsUserAlreadyExistConstraint,
+      validator: IsEmailExistConstraint,
     });
   };

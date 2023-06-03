@@ -1,5 +1,5 @@
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { UsersRepository } from '../../../../infrastructure/users/users.repository';
+import { UsersMongooseRepository } from '../../../../infrastructure/_mongoose/users/users.mongoose.repository';
 import { SAUserBanInputDto } from '../../../../dto/users/input/superadmin/sa.user-ban.input.dto';
 import { ResultCode } from '../../../../../enums/result-code.enum';
 import {
@@ -39,7 +39,7 @@ export class UserBanUseCase implements ICommandHandler<SAUserBanCommand> {
     private PostModel: PostModelType,
     @InjectModel(Comment.name)
     private CommentModel: CommentModelType,
-    private readonly usersRepository: UsersRepository,
+    private readonly usersRepository: UsersMongooseRepository,
     private readonly blogsRepository: BlogsRepository,
     private readonly postsRepository: PostsRepository,
     private readonly commentsRepository: CommentsRepository,

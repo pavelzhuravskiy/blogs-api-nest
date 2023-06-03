@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
-import { UsersRepository } from '../infrastructure/users/users.repository';
-import { UsersQueryRepository } from '../infrastructure/users/users.query.repository';
+import { UsersMongooseRepository } from '../infrastructure/_mongoose/users/users.mongoose.repository';
+import { UsersMongooseQueryRepository } from '../infrastructure/_mongoose/users/users.mongoose.query.repository';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UserMongoose, UserSchema } from '../entities/_mongoose/user.entity';
-import { IsUserAlreadyExistConstraint } from '../../exceptions/decorators/unique-user.decorator';
+import { IsLoginExistConstraint } from '../../exceptions/decorators/unique-login.decorator';
 import { SuperAdminUsersController } from '../_superadmin/users/sa.users.controller';
 import { CqrsModule } from '@nestjs/cqrs';
 import { UserCreateUseCase } from '../_superadmin/users/application/use-cases/user-create.use-case';
@@ -21,19 +21,24 @@ import { User } from '../entities/users/user.entity';
 import { UserEmailConfirmation } from '../entities/users/user-email-confirmation.entity';
 import { UserPasswordRecovery } from '../entities/users/user-password-recovery.entity';
 import { UserBan } from '../entities/users/user-ban.entity';
+import { UsersRepository } from '../infrastructure/users/users.repository';
+import { IsEmailExistConstraint } from '../../exceptions/decorators/unique-email.decorator';
+import { UsersQueryRepository } from '../infrastructure/users/users.query.repository';
 
 const useCases = [UserCreateUseCase, UserDeleteUseCase, UserBanUseCase];
 
 const entities = [User, UserEmailConfirmation, UserPasswordRecovery, UserBan];
 
-const repositories = [
-  UsersRepository,
-  UsersQueryRepository,
+const mongooseRepositories = [
+  UsersMongooseRepository,
+  UsersMongooseQueryRepository,
   BlogsRepository,
   PostsRepository,
   CommentsRepository,
   LikesRepository,
 ];
+
+const sqlRepositories = [UsersRepository, UsersQueryRepository];
 
 @Module({
   imports: [
@@ -47,6 +52,12 @@ const repositories = [
     CqrsModule,
   ],
   controllers: [SuperAdminUsersController],
-  providers: [...useCases, ...repositories, IsUserAlreadyExistConstraint],
+  providers: [
+    ...useCases,
+    ...sqlRepositories,
+    ...mongooseRepositories,
+    IsLoginExistConstraint,
+    IsEmailExistConstraint,
+  ],
 })
 export class UsersModule {}

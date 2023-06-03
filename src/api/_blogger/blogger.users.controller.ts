@@ -16,7 +16,7 @@ import { BloggerUserBanInputDto } from '../dto/users/input/blogger/blogger.user-
 import { BloggerUserBanCommand } from './application/use-cases/user-ban.use-case';
 import { BlogsQueryRepository } from '../infrastructure/blogs/blogs.query.repository';
 import { BloggerUserBanQueryDto } from '../dto/users/query/blogger/blogger.user-ban.query.dto';
-import { UsersQueryRepository } from '../infrastructure/users/users.query.repository';
+import { UsersMongooseQueryRepository } from '../infrastructure/_mongoose/users/users.mongoose.query.repository';
 import { UserIdFromGuard } from '../../auth/decorators/user-id-from-guard.decorator';
 
 @Controller('blogger/users')
@@ -24,7 +24,7 @@ export class BloggerUsersController {
   constructor(
     private commandBus: CommandBus,
     private readonly blogsQueryRepository: BlogsQueryRepository,
-    private readonly usersQueryRepository: UsersQueryRepository,
+    private readonly usersQueryRepository: UsersMongooseQueryRepository,
   ) {}
 
   @UseGuards(JwtBearerGuard)

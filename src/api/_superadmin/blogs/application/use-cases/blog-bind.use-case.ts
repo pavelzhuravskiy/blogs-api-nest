@@ -1,6 +1,6 @@
 import { BlogsRepository } from '../../../../infrastructure/blogs/blogs.repository';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { UsersRepository } from '../../../../infrastructure/users/users.repository';
+import { UsersMongooseRepository } from '../../../../infrastructure/_mongoose/users/users.mongoose.repository';
 import { ResultCode } from '../../../../../enums/result-code.enum';
 import {
   blogIDField,
@@ -19,7 +19,7 @@ export class BlogBindCommand {
 export class BlogBindUseCase implements ICommandHandler<BlogBindCommand> {
   constructor(
     private readonly blogsRepository: BlogsRepository,
-    private readonly usersRepository: UsersRepository,
+    private readonly usersRepository: UsersMongooseRepository,
   ) {}
 
   async execute(

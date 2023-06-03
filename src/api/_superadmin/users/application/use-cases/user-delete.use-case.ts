@@ -1,5 +1,5 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { UsersRepository } from '../../../../infrastructure/users/users.repository';
+import { UsersMongooseRepository } from '../../../../infrastructure/_mongoose/users/users.mongoose.repository';
 
 export class UserDeleteCommand {
   constructor(public userId: string) {}
@@ -7,7 +7,7 @@ export class UserDeleteCommand {
 
 @CommandHandler(UserDeleteCommand)
 export class UserDeleteUseCase implements ICommandHandler<UserDeleteCommand> {
-  constructor(private readonly usersRepository: UsersRepository) {}
+  constructor(private readonly usersRepository: UsersMongooseRepository) {}
 
   async execute(command: UserDeleteCommand): Promise<boolean> {
     const user = await this.usersRepository.findUserById(command.userId);

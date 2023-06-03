@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import bcrypt from 'bcrypt';
-import { UsersRepository } from '../../../../api/infrastructure/users/users.repository';
+import { UsersMongooseRepository } from '../../../../api/infrastructure/_mongoose/users/users.mongoose.repository';
 
 export class ValidateLoginAndPasswordCommand {
   constructor(public loginOrEmail: string, public password: string) {}
@@ -10,7 +10,7 @@ export class ValidateLoginAndPasswordCommand {
 export class ValidateLoginAndPasswordUseCase
   implements ICommandHandler<ValidateLoginAndPasswordCommand>
 {
-  constructor(private readonly usersRepository: UsersRepository) {}
+  constructor(private readonly usersRepository: UsersMongooseRepository) {}
 
   async execute(command: ValidateLoginAndPasswordCommand) {
     const user = await this.usersRepository.findUserByLoginOrEmail(

@@ -1,136 +1,74 @@
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import mongoose from 'mongoose';
-import {
-  UserMongoose,
-  UserDocument,
-  UserModelType,
-} from '../../entities/_mongoose/user.entity';
+import { UserInputDto } from '../../dto/users/input/user-input.dto';
+import { InjectDataSource } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
+import { User } from '../../entities/users/user.entity';
 
 @Injectable()
 export class UsersRepository {
-  constructor(
-    @InjectModel(UserMongoose.name)
-    private UserModel: UserModelType,
-  ) {}
+  constructor(@InjectDataSource() private dataSource: DataSource) {}
 
-  async save(user: UserDocument) {
-    return user.save();
-  }
+  async createUser(userInputDto: UserInputDto, hash: string) {
+    return await this.dataSource.transaction(async () => {
+      const user = await this.dataSource.query(
+        `insert into public.users (login, "passwordHash", email, "isConfirmed")
+         values ($1, $2, $3, $4)
+         returning id;`,
+        [userInputDto.login, hash, userInputDto.email, true],
+      );
+      const userId = user[0].id;
 
-  async findUserById(id: string): Promise<UserDocument | null> {
-    if (!mongoose.isValidObjectId(id)) {
-      return null;
-    }
-
-    const user = await this.UserModel.findOne({ _id: id });
-
-    if (!user) {
-      return null;
-    }
-
-    return user;
-  }
-
-  async findUserByLoginOrEmail(
-    loginOrEmail: string,
-  ): Promise<UserDocument | null> {
-    const user = await this.UserModel.findOne({
-      $or: [
-        { 'accountData.login': loginOrEmail },
-        { 'accountData.email': loginOrEmail },
-      ],
+      await this.dataSource.query(
+        `insert into user_bans ("isBanned", "userId")
+         values (false, $1);`,
+        [userId],
+      );
+      return userId;
     });
-
-    if (!user) {
-      return null;
-    }
-
-    return user;
   }
 
-  async findUserByEmailCode(code: string): Promise<UserDocument | null> {
-    const user = this.UserModel.findOne({
-      'emailConfirmation.confirmationCode': code,
-    });
-
-    if (!user) {
-      return null;
-    }
-
-    return user;
-  }
-
-  async findUserByRecoveryCode(code: string): Promise<UserDocument | null> {
-    const user = this.UserModel.findOne({
-      'passwordRecovery.recoveryCode': code,
-    });
-
-    if (!user) {
-      return null;
-    }
-
-    return user;
-  }
-
-  async deleteUser(id: string): Promise<boolean> {
-    const user = await this.UserModel.deleteOne({ _id: id });
-    return user.deletedCount === 1;
-  }
-
-  async findUserBanForBlog(
-    userId: string,
-    blogId: string,
-  ): Promise<UserDocument | null> {
-    const user = await this.UserModel.findOne({
-      _id: userId,
-      'bansForBlogs.banInfo.blogId': blogId,
-    });
-
-    if (!user) {
-      return null;
-    }
-
-    return user;
-  }
-
-  async banUserForBlog(
-    blogId: string,
-    userId: string,
-    userLogin: string,
-    banReason: string,
-  ): Promise<boolean> {
-    const result = await this.UserModel.updateOne(
-      { _id: userId },
-      {
-        $push: {
-          bansForBlogs: {
-            id: userId,
-            login: userLogin,
-            banInfo: {
-              isBanned: true,
-              banDate: new Date(),
-              banReason: banReason,
-              blogId: blogId,
-            },
-          },
-        },
-      },
+  async findUserById(id: string): Promise<User | null> {
+    const user = await this.dataSource.query(
+      `select *
+       from public.users
+       where id = $1;`,
+      [id],
     );
-    return result.matchedCount === 1;
+
+    if (!user) {
+      return null;
+    }
+
+    return user;
   }
 
-  async unbanUserForBlog(blogId: string, userId: string): Promise<any> {
-    const result = await this.UserModel.updateOne(
-      { 'bansForBlogs.banInfo.blogId': blogId },
-      {
-        $pull: {
-          bansForBlogs: {
-            id: userId,
-          },
-        },
-      },
+  async findExistingLogin(login: string): Promise<User | null> {
+    const users = await this.dataSource.query(
+      `select id
+       from public.users
+       where login = $1`,
+      [login],
     );
-    return result.matchedCount === 1;
+
+    if (users.length === 0) {
+      return null;
+    }
+
+    return users;
+  }
+
+  async findExistingEmail(email: string): Promise<User | null> {
+    const users = await this.dataSource.query(
+      `select id
+       from public.users
+       where email = $1`,
+      [email],
+    );
+
+    if (users.length === 0) {
+      return null;
+    }
+
+    return users;
   }
 }

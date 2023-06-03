@@ -12,7 +12,7 @@ import {
 import { PostInputDto } from '../../../dto/posts/input/post.input.dto';
 import { Post, PostModelType } from '../../../entities/_mongoose/post.entity';
 import { PostsRepository } from '../../../infrastructure/posts/posts.repository';
-import { UsersRepository } from '../../../infrastructure/users/users.repository';
+import { UsersMongooseRepository } from '../../../infrastructure/_mongoose/users/users.mongoose.repository';
 
 export class PostCreateCommand {
   constructor(
@@ -29,7 +29,7 @@ export class PostCreateUseCase implements ICommandHandler<PostCreateCommand> {
     private PostModel: PostModelType,
     private readonly postsRepository: PostsRepository,
     private readonly blogsRepository: BlogsRepository,
-    private readonly usersRepository: UsersRepository,
+    private readonly usersRepository: UsersMongooseRepository,
   ) {}
 
   async execute(

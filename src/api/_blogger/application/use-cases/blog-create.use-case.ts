@@ -3,7 +3,7 @@ import { Blog, BlogModelType } from '../../../entities/_mongoose/blog.entity';
 import { BlogInputDto } from '../../../dto/blogs/input/blog.input.dto';
 import { BlogsRepository } from '../../../infrastructure/blogs/blogs.repository';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { UsersRepository } from '../../../infrastructure/users/users.repository';
+import { UsersMongooseRepository } from '../../../infrastructure/_mongoose/users/users.mongoose.repository';
 
 export class BlogCreateCommand {
   constructor(public blogInputDto: BlogInputDto, public userId: string) {}
@@ -15,7 +15,7 @@ export class BlogCreateUseCase implements ICommandHandler<BlogCreateCommand> {
     @InjectModel(Blog.name)
     private BlogModel: BlogModelType,
     private readonly blogsRepository: BlogsRepository,
-    private readonly usersRepository: UsersRepository,
+    private readonly usersRepository: UsersMongooseRepository,
   ) {}
 
   async execute(command: BlogCreateCommand): Promise<string | null> {

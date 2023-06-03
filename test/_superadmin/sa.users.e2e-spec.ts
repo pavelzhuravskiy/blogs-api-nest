@@ -1,8 +1,6 @@
 import supertest, { SuperAgentTest } from 'supertest';
 import { Test } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
-import { MongooseModule } from '@nestjs/mongoose';
 
 import { useContainer } from 'class-validator';
 import { AppModule } from '../../src/app.module';
@@ -10,6 +8,7 @@ import { customExceptionFactory } from '../../src/exceptions/exception.factory';
 import { HttpExceptionFilter } from '../../src/exceptions/exception.filter';
 import { testingAllDataURI } from '../utils/constants/testing.constants';
 import {
+  banURI,
   saUsersURI,
   user01Email,
   user01Login,
@@ -19,7 +18,6 @@ import {
   user03Login,
   user04Email,
   user04Login,
-  banURI,
   userPassword,
 } from '../utils/constants/users.constants';
 import {
@@ -67,19 +65,15 @@ describe('Super admin users testing', () => {
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
-      imports: [
-        ConfigModule.forRoot(),
-        MongooseModule.forRoot(process.env.TEST_URI || ''),
-        AppModule,
-      ],
+      imports: [AppModule],
     }).compile();
 
     app = moduleRef.createNestApplication();
+
     useContainer(app.select(AppModule), { fallbackOnErrors: true });
-    app.enableCors();
+
     app.useGlobalPipes(
       new ValidationPipe({
-        transform: true,
         stopAtFirstError: true,
         exceptionFactory: customExceptionFactory,
       }),
@@ -87,6 +81,7 @@ describe('Super admin users testing', () => {
     app.useGlobalFilters(new HttpExceptionFilter());
 
     await app.init();
+
     agent = supertest.agent(app.getHttpServer());
 
     await agent.delete(testingAllDataURI);
@@ -223,7 +218,7 @@ describe('Super admin users testing', () => {
     });
 
     // Success
-    it(`should create three users`, async () => {
+    it.only(`should create three users`, async () => {
       const user01 = await agent
         .post(saUsersURI)
         .auth(basicAuthLogin, basicAuthPassword)
@@ -232,6 +227,7 @@ describe('Super admin users testing', () => {
           password: userPassword,
           email: user01Email,
         })
+
         .expect(201);
 
       expect(user01.body).toEqual(userObject);
