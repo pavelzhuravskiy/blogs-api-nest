@@ -11,6 +11,6 @@ export class UserPasswordRecovery {
   @Column({ type: 'timestamp', nullable: true })
   expirationDate: Date | null;
 
-  @Column({ type: 'uuid' })
-  userId: string;
+  @Column({ type: 'integer' })
+  userId: number; // FK 🔑
 }

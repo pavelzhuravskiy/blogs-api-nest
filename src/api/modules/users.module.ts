@@ -17,13 +17,14 @@ import { CommentsRepository } from '../infrastructure/comments/comments.reposito
 import { Comment, CommentSchema } from '../entities/_mongoose/comment.entity';
 import { LikesRepository } from '../infrastructure/likes/likes.repository';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from '../entities/users/user-account.entity';
+import { User } from '../entities/users/user.entity';
 import { UserEmailConfirmation } from '../entities/users/user-email-confirmation.entity';
 import { UserPasswordRecovery } from '../entities/users/user-password-recovery.entity';
+import { UserBan } from '../entities/users/user-ban.entity';
 
 const useCases = [UserCreateUseCase, UserDeleteUseCase, UserBanUseCase];
 
-const entities = [User, UserEmailConfirmation, UserPasswordRecovery];
+const entities = [User, UserEmailConfirmation, UserPasswordRecovery, UserBan];
 
 const repositories = [
   UsersRepository,
