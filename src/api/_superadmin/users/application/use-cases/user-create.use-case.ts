@@ -11,7 +11,7 @@ export class UserCreateCommand {
 export class UserCreateUseCase implements ICommandHandler<UserCreateCommand> {
   constructor(private readonly usersRepository: UsersRepository) {}
 
-  async execute(command: UserCreateCommand): Promise<string | null> {
+  async execute(command: UserCreateCommand): Promise<number> {
     const hash = await bcrypt.hash(
       command.userInputDto.password,
       Number(process.env.HASH_ROUNDS),

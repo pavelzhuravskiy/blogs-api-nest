@@ -9,12 +9,12 @@ import {
 } from '../../../entities/_mongoose/user.entity';
 import { UserQueryDto } from '../../../dto/users/query/user-query.dto';
 import { SuperAdminUserViewDto } from '../../../dto/users/view/superadmin/sa.user.view.dto';
-import { pFind } from '../../../../helpers/pagination/pagination-find';
-import { pSort } from '../../../../helpers/pagination/pagination-sort';
-import { pFilterUsersSA } from '../../../../helpers/pagination/pagination-filter-users';
+import { pFind } from '../../../../helpers/pagination/mongoose/pagination-find';
+import { pSort } from '../../../../helpers/pagination/mongoose/pagination-sort';
+import { pFilterUsersSA } from '../../../../helpers/pagination/mongoose/pagination-filter-users';
 import { BloggerUserBanQueryDto } from '../../../dto/users/query/blogger/blogger.user-ban.query.dto';
 import { UsersBannedByBloggerViewDto } from '../../../dto/users/view/blogger/blogger.user-ban.view.dto';
-import { pFilterUsersBannedByBlogger } from '../../../../helpers/pagination/pagination-filter-users-banned-by-blogger';
+import { pFilterUsersBannedByBlogger } from '../../../../helpers/pagination/mongoose/pagination-filter-users-banned-by-blogger';
 import { BlogsRepository } from '../../blogs/blogs.repository';
 import { ResultCode } from '../../../../enums/result-code.enum';
 import {

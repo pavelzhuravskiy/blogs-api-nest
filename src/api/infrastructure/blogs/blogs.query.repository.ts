@@ -9,9 +9,9 @@ import mongoose from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Paginator } from '../../../helpers/pagination/_paginator';
 import { BlogViewDto } from '../../dto/blogs/view/blog.view.dto';
-import { pFind } from '../../../helpers/pagination/pagination-find';
-import { pSort } from '../../../helpers/pagination/pagination-sort';
-import { pFilterBlogs } from '../../../helpers/pagination/pagination-filter-blogs';
+import { pFind } from '../../../helpers/pagination/mongoose/pagination-find';
+import { pSort } from '../../../helpers/pagination/mongoose/pagination-sort';
+import { pFilterBlogs } from '../../../helpers/pagination/mongoose/pagination-filter-blogs';
 import { Role } from '../../../enums/role.enum';
 import { SuperAdminBlogViewDto } from '../../dto/blogs/view/superadmin/sa.blog.view.dto';
 

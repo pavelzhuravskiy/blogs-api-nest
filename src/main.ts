@@ -15,6 +15,7 @@ async function bootstrap() {
   app.useGlobalPipes(
     new TrimPipe(),
     new ValidationPipe({
+      transform: true,
       stopAtFirstError: true,
       exceptionFactory: customExceptionFactory,
     }),

@@ -27,6 +27,7 @@ import { DeviceDeleteForLogoutUseCase } from './application/use-cases/devices/de
 import { ValidateRefreshTokenUseCase } from './application/use-cases/validations/validate-refresh-token.use-case';
 import { ValidateLoginAndPasswordUseCase } from './application/use-cases/validations/validate-login-pass.use-case';
 import { TokensCreateUseCase } from './application/use-cases/tokens/tokens-create.use-case';
+import { UsersRepository } from '../api/infrastructure/users/users.repository';
 
 const services = [JwtService];
 
@@ -44,7 +45,9 @@ const useCases = [
   TokensCreateUseCase,
 ];
 
-const repositories = [DevicesRepository, UsersMongooseRepository];
+const mongooseRepositories = [DevicesRepository, UsersMongooseRepository];
+
+const repositories = [UsersRepository];
 
 const strategies = [
   BasicStrategy,
@@ -67,6 +70,12 @@ const strategies = [
     PassportModule,
   ],
   controllers: [PublicAuthController],
-  providers: [...services, ...useCases, ...repositories, ...strategies],
+  providers: [
+    ...services,
+    ...useCases,
+    ...repositories,
+    ...mongooseRepositories,
+    ...strategies,
+  ],
 })
 export class AuthModule {}

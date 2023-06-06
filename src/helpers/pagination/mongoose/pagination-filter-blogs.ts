@@ -1,6 +1,6 @@
 import { FilterQuery } from 'mongoose';
-import { BlogDocument } from '../../api/entities/_mongoose/blog.entity';
-import { Role } from '../../enums/role.enum';
+import { BlogDocument } from '../../../api/entities/_mongoose/blog.entity';
+import { Role } from '../../../enums/role.enum';
 
 export const pFilterBlogs = (name: string, userId: string, role: string) => {
   const filter: FilterQuery<BlogDocument> = {};

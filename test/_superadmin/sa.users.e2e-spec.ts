@@ -218,7 +218,7 @@ describe('Super admin users testing', () => {
     });
 
     // Success
-    it.only(`should create three users`, async () => {
+    it(`should create three users`, async () => {
       const user01 = await agent
         .post(saUsersURI)
         .auth(basicAuthLogin, basicAuthPassword)

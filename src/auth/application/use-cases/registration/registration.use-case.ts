@@ -1,16 +1,9 @@
-import { InjectModel } from '@nestjs/mongoose';
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { UsersMongooseRepository } from '../../../../api/infrastructure/_mongoose/users/users.mongoose.repository';
 import { UserInputDto } from '../../../../api/dto/users/input/user-input.dto';
 import bcrypt from 'bcrypt';
 import { randomUUID } from 'crypto';
-import { add } from 'date-fns';
-import {
-  UserMongoose,
-  UserDocument,
-  UserModelType,
-} from '../../../../api/entities/_mongoose/user.entity';
 import { SendRegistrationMailCommand } from '../../../../mail/application/use-cases/send-registration-mail.use-case';
+import { UsersRepository } from '../../../../api/infrastructure/users/users.repository';
 
 export class RegistrationCommand {
   constructor(public userInputDto: UserInputDto) {}
@@ -21,47 +14,38 @@ export class RegistrationUseCase
   implements ICommandHandler<RegistrationCommand>
 {
   constructor(
-    @InjectModel(UserMongoose.name)
-    private UserModel: UserModelType,
     private commandBus: CommandBus,
-    private readonly usersRepository: UsersMongooseRepository,
+    private readonly usersRepository: UsersRepository,
   ) {}
 
-  async execute(command: RegistrationCommand): Promise<UserDocument | null> {
+  async execute(command: RegistrationCommand): Promise<number | null> {
     const hash = await bcrypt.hash(
       command.userInputDto.password,
       Number(process.env.HASH_ROUNDS),
     );
 
-    const emailData = {
-      confirmationCode: randomUUID(),
-      expirationDate: add(new Date(), { hours: 1 }),
-      isConfirmed: false,
-    };
+    const code = randomUUID();
 
-    const user = this.UserModel.createUser(
-      this.UserModel,
+    const userId = await this.usersRepository.registerUser(
       command.userInputDto,
       hash,
-      emailData,
+      code,
     );
-
-    const result = await this.usersRepository.save(user);
 
     try {
       await this.commandBus.execute(
         new SendRegistrationMailCommand(
           command.userInputDto.login,
           command.userInputDto.email,
-          emailData.confirmationCode,
+          code,
         ),
       );
     } catch (error) {
       console.error(error);
-      await this.usersRepository.deleteUser(user.id);
+      await this.usersRepository.deleteUser(userId);
       return null;
     }
 
-    return result;
+    return userId;
   }
 }

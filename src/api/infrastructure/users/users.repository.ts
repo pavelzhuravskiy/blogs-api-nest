@@ -8,38 +8,14 @@ import { User } from '../../entities/users/user.entity';
 export class UsersRepository {
   constructor(@InjectDataSource() private dataSource: DataSource) {}
 
-  async createUser(userInputDto: UserInputDto, hash: string) {
-    return await this.dataSource.transaction(async () => {
-      const user = await this.dataSource.query(
-        `insert into public.users (login, "passwordHash", email, "isConfirmed")
-         values ($1, $2, $3, $4)
-         returning id;`,
-        [userInputDto.login, hash, userInputDto.email, true],
-      );
-      const userId = user[0].id;
-
-      await this.dataSource.query(
-        `insert into user_bans ("isBanned", "userId")
-         values (false, $1);`,
-        [userId],
-      );
-      return userId;
-    });
-  }
-
-  async findUserById(id: string): Promise<User | null> {
-    const user = await this.dataSource.query(
-      `select *
+  async checkUserExistence(userId: number): Promise<User> {
+    const users = await this.dataSource.query(
+      `select id
        from public.users
-       where id = $1;`,
-      [id],
+       where id = $1`,
+      [userId],
     );
-
-    if (!user) {
-      return null;
-    }
-
-    return user;
+    return users[0];
   }
 
   async findExistingLogin(login: string): Promise<User | null> {
@@ -70,5 +46,71 @@ export class UsersRepository {
     }
 
     return users;
+  }
+
+  async createUser(userInputDto: UserInputDto, hash: string): Promise<number> {
+    return this.dataSource.transaction(async () => {
+      const user = await this.dataSource.query(
+        `insert into public.users (login, "passwordHash", email, "isConfirmed",
+                                   "isBanned")
+         values ($1, $2, $3, $4, $5)
+         returning id;`,
+        [userInputDto.login, hash, userInputDto.email, true, false],
+      );
+
+      const userId = user[0].id;
+
+      await this.dataSource.query(
+        `insert into public.user_bans ("userId")
+         values ($1);`,
+        [userId],
+      );
+
+      return userId;
+    });
+  }
+
+  async registerUser(
+    userInputDto: UserInputDto,
+    hash: string,
+    confirmationCode: string,
+  ): Promise<number> {
+    return this.dataSource.transaction(async () => {
+      const user = await this.dataSource.query(
+        `insert into public.users (login,
+                                   "passwordHash", email, "isConfirmed",
+                                   "isBanned")
+         values ($1, $2, $3, $4, $5)
+         returning id;`,
+        [userInputDto.login, hash, userInputDto.email, false, false],
+      );
+      const userId = user[0].id;
+
+      await this.dataSource.query(
+        `insert into public.user_bans ("userId")
+         values ($1);`,
+        [userId],
+      );
+
+      await this.dataSource.query(
+        `insert into public.user_email_confirmations ("userId",
+                                                      "confirmationCode",
+                                                      "expirationDate")
+         values ($1, $2, current_timestamp + interval '3 hours');`,
+        [userId, confirmationCode],
+      );
+
+      return userId;
+    });
+  }
+
+  async deleteUser(userId: number): Promise<boolean> {
+    const result = await this.dataSource.query(
+      `delete
+       from public.users
+       where id = $1;`,
+      [userId],
+    );
+    return result[1] === 1;
   }
 }

@@ -1,6 +1,4 @@
-import { SortOrder } from 'mongoose';
-
-export const pSort = (sortBy: string, sortDirection: SortOrder) => {
+export const pSort = (sortBy: string, sortDirection: any) => {
   const result = {
     [sortBy]: sortDirection,
   };

@@ -9,9 +9,9 @@ import {
 } from '../../entities/_mongoose/post.entity';
 import { PostViewModel } from '../../dto/posts/view/post.view.dto';
 import { QueryDto } from '../../dto/query.dto';
-import { pFind } from '../../../helpers/pagination/pagination-find';
-import { pSort } from '../../../helpers/pagination/pagination-sort';
-import { pFilterPosts } from '../../../helpers/pagination/pagination-filter-posts';
+import { pFind } from '../../../helpers/pagination/mongoose/pagination-find';
+import { pSort } from '../../../helpers/pagination/mongoose/pagination-sort';
+import { pFilterPosts } from '../../../helpers/pagination/mongoose/pagination-filter-posts';
 import { likeStatusFinder } from '../../_public/likes/helpers/like-status-finder';
 import { LikeStatus } from '../../../enums/like-status.enum';
 import { likesCounter } from '../../_public/likes/helpers/likes-counter';

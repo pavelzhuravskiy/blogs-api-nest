@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { TestingController } from '../_public/testing/testing.controller';
+import { TestingController } from '../_testing/testing.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Blog, BlogSchema } from '../entities/_mongoose/blog.entity';
 import { Post, PostSchema } from '../entities/_mongoose/post.entity';

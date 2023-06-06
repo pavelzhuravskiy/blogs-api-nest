@@ -2,10 +2,12 @@ import {
   Body,
   Controller,
   Delete,
+  Get,
   HttpCode,
   Param,
   Post,
   Put,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { UserInputDto } from '../../dto/users/input/user-input.dto';
@@ -22,6 +24,7 @@ import {
 import { SAUserBanInputDto } from '../../dto/users/input/superadmin/sa.user-ban.input.dto';
 import { SAUserBanCommand } from './application/use-cases/user-ban.use-case';
 import { UsersQueryRepository } from '../../infrastructure/users/users.query.repository';
+import { UserQueryDto } from '../../dto/users/query/user-query.dto';
 
 @Controller('sa/users')
 export class SuperAdminUsersController {
@@ -39,11 +42,11 @@ export class SuperAdminUsersController {
     return this.usersQueryRepository.findUserById(userId);
   }
 
-  /*@UseGuards(BasicAuthGuard)
+  @UseGuards(BasicAuthGuard)
   @Get()
   async findUsers(@Query() query: UserQueryDto) {
-    return this.usersQueryRepository.findUsersBySA(query);
-  }*/
+    return this.usersQueryRepository.findUsers(query);
+  }
 
   @UseGuards(BasicAuthGuard)
   @Delete(':id')

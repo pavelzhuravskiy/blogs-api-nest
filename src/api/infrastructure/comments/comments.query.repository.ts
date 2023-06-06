@@ -9,14 +9,14 @@ import {
 } from '../../entities/_mongoose/comment.entity';
 import { CommentViewDto } from '../../dto/comments/view/comment.view.dto';
 import { QueryDto } from '../../dto/query.dto';
-import { pFind } from '../../../helpers/pagination/pagination-find';
-import { pSort } from '../../../helpers/pagination/pagination-sort';
-import { pFilterComments } from '../../../helpers/pagination/pagination-filter-comments';
+import { pFind } from '../../../helpers/pagination/mongoose/pagination-find';
+import { pSort } from '../../../helpers/pagination/mongoose/pagination-sort';
+import { pFilterComments } from '../../../helpers/pagination/mongoose/pagination-filter-comments';
 import { likeStatusFinder } from '../../_public/likes/helpers/like-status-finder';
 import { PostsRepository } from '../posts/posts.repository';
 import { likesCounter } from '../../_public/likes/helpers/likes-counter';
 import { LikeStatus } from '../../../enums/like-status.enum';
-import { pFilterCommentsForBlogger } from '../../../helpers/pagination/pagination-filter-comments-for-blogger';
+import { pFilterCommentsForBlogger } from '../../../helpers/pagination/mongoose/pagination-filter-comments-for-blogger';
 import { BloggerCommentViewDto } from '../../dto/comments/view/blogger/blogger.comment.view.dto';
 
 @Injectable()
