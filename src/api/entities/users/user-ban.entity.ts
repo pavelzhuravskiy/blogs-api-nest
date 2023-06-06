@@ -8,7 +8,7 @@ export class UserBan {
   @Column({ type: 'integer' })
   userId: number; // FK 🔑
 
-  @Column({ type: 'timestamp', nullable: true })
+  @Column({ type: 'timestamp with time zone', nullable: true })
   banDate: Date;
 
   @Column({ type: 'varchar', nullable: true })

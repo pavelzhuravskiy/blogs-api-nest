@@ -19,7 +19,7 @@ export class User {
   @Column({ type: 'varchar', unique: true })
   email: string;
 
-  @CreateDateColumn({ type: 'timestamp' })
+  @CreateDateColumn({ type: 'timestamp with time zone' })
   createdAt: Date;
 
   @Column({ type: 'boolean' })

@@ -1,7 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { UsersMongooseRepository } from '../../../../infrastructure/_mongoose/users/users.mongoose.repository';
-import { UserDocument } from '../../../../entities/_mongoose/user.entity';
 import { ConfirmCodeInputDto } from '../../../dto/confirm-code.input.dto';
+import { UsersRepository } from '../../../../infrastructure/users/users.repository';
 
 export class RegistrationConfirmationCommand {
   constructor(public confirmCodeInputDto: ConfirmCodeInputDto) {}
@@ -11,20 +10,19 @@ export class RegistrationConfirmationCommand {
 export class RegistrationConfirmationUseCase
   implements ICommandHandler<RegistrationConfirmationCommand>
 {
-  constructor(private readonly usersRepository: UsersMongooseRepository) {}
+  constructor(private readonly usersRepository: UsersRepository) {}
 
-  async execute(
-    command: RegistrationConfirmationCommand,
-  ): Promise<UserDocument | null> {
-    const user = await this.usersRepository.findUserByEmailCode(
+  async execute(command: RegistrationConfirmationCommand): Promise<boolean> {
+    const user = await this.usersRepository.findUserForEmailConfirm(
       command.confirmCodeInputDto.code,
     );
 
-    if (!user || !user.userCanBeConfirmed()) {
+    console.log(user);
+
+    if (!user || user.isConfirmed || user.expirationDate < new Date()) {
       return null;
     }
 
-    await user.confirmUser();
-    return this.usersRepository.save(user);
+    return this.usersRepository.confirmUser(user.id);
   }
 }

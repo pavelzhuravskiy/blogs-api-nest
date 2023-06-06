@@ -57,7 +57,7 @@ export class UsersRepository {
         `insert into public.user_email_confirmations ("userId",
                                                       "confirmationCode",
                                                       "expirationDate")
-         values ($1, $2, current_timestamp + interval '3 hours');`,
+         values ($1, $2, now() + interval '3 hours');`,
         [userId, confirmationCode],
       );
 
@@ -66,17 +66,22 @@ export class UsersRepository {
   }
 
   // READ
-  async checkUserExistence(userId: number): Promise<User> {
+  async checkUserExistence(userId: number): Promise<User | null> {
     const users = await this.dataSource.query(
       `select id
        from public.users
        where id = $1`,
       [userId],
     );
+
+    if (users.length === 0) {
+      return null;
+    }
+
     return users[0];
   }
 
-  async findExistingLogin(login: string): Promise<User[]> {
+  async findExistingLogin(login: string): Promise<User[] | null> {
     const users = await this.dataSource.query(
       `select id
        from public.users
@@ -91,7 +96,7 @@ export class UsersRepository {
     return users;
   }
 
-  async findExistingEmail(email: string): Promise<User[]> {
+  async findExistingEmail(email: string): Promise<User[] | null> {
     const users = await this.dataSource.query(
       `select id
        from public.users
@@ -139,6 +144,23 @@ export class UsersRepository {
     return users[0];
   }
 
+  async findUserForEmailConfirm(code: string): Promise<any> {
+    const users = await this.dataSource.query(
+      `select u.id, u."isConfirmed", uec."confirmationCode", uec."expirationDate"
+       from public.users u
+                left join public.user_email_confirmations uec
+                          on u.id = uec."userId"
+       where uec."confirmationCode" = $1`,
+      [code],
+    );
+
+    if (users.length === 0) {
+      return null;
+    }
+
+    return users[0];
+  }
+
   // UPDATE
   async updateEmailConfirmationData(
     confirmationCode: string,
@@ -147,11 +169,31 @@ export class UsersRepository {
     const result = await this.dataSource.query(
       `update public.user_email_confirmations
        set "confirmationCode" = $1,
-           "expirationDate"   = current_timestamp + interval '3 hours'
+           "expirationDate"   = now() + interval '3 hours'
        where "userId" = $2`,
       [confirmationCode, userId],
     );
     return result[1] === 1;
+  }
+
+  async confirmUser(userId: number): Promise<boolean> {
+    return this.dataSource.transaction(async () => {
+      await this.dataSource.query(
+        `update public.users
+         set "isConfirmed" = true
+         where id = $1`,
+        [userId],
+      );
+
+      const result = await this.dataSource.query(
+        `update public.user_email_confirmations uec
+         set "confirmationCode" = null,
+             "expirationDate"   = null
+         where "userId" = $1`,
+        [userId],
+      );
+      return result[1] === 1;
+    });
   }
 
   // DELETE

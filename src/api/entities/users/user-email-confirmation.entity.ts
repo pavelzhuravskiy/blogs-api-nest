@@ -11,6 +11,6 @@ export class UserEmailConfirmation {
   @Column({ type: 'uuid', nullable: true })
   confirmationCode: string | null;
 
-  @Column({ type: 'timestamp', nullable: true })
+  @Column({ type: 'timestamp with time zone', nullable: true })
   expirationDate: Date | null;
 }

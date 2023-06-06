@@ -11,6 +11,6 @@ export class UserPasswordRecovery {
   @Column({ type: 'uuid', nullable: true })
   recoveryCode: string | null;
 
-  @Column({ type: 'timestamp', nullable: true })
+  @Column({ type: 'timestamp with time zone', nullable: true })
   expirationDate: Date | null;
 }

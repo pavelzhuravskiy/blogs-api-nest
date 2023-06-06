@@ -17,7 +17,7 @@ export class RegistrationEmailResendUseCase
     private readonly usersRepository: UsersRepository,
   ) {}
 
-  async execute(command: RegistrationEmailResendCommand): Promise<any> {
+  async execute(command: RegistrationEmailResendCommand): Promise<boolean> {
     const user = await this.usersRepository.findUserForEmailResend(
       command.emailInputDto.email,
     );
