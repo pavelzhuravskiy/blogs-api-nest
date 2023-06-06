@@ -17,9 +17,9 @@ import {
   postIDField,
   postNotFound,
 } from '../../../exceptions/exception.constants';
-import { JwtBearerGuard } from '../../../auth/guards/jwt-bearer.guard';
-import { UserIdFromGuard } from '../../../auth/decorators/user-id-from-guard.decorator';
-import { UserIdFromHeaders } from '../../../auth/decorators/user-id-from-headers.decorator';
+import { JwtBearerGuard } from '../../_auth/guards/jwt-bearer.guard';
+import { UserIdFromGuard } from '../../_auth/decorators/user-id-from-guard.decorator';
+import { UserIdFromHeaders } from '../../_auth/decorators/user-id-from-headers.decorator';
 import { CommentInputDto } from '../../dto/comments/input/comment.input.dto';
 import { CommentCreateCommand } from '../comments/application/use-cases/comment-create.use-case';
 import { CommandBus } from '@nestjs/cqrs';

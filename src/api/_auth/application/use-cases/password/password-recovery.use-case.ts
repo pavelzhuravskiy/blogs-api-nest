@@ -1,9 +1,9 @@
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { UsersMongooseRepository } from '../../../../api/infrastructure/_mongoose/users/users.mongoose.repository';
+import { UsersMongooseRepository } from '../../../../infrastructure/_mongoose/users/users.mongoose.repository';
 import { randomUUID } from 'crypto';
-import { UserDocument } from '../../../../api/entities/_mongoose/user.entity';
+import { UserDocument } from '../../../../entities/_mongoose/user.entity';
 import { EmailInputDto } from '../../../dto/email.input.dto';
-import { SendPasswordRecoveryMailCommand } from '../../../../mail/application/use-cases/send-pass-recovery-mail.use-case';
+import { SendPasswordRecoveryMailCommand } from '../../../../../mail/application/use-cases/send-pass-recovery-mail.use-case';
 
 export class PasswordRecoveryCommand {
   constructor(public emailInputDto: EmailInputDto) {}

@@ -14,8 +14,8 @@ import { BlogInputDto } from '../dto/blogs/input/blog.input.dto';
 import { CommandBus } from '@nestjs/cqrs';
 import { BlogCreateCommand } from './application/use-cases/blog-create.use-case';
 import { BlogsQueryRepository } from '../infrastructure/blogs/blogs.query.repository';
-import { JwtBearerGuard } from '../../auth/guards/jwt-bearer.guard';
-import { UserIdFromGuard } from '../../auth/decorators/user-id-from-guard.decorator';
+import { JwtBearerGuard } from '../_auth/guards/jwt-bearer.guard';
+import { UserIdFromGuard } from '../_auth/decorators/user-id-from-guard.decorator';
 import { exceptionHandler } from '../../exceptions/exception.handler';
 import { ResultCode } from '../../enums/result-code.enum';
 import {

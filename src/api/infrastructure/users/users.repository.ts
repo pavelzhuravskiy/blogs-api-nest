@@ -8,46 +8,7 @@ import { User } from '../../entities/users/user.entity';
 export class UsersRepository {
   constructor(@InjectDataSource() private dataSource: DataSource) {}
 
-  async checkUserExistence(userId: number): Promise<User> {
-    const users = await this.dataSource.query(
-      `select id
-       from public.users
-       where id = $1`,
-      [userId],
-    );
-    return users[0];
-  }
-
-  async findExistingLogin(login: string): Promise<User | null> {
-    const users = await this.dataSource.query(
-      `select id
-       from public.users
-       where login = $1`,
-      [login],
-    );
-
-    if (users.length === 0) {
-      return null;
-    }
-
-    return users;
-  }
-
-  async findExistingEmail(email: string): Promise<User | null> {
-    const users = await this.dataSource.query(
-      `select id
-       from public.users
-       where email = $1`,
-      [email],
-    );
-
-    if (users.length === 0) {
-      return null;
-    }
-
-    return users;
-  }
-
+  // CREATE
   async createUser(userInputDto: UserInputDto, hash: string): Promise<number> {
     return this.dataSource.transaction(async () => {
       const user = await this.dataSource.query(
@@ -104,6 +65,96 @@ export class UsersRepository {
     });
   }
 
+  // READ
+  async checkUserExistence(userId: number): Promise<User> {
+    const users = await this.dataSource.query(
+      `select id
+       from public.users
+       where id = $1`,
+      [userId],
+    );
+    return users[0];
+  }
+
+  async findExistingLogin(login: string): Promise<User[]> {
+    const users = await this.dataSource.query(
+      `select id
+       from public.users
+       where login = $1`,
+      [login],
+    );
+
+    if (users.length === 0) {
+      return null;
+    }
+
+    return users;
+  }
+
+  async findExistingEmail(email: string): Promise<User[]> {
+    const users = await this.dataSource.query(
+      `select id
+       from public.users
+       where email = $1`,
+      [email],
+    );
+
+    if (users.length === 0) {
+      return null;
+    }
+
+    return users;
+  }
+
+  async findUserForLoginValidation(loginOrEmail: string): Promise<User | null> {
+    const users = await this.dataSource.query(
+      `select id, "passwordHash", "isConfirmed", "isBanned"
+       from public.users
+       where login = $1
+          or email = $1;`,
+      [loginOrEmail],
+    );
+
+    if (users.length === 0) {
+      return null;
+    }
+
+    return users[0];
+  }
+
+  async findUserForEmailResend(email: string): Promise<User | null> {
+    const users = await this.dataSource.query(
+      `select u.id, u.login, u.email, u."isConfirmed", uec."confirmationCode"
+       from public.users u
+                left join public.user_email_confirmations uec
+                          on u.id = uec."userId"
+       where email = $1`,
+      [email],
+    );
+
+    if (users.length === 0) {
+      return null;
+    }
+
+    return users[0];
+  }
+
+  // UPDATE
+  async updateEmailConfirmationData(
+    confirmationCode: string,
+    userId: number,
+  ): Promise<boolean> {
+    const result = await this.dataSource.query(
+      `update public.user_email_confirmations
+       set "confirmationCode" = $1,
+           "expirationDate"   = current_timestamp + interval '3 hours'
+       where "userId" = $2`,
+      [confirmationCode, userId],
+    );
+    return result[1] === 1;
+  }
+
+  // DELETE
   async deleteUser(userId: number): Promise<boolean> {
     const result = await this.dataSource.query(
       `delete

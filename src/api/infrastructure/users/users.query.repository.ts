@@ -4,7 +4,7 @@ import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { UserQueryDto } from '../../dto/users/query/user-query.dto';
 import { Paginator } from '../../../helpers/pagination/_paginator';
-import { filterUsers } from '../../../helpers/pagination/pagination-filter-users-';
+import { filterUsers } from '../../../helpers/filters/filter-users';
 
 @Injectable()
 export class UsersQueryRepository {

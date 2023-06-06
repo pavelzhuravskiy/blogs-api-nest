@@ -4,7 +4,7 @@ import { BlogQueryDto } from '../../dto/blogs/query/blog.query.dto';
 import { Role } from '../../../enums/role.enum';
 import { QueryDto } from '../../dto/query.dto';
 import { PostsQueryRepository } from '../../infrastructure/posts/posts.query.repository';
-import { UserIdFromHeaders } from '../../../auth/decorators/user-id-from-headers.decorator';
+import { UserIdFromHeaders } from '../../_auth/decorators/user-id-from-headers.decorator';
 import { exceptionHandler } from '../../../exceptions/exception.handler';
 import {
   blogIDField,

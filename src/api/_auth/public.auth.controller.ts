@@ -11,14 +11,14 @@ import {
 } from '@nestjs/common';
 import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
 import { LocalAuthGuard } from './guards/local-auth.guard';
-import { UsersMongooseRepository } from '../api/infrastructure/_mongoose/users/users.mongoose.repository';
+import { UsersMongooseRepository } from '../infrastructure/_mongoose/users/users.mongoose.repository';
 import { UserIdFromGuard } from './decorators/user-id-from-guard.decorator';
 import { JwtService } from '@nestjs/jwt';
 import { JwtBearerGuard } from './guards/jwt-bearer.guard';
-import { UserInputDto } from '../api/dto/users/input/user-input.dto';
+import { UserInputDto } from '../dto/users/input/user-input.dto';
 import { ConfirmCodeInputDto } from './dto/confirm-code.input.dto';
-import { exceptionHandler } from '../exceptions/exception.handler';
-import { ResultCode } from '../enums/result-code.enum';
+import { exceptionHandler } from '../../exceptions/exception.handler';
+import { ResultCode } from '../../enums/result-code.enum';
 import {
   confirmCodeField,
   confirmCodeIsIncorrect,
@@ -28,7 +28,7 @@ import {
   userIDField,
   userNotFound,
   userNotFoundOrConfirmed,
-} from '../exceptions/exception.constants';
+} from '../../exceptions/exception.constants';
 import { EmailInputDto } from './dto/email.input.dto';
 import { NewPasswordInputDto } from './dto/new-password.input.dto';
 import { Throttle, ThrottlerGuard } from '@nestjs/throttler';

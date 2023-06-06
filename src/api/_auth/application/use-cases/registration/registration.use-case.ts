@@ -1,9 +1,9 @@
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { UserInputDto } from '../../../../api/dto/users/input/user-input.dto';
+import { UserInputDto } from '../../../../dto/users/input/user-input.dto';
 import bcrypt from 'bcrypt';
 import { randomUUID } from 'crypto';
-import { SendRegistrationMailCommand } from '../../../../mail/application/use-cases/send-registration-mail.use-case';
-import { UsersRepository } from '../../../../api/infrastructure/users/users.repository';
+import { SendRegistrationMailCommand } from '../../../../../mail/application/use-cases/send-registration-mail.use-case';
+import { UsersRepository } from '../../../../infrastructure/users/users.repository';
 
 export class RegistrationCommand {
   constructor(public userInputDto: UserInputDto) {}

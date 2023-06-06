@@ -15,10 +15,10 @@ import {
   commentIDField,
   commentNotFound,
 } from '../../../exceptions/exception.constants';
-import { JwtBearerGuard } from '../../../auth/guards/jwt-bearer.guard';
-import { UserIdFromGuard } from '../../../auth/decorators/user-id-from-guard.decorator';
+import { JwtBearerGuard } from '../../_auth/guards/jwt-bearer.guard';
+import { UserIdFromGuard } from '../../_auth/decorators/user-id-from-guard.decorator';
 import { CommentInputDto } from '../../dto/comments/input/comment.input.dto';
-import { UserIdFromHeaders } from '../../../auth/decorators/user-id-from-headers.decorator';
+import { UserIdFromHeaders } from '../../_auth/decorators/user-id-from-headers.decorator';
 import { CommentUpdateCommand } from './application/use-cases/comment-update.use-case';
 import { CommandBus } from '@nestjs/cqrs';
 import { CommentDeleteCommand } from './application/use-cases/comment-delete.use-case';

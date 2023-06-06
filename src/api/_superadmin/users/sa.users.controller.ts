@@ -11,7 +11,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { UserInputDto } from '../../dto/users/input/user-input.dto';
-import { BasicAuthGuard } from '../../../auth/guards/basic-auth.guard';
+import { BasicAuthGuard } from '../../_auth/guards/basic-auth.guard';
 import { CommandBus } from '@nestjs/cqrs';
 import { UserCreateCommand } from './application/use-cases/user-create.use-case';
 import { UserDeleteCommand } from './application/use-cases/user-delete.use-case';

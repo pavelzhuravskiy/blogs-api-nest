@@ -12,7 +12,7 @@ import { CommandBus } from '@nestjs/cqrs';
 import { BlogsQueryRepository } from '../../infrastructure/blogs/blogs.query.repository';
 import { BlogQueryDto } from '../../dto/blogs/query/blog.query.dto';
 import { Role } from '../../../enums/role.enum';
-import { BasicAuthGuard } from '../../../auth/guards/basic-auth.guard';
+import { BasicAuthGuard } from '../../_auth/guards/basic-auth.guard';
 import { ResultCode } from '../../../enums/result-code.enum';
 import { exceptionHandler } from '../../../exceptions/exception.handler';
 import { BlogBindCommand } from './application/use-cases/blog-bind.use-case';

@@ -7,15 +7,12 @@ import { JwtService } from '@nestjs/jwt';
 import { JwtRefreshTokenStrategy } from './strategies/jwt-refresh.strategy';
 import { BasicStrategy } from './strategies/basic.strategy';
 import { MongooseModule } from '@nestjs/mongoose';
-import {
-  UserMongoose,
-  UserSchema,
-} from '../api/entities/_mongoose/user.entity';
+import { UserMongoose, UserSchema } from '../entities/_mongoose/user.entity';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { CqrsModule } from '@nestjs/cqrs';
-import { Device, DeviceSchema } from '../api/entities/_mongoose/device.entity';
-import { DevicesRepository } from '../api/infrastructure/devices/devices.repository';
-import { UsersMongooseRepository } from '../api/infrastructure/_mongoose/users/users.mongoose.repository';
+import { Device, DeviceSchema } from '../entities/_mongoose/device.entity';
+import { DevicesRepository } from '../infrastructure/devices/devices.repository';
+import { UsersMongooseRepository } from '../infrastructure/_mongoose/users/users.mongoose.repository';
 import { RegistrationUseCase } from './application/use-cases/registration/registration.use-case';
 import { RegistrationEmailResendUseCase } from './application/use-cases/registration/registration-email-resend.use-case';
 import { RegistrationConfirmationUseCase } from './application/use-cases/registration/registration-confirmation.use-case';
@@ -27,7 +24,7 @@ import { DeviceDeleteForLogoutUseCase } from './application/use-cases/devices/de
 import { ValidateRefreshTokenUseCase } from './application/use-cases/validations/validate-refresh-token.use-case';
 import { ValidateLoginAndPasswordUseCase } from './application/use-cases/validations/validate-login-pass.use-case';
 import { TokensCreateUseCase } from './application/use-cases/tokens/tokens-create.use-case';
-import { UsersRepository } from '../api/infrastructure/users/users.repository';
+import { UsersRepository } from '../infrastructure/users/users.repository';
 
 const services = [JwtService];
 
