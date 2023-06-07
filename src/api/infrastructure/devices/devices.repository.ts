@@ -1,43 +1,63 @@
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import {
-  Device,
-  DeviceDocument,
-  DeviceModelType,
-} from '../../entities/_mongoose/device.entity';
+import { InjectDataSource } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
+import { Device } from '../../entities/devices/device.entity';
 
 @Injectable()
 export class DevicesRepository {
-  constructor(
-    @InjectModel(Device.name)
-    private DeviceModel: DeviceModelType,
-  ) {}
-  async save(device: DeviceDocument) {
-    return device.save();
+  constructor(@InjectDataSource() private dataSource: DataSource) {}
+  async createDevice(
+    decodedToken: any,
+    ip: string,
+    userAgent: string,
+  ): Promise<number> {
+    const device = await this.dataSource.query(
+      `insert into public.devices ("userId", "deviceId", ip, title, "lastActiveDate",
+                            "expirationDate")
+         values ($1, $2, $3, $4, $5, $6)
+         returning id;`,
+      [
+        decodedToken.sub,
+        decodedToken.deviceId,
+        ip,
+        userAgent,
+        decodedToken.iat,
+        decodedToken.exp,
+      ],
+    );
+    return device[0].id;
   }
 
-  async findDevice(id: string): Promise<DeviceDocument | null> {
-    const device = await this.DeviceModel.findOne({ deviceId: id });
+  async findDevice(deviceId: string): Promise<Device | null> {
+    const devices = await this.dataSource.query(
+      `select id, "deviceId", "lastActiveDate"
+       from public.devices
+       where "deviceId" = $1`,
+      [deviceId],
+    );
 
-    if (!device) {
+    if (devices.length === 0) {
       return null;
     }
 
-    return device;
+    return devices[0];
   }
 
-  async deleteDevice(id: string): Promise<boolean> {
-    const result = await this.DeviceModel.deleteOne({ deviceId: id });
-    return result.deletedCount === 1;
-  }
-
-  async deleteOldDevices(currentDevice: string): Promise<boolean> {
-    await this.DeviceModel.deleteMany({ deviceId: { $ne: currentDevice } });
-    return (await this.DeviceModel.countDocuments()) === 1;
-  }
-
-  async deleteAllUserDevices(userId: string): Promise<boolean> {
-    await this.DeviceModel.deleteMany({ userId: userId });
-    return (await this.DeviceModel.countDocuments({ userId: userId })) === 0;
+  async updateDevice(
+    deviceId: string,
+    token: any,
+    ip: string,
+    userAgent: string,
+  ): Promise<boolean> {
+    console.log(token);
+    const result = await this.dataSource.query(
+      `update public.devices
+       set "lastActiveDate" = $2,
+           ip = $3,
+           title = $4
+       where "deviceId" = $1`,
+      [deviceId, token.iat, ip, userAgent],
+    );
+    return result[1] === 1;
   }
 }

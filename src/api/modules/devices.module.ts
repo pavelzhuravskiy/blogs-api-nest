@@ -2,9 +2,9 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Device, DeviceSchema } from '../entities/_mongoose/device.entity';
 import { JwtService } from '@nestjs/jwt';
-import { DevicesRepository } from '../infrastructure/devices/devices.repository';
+import { DevicesMongooseRepository } from '../infrastructure/devices/mongoose/devices.repository';
 import { PublicDevicesController } from '../_public/devices/public.devices.controller';
-import { DevicesQueryRepository } from '../infrastructure/devices/devices.query.repository';
+import { DevicesMongooseQueryRepository } from '../infrastructure/devices/mongoose/devices.query.repository';
 import { DeviceDeleteForTerminateUseCase } from '../_public/devices/application/use-cases/device-delete-for-terminate.use-case';
 import { DevicesDeleteOldUseCase } from '../_public/devices/application/use-cases/devices-delete-old.use-case';
 import { CqrsModule } from '@nestjs/cqrs';
@@ -15,7 +15,10 @@ const useCases = [
   DevicesDeleteOldUseCase,
   DevicesDeleteForUserBanUseCase,
 ];
-const repositories = [DevicesRepository, DevicesQueryRepository];
+const repositories = [
+  DevicesMongooseRepository,
+  DevicesMongooseQueryRepository,
+];
 
 @Module({
   imports: [

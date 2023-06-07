@@ -11,7 +11,7 @@ import { UserMongoose, UserSchema } from '../entities/_mongoose/user.entity';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { CqrsModule } from '@nestjs/cqrs';
 import { Device, DeviceSchema } from '../entities/_mongoose/device.entity';
-import { DevicesRepository } from '../infrastructure/devices/devices.repository';
+import { DevicesMongooseRepository } from '../infrastructure/devices/mongoose/devices.repository';
 import { UsersMongooseRepository } from '../infrastructure/_mongoose/users/users.mongoose.repository';
 import { RegistrationUseCase } from './application/use-cases/registration/registration.use-case';
 import { RegistrationEmailResendUseCase } from './application/use-cases/registration/registration-email-resend.use-case';
@@ -25,6 +25,7 @@ import { ValidateRefreshTokenUseCase } from './application/use-cases/validations
 import { ValidateLoginAndPasswordUseCase } from './application/use-cases/validations/validate-login-pass.use-case';
 import { TokensCreateUseCase } from './application/use-cases/tokens/tokens-create.use-case';
 import { UsersRepository } from '../infrastructure/users/users.repository';
+import { DevicesRepository } from '../infrastructure/devices/devices.repository';
 
 const services = [JwtService];
 
@@ -42,9 +43,12 @@ const useCases = [
   TokensCreateUseCase,
 ];
 
-const mongooseRepositories = [DevicesRepository, UsersMongooseRepository];
+const mongooseRepositories = [
+  DevicesMongooseRepository,
+  UsersMongooseRepository,
+];
 
-const repositories = [UsersRepository];
+const repositories = [UsersRepository, DevicesRepository];
 
 const strategies = [
   BasicStrategy,

@@ -1,5 +1,4 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { DeviceDocument } from '../../../../entities/_mongoose/device.entity';
 import { DevicesRepository } from '../../../../infrastructure/devices/devices.repository';
 
 export class DeviceUpdateForTokensCommand {
@@ -12,9 +11,7 @@ export class DeviceUpdateForTokensUseCase
 {
   constructor(private readonly devicesRepository: DevicesRepository) {}
 
-  async execute(
-    command: DeviceUpdateForTokensCommand,
-  ): Promise<DeviceDocument | null> {
+  async execute(command: DeviceUpdateForTokensCommand): Promise<boolean> {
     const device = await this.devicesRepository.findDevice(
       command.token.deviceId,
     );
@@ -23,7 +20,11 @@ export class DeviceUpdateForTokensUseCase
       return null;
     }
 
-    await device.updateDevice(command.token, command.ip, command.userAgent);
-    return this.devicesRepository.save(device);
+    return this.devicesRepository.updateDevice(
+      device.deviceId,
+      command.token,
+      command.ip,
+      command.userAgent,
+    );
   }
 }

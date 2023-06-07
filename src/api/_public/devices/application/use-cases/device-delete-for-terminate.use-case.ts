@@ -1,5 +1,5 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { DevicesRepository } from '../../../../infrastructure/devices/devices.repository';
+import { DevicesMongooseRepository } from '../../../../infrastructure/devices/mongoose/devices.repository';
 import { ResultCode } from '../../../../../enums/result-code.enum';
 import {
   deviceIDField,
@@ -15,7 +15,7 @@ export class DeviceDeleteForTerminateCommand {
 export class DeviceDeleteForTerminateUseCase
   implements ICommandHandler<DeviceDeleteForTerminateCommand>
 {
-  constructor(private readonly devicesRepository: DevicesRepository) {}
+  constructor(private readonly devicesRepository: DevicesMongooseRepository) {}
 
   async execute(
     command: DeviceDeleteForTerminateCommand,

@@ -80,7 +80,7 @@ export class UsersRepository {
 
   async findUserById(userId: number): Promise<User | null> {
     const users = await this.dataSource.query(
-      `select id
+      `select id, login, email
        from public.users
        where id = $1`,
       [userId],

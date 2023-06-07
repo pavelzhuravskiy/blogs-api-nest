@@ -3,11 +3,11 @@ import { InjectModel } from '@nestjs/mongoose';
 import {
   Device,
   DeviceModelType,
-} from '../../entities/_mongoose/device.entity';
-import { DeviceViewDto } from '../../dto/devices/view/device.view.dto';
+} from '../../../entities/_mongoose/device.entity';
+import { DeviceViewDto } from '../../../dto/devices/view/device.view.dto';
 
 @Injectable()
-export class DevicesQueryRepository {
+export class DevicesMongooseQueryRepository {
   constructor(
     @InjectModel(Device.name)
     private DeviceModel: DeviceModelType,
