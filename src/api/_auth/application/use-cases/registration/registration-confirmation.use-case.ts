@@ -17,8 +17,6 @@ export class RegistrationConfirmationUseCase
       command.confirmCodeInputDto.code,
     );
 
-    console.log(user);
-
     if (!user || user.isConfirmed || user.expirationDate < new Date()) {
       return null;
     }

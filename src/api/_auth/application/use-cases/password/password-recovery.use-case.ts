@@ -1,9 +1,8 @@
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { UsersMongooseRepository } from '../../../../infrastructure/_mongoose/users/users.mongoose.repository';
 import { randomUUID } from 'crypto';
-import { UserDocument } from '../../../../entities/_mongoose/user.entity';
 import { EmailInputDto } from '../../../dto/email.input.dto';
 import { SendPasswordRecoveryMailCommand } from '../../../../../mail/application/use-cases/send-pass-recovery-mail.use-case';
+import { UsersRepository } from '../../../../infrastructure/users/users.repository';
 
 export class PasswordRecoveryCommand {
   constructor(public emailInputDto: EmailInputDto) {}
@@ -15,13 +14,11 @@ export class PasswordRecoveryUseCase
 {
   constructor(
     private commandBus: CommandBus,
-    private readonly usersRepository: UsersMongooseRepository,
+    private readonly usersRepository: UsersRepository,
   ) {}
 
-  async execute(
-    command: PasswordRecoveryCommand,
-  ): Promise<UserDocument | null> {
-    const user = await this.usersRepository.findUserByLoginOrEmail(
+  async execute(command: PasswordRecoveryCommand): Promise<boolean> {
+    const user = await this.usersRepository.findUserByEmail(
       command.emailInputDto.email,
     );
 
@@ -31,14 +28,16 @@ export class PasswordRecoveryUseCase
 
     const recoveryCode = randomUUID();
 
-    await user.updatePasswordRecoveryData(recoveryCode);
-    const result = await this.usersRepository.save(user);
+    const result = await this.usersRepository.updatePasswordRecoveryData(
+      recoveryCode,
+      user.id,
+    );
 
     try {
       await this.commandBus.execute(
         new SendPasswordRecoveryMailCommand(
-          user.accountData.login,
-          user.accountData.email,
+          user.login,
+          user.email,
           recoveryCode,
         ),
       );

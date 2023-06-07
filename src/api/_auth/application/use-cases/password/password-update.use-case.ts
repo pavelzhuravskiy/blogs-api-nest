@@ -1,8 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { UsersMongooseRepository } from '../../../../infrastructure/_mongoose/users/users.mongoose.repository';
-import { UserDocument } from '../../../../entities/_mongoose/user.entity';
 import { NewPasswordInputDto } from '../../../dto/new-password.input.dto';
 import bcrypt from 'bcrypt';
+import { UsersRepository } from '../../../../infrastructure/users/users.repository';
 
 export class PasswordUpdateCommand {
   constructor(public newPasswordDto: NewPasswordInputDto) {}
@@ -12,14 +11,15 @@ export class PasswordUpdateCommand {
 export class PasswordUpdateUseCase
   implements ICommandHandler<PasswordUpdateCommand>
 {
-  constructor(private readonly usersRepository: UsersMongooseRepository) {}
+  constructor(private readonly usersRepository: UsersRepository) {}
 
-  async execute(command: PasswordUpdateCommand): Promise<UserDocument | null> {
-    const user = await this.usersRepository.findUserByRecoveryCode(
-      command.newPasswordDto.recoveryCode,
-    );
+  async execute(command: PasswordUpdateCommand): Promise<boolean> {
+    const recoveryRecord =
+      await this.usersRepository.findPasswordRecoveryRecord(
+        command.newPasswordDto.recoveryCode,
+      );
 
-    if (!user || !user.passwordCanBeUpdated()) {
+    if (!recoveryRecord || recoveryRecord.expirationDate < new Date()) {
       return null;
     }
 
@@ -28,7 +28,6 @@ export class PasswordUpdateUseCase
       Number(process.env.HASH_ROUNDS),
     );
 
-    await user.updatePassword(hash);
-    return this.usersRepository.save(user);
+    return this.usersRepository.updatePassword(recoveryRecord.userId, hash);
   }
 }

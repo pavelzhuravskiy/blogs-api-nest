@@ -8,7 +8,6 @@ import { User } from '../../entities/users/user.entity';
 export class UsersRepository {
   constructor(@InjectDataSource() private dataSource: DataSource) {}
 
-  // CREATE
   async createUser(userInputDto: UserInputDto, hash: string): Promise<number> {
     return this.dataSource.transaction(async () => {
       const user = await this.dataSource.query(
@@ -24,6 +23,13 @@ export class UsersRepository {
       await this.dataSource.query(
         `insert into public.user_bans ("userId")
          values ($1);`,
+        [userId],
+      );
+
+      await this.dataSource.query(
+        `insert into public.user_password_recoveries("userId", "recoveryCode",
+                                                     "expirationDate")
+         values ($1, null, null);`,
         [userId],
       );
 
@@ -61,17 +67,38 @@ export class UsersRepository {
         [userId, confirmationCode],
       );
 
+      await this.dataSource.query(
+        `insert into public.user_password_recoveries(
+                                            "userId", "recoveryCode", "expirationDate")
+         values ($1, null, null);`,
+        [userId],
+      );
+
       return userId;
     });
   }
 
-  // READ
-  async checkUserExistence(userId: number): Promise<User | null> {
+  async findUserById(userId: number): Promise<User | null> {
     const users = await this.dataSource.query(
       `select id
        from public.users
        where id = $1`,
       [userId],
+    );
+
+    if (users.length === 0) {
+      return null;
+    }
+
+    return users[0];
+  }
+
+  async findUserByEmail(email: string): Promise<User | null> {
+    const users = await this.dataSource.query(
+      `select id, email, login
+       from public.users
+       where email = $1`,
+      [email],
     );
 
     if (users.length === 0) {
@@ -146,7 +173,10 @@ export class UsersRepository {
 
   async findUserForEmailConfirm(code: string): Promise<any> {
     const users = await this.dataSource.query(
-      `select u.id, u."isConfirmed", uec."confirmationCode", uec."expirationDate"
+      `select u.id,
+              u."isConfirmed",
+              uec."confirmationCode",
+              uec."expirationDate"
        from public.users u
                 left join public.user_email_confirmations uec
                           on u.id = uec."userId"
@@ -161,7 +191,21 @@ export class UsersRepository {
     return users[0];
   }
 
-  // UPDATE
+  async findPasswordRecoveryRecord(code: string): Promise<any> {
+    const users = await this.dataSource.query(
+      `select *
+       from user_password_recoveries
+       where "recoveryCode" = $1`,
+      [code],
+    );
+
+    if (users.length === 0) {
+      return null;
+    }
+
+    return users[0];
+  }
+
   async updateEmailConfirmationData(
     confirmationCode: string,
     userId: number,
@@ -196,7 +240,40 @@ export class UsersRepository {
     });
   }
 
-  // DELETE
+  async updatePasswordRecoveryData(
+    recoveryCode: string,
+    userId: number,
+  ): Promise<boolean> {
+    const result = await this.dataSource.query(
+      `update public.user_password_recoveries upr 
+       set "recoveryCode" = $1,
+           "expirationDate"   = now() + interval '3 hours'
+       where "userId" = $2`,
+      [recoveryCode, userId],
+    );
+    return result[1] === 1;
+  }
+
+  async updatePassword(userId: number, hash: string): Promise<boolean> {
+    return this.dataSource.transaction(async () => {
+      await this.dataSource.query(
+        `update public.users
+         set "passwordHash" = $2
+         where id = $1`,
+        [userId, hash],
+      );
+
+      const result = await this.dataSource.query(
+        `update public.user_password_recoveries uec
+         set "recoveryCode" = null,
+             "expirationDate"   = null
+         where "userId" = $1`,
+        [userId],
+      );
+      return result[1] === 1;
+    });
+  }
+
   async deleteUser(userId: number): Promise<boolean> {
     const result = await this.dataSource.query(
       `delete

@@ -10,7 +10,7 @@ export class UserDeleteUseCase implements ICommandHandler<UserDeleteCommand> {
   constructor(private readonly usersRepository: UsersRepository) {}
 
   async execute(command: UserDeleteCommand): Promise<boolean> {
-    const user = await this.usersRepository.checkUserExistence(+command.userId);
+    const user = await this.usersRepository.findUserById(+command.userId);
 
     if (!user) {
       return null;
