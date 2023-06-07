@@ -12,7 +12,7 @@ export class UsersQueryRepository {
 
   async findUsers(
     query: UserQueryDto,
-  ): Promise<Paginator<SuperAdminUserViewDto>> {
+  ): Promise<Paginator<SuperAdminUserViewDto[]>> {
     const filter = filterUsers(
       query.banStatus,
       query.searchLoginTerm,
@@ -71,7 +71,7 @@ export class UsersQueryRepository {
     return mappedUsers[0];
   }
 
-  private async usersMapping(array: any): Promise<SuperAdminUserViewDto> {
+  private async usersMapping(array: any): Promise<SuperAdminUserViewDto[]> {
     return array.map((u) => {
       return {
         id: u.id.toString(),

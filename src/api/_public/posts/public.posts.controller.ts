@@ -6,13 +6,11 @@ import {
   Param,
   Post,
   Put,
-  Query,
   UseGuards,
 } from '@nestjs/common';
 import { PostsQueryRepository } from '../../infrastructure/posts/posts.query.repository';
 import { exceptionHandler } from '../../../exceptions/exception.handler';
 import { ResultCode } from '../../../enums/result-code.enum';
-import { QueryDto } from '../../dto/query.dto';
 import {
   postIDField,
   postNotFound,
@@ -35,10 +33,10 @@ export class PublicPostsController {
     private readonly commentsQueryRepository: CommentsQueryRepository,
   ) {}
 
-  @Get()
+  /*@Get()
   async findPosts(@Query() query: QueryDto, @UserIdFromHeaders() userId) {
     return this.postsQueryRepository.findPosts(query, userId);
-  }
+  }*/
 
   @Get(':id')
   async findPost(@Param('id') postId, @UserIdFromHeaders() userId) {
@@ -69,7 +67,7 @@ export class PublicPostsController {
     return this.commentsQueryRepository.findComment(result.response);
   }
 
-  @Get(':id/comments')
+  /*@Get(':id/comments')
   async findComments(
     @Query() query: QueryDto,
     @Param('id') postId,
@@ -86,7 +84,7 @@ export class PublicPostsController {
     }
 
     return result;
-  }
+  }*/
 
   @UseGuards(JwtBearerGuard)
   @Put(':id/like-status')

@@ -1,22 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import mongoose from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { Paginator } from '../../../helpers/pagination/_paginator';
 import {
   Comment,
   CommentLeanType,
   CommentModelType,
 } from '../../entities/_mongoose/comment.entity';
 import { CommentViewDto } from '../../dto/comments/view/comment.view.dto';
-import { QueryDto } from '../../dto/query.dto';
-import { pFind } from '../../../helpers/pagination/mongoose/pagination-find';
-import { pSort } from '../../../helpers/pagination/mongoose/pagination-sort';
-import { pFilterComments } from '../../../helpers/pagination/mongoose/pagination-filter-comments';
 import { likeStatusFinder } from '../../_public/likes/helpers/like-status-finder';
 import { PostsRepository } from '../posts/posts.repository';
 import { likesCounter } from '../../_public/likes/helpers/likes-counter';
 import { LikeStatus } from '../../../enums/like-status.enum';
-import { pFilterCommentsForBlogger } from '../../../helpers/pagination/mongoose/pagination-filter-comments-for-blogger';
 import { BloggerCommentViewDto } from '../../dto/comments/view/blogger/blogger.comment.view.dto';
 
 @Injectable()
@@ -26,60 +20,60 @@ export class CommentsQueryRepository {
     private CommentModel: CommentModelType,
     private postsRepository: PostsRepository,
   ) {}
-  async findComments(
-    query: QueryDto,
-    postId: string,
-    userId: string,
-  ): Promise<Paginator<CommentViewDto[]>> {
-    const post = await this.postsRepository.findPost(postId);
+  // async findComments(
+  //   query: QueryDto,
+  //   postId: string,
+  //   userId: string,
+  // ): Promise<Paginator<CommentViewDto[]>> {
+  //   const post = await this.postsRepository.findPost(postId);
+  //
+  //   if (!post) {
+  //     return null;
+  //   }
+  //
+  //   const comments = await pFind(
+  //     this.CommentModel,
+  //     query.pageNumber,
+  //     query.pageSize,
+  //     pFilterComments(postId),
+  //     pSort(query.sortBy, query.sortDirection),
+  //   );
+  //
+  //   const totalCount = await this.CommentModel.countDocuments(
+  //     pFilterComments(postId),
+  //   );
+  //
+  //   return Paginator.paginate({
+  //     pageNumber: query.pageNumber,
+  //     pageSize: query.pageSize,
+  //     totalCount: totalCount,
+  //     items: await this.commentsMapping(comments, userId),
+  //   });
+  // }
 
-    if (!post) {
-      return null;
-    }
-
-    const comments = await pFind(
-      this.CommentModel,
-      query.pageNumber,
-      query.pageSize,
-      pFilterComments(postId),
-      pSort(query.sortBy, query.sortDirection),
-    );
-
-    const totalCount = await this.CommentModel.countDocuments(
-      pFilterComments(postId),
-    );
-
-    return Paginator.paginate({
-      pageNumber: query.pageNumber,
-      pageSize: query.pageSize,
-      totalCount: totalCount,
-      items: await this.commentsMapping(comments, userId),
-    });
-  }
-
-  async findCommentsOfBloggersPosts(
-    query: QueryDto,
-    userId: string,
-  ): Promise<Paginator<BloggerCommentViewDto[]>> {
-    const comments = await pFind(
-      this.CommentModel,
-      query.pageNumber,
-      query.pageSize,
-      pFilterCommentsForBlogger(userId),
-      pSort(query.sortBy, query.sortDirection),
-    );
-
-    const totalCount = await this.CommentModel.countDocuments(
-      pFilterCommentsForBlogger(userId),
-    );
-
-    return Paginator.paginate({
-      pageNumber: query.pageNumber,
-      pageSize: query.pageSize,
-      totalCount: totalCount,
-      items: await this.commentsForBloggerMapping(comments, userId),
-    });
-  }
+  // async findCommentsOfBloggersPosts(
+  //   query: QueryDto,
+  //   userId: string,
+  // ): Promise<Paginator<BloggerCommentViewDto[]>> {
+  //   const comments = await pFind(
+  //     this.CommentModel,
+  //     query.pageNumber,
+  //     query.pageSize,
+  //     pFilterCommentsForBlogger(userId),
+  //     pSort(query.sortBy, query.sortDirection),
+  //   );
+  //
+  //   const totalCount = await this.CommentModel.countDocuments(
+  //     pFilterCommentsForBlogger(userId),
+  //   );
+  //
+  //   return Paginator.paginate({
+  //     pageNumber: query.pageNumber,
+  //     pageSize: query.pageSize,
+  //     totalCount: totalCount,
+  //     items: await this.commentsForBloggerMapping(comments, userId),
+  //   });
+  // }
 
   async findComment(
     commentId: string,

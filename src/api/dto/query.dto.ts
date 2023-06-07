@@ -1,16 +1,6 @@
 import { Transform } from 'class-transformer';
-import { User } from '../entities/users/user.entity';
 
 export class QueryDto {
-  @Transform(({ value }) => {
-    if (User.checkSortingField(value)) {
-      return value;
-    } else {
-      return 'createdAt';
-    }
-  })
-  sortBy = 'createdAt';
-
   @Transform(({ value }) => {
     if (value.toLowerCase() === 'asc') {
       return value;

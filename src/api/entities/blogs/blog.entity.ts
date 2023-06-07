@@ -28,6 +28,15 @@ export class Blog {
   @Column({ type: 'boolean' })
   isBanned: boolean;
 
-  // @Column({ required: true })
-  // banInfo: BlogBanInfoSchema;
+  static checkSortingField(value: any) {
+    const b = new Blog();
+    b.id = 1;
+    b.name = '';
+    b.description = '';
+    b.websiteUrl = '';
+    b.createdAt = new Date();
+    b.isMembership = false;
+    b.isBanned = false;
+    return b.hasOwnProperty(value);
+  }
 }

@@ -2,9 +2,7 @@ import { Controller, Get, Param, Query } from '@nestjs/common';
 import { BlogsMongooseQueryRepository } from '../../infrastructure/_mongoose/blogs/blogs.query.repository';
 import { BlogQueryDto } from '../../dto/blogs/query/blog.query.dto';
 import { Role } from '../../../enums/role.enum';
-import { QueryDto } from '../../dto/query.dto';
 import { PostsQueryRepository } from '../../infrastructure/posts/posts.query.repository';
-import { UserIdFromHeaders } from '../../_auth/decorators/user-id-from-headers.decorator';
 import { exceptionHandler } from '../../../exceptions/exception.handler';
 import {
   blogIDField,
@@ -39,7 +37,7 @@ export class PublicBlogsController {
     return result;
   }
 
-  @Get(':id/posts')
+  /*@Get(':id/posts')
   async findPosts(
     @Query() query: QueryDto,
     @Param('id') blogId,
@@ -56,5 +54,5 @@ export class PublicBlogsController {
     }
 
     return result;
-  }
+  }*/
 }

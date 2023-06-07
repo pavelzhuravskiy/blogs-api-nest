@@ -1,17 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import mongoose from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { Paginator } from '../../../helpers/pagination/_paginator';
 import {
   Post,
   PostLeanType,
   PostModelType,
 } from '../../entities/_mongoose/post.entity';
 import { PostViewModel } from '../../dto/posts/view/post.view.dto';
-import { QueryDto } from '../../dto/query.dto';
-import { pFind } from '../../../helpers/pagination/mongoose/pagination-find';
-import { pSort } from '../../../helpers/pagination/mongoose/pagination-sort';
-import { pFilterPosts } from '../../../helpers/pagination/mongoose/pagination-filter-posts';
 import { likeStatusFinder } from '../../_public/likes/helpers/like-status-finder';
 import { LikeStatus } from '../../../enums/like-status.enum';
 import { likesCounter } from '../../_public/likes/helpers/likes-counter';
@@ -24,37 +19,37 @@ export class PostsQueryRepository {
     private PostModel: PostModelType,
     private readonly blogsRepository: BlogsMongooseRepository,
   ) {}
-  async findPosts(
-    query: QueryDto,
-    userId: string,
-    blogId?: string,
-  ): Promise<Paginator<PostViewModel[]> | null> {
-    if (blogId) {
-      const blog = await this.blogsRepository.findBlog(blogId);
-      if (!blog) {
-        return null;
-      }
-    }
-
-    const posts = await pFind(
-      this.PostModel,
-      query.pageNumber,
-      query.pageSize,
-      pFilterPosts(blogId),
-      pSort(query.sortBy, query.sortDirection),
-    );
-
-    const totalCount = await this.PostModel.countDocuments(
-      pFilterPosts(blogId),
-    );
-
-    return Paginator.paginate({
-      pageNumber: query.pageNumber,
-      pageSize: query.pageSize,
-      totalCount: totalCount,
-      items: await this.postsMapping(posts, userId),
-    });
-  }
+  // async findPosts(
+  //   query: QueryDto,
+  //   userId: string,
+  //   blogId?: string,
+  // ): Promise<Paginator<PostViewModel[]> | null> {
+  //   if (blogId) {
+  //     const blog = await this.blogsRepository.findBlog(blogId);
+  //     if (!blog) {
+  //       return null;
+  //     }
+  //   }
+  //
+  //   const posts = await pFind(
+  //     this.PostModel,
+  //     query.pageNumber,
+  //     query.pageSize,
+  //     pFilterPosts(blogId),
+  //     pSort(query.sortBy, query.sortDirection),
+  //   );
+  //
+  //   const totalCount = await this.PostModel.countDocuments(
+  //     pFilterPosts(blogId),
+  //   );
+  //
+  //   return Paginator.paginate({
+  //     pageNumber: query.pageNumber,
+  //     pageSize: query.pageSize,
+  //     totalCount: totalCount,
+  //     items: await this.postsMapping(posts, userId),
+  //   });
+  // }
 
   async findPost(
     postId: string,

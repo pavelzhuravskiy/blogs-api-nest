@@ -23,9 +23,6 @@ export class User {
   createdAt: Date;
 
   @Column({ type: 'boolean' })
-  isMembership: boolean;
-
-  @Column({ type: 'boolean' })
   isConfirmed: boolean;
 
   @Column({ type: 'boolean' })
@@ -35,11 +32,8 @@ export class User {
     const u = new User();
     u.id = 1;
     u.login = '';
-    u.passwordHash = '';
     u.email = '';
     u.createdAt = new Date();
-    u.isMembership = false;
-    u.isConfirmed = false;
     u.isBanned = false;
     return u.hasOwnProperty(value);
   }

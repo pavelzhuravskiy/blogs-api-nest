@@ -1,11 +1,9 @@
 import {
   Body,
   Controller,
-  Get,
   HttpCode,
   Param,
   Put,
-  Query,
   UseGuards,
 } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
@@ -15,7 +13,6 @@ import { JwtBearerGuard } from '../_auth/guards/jwt-bearer.guard';
 import { BloggerUserBanInputDto } from '../dto/users/input/blogger/blogger.user-ban.input.dto';
 import { BloggerUserBanCommand } from './application/use-cases/user-ban.use-case';
 import { BlogsMongooseQueryRepository } from '../infrastructure/_mongoose/blogs/blogs.query.repository';
-import { BloggerUserBanQueryDto } from '../dto/users/query/blogger/blogger.user-ban.query.dto';
 import { UsersMongooseQueryRepository } from '../infrastructure/_mongoose/users/users.mongoose.query.repository';
 import { UserIdFromGuard } from '../_auth/decorators/user-id-from-guard.decorator';
 
@@ -46,7 +43,7 @@ export class BloggerUsersController {
     return result;
   }
 
-  @UseGuards(JwtBearerGuard)
+  /*@UseGuards(JwtBearerGuard)
   @Get('blog/:id')
   async findUsers(
     @Query() query: BloggerUserBanQueryDto,
@@ -64,5 +61,5 @@ export class BloggerUsersController {
     }
 
     return result.response;
-  }
+  }*/
 }
