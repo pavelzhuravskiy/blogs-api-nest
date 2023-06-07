@@ -82,6 +82,10 @@ export class UsersRepository {
   }
 
   async findUserById(userId: number): Promise<User | null> {
+    if (isNaN(+userId)) {
+      return null;
+    }
+
     const users = await this.dataSource.query(
       `select id, login, email, "isBanned"
        from public.users
