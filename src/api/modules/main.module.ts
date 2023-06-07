@@ -43,6 +43,11 @@ import { BloggerUserBanUseCase } from '../_blogger/application/use-cases/user-ba
 import { BloggerUsersController } from '../_blogger/blogger.users.controller';
 import { UsersMongooseQueryRepository } from '../infrastructure/_mongoose/users/users.mongoose.query.repository';
 import { BlogBanUseCase } from '../_superadmin/blogs/application/use-cases/blog-ban.use-case';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { BlogOwner } from '../entities/blogs/blog-owner.entity';
+import { BlogBan } from '../entities/blogs/blog-ban.entity';
+
+const entities = [Blog, BlogOwner, BlogBan];
 
 const controllers = [
   SuperAdminBlogsController,
@@ -89,6 +94,7 @@ const queryRepositories = [
 
 @Module({
   imports: [
+    TypeOrmModule.forFeature([...entities]),
     MongooseModule.forFeature([
       { name: Blog.name, schema: BlogSchema },
       { name: Post.name, schema: PostSchema },

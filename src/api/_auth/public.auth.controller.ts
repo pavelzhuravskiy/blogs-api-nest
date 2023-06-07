@@ -42,6 +42,7 @@ import { DeviceUpdateForTokensCommand } from './application/use-cases/devices/de
 import { DeviceDeleteForLogoutCommand } from './application/use-cases/devices/device-delete-for-logout.use-case';
 import { TokensCreateCommand } from './application/use-cases/tokens/tokens-create.use-case';
 import { UsersRepository } from '../infrastructure/users/users.repository';
+import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 
 @Controller('auth')
 export class PublicAuthController {
