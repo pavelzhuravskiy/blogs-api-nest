@@ -66,13 +66,12 @@ export class DevicesRepository {
   }
 
   async deleteOldDevices(deviceId: string): Promise<boolean> {
-    const result = await this.dataSource.query(
+    return this.dataSource.query(
       `delete
        from public.devices
        where "deviceId" != $1;`,
       [deviceId],
     );
-    return result[1] === 1;
   }
 
   async deleteDevice(deviceId: string): Promise<boolean> {
@@ -83,5 +82,14 @@ export class DevicesRepository {
       [deviceId],
     );
     return result[1] === 1;
+  }
+
+  async deleteBannedUserDevices(userId: number): Promise<boolean> {
+    return this.dataSource.query(
+      `delete
+       from public.devices
+       where "userId" = $1;`,
+      [userId],
+    );
   }
 }

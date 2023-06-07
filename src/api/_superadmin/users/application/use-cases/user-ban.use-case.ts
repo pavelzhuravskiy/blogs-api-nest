@@ -1,5 +1,4 @@
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { UsersMongooseRepository } from '../../../../infrastructure/_mongoose/users/users.mongoose.repository';
 import { SAUserBanInputDto } from '../../../../dto/users/input/superadmin/sa.user-ban.input.dto';
 import { ResultCode } from '../../../../../enums/result-code.enum';
 import {
@@ -9,20 +8,12 @@ import {
   userNotFound,
 } from '../../../../../exceptions/exception.constants';
 import { ExceptionResultType } from '../../../../../exceptions/types/exception-result.type';
-import { DevicesDeleteForUserBanCommand } from '../../../../_public/devices/application/use-cases/devices-delete-for-user-ban.use-case';
 import { PostsRepository } from '../../../../infrastructure/posts/posts.repository';
 import { BlogsRepository } from '../../../../infrastructure/blogs/blogs.repository';
 import { CommentsRepository } from '../../../../infrastructure/comments/comments.repository';
 import { LikesRepository } from '../../../../infrastructure/likes/likes.repository';
-import { InjectModel } from '@nestjs/mongoose';
-import {
-  Post,
-  PostModelType,
-} from '../../../../entities/_mongoose/post.entity';
-import {
-  Comment,
-  CommentModelType,
-} from '../../../../entities/_mongoose/comment.entity';
+import { UsersRepository } from '../../../../infrastructure/users/users.repository';
+import { DevicesRepository } from '../../../../infrastructure/devices/devices.repository';
 
 export class SAUserBanCommand {
   constructor(
@@ -35,11 +26,8 @@ export class SAUserBanCommand {
 export class UserBanUseCase implements ICommandHandler<SAUserBanCommand> {
   constructor(
     private commandBus: CommandBus,
-    @InjectModel(Post.name)
-    private PostModel: PostModelType,
-    @InjectModel(Comment.name)
-    private CommentModel: CommentModelType,
-    private readonly usersRepository: UsersMongooseRepository,
+    private readonly usersRepository: UsersRepository,
+    private readonly devicesRepository: DevicesRepository,
     private readonly blogsRepository: BlogsRepository,
     private readonly postsRepository: PostsRepository,
     private readonly commentsRepository: CommentsRepository,
@@ -49,7 +37,7 @@ export class UserBanUseCase implements ICommandHandler<SAUserBanCommand> {
   async execute(
     command: SAUserBanCommand,
   ): Promise<ExceptionResultType<boolean>> {
-    const user = await this.usersRepository.findUserById(command.userId);
+    const user = await this.usersRepository.findUserById(+command.userId);
 
     if (!user) {
       return {
@@ -60,7 +48,7 @@ export class UserBanUseCase implements ICommandHandler<SAUserBanCommand> {
       };
     }
 
-    const banDBStatus = user.banInfo.isBanned;
+    const banDBStatus = user.isBanned;
 
     if (banDBStatus && command.saUserBanInputDto.isBanned) {
       return {
@@ -81,49 +69,48 @@ export class UserBanUseCase implements ICommandHandler<SAUserBanCommand> {
     }
 
     if (!banDBStatus) {
-      user.saBanUser(command.saUserBanInputDto);
-
-      await this.commandBus.execute(
-        new DevicesDeleteForUserBanCommand(command.userId),
+      await this.usersRepository.banUser(
+        user.id,
+        command.saUserBanInputDto.banReason,
       );
 
-      await this.blogsRepository.setBlogsOwnerBanStatus(command.userId, true);
-      await this.postsRepository.setPostsOwnerBanStatus(command.userId, true);
-      await this.commentsRepository.setCommentsOwnerBanStatus(
+      await this.devicesRepository.deleteBannedUserDevices(user.id);
+
+      /*await this.blogsRepository.setBlogsOwnerBanStatus(command.userId, true);*/
+      /*await this.postsRepository.setPostsOwnerBanStatus(command.userId, true);*/
+      /*await this.commentsRepository.setCommentsOwnerBanStatus(
         command.userId,
         true,
-      );
-      await this.likesRepository.setLikesOwnerBanStatus(
+      );*/
+      /*await this.likesRepository.setLikesOwnerBanStatus(
         command.userId,
         true,
         this.PostModel,
-      );
-      await this.likesRepository.setLikesOwnerBanStatus(
+      );*/
+      /*await this.likesRepository.setLikesOwnerBanStatus(
         command.userId,
         true,
         this.CommentModel,
-      );
+      );*/
     } else {
-      user.saUnbanUser();
-      await this.blogsRepository.setBlogsOwnerBanStatus(command.userId, false);
-      await this.postsRepository.setPostsOwnerBanStatus(command.userId, false);
-      await this.commentsRepository.setCommentsOwnerBanStatus(
+      await this.usersRepository.unbanUser(user.id);
+      /*await this.blogsRepository.setBlogsOwnerBanStatus(command.userId, false);*/
+      /*await this.postsRepository.setPostsOwnerBanStatus(command.userId, false);*/
+      /*await this.commentsRepository.setCommentsOwnerBanStatus(
         command.userId,
         false,
-      );
-      await this.likesRepository.setLikesOwnerBanStatus(
+      );*/
+      /*await this.likesRepository.setLikesOwnerBanStatus(
         command.userId,
         false,
         this.PostModel,
-      );
-      await this.likesRepository.setLikesOwnerBanStatus(
+      );*/
+      /*await this.likesRepository.setLikesOwnerBanStatus(
         command.userId,
         false,
         this.CommentModel,
-      );
+      );*/
     }
-
-    await this.usersRepository.save(user);
 
     return {
       data: true,

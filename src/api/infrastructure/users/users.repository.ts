@@ -83,7 +83,7 @@ export class UsersRepository {
 
   async findUserById(userId: number): Promise<User | null> {
     const users = await this.dataSource.query(
-      `select id, login, email
+      `select id, login, email, "isBanned"
        from public.users
        where id = $1`,
       [userId],
@@ -297,5 +297,45 @@ export class UsersRepository {
       [userId],
     );
     return result[1] === 1;
+  }
+
+  async banUser(userId: number, banReason: string): Promise<boolean> {
+    return this.dataSource.transaction(async () => {
+      await this.dataSource.query(
+        `update public.users
+         set "isBanned" = true
+         where id = $1`,
+        [userId],
+      );
+
+      const result = await this.dataSource.query(
+        `update public.user_bans
+         set "banDate" = now(),
+             "banReason"   = $2
+         where "userId" = $1`,
+        [userId, banReason],
+      );
+      return result[1] === 1;
+    });
+  }
+
+  async unbanUser(userId: number): Promise<boolean> {
+    return this.dataSource.transaction(async () => {
+      await this.dataSource.query(
+        `update public.users
+         set "isBanned" = false
+         where id = $1`,
+        [userId],
+      );
+
+      const result = await this.dataSource.query(
+        `update public.user_bans
+         set "banDate" = null,
+             "banReason"   = null
+         where "userId" = $1`,
+        [userId],
+      );
+      return result[1] === 1;
+    });
   }
 }

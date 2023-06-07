@@ -24,6 +24,7 @@ import { UserBan } from '../entities/users/user-ban.entity';
 import { UsersRepository } from '../infrastructure/users/users.repository';
 import { IsEmailExistConstraint } from '../../exceptions/decorators/unique-email.decorator';
 import { UsersQueryRepository } from '../infrastructure/users/users.query.repository';
+import { DevicesRepository } from '../infrastructure/devices/devices.repository';
 
 const useCases = [UserCreateUseCase, UserDeleteUseCase, UserBanUseCase];
 
@@ -38,7 +39,11 @@ const mongooseRepositories = [
   LikesRepository,
 ];
 
-const sqlRepositories = [UsersRepository, UsersQueryRepository];
+const sqlRepositories = [
+  UsersRepository,
+  UsersQueryRepository,
+  DevicesRepository,
+];
 
 @Module({
   imports: [
