@@ -1,5 +1,5 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { DevicesMongooseRepository } from '../../../../infrastructure/devices/mongoose/devices.repository';
+import { DevicesRepository } from '../../../../infrastructure/devices/devices.repository';
 
 export class DevicesDeleteOldCommand {
   constructor(public deviceId: string) {}
@@ -9,7 +9,7 @@ export class DevicesDeleteOldCommand {
 export class DevicesDeleteOldUseCase
   implements ICommandHandler<DevicesDeleteOldCommand>
 {
-  constructor(private readonly devicesRepository: DevicesMongooseRepository) {}
+  constructor(private readonly devicesRepository: DevicesRepository) {}
 
   async execute(command: DevicesDeleteOldCommand): Promise<boolean> {
     return this.devicesRepository.deleteOldDevices(command.deviceId);

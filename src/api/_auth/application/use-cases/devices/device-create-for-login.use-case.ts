@@ -20,7 +20,7 @@ export class DeviceCreateForLoginUseCase
   ) {}
 
   async execute(command: DeviceCreateForLoginCommand): Promise<number> {
-    const decodedToken = await this.jwtService.decode(command.token);
+    const decodedToken = this.jwtService.decode(command.token);
     return this.devicesRepository.createDevice(
       decodedToken,
       command.ip,

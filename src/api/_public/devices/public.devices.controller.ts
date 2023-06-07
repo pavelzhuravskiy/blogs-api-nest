@@ -7,7 +7,6 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { DevicesMongooseQueryRepository } from '../../infrastructure/devices/mongoose/devices.query.repository';
 import { exceptionHandler } from '../../../exceptions/exception.handler';
 import { ResultCode } from '../../../enums/result-code.enum';
 import { UserIdFromGuard } from '../../_auth/decorators/user-id-from-guard.decorator';
@@ -16,12 +15,13 @@ import { RefreshToken } from '../../_auth/decorators/refresh-token.decorator';
 import { CommandBus } from '@nestjs/cqrs';
 import { DeviceDeleteForTerminateCommand } from './application/use-cases/device-delete-for-terminate.use-case';
 import { DevicesDeleteOldCommand } from './application/use-cases/devices-delete-old.use-case';
+import { DevicesQueryRepository } from '../../infrastructure/devices/devices.query.repository';
 
 @Controller('security')
 export class PublicDevicesController {
   constructor(
     private commandBus: CommandBus,
-    private readonly devicesQueryRepository: DevicesMongooseQueryRepository,
+    private readonly devicesQueryRepository: DevicesQueryRepository,
     private readonly jwtService: JwtService,
   ) {}
 

@@ -1,17 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import mongoose from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Paginator } from '../../../../helpers/pagination/_paginator';
 import {
-  UserMongoose,
-  UserLeanType,
   UserModelType,
+  UserMongoose,
 } from '../../../entities/_mongoose/user.entity';
-import { UserQueryDto } from '../../../dto/users/query/user-query.dto';
-import { SuperAdminUserViewDto } from '../../../dto/users/view/superadmin/sa.user.view.dto';
 import { pFind } from '../../../../helpers/pagination/mongoose/pagination-find';
 import { pSort } from '../../../../helpers/pagination/mongoose/pagination-sort';
-import { pFilterUsersSA } from '../../../../helpers/pagination/mongoose/pagination-filter-users';
 import { BloggerUserBanQueryDto } from '../../../dto/users/query/blogger/blogger.user-ban.query.dto';
 import { UsersBannedByBloggerViewDto } from '../../../dto/users/view/blogger/blogger.user-ban.view.dto';
 import { pFilterUsersBannedByBlogger } from '../../../../helpers/pagination/mongoose/pagination-filter-users-banned-by-blogger';
@@ -30,36 +25,6 @@ export class UsersMongooseQueryRepository {
     private UserModel: UserModelType,
     private readonly blogsRepository: BlogsRepository,
   ) {}
-  async findUsersBySA(
-    query: UserQueryDto,
-  ): Promise<Paginator<SuperAdminUserViewDto[]>> {
-    const users = await pFind(
-      this.UserModel,
-      query.pageNumber,
-      query.pageSize,
-      pFilterUsersSA(
-        query.banStatus,
-        query.searchLoginTerm,
-        query.searchEmailTerm,
-      ),
-      pSort(`accountData.${query.sortBy}`, query.sortDirection),
-    );
-
-    const totalCount = await this.UserModel.countDocuments(
-      pFilterUsersSA(
-        query.banStatus,
-        query.searchLoginTerm,
-        query.searchEmailTerm,
-      ),
-    );
-
-    return Paginator.paginate({
-      pageNumber: query.pageNumber,
-      pageSize: query.pageSize,
-      totalCount: totalCount,
-      items: await this.usersMapping(users),
-    });
-  }
 
   async findUsersBannedByBlogger(
     query: BloggerUserBanQueryDto,
@@ -112,48 +77,6 @@ export class UsersMongooseQueryRepository {
       code: ResultCode.Success,
       response: result,
     };
-  }
-
-  async findUser(id: string): Promise<SuperAdminUserViewDto | null> {
-    if (!mongoose.isValidObjectId(id)) {
-      return null;
-    }
-
-    const user = await this.UserModel.findOne({ _id: id });
-
-    if (!user) {
-      return null;
-    }
-
-    return {
-      id: user.id,
-      login: user.accountData.login,
-      email: user.accountData.email,
-      createdAt: user.accountData.createdAt,
-      banInfo: {
-        isBanned: user.banInfo.isBanned,
-        banDate: user.banInfo.banDate,
-        banReason: user.banInfo.banReason,
-      },
-    };
-  }
-
-  private async usersMapping(
-    users: UserLeanType[],
-  ): Promise<SuperAdminUserViewDto[]> {
-    return users.map((u) => {
-      return {
-        id: u._id.toString(),
-        login: u.accountData.login,
-        email: u.accountData.email,
-        createdAt: u.accountData.createdAt,
-        banInfo: {
-          isBanned: u.banInfo.isBanned,
-          banDate: u.banInfo.banDate,
-          banReason: u.banInfo.banReason,
-        },
-      };
-    });
   }
 
   private async usersBannedByBloggerMapping(

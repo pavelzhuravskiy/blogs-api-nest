@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { Device } from '../../entities/devices/device.entity';
+import { uuidIsValid } from '../../../helpers/uuid-is-valid';
 
 @Injectable()
 export class DevicesRepository {
@@ -29,8 +30,12 @@ export class DevicesRepository {
   }
 
   async findDevice(deviceId: string): Promise<Device | null> {
+    if (!uuidIsValid(deviceId)) {
+      return null;
+    }
+
     const devices = await this.dataSource.query(
-      `select id, "deviceId", "lastActiveDate"
+      `select id, "userId", "deviceId", "lastActiveDate"
        from public.devices
        where "deviceId" = $1`,
       [deviceId],
@@ -49,7 +54,6 @@ export class DevicesRepository {
     ip: string,
     userAgent: string,
   ): Promise<boolean> {
-    console.log(token);
     const result = await this.dataSource.query(
       `update public.devices
        set "lastActiveDate" = $2,
@@ -57,6 +61,26 @@ export class DevicesRepository {
            title = $4
        where "deviceId" = $1`,
       [deviceId, token.iat, ip, userAgent],
+    );
+    return result[1] === 1;
+  }
+
+  async deleteOldDevices(deviceId: string): Promise<boolean> {
+    const result = await this.dataSource.query(
+      `delete
+       from public.devices
+       where "deviceId" != $1;`,
+      [deviceId],
+    );
+    return result[1] === 1;
+  }
+
+  async deleteDevice(deviceId: string): Promise<boolean> {
+    const result = await this.dataSource.query(
+      `delete
+       from public.devices
+       where "deviceId" = $1;`,
+      [deviceId],
     );
     return result[1] === 1;
   }

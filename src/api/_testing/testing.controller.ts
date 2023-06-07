@@ -11,7 +11,7 @@ export class TestingController {
   async deleteAll() {
     await this.dataSource.query(
       `delete
-       from public.users;`,
+       from public.devices;`,
     );
     await this.dataSource.query(
       `delete
@@ -24,6 +24,10 @@ export class TestingController {
     await this.dataSource.query(
       `delete
        from public.user_password_recoveries;`,
+    );
+    await this.dataSource.query(
+      `delete
+       from public.users;`,
     );
   }
 }

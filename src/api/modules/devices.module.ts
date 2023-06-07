@@ -4,21 +4,21 @@ import { Device, DeviceSchema } from '../entities/_mongoose/device.entity';
 import { JwtService } from '@nestjs/jwt';
 import { DevicesMongooseRepository } from '../infrastructure/devices/mongoose/devices.repository';
 import { PublicDevicesController } from '../_public/devices/public.devices.controller';
-import { DevicesMongooseQueryRepository } from '../infrastructure/devices/mongoose/devices.query.repository';
 import { DeviceDeleteForTerminateUseCase } from '../_public/devices/application/use-cases/device-delete-for-terminate.use-case';
 import { DevicesDeleteOldUseCase } from '../_public/devices/application/use-cases/devices-delete-old.use-case';
 import { CqrsModule } from '@nestjs/cqrs';
 import { DevicesDeleteForUserBanUseCase } from '../_public/devices/application/use-cases/devices-delete-for-user-ban.use-case';
+import { DevicesRepository } from '../infrastructure/devices/devices.repository';
+import { DevicesQueryRepository } from '../infrastructure/devices/devices.query.repository';
 
 const useCases = [
   DeviceDeleteForTerminateUseCase,
   DevicesDeleteOldUseCase,
   DevicesDeleteForUserBanUseCase,
 ];
-const repositories = [
-  DevicesMongooseRepository,
-  DevicesMongooseQueryRepository,
-];
+const mongooseRepositories = [DevicesMongooseRepository];
+
+const repositories = [DevicesRepository, DevicesQueryRepository];
 
 @Module({
   imports: [
@@ -26,6 +26,11 @@ const repositories = [
     CqrsModule,
   ],
   controllers: [PublicDevicesController],
-  providers: [JwtService, ...useCases, ...repositories],
+  providers: [
+    JwtService,
+    ...useCases,
+    ...repositories,
+    ...mongooseRepositories,
+  ],
 })
 export class DevicesModule {}

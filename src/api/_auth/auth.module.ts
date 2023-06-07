@@ -11,8 +11,6 @@ import { UserMongoose, UserSchema } from '../entities/_mongoose/user.entity';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { CqrsModule } from '@nestjs/cqrs';
 import { Device, DeviceSchema } from '../entities/_mongoose/device.entity';
-import { DevicesMongooseRepository } from '../infrastructure/devices/mongoose/devices.repository';
-import { UsersMongooseRepository } from '../infrastructure/_mongoose/users/users.mongoose.repository';
 import { RegistrationUseCase } from './application/use-cases/registration/registration.use-case';
 import { RegistrationEmailResendUseCase } from './application/use-cases/registration/registration-email-resend.use-case';
 import { RegistrationConfirmationUseCase } from './application/use-cases/registration/registration-confirmation.use-case';
@@ -43,11 +41,6 @@ const useCases = [
   TokensCreateUseCase,
 ];
 
-const mongooseRepositories = [
-  DevicesMongooseRepository,
-  UsersMongooseRepository,
-];
-
 const repositories = [UsersRepository, DevicesRepository];
 
 const strategies = [
@@ -71,12 +64,6 @@ const strategies = [
     PassportModule,
   ],
   controllers: [PublicAuthController],
-  providers: [
-    ...services,
-    ...useCases,
-    ...repositories,
-    ...mongooseRepositories,
-    ...strategies,
-  ],
+  providers: [...services, ...useCases, ...repositories, ...strategies],
 })
 export class AuthModule {}

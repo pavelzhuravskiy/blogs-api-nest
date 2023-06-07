@@ -11,7 +11,6 @@ import {
 } from '@nestjs/common';
 import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
 import { LocalAuthGuard } from './guards/local-auth.guard';
-import { UsersMongooseRepository } from '../infrastructure/_mongoose/users/users.mongoose.repository';
 import { UserIdFromGuard } from './decorators/user-id-from-guard.decorator';
 import { JwtService } from '@nestjs/jwt';
 import { JwtBearerGuard } from './guards/jwt-bearer.guard';
@@ -31,7 +30,6 @@ import {
 } from '../../exceptions/exception.constants';
 import { EmailInputDto } from './dto/email.input.dto';
 import { NewPasswordInputDto } from './dto/new-password.input.dto';
-import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 import { RefreshToken } from './decorators/refresh-token.decorator';
 import { CommandBus } from '@nestjs/cqrs';
 import { RegistrationCommand } from './application/use-cases/registration/registration.use-case';
@@ -50,7 +48,6 @@ export class PublicAuthController {
   constructor(
     private commandBus: CommandBus,
     private readonly jwtService: JwtService,
-    private readonly usersMongooseRepository: UsersMongooseRepository,
     private readonly usersRepository: UsersRepository,
   ) {}
 
@@ -210,7 +207,7 @@ export class PublicAuthController {
     return {
       email: user.email,
       login: user.login,
-      userId: userId,
+      userId: userId.toString(),
     };
   }
 }

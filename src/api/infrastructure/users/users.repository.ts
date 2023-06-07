@@ -3,6 +3,9 @@ import { UserInputDto } from '../../dto/users/input/user-input.dto';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { User } from '../../entities/users/user.entity';
+import { uuidIsValid } from '../../../helpers/uuid-is-valid';
+import { UserPasswordRecovery } from '../../entities/users/user-password-recovery.entity';
+import { UserEmailConfirmation } from '../../entities/users/user-email-confirmation.entity';
 
 @Injectable()
 export class UsersRepository {
@@ -171,7 +174,13 @@ export class UsersRepository {
     return users[0];
   }
 
-  async findUserForEmailConfirm(code: string): Promise<any> {
+  async findUserForEmailConfirm(
+    code: string,
+  ): Promise<(User & UserEmailConfirmation) | null> {
+    if (!uuidIsValid(code)) {
+      return null;
+    }
+
     const users = await this.dataSource.query(
       `select u.id,
               u."isConfirmed",
@@ -191,7 +200,13 @@ export class UsersRepository {
     return users[0];
   }
 
-  async findPasswordRecoveryRecord(code: string): Promise<any> {
+  async findPasswordRecoveryRecord(
+    code: string,
+  ): Promise<UserPasswordRecovery> {
+    if (!uuidIsValid(code)) {
+      return null;
+    }
+
     const users = await this.dataSource.query(
       `select *
        from user_password_recoveries
