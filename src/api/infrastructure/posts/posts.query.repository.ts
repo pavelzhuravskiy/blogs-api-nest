@@ -15,14 +15,14 @@ import { pFilterPosts } from '../../../helpers/pagination/mongoose/pagination-fi
 import { likeStatusFinder } from '../../_public/likes/helpers/like-status-finder';
 import { LikeStatus } from '../../../enums/like-status.enum';
 import { likesCounter } from '../../_public/likes/helpers/likes-counter';
-import { BlogsRepository } from '../blogs/blogs.repository';
+import { BlogsMongooseRepository } from '../_mongoose/blogs/blogs.repository';
 
 @Injectable()
 export class PostsQueryRepository {
   constructor(
     @InjectModel(Post.name)
     private PostModel: PostModelType,
-    private readonly blogsRepository: BlogsRepository,
+    private readonly blogsRepository: BlogsMongooseRepository,
   ) {}
   async findPosts(
     query: QueryDto,

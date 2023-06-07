@@ -9,7 +9,7 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { UserCreateUseCase } from '../_superadmin/users/application/use-cases/user-create.use-case';
 import { UserDeleteUseCase } from '../_superadmin/users/application/use-cases/user-delete.use-case';
 import { UserBanUseCase } from '../_superadmin/users/application/use-cases/user-ban.use-case';
-import { BlogsRepository } from '../infrastructure/blogs/blogs.repository';
+import { BlogsMongooseRepository } from '../infrastructure/_mongoose/blogs/blogs.repository';
 import { PostsRepository } from '../infrastructure/posts/posts.repository';
 import { Blog, BlogSchema } from '../entities/_mongoose/blog.entity';
 import { Post, PostSchema } from '../entities/_mongoose/post.entity';
@@ -33,7 +33,7 @@ const entities = [User, UserEmailConfirmation, UserPasswordRecovery, UserBan];
 const mongooseRepositories = [
   UsersMongooseRepository,
   UsersMongooseQueryRepository,
-  BlogsRepository,
+  BlogsMongooseRepository,
   PostsRepository,
   CommentsRepository,
   LikesRepository,

@@ -7,7 +7,7 @@ import {
   blogNotFound,
 } from '../../../../../exceptions/exception.constants';
 import { ExceptionResultType } from '../../../../../exceptions/types/exception-result.type';
-import { BlogsRepository } from '../../../../infrastructure/blogs/blogs.repository';
+import { BlogsMongooseRepository } from '../../../../infrastructure/_mongoose/blogs/blogs.repository';
 import { SABlogBanInputDto } from '../../../../dto/users/input/superadmin/sa.blog-ban.input.dto';
 import { PostsRepository } from '../../../../infrastructure/posts/posts.repository';
 
@@ -21,7 +21,7 @@ export class SABlogBanCommand {
 @CommandHandler(SABlogBanCommand)
 export class BlogBanUseCase implements ICommandHandler<SABlogBanCommand> {
   constructor(
-    private readonly blogsRepository: BlogsRepository,
+    private readonly blogsRepository: BlogsMongooseRepository,
     private readonly postsRepository: PostsRepository,
   ) {}
 

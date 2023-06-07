@@ -13,7 +13,6 @@ import {
 import { BlogInputDto } from '../dto/blogs/input/blog.input.dto';
 import { CommandBus } from '@nestjs/cqrs';
 import { BlogCreateCommand } from './application/use-cases/blog-create.use-case';
-import { BlogsQueryRepository } from '../infrastructure/blogs/blogs.query.repository';
 import { JwtBearerGuard } from '../_auth/guards/jwt-bearer.guard';
 import { UserIdFromGuard } from '../_auth/decorators/user-id-from-guard.decorator';
 import { exceptionHandler } from '../../exceptions/exception.handler';
@@ -22,17 +21,16 @@ import {
   userIDField,
   userNotFound,
 } from '../../exceptions/exception.constants';
-import { BlogQueryDto } from '../dto/blogs/query/blog.query.dto';
 import { BlogUpdateCommand } from './application/use-cases/blog-update.use-case';
 import { BlogDeleteCommand } from './application/use-cases/blog-delete.use-case';
 import { PostInputDto } from '../dto/posts/input/post.input.dto';
 import { PostsQueryRepository } from '../infrastructure/posts/posts.query.repository';
-import { Role } from '../../enums/role.enum';
 import { PostUpdateCommand } from './application/use-cases/post-update.use-case';
 import { PostCreateCommand } from './application/use-cases/post-create.use-case';
 import { PostDeleteCommand } from './application/use-cases/post-delete.use-case';
 import { QueryDto } from '../dto/query.dto';
 import { CommentsQueryRepository } from '../infrastructure/comments/comments.query.repository';
+import { BlogsQueryRepository } from '../infrastructure/blogs/blogs.query.repository';
 
 @Controller('blogger/blogs')
 export class BloggerBlogsController {
@@ -60,12 +58,12 @@ export class BloggerBlogsController {
     return this.blogsQueryRepository.findBlog(blogId);
   }
 
-  @UseGuards(JwtBearerGuard)
+  /*@UseGuards(JwtBearerGuard)
   @Get()
   async findBlogs(@Query() query: BlogQueryDto, @UserIdFromGuard() userId) {
     const role = Role.Blogger;
     return this.blogsQueryRepository.findBlogs(query, role, userId);
-  }
+  }*/
 
   @UseGuards(JwtBearerGuard)
   @Put(':id')

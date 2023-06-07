@@ -9,7 +9,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
-import { BlogsQueryRepository } from '../../infrastructure/blogs/blogs.query.repository';
+import { BlogsMongooseQueryRepository } from '../../infrastructure/_mongoose/blogs/blogs.query.repository';
 import { BlogQueryDto } from '../../dto/blogs/query/blog.query.dto';
 import { Role } from '../../../enums/role.enum';
 import { BasicAuthGuard } from '../../_auth/guards/basic-auth.guard';
@@ -23,7 +23,7 @@ import { SABlogBanCommand } from './application/use-cases/blog-ban.use-case';
 export class SuperAdminBlogsController {
   constructor(
     private commandBus: CommandBus,
-    private readonly blogsQueryRepository: BlogsQueryRepository,
+    private readonly blogsQueryRepository: BlogsMongooseQueryRepository,
   ) {}
 
   @UseGuards(BasicAuthGuard)

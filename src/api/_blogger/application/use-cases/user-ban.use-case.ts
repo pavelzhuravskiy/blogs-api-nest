@@ -8,7 +8,7 @@ import {
 } from '../../../../exceptions/exception.constants';
 import { ExceptionResultType } from '../../../../exceptions/types/exception-result.type';
 import { BloggerUserBanInputDto } from '../../../dto/users/input/blogger/blogger.user-ban.input.dto';
-import { BlogsRepository } from '../../../infrastructure/blogs/blogs.repository';
+import { BlogsMongooseRepository } from '../../../infrastructure/_mongoose/blogs/blogs.repository';
 
 export class BloggerUserBanCommand {
   constructor(
@@ -24,7 +24,7 @@ export class BloggerUserBanUseCase
 {
   constructor(
     private readonly usersRepository: UsersMongooseRepository,
-    private readonly blogsRepository: BlogsRepository,
+    private readonly blogsRepository: BlogsMongooseRepository,
   ) {}
 
   async execute(

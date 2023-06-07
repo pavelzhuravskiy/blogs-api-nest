@@ -1,4 +1,4 @@
-import { BlogsRepository } from '../../../infrastructure/blogs/blogs.repository';
+import { BlogsMongooseRepository } from '../../../infrastructure/_mongoose/blogs/blogs.repository';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { ExceptionResultType } from '../../../../exceptions/types/exception-result.type';
 import { ResultCode } from '../../../../enums/result-code.enum';
@@ -21,7 +21,7 @@ export class PostDeleteCommand {
 @CommandHandler(PostDeleteCommand)
 export class PostDeleteUseCase implements ICommandHandler<PostDeleteCommand> {
   constructor(
-    private readonly blogsRepository: BlogsRepository,
+    private readonly blogsRepository: BlogsMongooseRepository,
     private readonly postsRepository: PostsRepository,
   ) {}
 

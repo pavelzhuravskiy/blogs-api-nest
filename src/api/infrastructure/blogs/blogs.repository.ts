@@ -1,53 +1,38 @@
 import { Injectable } from '@nestjs/common';
-import {
-  Blog,
-  BlogDocument,
-  BlogModelType,
-} from '../../entities/_mongoose/blog.entity';
-import { InjectModel } from '@nestjs/mongoose';
-import mongoose from 'mongoose';
+import { InjectDataSource } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
+import { BlogInputDto } from '../../dto/blogs/input/blog.input.dto';
 
 @Injectable()
 export class BlogsRepository {
-  constructor(
-    @InjectModel(Blog.name)
-    private BlogModel: BlogModelType,
-  ) {}
-  async save(blog: BlogDocument) {
-    return blog.save();
-  }
+  constructor(@InjectDataSource() private dataSource: DataSource) {}
+  async createBlog(
+    blogInputDto: BlogInputDto,
+    userId: number,
+  ): Promise<number> {
+    return this.dataSource.transaction(async () => {
+      const blog = await this.dataSource.query(
+        `insert into public.blogs (name, description, "websiteUrl")
+         values ($1, $2, $3)
+        returning id;`,
+        [blogInputDto.name, blogInputDto.description, blogInputDto.websiteUrl],
+      );
 
-  async findBlog(id?: string): Promise<BlogDocument | null> {
-    if (!mongoose.isValidObjectId(id)) {
-      return null;
-    }
+      const blogId = blog[0].id;
 
-    const blog = await this.BlogModel.findOne({ _id: id });
+      await this.dataSource.query(
+        `insert into public.blog_bans ("blogId")
+         values ($1);`,
+        [blogId],
+      );
 
-    if (!blog) {
-      return null;
-    }
+      await this.dataSource.query(
+        `insert into public.blog_owners ("blogId", "ownerId")
+         values ($1, $2);`,
+        [blogId, userId],
+      );
 
-    return blog;
-  }
-
-  async deleteBlog(id: string): Promise<boolean> {
-    const blog = await this.BlogModel.deleteOne({ _id: id });
-    return blog.deletedCount === 1;
-  }
-
-  async setBlogsOwnerBanStatus(
-    userId: string,
-    banStatus: boolean,
-  ): Promise<boolean> {
-    const result = await this.BlogModel.updateMany(
-      { 'blogOwnerInfo.userId': userId },
-      {
-        $set: {
-          'blogOwnerInfo.isBanned': banStatus,
-        },
-      },
-    );
-    return result.acknowledged === true;
+      return blogId;
+    });
   }
 }

@@ -9,7 +9,7 @@ export class UserBan {
   userId: number; // FK 🔑
 
   @Column({ type: 'timestamp with time zone', nullable: true })
-  banDate: Date;
+  banDate: Date | null;
 
   @Column({ type: 'varchar', nullable: true })
   banReason: string | null;

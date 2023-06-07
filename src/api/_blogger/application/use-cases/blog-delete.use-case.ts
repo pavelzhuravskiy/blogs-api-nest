@@ -1,4 +1,4 @@
-import { BlogsRepository } from '../../../infrastructure/blogs/blogs.repository';
+import { BlogsMongooseRepository } from '../../../infrastructure/_mongoose/blogs/blogs.repository';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { ExceptionResultType } from '../../../../exceptions/types/exception-result.type';
 import { ResultCode } from '../../../../enums/result-code.enum';
@@ -13,7 +13,7 @@ export class BlogDeleteCommand {
 
 @CommandHandler(BlogDeleteCommand)
 export class BlogDeleteUseCase implements ICommandHandler<BlogDeleteCommand> {
-  constructor(private readonly blogsRepository: BlogsRepository) {}
+  constructor(private readonly blogsRepository: BlogsMongooseRepository) {}
 
   async execute(
     command: BlogDeleteCommand,

@@ -1,5 +1,5 @@
 import { BlogInputDto } from '../../../dto/blogs/input/blog.input.dto';
-import { BlogsRepository } from '../../../infrastructure/blogs/blogs.repository';
+import { BlogsMongooseRepository } from '../../../infrastructure/_mongoose/blogs/blogs.repository';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { ExceptionResultType } from '../../../../exceptions/types/exception-result.type';
 import { ResultCode } from '../../../../enums/result-code.enum';
@@ -18,7 +18,7 @@ export class BlogUpdateCommand {
 
 @CommandHandler(BlogUpdateCommand)
 export class BlogUpdateUseCase implements ICommandHandler<BlogUpdateCommand> {
-  constructor(private readonly blogsRepository: BlogsRepository) {}
+  constructor(private readonly blogsRepository: BlogsMongooseRepository) {}
 
   async execute(
     command: BlogUpdateCommand,

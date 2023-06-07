@@ -7,8 +7,8 @@ import {
 import { PublicBlogsController } from '../_public/blogs/public.blogs.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Blog, BlogSchema } from '../entities/_mongoose/blog.entity';
-import { BlogsRepository } from '../infrastructure/blogs/blogs.repository';
-import { BlogsQueryRepository } from '../infrastructure/blogs/blogs.query.repository';
+import { BlogsMongooseRepository } from '../infrastructure/_mongoose/blogs/blogs.repository';
+import { BlogsMongooseQueryRepository } from '../infrastructure/_mongoose/blogs/blogs.query.repository';
 import { PublicPostsController } from '../_public/posts/public.posts.controller';
 import { PostsRepository } from '../infrastructure/posts/posts.repository';
 import { PostsQueryRepository } from '../infrastructure/posts/posts.query.repository';
@@ -46,6 +46,9 @@ import { BlogBanUseCase } from '../_superadmin/blogs/application/use-cases/blog-
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { BlogOwner } from '../entities/blogs/blog-owner.entity';
 import { BlogBan } from '../entities/blogs/blog-ban.entity';
+import { BlogsRepository } from '../infrastructure/blogs/blogs.repository';
+import { UsersRepository } from '../infrastructure/users/users.repository';
+import { BlogsQueryRepository } from '../infrastructure/blogs/blogs.query.repository';
 
 const entities = [Blog, BlogOwner, BlogBan];
 
@@ -77,16 +80,19 @@ const useCases = [
   BloggerUserBanUseCase,
 ];
 
-const repositories = [
-  BlogsRepository,
+const repositories = [BlogsRepository, UsersRepository];
+const queryRepositories = [BlogsQueryRepository];
+
+const mongooseRepositories = [
+  BlogsMongooseRepository,
   PostsRepository,
   CommentsRepository,
   UsersMongooseRepository,
   LikesRepository,
 ];
 
-const queryRepositories = [
-  BlogsQueryRepository,
+const mongooseQueryRepositories = [
+  BlogsMongooseQueryRepository,
   PostsQueryRepository,
   CommentsQueryRepository,
   UsersMongooseQueryRepository,
@@ -109,6 +115,8 @@ const queryRepositories = [
     ...useCases,
     ...repositories,
     ...queryRepositories,
+    ...mongooseRepositories,
+    ...mongooseQueryRepositories,
     IsBlogExistConstraint,
   ],
 })

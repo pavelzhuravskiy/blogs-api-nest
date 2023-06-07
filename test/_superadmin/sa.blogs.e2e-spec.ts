@@ -45,7 +45,7 @@ import {
   saUnbannedBlogObject,
 } from '../utils/objects/blogs.objects';
 import { isBannedField } from '../utils/constants/exceptions.constants';
-import { BlogsRepository } from '../../src/api/infrastructure/blogs/blogs.repository';
+import { BlogsMongooseRepository } from '../../src/api/infrastructure/_mongoose/blogs/blogs.repository';
 import {
   postContent,
   postShortDescription,
@@ -58,7 +58,7 @@ import { postObject } from '../utils/objects/posts.objects';
 describe('Super admin blogs testing', () => {
   let app: INestApplication;
   let agent: SuperAgentTest;
-  let blogsRepository: BlogsRepository;
+  let blogsRepository: BlogsMongooseRepository;
   let postsRepository: PostsRepository;
 
   beforeAll(async () => {
@@ -81,7 +81,7 @@ describe('Super admin blogs testing', () => {
       }),
     );
     app.useGlobalFilters(new HttpExceptionFilter());
-    blogsRepository = app.get(BlogsRepository);
+    blogsRepository = app.get(BlogsMongooseRepository);
     postsRepository = app.get(PostsRepository);
     await app.init();
     agent = supertest.agent(app.getHttpServer());

@@ -1,5 +1,5 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
-import { BlogsQueryRepository } from '../../infrastructure/blogs/blogs.query.repository';
+import { BlogsMongooseQueryRepository } from '../../infrastructure/_mongoose/blogs/blogs.query.repository';
 import { BlogQueryDto } from '../../dto/blogs/query/blog.query.dto';
 import { Role } from '../../../enums/role.enum';
 import { QueryDto } from '../../dto/query.dto';
@@ -17,7 +17,7 @@ import { CommandBus } from '@nestjs/cqrs';
 export class PublicBlogsController {
   constructor(
     private commandBus: CommandBus,
-    private readonly blogsQueryRepository: BlogsQueryRepository,
+    private readonly blogsQueryRepository: BlogsMongooseQueryRepository,
     private readonly postsQueryRepository: PostsQueryRepository,
   ) {}
 

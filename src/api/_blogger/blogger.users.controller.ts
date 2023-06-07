@@ -14,7 +14,7 @@ import { ResultCode } from '../../enums/result-code.enum';
 import { JwtBearerGuard } from '../_auth/guards/jwt-bearer.guard';
 import { BloggerUserBanInputDto } from '../dto/users/input/blogger/blogger.user-ban.input.dto';
 import { BloggerUserBanCommand } from './application/use-cases/user-ban.use-case';
-import { BlogsQueryRepository } from '../infrastructure/blogs/blogs.query.repository';
+import { BlogsMongooseQueryRepository } from '../infrastructure/_mongoose/blogs/blogs.query.repository';
 import { BloggerUserBanQueryDto } from '../dto/users/query/blogger/blogger.user-ban.query.dto';
 import { UsersMongooseQueryRepository } from '../infrastructure/_mongoose/users/users.mongoose.query.repository';
 import { UserIdFromGuard } from '../_auth/decorators/user-id-from-guard.decorator';
@@ -23,7 +23,7 @@ import { UserIdFromGuard } from '../_auth/decorators/user-id-from-guard.decorato
 export class BloggerUsersController {
   constructor(
     private commandBus: CommandBus,
-    private readonly blogsQueryRepository: BlogsQueryRepository,
+    private readonly blogsQueryRepository: BlogsMongooseQueryRepository,
     private readonly usersQueryRepository: UsersMongooseQueryRepository,
   ) {}
 

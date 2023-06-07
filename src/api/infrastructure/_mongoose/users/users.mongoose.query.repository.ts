@@ -10,7 +10,7 @@ import { pSort } from '../../../../helpers/pagination/mongoose/pagination-sort';
 import { BloggerUserBanQueryDto } from '../../../dto/users/query/blogger/blogger.user-ban.query.dto';
 import { UsersBannedByBloggerViewDto } from '../../../dto/users/view/blogger/blogger.user-ban.view.dto';
 import { pFilterUsersBannedByBlogger } from '../../../../helpers/pagination/mongoose/pagination-filter-users-banned-by-blogger';
-import { BlogsRepository } from '../../blogs/blogs.repository';
+import { BlogsMongooseRepository } from '../blogs/blogs.repository';
 import { ResultCode } from '../../../../enums/result-code.enum';
 import {
   blogIDField,
@@ -23,7 +23,7 @@ export class UsersMongooseQueryRepository {
   constructor(
     @InjectModel(UserMongoose.name)
     private UserModel: UserModelType,
-    private readonly blogsRepository: BlogsRepository,
+    private readonly blogsRepository: BlogsMongooseRepository,
   ) {}
 
   async findUsersBannedByBlogger(

@@ -30,9 +30,8 @@ export class UsersRepository {
       );
 
       await this.dataSource.query(
-        `insert into public.user_password_recoveries("userId", "recoveryCode",
-                                                     "expirationDate")
-         values ($1, null, null);`,
+        `insert into public.user_password_recoveries("userId")
+         values ($1);`,
         [userId],
       );
 
@@ -48,11 +47,10 @@ export class UsersRepository {
     return this.dataSource.transaction(async () => {
       const user = await this.dataSource.query(
         `insert into public.users (login,
-                                   "passwordHash", email, "isConfirmed",
-                                   "isBanned")
-         values ($1, $2, $3, $4, $5)
+                                   "passwordHash", email, "isConfirmed")
+         values ($1, $2, $3, $4)
          returning id;`,
-        [userInputDto.login, hash, userInputDto.email, false, false],
+        [userInputDto.login, hash, userInputDto.email, false],
       );
       const userId = user[0].id;
 
@@ -71,9 +69,8 @@ export class UsersRepository {
       );
 
       await this.dataSource.query(
-        `insert into public.user_password_recoveries(
-                                            "userId", "recoveryCode", "expirationDate")
-         values ($1, null, null);`,
+        `insert into public.user_password_recoveries("userId")
+         values ($1);`,
         [userId],
       );
 
@@ -264,9 +261,9 @@ export class UsersRepository {
     userId: number,
   ): Promise<boolean> {
     const result = await this.dataSource.query(
-      `update public.user_password_recoveries upr 
-       set "recoveryCode" = $1,
-           "expirationDate"   = now() + interval '3 hours'
+      `update public.user_password_recoveries upr
+       set "recoveryCode"   = $1,
+           "expirationDate" = now() + interval '3 hours'
        where "userId" = $2`,
       [recoveryCode, userId],
     );
@@ -284,8 +281,8 @@ export class UsersRepository {
 
       const result = await this.dataSource.query(
         `update public.user_password_recoveries uec
-         set "recoveryCode" = null,
-             "expirationDate"   = null
+         set "recoveryCode"   = null,
+             "expirationDate" = null
          where "userId" = $1`,
         [userId],
       );
@@ -314,8 +311,8 @@ export class UsersRepository {
 
       const result = await this.dataSource.query(
         `update public.user_bans
-         set "banDate" = now(),
-             "banReason"   = $2
+         set "banDate"   = now(),
+             "banReason" = $2
          where "userId" = $1`,
         [userId, banReason],
       );
@@ -334,8 +331,8 @@ export class UsersRepository {
 
       const result = await this.dataSource.query(
         `update public.user_bans
-         set "banDate" = null,
-             "banReason"   = null
+         set "banDate"   = null,
+             "banReason" = null
          where "userId" = $1`,
         [userId],
       );

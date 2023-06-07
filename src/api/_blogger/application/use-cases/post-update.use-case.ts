@@ -1,4 +1,4 @@
-import { BlogsRepository } from '../../../infrastructure/blogs/blogs.repository';
+import { BlogsMongooseRepository } from '../../../infrastructure/_mongoose/blogs/blogs.repository';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { ExceptionResultType } from '../../../../exceptions/types/exception-result.type';
 import { ResultCode } from '../../../../enums/result-code.enum';
@@ -23,7 +23,7 @@ export class PostUpdateCommand {
 @CommandHandler(PostUpdateCommand)
 export class PostUpdateUseCase implements ICommandHandler<PostUpdateCommand> {
   constructor(
-    private readonly blogsRepository: BlogsRepository,
+    private readonly blogsRepository: BlogsMongooseRepository,
     private readonly postsRepository: PostsRepository,
   ) {}
 

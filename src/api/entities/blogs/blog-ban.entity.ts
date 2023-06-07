@@ -9,5 +9,5 @@ export class BlogBan {
   blogId: number; // FK 🔑
 
   @Column({ type: 'timestamp with time zone', nullable: true })
-  banDate: Date;
+  banDate: Date | null;
 }

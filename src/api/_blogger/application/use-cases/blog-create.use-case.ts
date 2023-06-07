@@ -1,36 +1,26 @@
-import { InjectModel } from '@nestjs/mongoose';
-import { Blog, BlogModelType } from '../../../entities/_mongoose/blog.entity';
 import { BlogInputDto } from '../../../dto/blogs/input/blog.input.dto';
-import { BlogsRepository } from '../../../infrastructure/blogs/blogs.repository';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { UsersMongooseRepository } from '../../../infrastructure/_mongoose/users/users.mongoose.repository';
+import { UsersRepository } from '../../../infrastructure/users/users.repository';
+import { BlogsRepository } from '../../../infrastructure/blogs/blogs.repository';
 
 export class BlogCreateCommand {
-  constructor(public blogInputDto: BlogInputDto, public userId: string) {}
+  constructor(public blogInputDto: BlogInputDto, public userId: number) {}
 }
 
 @CommandHandler(BlogCreateCommand)
 export class BlogCreateUseCase implements ICommandHandler<BlogCreateCommand> {
   constructor(
-    @InjectModel(Blog.name)
-    private BlogModel: BlogModelType,
     private readonly blogsRepository: BlogsRepository,
-    private readonly usersRepository: UsersMongooseRepository,
+    private readonly usersRepository: UsersRepository,
   ) {}
 
-  async execute(command: BlogCreateCommand): Promise<string | null> {
+  async execute(command: BlogCreateCommand): Promise<number> {
     const user = await this.usersRepository.findUserById(command.userId);
 
     if (!user) {
       return null;
     }
 
-    const blog = this.BlogModel.createBlog(
-      this.BlogModel,
-      command.blogInputDto,
-      user,
-    );
-    await this.blogsRepository.save(blog);
-    return blog.id;
+    return this.blogsRepository.createBlog(command.blogInputDto, user.id);
   }
 }

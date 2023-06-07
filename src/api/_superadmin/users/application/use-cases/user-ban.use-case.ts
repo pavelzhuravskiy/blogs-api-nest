@@ -9,7 +9,7 @@ import {
 } from '../../../../../exceptions/exception.constants';
 import { ExceptionResultType } from '../../../../../exceptions/types/exception-result.type';
 import { PostsRepository } from '../../../../infrastructure/posts/posts.repository';
-import { BlogsRepository } from '../../../../infrastructure/blogs/blogs.repository';
+import { BlogsMongooseRepository } from '../../../../infrastructure/_mongoose/blogs/blogs.repository';
 import { CommentsRepository } from '../../../../infrastructure/comments/comments.repository';
 import { LikesRepository } from '../../../../infrastructure/likes/likes.repository';
 import { UsersRepository } from '../../../../infrastructure/users/users.repository';
@@ -18,7 +18,7 @@ import { DevicesRepository } from '../../../../infrastructure/devices/devices.re
 export class SAUserBanCommand {
   constructor(
     public saUserBanInputDto: SAUserBanInputDto,
-    public userId: string,
+    public userId: number,
   ) {}
 }
 
@@ -28,7 +28,7 @@ export class UserBanUseCase implements ICommandHandler<SAUserBanCommand> {
     private commandBus: CommandBus,
     private readonly usersRepository: UsersRepository,
     private readonly devicesRepository: DevicesRepository,
-    private readonly blogsRepository: BlogsRepository,
+    private readonly blogsRepository: BlogsMongooseRepository,
     private readonly postsRepository: PostsRepository,
     private readonly commentsRepository: CommentsRepository,
     private readonly likesRepository: LikesRepository,
@@ -37,7 +37,7 @@ export class UserBanUseCase implements ICommandHandler<SAUserBanCommand> {
   async execute(
     command: SAUserBanCommand,
   ): Promise<ExceptionResultType<boolean>> {
-    const user = await this.usersRepository.findUserById(+command.userId);
+    const user = await this.usersRepository.findUserById(command.userId);
 
     if (!user) {
       return {
