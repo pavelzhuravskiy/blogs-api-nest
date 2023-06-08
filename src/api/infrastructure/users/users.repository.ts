@@ -29,12 +29,6 @@ export class UsersRepository {
         [userId],
       );
 
-      await this.dataSource.query(
-        `insert into public.user_password_recoveries("userId")
-         values ($1);`,
-        [userId],
-      );
-
       return userId;
     });
   }
@@ -47,10 +41,11 @@ export class UsersRepository {
     return this.dataSource.transaction(async () => {
       const user = await this.dataSource.query(
         `insert into public.users (login,
-                                   "passwordHash", email, "isConfirmed")
-         values ($1, $2, $3, $4)
+                                   "passwordHash", email, "isConfirmed",
+                                   "isBanned")
+         values ($1, $2, $3, $4, $5)
          returning id;`,
-        [userInputDto.login, hash, userInputDto.email, false],
+        [userInputDto.login, hash, userInputDto.email, false, false],
       );
       const userId = user[0].id;
 
@@ -68,18 +63,12 @@ export class UsersRepository {
         [userId, confirmationCode],
       );
 
-      await this.dataSource.query(
-        `insert into public.user_password_recoveries("userId")
-         values ($1);`,
-        [userId],
-      );
-
       return userId;
     });
   }
 
   async findUserById(userId: number): Promise<User | null> {
-    if (isNaN(+userId)) {
+    if (isNaN(userId)) {
       return null;
     }
 
@@ -246,28 +235,26 @@ export class UsersRepository {
       );
 
       const result = await this.dataSource.query(
-        `update public.user_email_confirmations uec
-         set "confirmationCode" = null,
-             "expirationDate"   = null
-         where "userId" = $1`,
+        `delete
+         from public.user_email_confirmations
+         where "userId" = $1;`,
         [userId],
       );
       return result[1] === 1;
     });
   }
 
-  async updatePasswordRecoveryData(
+  async createPasswordRecoveryRecord(
     recoveryCode: string,
     userId: number,
-  ): Promise<boolean> {
+  ): Promise<number> {
     const result = await this.dataSource.query(
-      `update public.user_password_recoveries upr
-       set "recoveryCode"   = $1,
-           "expirationDate" = now() + interval '3 hours'
-       where "userId" = $2`,
-      [recoveryCode, userId],
+      `insert into public.user_password_recoveries("userId", "recoveryCode", "expirationDate") 
+       values ($1, $2, now() + interval '3 hours') returning id;`,
+      [userId, recoveryCode],
     );
-    return result[1] === 1;
+
+    return result[0].id;
   }
 
   async updatePassword(userId: number, hash: string): Promise<boolean> {
@@ -280,10 +267,9 @@ export class UsersRepository {
       );
 
       const result = await this.dataSource.query(
-        `update public.user_password_recoveries uec
-         set "recoveryCode"   = null,
-             "expirationDate" = null
-         where "userId" = $1`,
+        `delete
+         from public.user_password_recoveries
+         where "userId" = $1;`,
         [userId],
       );
       return result[1] === 1;
@@ -311,8 +297,8 @@ export class UsersRepository {
 
       const result = await this.dataSource.query(
         `update public.user_bans
-         set "banDate"   = now(),
-             "banReason" = $2
+         set "banDate" = now(),
+             "banReason"   = $2
          where "userId" = $1`,
         [userId, banReason],
       );
@@ -331,8 +317,8 @@ export class UsersRepository {
 
       const result = await this.dataSource.query(
         `update public.user_bans
-         set "banDate"   = null,
-             "banReason" = null
+         set "banDate" = null,
+             "banReason"   = null
          where "userId" = $1`,
         [userId],
       );

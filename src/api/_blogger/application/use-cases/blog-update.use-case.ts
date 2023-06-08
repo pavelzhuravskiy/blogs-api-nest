@@ -1,5 +1,4 @@
 import { BlogInputDto } from '../../../dto/blogs/input/blog.input.dto';
-import { BlogsMongooseRepository } from '../../../infrastructure/_mongoose/blogs/blogs.repository';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { ExceptionResultType } from '../../../../exceptions/types/exception-result.type';
 import { ResultCode } from '../../../../enums/result-code.enum';
@@ -7,18 +6,19 @@ import {
   blogIDField,
   blogNotFound,
 } from '../../../../exceptions/exception.constants';
+import { BlogsRepository } from '../../../infrastructure/blogs/blogs.repository';
 
 export class BlogUpdateCommand {
   constructor(
     public blogInputDto: BlogInputDto,
-    public blogId: string,
-    public userId: string,
+    public blogId: number,
+    public userId: number,
   ) {}
 }
 
 @CommandHandler(BlogUpdateCommand)
 export class BlogUpdateUseCase implements ICommandHandler<BlogUpdateCommand> {
-  constructor(private readonly blogsRepository: BlogsMongooseRepository) {}
+  constructor(private readonly blogsRepository: BlogsRepository) {}
 
   async execute(
     command: BlogUpdateCommand,
@@ -34,15 +34,14 @@ export class BlogUpdateUseCase implements ICommandHandler<BlogUpdateCommand> {
       };
     }
 
-    if (blog.blogOwnerInfo.userId !== command.userId) {
+    if (blog.ownerId !== command.userId) {
       return {
         data: false,
         code: ResultCode.Forbidden,
       };
     }
 
-    await blog.updateBlog(command.blogInputDto);
-    await this.blogsRepository.save(blog);
+    await this.blogsRepository.updateBlog(command.blogInputDto, blog.id);
 
     return {
       data: true,

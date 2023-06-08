@@ -1,5 +1,4 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
-import { BlogsMongooseQueryRepository } from '../../infrastructure/_mongoose/blogs/blogs.query.repository';
 import { BlogQueryDto } from '../../dto/blogs/query/blog.query.dto';
 import { Role } from '../../../enums/role.enum';
 import { PostsQueryRepository } from '../../infrastructure/posts/posts.query.repository';
@@ -10,12 +9,13 @@ import {
 } from '../../../exceptions/exception.constants';
 import { ResultCode } from '../../../enums/result-code.enum';
 import { CommandBus } from '@nestjs/cqrs';
+import { BlogsQueryRepository } from '../../infrastructure/blogs/blogs.query.repository';
 
 @Controller('blogs')
 export class PublicBlogsController {
   constructor(
     private commandBus: CommandBus,
-    private readonly blogsQueryRepository: BlogsMongooseQueryRepository,
+    private readonly blogsQueryRepository: BlogsQueryRepository,
     private readonly postsQueryRepository: PostsQueryRepository,
   ) {}
 

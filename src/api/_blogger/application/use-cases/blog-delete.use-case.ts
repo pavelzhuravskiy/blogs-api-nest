@@ -1,4 +1,3 @@
-import { BlogsMongooseRepository } from '../../../infrastructure/_mongoose/blogs/blogs.repository';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { ExceptionResultType } from '../../../../exceptions/types/exception-result.type';
 import { ResultCode } from '../../../../enums/result-code.enum';
@@ -6,14 +5,15 @@ import {
   blogIDField,
   blogNotFound,
 } from '../../../../exceptions/exception.constants';
+import { BlogsRepository } from '../../../infrastructure/blogs/blogs.repository';
 
 export class BlogDeleteCommand {
-  constructor(public blogId: string, public userId: string) {}
+  constructor(public blogId: number, public userId: number) {}
 }
 
 @CommandHandler(BlogDeleteCommand)
 export class BlogDeleteUseCase implements ICommandHandler<BlogDeleteCommand> {
-  constructor(private readonly blogsRepository: BlogsMongooseRepository) {}
+  constructor(private readonly blogsRepository: BlogsRepository) {}
 
   async execute(
     command: BlogDeleteCommand,
@@ -29,7 +29,7 @@ export class BlogDeleteUseCase implements ICommandHandler<BlogDeleteCommand> {
       };
     }
 
-    if (blog.blogOwnerInfo.userId !== command.userId) {
+    if (blog.ownerId !== command.userId) {
       return {
         data: false,
         code: ResultCode.Forbidden,

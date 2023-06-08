@@ -17,7 +17,7 @@ export class PasswordRecoveryUseCase
     private readonly usersRepository: UsersRepository,
   ) {}
 
-  async execute(command: PasswordRecoveryCommand): Promise<boolean> {
+  async execute(command: PasswordRecoveryCommand): Promise<number> {
     const user = await this.usersRepository.findUserByEmail(
       command.emailInputDto.email,
     );
@@ -28,7 +28,7 @@ export class PasswordRecoveryUseCase
 
     const recoveryCode = randomUUID();
 
-    const result = await this.usersRepository.updatePasswordRecoveryData(
+    const result = await this.usersRepository.createPasswordRecoveryRecord(
       recoveryCode,
       user.id,
     );

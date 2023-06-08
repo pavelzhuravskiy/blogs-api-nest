@@ -15,19 +15,11 @@ export class TestingController {
     );
     await this.dataSource.query(
       `delete
-       from public.user_bans;`,
-    );
-    await this.dataSource.query(
-      `delete
-       from public.user_email_confirmations;`,
-    );
-    await this.dataSource.query(
-      `delete
-       from public.user_password_recoveries;`,
-    );
-    await this.dataSource.query(
-      `delete
        from public.users;`,
+    );
+    await this.dataSource.query(
+      `delete
+       from public.blogs;`,
     );
   }
 }

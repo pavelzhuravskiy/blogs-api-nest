@@ -5,10 +5,59 @@ import { BlogViewDto } from '../../dto/blogs/view/blog.view.dto';
 import { Paginator } from '../../../helpers/pagination/_paginator';
 import { BlogQueryDto } from '../../dto/blogs/query/blog.query.dto';
 import { filterBlogs } from '../../../helpers/filters/filter-blogs';
+import { Role } from '../../../enums/role.enum';
+import { SuperAdminBlogViewDto } from '../../dto/blogs/view/superadmin/sa.blog.view.dto';
+import { Blog } from '../../entities/blogs/blog.entity';
+import { BlogOwner } from '../../entities/blogs/blog-owner.entity';
+import { BlogBan } from '../../entities/blogs/blog-ban.entity';
 
 @Injectable()
 export class BlogsQueryRepository {
   constructor(@InjectDataSource() private dataSource: DataSource) {}
+  async findBlogs(
+    query: BlogQueryDto,
+    role: string,
+  ): Promise<Paginator<BlogViewDto[]>> {
+    const filter = filterBlogs(query.searchNameTerm);
+
+    const blogs = await this.dataSource.query(
+      `select b.id,
+              b.name,
+              b.description,
+              b."websiteUrl",
+              b."createdAt",
+              b."isMembership",
+              bo."ownerId"
+       from blogs b
+                left join blog_owners bo on b.id = bo."blogId"
+                left join blog_bans bb on b.id = bb."blogId"
+       where (b.name ilike $1)
+       order by "${query.sortBy}" ${query.sortDirection}
+       limit ${query.pageSize} offset (${query.pageNumber} - 1) * ${query.pageSize}`,
+      [filter],
+    );
+
+    const totalCount = await this.dataSource.query(
+      `select count(*)
+       from blogs b
+                left join blog_owners bo on b.id = bo."blogId"
+       where (b.name ilike $1);`,
+      [filter],
+    );
+
+    let items = await this.blogsMapping(blogs);
+
+    if (role === Role.SuperAdmin) {
+      items = await this.blogsMappingForSA(blogs);
+    }
+
+    return Paginator.paginate({
+      pageNumber: query.pageNumber,
+      pageSize: query.pageSize,
+      totalCount: Number(totalCount[0].count),
+      items: items,
+    });
+  }
 
   async findBlogsOfCurrentBlogger(
     query: BlogQueryDto,
@@ -50,7 +99,7 @@ export class BlogsQueryRepository {
     });
   }
 
-  async findBlog(id: number): Promise<BlogViewDto> {
+  async findBlog(id: number, role?: string): Promise<BlogViewDto> {
     const blogs = await this.dataSource.query(
       `select id, name, description, "websiteUrl", "createdAt", "isMembership"
        from public.blogs
@@ -58,12 +107,17 @@ export class BlogsQueryRepository {
       [id],
     );
 
-    const mappedBlogs = await this.blogsMapping(blogs);
+    let mappedBlogs = await this.blogsMapping(blogs);
+
+    if (role === Role.SuperAdmin) {
+      mappedBlogs = await this.blogsMappingForSA(blogs);
+    }
+
     return mappedBlogs[0];
   }
 
-  private async blogsMapping(array: any): Promise<BlogViewDto[]> {
-    return array.map((b) => {
+  private async blogsMapping(blogs: any): Promise<BlogViewDto[]> {
+    return blogs.map((b) => {
       return {
         id: b.id.toString(),
         name: b.name,
@@ -71,6 +125,29 @@ export class BlogsQueryRepository {
         websiteUrl: b.websiteUrl,
         createdAt: b.createdAt.toISOString(),
         isMembership: b.isMembership,
+      };
+    });
+  }
+
+  private async blogsMappingForSA(
+    blogs: Array<Blog & BlogOwner & BlogBan>,
+  ): Promise<SuperAdminBlogViewDto[]> {
+    return blogs.map((b) => {
+      return {
+        id: b.id.toString(),
+        name: b.name,
+        description: b.description,
+        websiteUrl: b.websiteUrl,
+        createdAt: b.createdAt,
+        isMembership: b.isMembership,
+        blogOwnerInfo: {
+          userId: b.ownerId.toString(),
+          userLogin: b.ownerLogin,
+        },
+        banInfo: {
+          isBanned: b.isBanned,
+          banDate: b.banDate,
+        },
       };
     });
   }

@@ -8,9 +8,9 @@ export class UserPasswordRecovery {
   @Column({ type: 'integer' })
   userId: number; // FK 🔑
 
-  @Column({ type: 'uuid', nullable: true })
-  recoveryCode: string | null;
+  @Column({ type: 'uuid' })
+  recoveryCode: string;
 
-  @Column({ type: 'timestamp with time zone', nullable: true })
-  expirationDate: Date | null;
+  @Column({ type: 'timestamp with time zone' })
+  expirationDate: Date;
 }

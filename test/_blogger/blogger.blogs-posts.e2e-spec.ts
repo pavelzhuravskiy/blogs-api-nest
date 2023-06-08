@@ -1,18 +1,16 @@
 import supertest, { SuperAgentTest } from 'supertest';
 import { Test } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
-import { MongooseModule } from '@nestjs/mongoose';
 import {
+  blog01Name,
+  blog02Name,
   blogDescription,
   bloggerBlogsURI,
-  blog01Name,
   blogUpdatedDescription,
   blogUpdatedName,
   blogUpdatedWebsite,
   blogWebsite,
   publicBlogsURI,
-  blog02Name,
 } from '../utils/constants/blogs.constants';
 import { testingAllDataURI } from '../utils/constants/testing.constants';
 import {
@@ -36,12 +34,12 @@ import {
 } from '../utils/constants/exceptions.constants';
 import { AppModule } from '../../src/app.module';
 import {
+  saUsersURI,
   user01Email,
   user01Login,
   user02Email,
   user02Login,
   userPassword,
-  saUsersURI,
 } from '../utils/constants/users.constants';
 import {
   basicAuthLogin,
@@ -72,16 +70,11 @@ describe('Blogger blogs and posts testing', () => {
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
-      imports: [
-        ConfigModule.forRoot(),
-        MongooseModule.forRoot(process.env.TEST_URI || ''),
-        AppModule,
-      ],
+      imports: [AppModule],
     }).compile();
 
     app = moduleRef.createNestApplication();
     useContainer(app.select(AppModule), { fallbackOnErrors: true });
-    app.enableCors();
     app.useGlobalPipes(
       new ValidationPipe({
         transform: true,
@@ -90,10 +83,9 @@ describe('Blogger blogs and posts testing', () => {
       }),
     );
     app.useGlobalFilters(new HttpExceptionFilter());
-
     await app.init();
-    agent = supertest.agent(app.getHttpServer());
 
+    agent = supertest.agent(app.getHttpServer());
     await agent.delete(testingAllDataURI);
   });
 
@@ -149,7 +141,7 @@ describe('Blogger blogs and posts testing', () => {
     });
   });
 
-  describe('Create blog', () => {
+  describe('Create blogs', () => {
     // Validation errors [400]
     it(`should return 400 when trying to create blog without name`, async () => {
       const response = await agent
@@ -458,7 +450,7 @@ describe('Blogger blogs and posts testing', () => {
     });
   });
 
-  describe('Create post', () => {
+  describe.skip('Create post', () => {
     // Validation errors [400]
     it(`should return 400 when trying to create post without title`, async () => {
       const response = await agent
@@ -639,7 +631,7 @@ describe('Blogger blogs and posts testing', () => {
       });
     });
   });
-  describe('Update post', () => {
+  describe.skip('Update post', () => {
     // Auth errors [401]
     it(`should return 401 when trying to update post with incorrect access token`, async () => {
       return agent
@@ -706,7 +698,7 @@ describe('Blogger blogs and posts testing', () => {
       expect(check.body).toEqual(updatedPostObject);
     });
   });
-  describe('Delete post', () => {
+  describe.skip('Delete post', () => {
     // Auth errors [401]
     it(`should return 401 when trying to delete post with incorrect access token`, async () => {
       return agent

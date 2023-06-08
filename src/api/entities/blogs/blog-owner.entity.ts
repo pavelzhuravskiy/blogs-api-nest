@@ -10,4 +10,7 @@ export class BlogOwner {
 
   @Column({ type: 'integer' })
   ownerId: number; // FK 🔑
+
+  @Column({ type: 'varchar' })
+  ownerLogin: string; // FK 🔑
 }
