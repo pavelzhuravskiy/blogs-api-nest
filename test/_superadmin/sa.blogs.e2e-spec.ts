@@ -52,14 +52,14 @@ import {
   postTitle,
   publicPostsURI,
 } from '../utils/constants/posts.constants';
-import { PostsRepository } from '../../src/api/infrastructure/posts/posts.repository';
+import { PostsMongooseRepository } from '../../src/api/infrastructure/_mongoose/posts/posts.repository';
 import { postObject } from '../utils/objects/posts.objects';
 
 describe('Super admin blogs testing', () => {
   let app: INestApplication;
   let agent: SuperAgentTest;
   let blogsRepository: BlogsMongooseRepository;
-  let postsRepository: PostsRepository;
+  let postsRepository: PostsMongooseRepository;
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -82,7 +82,7 @@ describe('Super admin blogs testing', () => {
     );
     app.useGlobalFilters(new HttpExceptionFilter());
     blogsRepository = app.get(BlogsMongooseRepository);
-    postsRepository = app.get(PostsRepository);
+    postsRepository = app.get(PostsMongooseRepository);
     await app.init();
     agent = supertest.agent(app.getHttpServer());
 

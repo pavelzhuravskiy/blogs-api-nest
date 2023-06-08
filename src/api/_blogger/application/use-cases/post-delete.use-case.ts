@@ -1,4 +1,3 @@
-import { BlogsMongooseRepository } from '../../../infrastructure/_mongoose/blogs/blogs.repository';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { ExceptionResultType } from '../../../../exceptions/types/exception-result.type';
 import { ResultCode } from '../../../../enums/result-code.enum';
@@ -8,20 +7,21 @@ import {
   postIDField,
   postNotFound,
 } from '../../../../exceptions/exception.constants';
+import { BlogsRepository } from '../../../infrastructure/blogs/blogs.repository';
 import { PostsRepository } from '../../../infrastructure/posts/posts.repository';
 
 export class PostDeleteCommand {
   constructor(
-    public blogId: string,
-    public postId: string,
-    public userId: string,
+    public blogId: number,
+    public postId: number,
+    public userId: number,
   ) {}
 }
 
 @CommandHandler(PostDeleteCommand)
 export class PostDeleteUseCase implements ICommandHandler<PostDeleteCommand> {
   constructor(
-    private readonly blogsRepository: BlogsMongooseRepository,
+    private readonly blogsRepository: BlogsRepository,
     private readonly postsRepository: PostsRepository,
   ) {}
 
@@ -50,14 +50,14 @@ export class PostDeleteUseCase implements ICommandHandler<PostDeleteCommand> {
       };
     }
 
-    if (blog.blogOwnerInfo.userId !== command.userId) {
+    if (blog.ownerId !== command.userId) {
       return {
         data: false,
         code: ResultCode.Forbidden,
       };
     }
 
-    await this.postsRepository.deletePost(command.postId);
+    await this.postsRepository.deletePost(post.id);
 
     return {
       data: true,

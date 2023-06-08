@@ -1,29 +1,14 @@
-import {
-  Body,
-  Controller,
-  Get,
-  HttpCode,
-  Param,
-  Post,
-  Put,
-  UseGuards,
-} from '@nestjs/common';
-import { PostsQueryRepository } from '../../infrastructure/posts/posts.query.repository';
+import { Controller, Get, Param } from '@nestjs/common';
 import { exceptionHandler } from '../../../exceptions/exception.handler';
 import { ResultCode } from '../../../enums/result-code.enum';
 import {
   postIDField,
   postNotFound,
 } from '../../../exceptions/exception.constants';
-import { JwtBearerGuard } from '../../_auth/guards/jwt-bearer.guard';
-import { UserIdFromGuard } from '../../_auth/decorators/user-id-from-guard.decorator';
 import { UserIdFromHeaders } from '../../_auth/decorators/user-id-from-headers.decorator';
-import { CommentInputDto } from '../../dto/comments/input/comment.input.dto';
-import { CommentCreateCommand } from '../comments/application/use-cases/comment-create.use-case';
 import { CommandBus } from '@nestjs/cqrs';
 import { CommentsQueryRepository } from '../../infrastructure/comments/comments.query.repository';
-import { LikeStatusInputDto } from '../../dto/likes/input/like-status.input.dto';
-import { LikeUpdateForPostCommand } from '../likes/application/use-cases/like-update-for-post-use.case';
+import { PostsQueryRepository } from '../../infrastructure/posts/posts.query.repository';
 
 @Controller('posts')
 export class PublicPostsController {
@@ -40,7 +25,9 @@ export class PublicPostsController {
 
   @Get(':id')
   async findPost(@Param('id') postId, @UserIdFromHeaders() userId) {
-    const result = await this.postsQueryRepository.findPost(postId, userId);
+    const result = await this.postsQueryRepository.findPost(
+      postId /*, userId*/,
+    );
 
     if (!result) {
       return exceptionHandler(ResultCode.NotFound, postNotFound, postIDField);
@@ -49,7 +36,7 @@ export class PublicPostsController {
     return result;
   }
 
-  @UseGuards(JwtBearerGuard)
+  /*@UseGuards(JwtBearerGuard)
   @Post(':id/comments')
   async createComment(
     @Body() commentInputDto: CommentInputDto,
@@ -65,7 +52,7 @@ export class PublicPostsController {
     }
 
     return this.commentsQueryRepository.findComment(result.response);
-  }
+  }*/
 
   /*@Get(':id/comments')
   async findComments(
@@ -86,7 +73,7 @@ export class PublicPostsController {
     return result;
   }*/
 
-  @UseGuards(JwtBearerGuard)
+  /*@UseGuards(JwtBearerGuard)
   @Put(':id/like-status')
   @HttpCode(204)
   async updateLikeStatus(
@@ -103,5 +90,5 @@ export class PublicPostsController {
     }
 
     return result;
-  }
+  }*/
 }

@@ -9,7 +9,7 @@ import {
 import { ExceptionResultType } from '../../../../../exceptions/types/exception-result.type';
 import { BlogsMongooseRepository } from '../../../../infrastructure/_mongoose/blogs/blogs.repository';
 import { SABlogBanInputDto } from '../../../../dto/users/input/superadmin/sa.blog-ban.input.dto';
-import { PostsRepository } from '../../../../infrastructure/posts/posts.repository';
+import { PostsMongooseRepository } from '../../../../infrastructure/_mongoose/posts/posts.repository';
 
 export class SABlogBanCommand {
   constructor(
@@ -22,7 +22,7 @@ export class SABlogBanCommand {
 export class BlogBanUseCase implements ICommandHandler<SABlogBanCommand> {
   constructor(
     private readonly blogsRepository: BlogsMongooseRepository,
-    private readonly postsRepository: PostsRepository,
+    private readonly postsRepository: PostsMongooseRepository,
   ) {}
 
   async execute(

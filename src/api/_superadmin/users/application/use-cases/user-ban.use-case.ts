@@ -8,7 +8,7 @@ import {
   userNotFound,
 } from '../../../../../exceptions/exception.constants';
 import { ExceptionResultType } from '../../../../../exceptions/types/exception-result.type';
-import { PostsRepository } from '../../../../infrastructure/posts/posts.repository';
+import { PostsMongooseRepository } from '../../../../infrastructure/_mongoose/posts/posts.repository';
 import { BlogsMongooseRepository } from '../../../../infrastructure/_mongoose/blogs/blogs.repository';
 import { CommentsRepository } from '../../../../infrastructure/comments/comments.repository';
 import { LikesRepository } from '../../../../infrastructure/likes/likes.repository';
@@ -29,7 +29,7 @@ export class UserBanUseCase implements ICommandHandler<SAUserBanCommand> {
     private readonly usersRepository: UsersRepository,
     private readonly devicesRepository: DevicesRepository,
     private readonly blogsRepository: BlogsMongooseRepository,
-    private readonly postsRepository: PostsRepository,
+    private readonly postsRepository: PostsMongooseRepository,
     private readonly commentsRepository: CommentsRepository,
     private readonly likesRepository: LikesRepository,
   ) {}

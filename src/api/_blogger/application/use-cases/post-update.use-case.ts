@@ -1,4 +1,3 @@
-import { BlogsMongooseRepository } from '../../../infrastructure/_mongoose/blogs/blogs.repository';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { ExceptionResultType } from '../../../../exceptions/types/exception-result.type';
 import { ResultCode } from '../../../../enums/result-code.enum';
@@ -10,20 +9,21 @@ import {
 } from '../../../../exceptions/exception.constants';
 import { PostInputDto } from '../../../dto/posts/input/post.input.dto';
 import { PostsRepository } from '../../../infrastructure/posts/posts.repository';
+import { BlogsRepository } from '../../../infrastructure/blogs/blogs.repository';
 
 export class PostUpdateCommand {
   constructor(
     public postInputDto: PostInputDto,
-    public blogId: string,
-    public postId: string,
-    public userId: string,
+    public blogId: number,
+    public postId: number,
+    public userId: number,
   ) {}
 }
 
 @CommandHandler(PostUpdateCommand)
 export class PostUpdateUseCase implements ICommandHandler<PostUpdateCommand> {
   constructor(
-    private readonly blogsRepository: BlogsMongooseRepository,
+    private readonly blogsRepository: BlogsRepository,
     private readonly postsRepository: PostsRepository,
   ) {}
 
@@ -52,15 +52,14 @@ export class PostUpdateUseCase implements ICommandHandler<PostUpdateCommand> {
       };
     }
 
-    if (blog.blogOwnerInfo.userId !== command.userId) {
+    if (blog.ownerId !== command.userId) {
       return {
         data: false,
         code: ResultCode.Forbidden,
       };
     }
 
-    post.updatePost(command.postInputDto);
-    await this.postsRepository.save(post);
+    await this.postsRepository.updatePost(command.postInputDto, post.id);
 
     return {
       data: true,

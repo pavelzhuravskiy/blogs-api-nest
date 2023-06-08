@@ -4,7 +4,7 @@ class likes {
   login: string;
 }
 
-export class PostViewModel {
+export class PostViewDto {
   id: string;
   title: string;
   shortDescription: string;

@@ -8,7 +8,7 @@ import {
 } from '../../entities/_mongoose/comment.entity';
 import { CommentViewDto } from '../../dto/comments/view/comment.view.dto';
 import { likeStatusFinder } from '../../_public/likes/helpers/like-status-finder';
-import { PostsRepository } from '../posts/posts.repository';
+import { PostsMongooseRepository } from '../_mongoose/posts/posts.repository';
 import { likesCounter } from '../../_public/likes/helpers/likes-counter';
 import { LikeStatus } from '../../../enums/like-status.enum';
 import { BloggerCommentViewDto } from '../../dto/comments/view/blogger/blogger.comment.view.dto';
@@ -18,7 +18,7 @@ export class CommentsQueryRepository {
   constructor(
     @InjectModel(Comment.name)
     private CommentModel: CommentModelType,
-    private postsRepository: PostsRepository,
+    private postsRepository: PostsMongooseRepository,
   ) {}
   // async findComments(
   //   query: QueryDto,

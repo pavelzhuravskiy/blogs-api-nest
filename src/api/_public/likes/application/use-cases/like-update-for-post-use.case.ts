@@ -4,7 +4,7 @@ import {
   Post,
   PostModelType,
 } from '../../../../entities/_mongoose/post.entity';
-import { PostsRepository } from '../../../../infrastructure/posts/posts.repository';
+import { PostsMongooseRepository } from '../../../../infrastructure/_mongoose/posts/posts.repository';
 import { LikesDataType } from '../../../../dto/likes/schemas/likes-data.type';
 import { LikesService } from '../likes.service';
 import { LikeStatusInputDto } from '../../../../dto/likes/input/like-status.input.dto';
@@ -24,7 +24,7 @@ export class LikeUpdateForPostUseCase
   constructor(
     @InjectModel(Post.name)
     private PostModel: PostModelType,
-    private readonly postsRepository: PostsRepository,
+    private readonly postsRepository: PostsMongooseRepository,
     private readonly likesService: LikesService,
   ) {}
 

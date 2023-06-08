@@ -36,7 +36,7 @@ export class BlogDeleteUseCase implements ICommandHandler<BlogDeleteCommand> {
       };
     }
 
-    await this.blogsRepository.deleteBlog(command.blogId);
+    await this.blogsRepository.deleteBlog(blog.id);
 
     return {
       data: true,

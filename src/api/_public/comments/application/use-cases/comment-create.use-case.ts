@@ -6,7 +6,7 @@ import {
   Comment,
   CommentModelType,
 } from '../../../../entities/_mongoose/comment.entity';
-import { PostsRepository } from '../../../../infrastructure/posts/posts.repository';
+import { PostsMongooseRepository } from '../../../../infrastructure/_mongoose/posts/posts.repository';
 import { CommentsRepository } from '../../../../infrastructure/comments/comments.repository';
 import { ExceptionResultType } from '../../../../../exceptions/types/exception-result.type';
 import { ResultCode } from '../../../../../enums/result-code.enum';
@@ -34,7 +34,7 @@ export class CommentCreateUseCase
     @InjectModel(Comment.name)
     private CommentModel: CommentModelType,
     private readonly commentsRepository: CommentsRepository,
-    private readonly postsRepository: PostsRepository,
+    private readonly postsRepository: PostsMongooseRepository,
     private readonly usersRepository: UsersMongooseRepository,
   ) {}
 

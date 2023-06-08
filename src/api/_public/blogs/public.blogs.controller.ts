@@ -1,7 +1,7 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
 import { BlogQueryDto } from '../../dto/blogs/query/blog.query.dto';
 import { Role } from '../../../enums/role.enum';
-import { PostsQueryRepository } from '../../infrastructure/posts/posts.query.repository';
+import { PostsMongooseQueryRepository } from '../../infrastructure/_mongoose/posts/posts.query.repository';
 import { exceptionHandler } from '../../../exceptions/exception.handler';
 import {
   blogIDField,
@@ -16,7 +16,7 @@ export class PublicBlogsController {
   constructor(
     private commandBus: CommandBus,
     private readonly blogsQueryRepository: BlogsQueryRepository,
-    private readonly postsQueryRepository: PostsQueryRepository,
+    private readonly postsQueryRepository: PostsMongooseQueryRepository,
   ) {}
 
   @Get()

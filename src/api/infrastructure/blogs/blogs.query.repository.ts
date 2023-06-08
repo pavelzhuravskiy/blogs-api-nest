@@ -100,6 +100,10 @@ export class BlogsQueryRepository {
   }
 
   async findBlog(id: number, role?: string): Promise<BlogViewDto> {
+    if (isNaN(id)) {
+      return null;
+    }
+
     const blogs = await this.dataSource.query(
       `select id, name, description, "websiteUrl", "createdAt", "isMembership"
        from public.blogs

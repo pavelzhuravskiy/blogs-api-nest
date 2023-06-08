@@ -10,8 +10,8 @@ import { Blog, BlogSchema } from '../entities/_mongoose/blog.entity';
 import { BlogsMongooseRepository } from '../infrastructure/_mongoose/blogs/blogs.repository';
 import { BlogsMongooseQueryRepository } from '../infrastructure/_mongoose/blogs/blogs.query.repository';
 import { PublicPostsController } from '../_public/posts/public.posts.controller';
-import { PostsRepository } from '../infrastructure/posts/posts.repository';
-import { PostsQueryRepository } from '../infrastructure/posts/posts.query.repository';
+import { PostsMongooseRepository } from '../infrastructure/_mongoose/posts/posts.repository';
+import { PostsMongooseQueryRepository } from '../infrastructure/_mongoose/posts/posts.query.repository';
 import { Post, PostSchema } from '../entities/_mongoose/post.entity';
 import { Comment, CommentSchema } from '../entities/_mongoose/comment.entity';
 import { UsersMongooseRepository } from '../infrastructure/_mongoose/users/users.mongoose.repository';
@@ -49,6 +49,8 @@ import { BlogBan } from '../entities/blogs/blog-ban.entity';
 import { BlogsRepository } from '../infrastructure/blogs/blogs.repository';
 import { UsersRepository } from '../infrastructure/users/users.repository';
 import { BlogsQueryRepository } from '../infrastructure/blogs/blogs.query.repository';
+import { PostsRepository } from '../infrastructure/posts/posts.repository';
+import { PostsQueryRepository } from '../infrastructure/posts/posts.query.repository';
 
 const entities = [Blog, BlogOwner, BlogBan];
 
@@ -80,12 +82,12 @@ const useCases = [
   BloggerUserBanUseCase,
 ];
 
-const repositories = [BlogsRepository, UsersRepository];
-const queryRepositories = [BlogsQueryRepository];
+const repositories = [BlogsRepository, UsersRepository, PostsRepository];
+const queryRepositories = [BlogsQueryRepository, PostsQueryRepository];
 
 const mongooseRepositories = [
   BlogsMongooseRepository,
-  PostsRepository,
+  PostsMongooseRepository,
   CommentsRepository,
   UsersMongooseRepository,
   LikesRepository,
@@ -93,7 +95,7 @@ const mongooseRepositories = [
 
 const mongooseQueryRepositories = [
   BlogsMongooseQueryRepository,
-  PostsQueryRepository,
+  PostsMongooseQueryRepository,
   CommentsQueryRepository,
   UsersMongooseQueryRepository,
 ];

@@ -1,71 +1,74 @@
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import {
-  Post,
-  PostDocument,
-  PostModelType,
-} from '../../entities/_mongoose/post.entity';
-import { Blog, BlogModelType } from '../../entities/_mongoose/blog.entity';
-import mongoose from 'mongoose';
+import { InjectDataSource } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
+import { PostInputDto } from '../../dto/posts/input/post.input.dto';
+import { Post } from '../../entities/posts/post.entity';
 
 @Injectable()
 export class PostsRepository {
-  constructor(
-    @InjectModel(Post.name)
-    private PostModel: PostModelType,
-    @InjectModel(Blog.name)
-    private BlogModel: BlogModelType,
-  ) {}
-  async save(post: PostDocument) {
-    return post.save();
+  constructor(@InjectDataSource() private dataSource: DataSource) {}
+
+  async createPost(
+    postInputDto: PostInputDto,
+    blogId: number,
+  ): Promise<number> {
+    const post = await this.dataSource.query(
+      `insert into public.posts (title, "shortDescription", content,
+                                 "blogId")
+       values ($1, $2, $3, $4)
+       returning id;`,
+      [
+        postInputDto.title,
+        postInputDto.shortDescription,
+        postInputDto.content,
+        blogId,
+      ],
+    );
+    return post[0].id;
   }
 
-  async findPost(id: string): Promise<PostDocument | null> {
-    if (!mongoose.isValidObjectId(id)) {
+  async findPost(id: number): Promise<Post | null> {
+    if (isNaN(id)) {
       return null;
     }
 
-    const post = await this.PostModel.findOne({ _id: id });
-
-    if (!post) {
-      return null;
-    }
-
-    return post;
-  }
-
-  async deletePost(id: string): Promise<boolean> {
-    const post = await this.PostModel.deleteOne({ _id: id });
-    return post.deletedCount === 1;
-  }
-
-  async setPostsOwnerBanStatus(
-    userId: string,
-    banStatus: boolean,
-  ): Promise<boolean> {
-    const result = await this.PostModel.updateMany(
-      { 'blogInfo.blogOwnerId': userId },
-      {
-        $set: {
-          'blogInfo.blogOwnerIsBanned': banStatus,
-        },
-      },
+    const posts = await this.dataSource.query(
+      `select id
+       from public.posts
+       where id = $1`,
+      [id],
     );
-    return result.acknowledged === true;
+
+    return posts[0];
   }
 
-  async setPostsBanStatus(
-    blogId: string,
-    banStatus: boolean,
+  async updatePost(
+    postInputDto: PostInputDto,
+    postId: number,
   ): Promise<boolean> {
-    const result = await this.PostModel.updateMany(
-      { 'blogInfo.blogId': blogId },
-      {
-        $set: {
-          'blogInfo.blogIsBanned': banStatus,
-        },
-      },
+    const result = await this.dataSource.query(
+      `update public.posts
+       set "title"            = $1,
+           "shortDescription" = $2,
+           "content"          = $3
+       where "id" = $4`,
+      [
+        postInputDto.title,
+        postInputDto.shortDescription,
+        postInputDto.content,
+        postId,
+      ],
     );
-    return result.acknowledged === true;
+    return result[1] === 1;
+  }
+
+  async deletePost(postId: number): Promise<boolean> {
+    const result = await this.dataSource.query(
+      `delete
+       from public.posts
+       where id = $1;`,
+      [postId],
+    );
+    return result[1] === 1;
   }
 }

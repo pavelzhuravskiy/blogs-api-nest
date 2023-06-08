@@ -10,7 +10,7 @@ import { UserCreateUseCase } from '../_superadmin/users/application/use-cases/us
 import { UserDeleteUseCase } from '../_superadmin/users/application/use-cases/user-delete.use-case';
 import { UserBanUseCase } from '../_superadmin/users/application/use-cases/user-ban.use-case';
 import { BlogsMongooseRepository } from '../infrastructure/_mongoose/blogs/blogs.repository';
-import { PostsRepository } from '../infrastructure/posts/posts.repository';
+import { PostsMongooseRepository } from '../infrastructure/_mongoose/posts/posts.repository';
 import { Blog, BlogSchema } from '../entities/_mongoose/blog.entity';
 import { Post, PostSchema } from '../entities/_mongoose/post.entity';
 import { CommentsRepository } from '../infrastructure/comments/comments.repository';
@@ -34,7 +34,7 @@ const mongooseRepositories = [
   UsersMongooseRepository,
   UsersMongooseQueryRepository,
   BlogsMongooseRepository,
-  PostsRepository,
+  PostsMongooseRepository,
   CommentsRepository,
   LikesRepository,
 ];

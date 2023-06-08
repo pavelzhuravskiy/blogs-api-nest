@@ -1,35 +1,27 @@
-import { InjectModel } from '@nestjs/mongoose';
-import { BlogsMongooseRepository } from '../../../infrastructure/_mongoose/blogs/blogs.repository';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { ExceptionResultType } from '../../../../exceptions/types/exception-result.type';
 import { ResultCode } from '../../../../enums/result-code.enum';
 import {
   blogIDField,
   blogNotFound,
-  userIDField,
-  userNotFound,
 } from '../../../../exceptions/exception.constants';
 import { PostInputDto } from '../../../dto/posts/input/post.input.dto';
-import { Post, PostModelType } from '../../../entities/_mongoose/post.entity';
 import { PostsRepository } from '../../../infrastructure/posts/posts.repository';
-import { UsersMongooseRepository } from '../../../infrastructure/_mongoose/users/users.mongoose.repository';
+import { BlogsRepository } from '../../../infrastructure/blogs/blogs.repository';
 
 export class PostCreateCommand {
   constructor(
     public postInputDto: PostInputDto,
-    public blogId: string,
-    public userId: string,
+    public blogId: number,
+    public userId: number,
   ) {}
 }
 
 @CommandHandler(PostCreateCommand)
 export class PostCreateUseCase implements ICommandHandler<PostCreateCommand> {
   constructor(
-    @InjectModel(Post.name)
-    private PostModel: PostModelType,
     private readonly postsRepository: PostsRepository,
-    private readonly blogsRepository: BlogsMongooseRepository,
-    private readonly usersRepository: UsersMongooseRepository,
+    private readonly blogsRepository: BlogsRepository,
   ) {}
 
   async execute(
@@ -46,36 +38,22 @@ export class PostCreateUseCase implements ICommandHandler<PostCreateCommand> {
       };
     }
 
-    if (blog.blogOwnerInfo.userId !== command.userId) {
+    if (blog.ownerId !== command.userId) {
       return {
         data: false,
         code: ResultCode.Forbidden,
       };
     }
 
-    const user = await this.usersRepository.findUserById(command.userId);
-
-    if (!user) {
-      return {
-        data: false,
-        code: ResultCode.NotFound,
-        field: userIDField,
-        message: userNotFound,
-      };
-    }
-
-    const post = this.PostModel.createPost(
-      this.PostModel,
+    const postId = await this.postsRepository.createPost(
       command.postInputDto,
-      blog,
+      blog.id,
     );
-
-    await this.postsRepository.save(post);
 
     return {
       data: true,
       code: ResultCode.Success,
-      response: post.id,
+      response: postId,
     };
   }
 }
