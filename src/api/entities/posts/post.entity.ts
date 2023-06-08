@@ -24,4 +24,14 @@ export class Post {
 
   @Column({ type: 'integer' })
   blogId: number; // FK 🔑
+
+  static checkSortingField(value: any) {
+    const p = new Post();
+    p.id = 1;
+    p.title = '';
+    p.shortDescription = '';
+    p.content = '';
+    p.createdAt = new Date();
+    return p.hasOwnProperty(value);
+  }
 }

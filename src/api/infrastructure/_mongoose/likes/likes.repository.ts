@@ -4,13 +4,13 @@ import {
   Comment,
   CommentDocument,
   CommentModelType,
-} from '../../entities/_mongoose/comment.entity';
+} from '../../../entities/_mongoose/comment.entity';
 import {
   Post,
   PostDocument,
   PostModelType,
-} from '../../entities/_mongoose/post.entity';
-import { LikesDataType } from '../../dto/likes/schemas/likes-data.type';
+} from '../../../entities/_mongoose/post.entity';
+import { LikesDataType } from '../../../dto/likes/schemas/likes-data.type';
 
 @Injectable()
 export class LikesRepository {

@@ -10,6 +10,7 @@ import { SuperAdminBlogViewDto } from '../../dto/blogs/view/superadmin/sa.blog.v
 import { Blog } from '../../entities/blogs/blog.entity';
 import { BlogOwner } from '../../entities/blogs/blog-owner.entity';
 import { BlogBan } from '../../entities/blogs/blog-ban.entity';
+import { idIsValid } from '../../../helpers/id-is-valid';
 
 @Injectable()
 export class BlogsQueryRepository {
@@ -28,7 +29,7 @@ export class BlogsQueryRepository {
               b."createdAt",
               b."isMembership",
               bo."ownerId"
-       from blogs b
+       from public.blogs b
                 left join blog_owners bo on b.id = bo."blogId"
                 left join blog_bans bb on b.id = bb."blogId"
        where (b.name ilike $1)
@@ -39,8 +40,8 @@ export class BlogsQueryRepository {
 
     const totalCount = await this.dataSource.query(
       `select count(*)
-       from blogs b
-                left join blog_owners bo on b.id = bo."blogId"
+       from public.blogs b
+                left join public.blog_owners bo on b.id = bo."blogId"
        where (b.name ilike $1);`,
       [filter],
     );
@@ -73,8 +74,8 @@ export class BlogsQueryRepository {
               b."createdAt",
               b."isMembership",
               bo."ownerId"
-       from blogs b
-                left join blog_owners bo on b.id = bo."blogId"
+       from public.blogs b
+                left join public.blog_owners bo on b.id = bo."blogId"
        where (bo."ownerId" = $1)
          and (b.name ilike $2)
        order by "${query.sortBy}" ${query.sortDirection}
@@ -84,8 +85,8 @@ export class BlogsQueryRepository {
 
     const totalCount = await this.dataSource.query(
       `select count(*)
-       from blogs b
-                left join blog_owners bo on b.id = bo."blogId"
+       from public.blogs b
+                left join public.blog_owners bo on b.id = bo."blogId"
        where (bo."ownerId" = $1)
          and (b.name ilike $2);`,
       [userId, filter],
@@ -99,8 +100,8 @@ export class BlogsQueryRepository {
     });
   }
 
-  async findBlog(id: number, role?: string): Promise<BlogViewDto> {
-    if (isNaN(id)) {
+  async findBlog(blogId: string, role?: string): Promise<BlogViewDto> {
+    if (!idIsValid(blogId)) {
       return null;
     }
 
@@ -108,7 +109,7 @@ export class BlogsQueryRepository {
       `select id, name, description, "websiteUrl", "createdAt", "isMembership"
        from public.blogs
        where id = $1`,
-      [id],
+      [blogId],
     );
 
     let mappedBlogs = await this.blogsMapping(blogs);

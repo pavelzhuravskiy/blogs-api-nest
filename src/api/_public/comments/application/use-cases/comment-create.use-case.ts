@@ -7,7 +7,7 @@ import {
   CommentModelType,
 } from '../../../../entities/_mongoose/comment.entity';
 import { PostsMongooseRepository } from '../../../../infrastructure/_mongoose/posts/posts.repository';
-import { CommentsRepository } from '../../../../infrastructure/comments/comments.repository';
+import { CommentsRepository } from '../../../../infrastructure/_mongoose/comments/comments.repository';
 import { ExceptionResultType } from '../../../../../exceptions/types/exception-result.type';
 import { ResultCode } from '../../../../../enums/result-code.enum';
 import {

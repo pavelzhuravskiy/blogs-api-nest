@@ -5,13 +5,13 @@ import {
   Comment,
   CommentLeanType,
   CommentModelType,
-} from '../../entities/_mongoose/comment.entity';
-import { CommentViewDto } from '../../dto/comments/view/comment.view.dto';
-import { likeStatusFinder } from '../../_public/likes/helpers/like-status-finder';
-import { PostsMongooseRepository } from '../_mongoose/posts/posts.repository';
-import { likesCounter } from '../../_public/likes/helpers/likes-counter';
-import { LikeStatus } from '../../../enums/like-status.enum';
-import { BloggerCommentViewDto } from '../../dto/comments/view/blogger/blogger.comment.view.dto';
+} from '../../../entities/_mongoose/comment.entity';
+import { CommentViewDto } from '../../../dto/comments/view/comment.view.dto';
+import { likeStatusFinder } from '../../../_public/likes/helpers/like-status-finder';
+import { PostsMongooseRepository } from '../posts/posts.repository';
+import { likesCounter } from '../../../_public/likes/helpers/likes-counter';
+import { LikeStatus } from '../../../../enums/like-status.enum';
+import { BloggerCommentViewDto } from '../../../dto/comments/view/blogger/blogger.comment.view.dto';
 
 @Injectable()
 export class CommentsQueryRepository {

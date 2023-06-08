@@ -3,12 +3,84 @@ import { PostViewDto } from '../../dto/posts/view/post.view.dto';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { LikeStatus } from '../../../enums/like-status.enum';
+import { Paginator } from '../../../helpers/pagination/_paginator';
+import { PostQueryDto } from '../../dto/posts/query/post.query.dto';
+import { idIsValid } from '../../../helpers/id-is-valid';
 
 @Injectable()
 export class PostsQueryRepository {
   constructor(@InjectDataSource() private dataSource: DataSource) {}
-  async findPost(id: number): Promise<PostViewDto> {
-    if (isNaN(id)) {
+  async findPosts(query: PostQueryDto): Promise<Paginator<PostViewDto[]>> {
+    const posts = await this.dataSource.query(
+      `select p.id as "postId",
+              p.title,
+              p."shortDescription",
+              p.content,
+              b.id as "blogId",
+              b.name as "blogName",
+              p."createdAt"
+       from public.posts p
+                left join public.blogs b on b.id = p."blogId"
+       order by "${query.sortBy}" ${query.sortDirection}
+       limit ${query.pageSize} offset (${query.pageNumber} - 1) * ${query.pageSize}`,
+    );
+
+    const totalCount = await this.dataSource.query(
+      `select count(*)
+       from public.posts p
+                left join public.blogs b on b.id = p."blogId"`,
+    );
+
+    return Paginator.paginate({
+      pageNumber: query.pageNumber,
+      pageSize: query.pageSize,
+      totalCount: Number(totalCount[0].count),
+      items: await this.postsMapping(posts),
+    });
+  }
+
+  async findPostsForBlog(
+    query: PostQueryDto,
+    blogId: string,
+  ): Promise<Paginator<PostViewDto[]>> {
+    if (!idIsValid(blogId)) {
+      return null;
+    }
+
+    const posts = await this.dataSource.query(
+      `select p.id as "postId",
+              p.title,
+              p."shortDescription",
+              p.content,
+              b.id as "blogId",
+              b.name as "blogName",
+              p."createdAt"
+       from public.posts p
+                left join public.blogs b on b.id = p."blogId"
+       where "blogId" = $1
+       order by "${query.sortBy}" ${query.sortDirection}
+       limit ${query.pageSize} offset (${query.pageNumber} - 1) * ${query.pageSize}`,
+      [blogId],
+    );
+
+    const totalCount = await this.dataSource.query(
+      `select count(*)
+       from public.posts p
+                left join public.blogs b on b.id = p."blogId"
+       where "blogId" = $1;`,
+      [blogId],
+    );
+
+    return Paginator.paginate({
+      pageNumber: query.pageNumber,
+      pageSize: query.pageSize,
+      totalCount: Number(totalCount[0].count),
+      items: await this.postsMapping(posts),
+    });
+  }
+
+  async findPost(postId: string): Promise<PostViewDto> {
+    if (!idIsValid(postId)) {
       return null;
     }
 
@@ -23,7 +95,7 @@ export class PostsQueryRepository {
        from posts p
                 left join blogs b on b.id = p."blogId"
        where p.id = $1`,
-      [id],
+      [postId],
     );
 
     const mappedPosts = await this.postsMapping(posts);
@@ -33,11 +105,11 @@ export class PostsQueryRepository {
   private async postsMapping(posts: any): Promise<PostViewDto[]> {
     return posts.map((p) => {
       return {
-        id: p.postId,
+        id: p.postId.toString(),
         title: p.title,
         shortDescription: p.shortDescription,
         content: p.content,
-        blogId: p.blogId,
+        blogId: p.blogId.toString(),
         blogName: p.blogName,
         createdAt: p.createdAt,
         extendedLikesInfo: {

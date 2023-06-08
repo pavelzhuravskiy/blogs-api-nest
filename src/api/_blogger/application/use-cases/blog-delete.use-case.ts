@@ -8,7 +8,7 @@ import {
 import { BlogsRepository } from '../../../infrastructure/blogs/blogs.repository';
 
 export class BlogDeleteCommand {
-  constructor(public blogId: number, public userId: number) {}
+  constructor(public blogId: string, public userId: number) {}
 }
 
 @CommandHandler(BlogDeleteCommand)

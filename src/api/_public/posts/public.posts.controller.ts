@@ -1,4 +1,4 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, Query } from '@nestjs/common';
 import { exceptionHandler } from '../../../exceptions/exception.handler';
 import { ResultCode } from '../../../enums/result-code.enum';
 import {
@@ -7,8 +7,9 @@ import {
 } from '../../../exceptions/exception.constants';
 import { UserIdFromHeaders } from '../../_auth/decorators/user-id-from-headers.decorator';
 import { CommandBus } from '@nestjs/cqrs';
-import { CommentsQueryRepository } from '../../infrastructure/comments/comments.query.repository';
+import { CommentsQueryRepository } from '../../infrastructure/_mongoose/comments/comments.query.repository';
 import { PostsQueryRepository } from '../../infrastructure/posts/posts.query.repository';
+import { PostQueryDto } from '../../dto/posts/query/post.query.dto';
 
 @Controller('posts')
 export class PublicPostsController {
@@ -18,10 +19,10 @@ export class PublicPostsController {
     private readonly commentsQueryRepository: CommentsQueryRepository,
   ) {}
 
-  /*@Get()
-  async findPosts(@Query() query: QueryDto, @UserIdFromHeaders() userId) {
-    return this.postsQueryRepository.findPosts(query, userId);
-  }*/
+  @Get()
+  async findPosts(@Query() query: PostQueryDto, @UserIdFromHeaders() userId) {
+    return this.postsQueryRepository.findPosts(query /*, userId*/);
+  }
 
   @Get(':id')
   async findPost(@Param('id') postId, @UserIdFromHeaders() userId) {

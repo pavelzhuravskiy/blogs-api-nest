@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { LikesRepository } from '../../../infrastructure/likes/likes.repository';
+import { LikesRepository } from '../../../infrastructure/_mongoose/likes/likes.repository';
 import { LikeStatus } from '../../../../enums/like-status.enum';
 import { LikesDataType } from '../../../dto/likes/schemas/likes-data.type';
 import { UsersMongooseRepository } from '../../../infrastructure/_mongoose/users/users.mongoose.repository';

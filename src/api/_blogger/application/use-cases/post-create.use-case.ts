@@ -12,7 +12,7 @@ import { BlogsRepository } from '../../../infrastructure/blogs/blogs.repository'
 export class PostCreateCommand {
   constructor(
     public postInputDto: PostInputDto,
-    public blogId: number,
+    public blogId: string,
     public userId: number,
   ) {}
 }

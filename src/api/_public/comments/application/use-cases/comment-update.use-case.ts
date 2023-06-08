@@ -6,7 +6,7 @@ import {
   commentNotFound,
 } from '../../../../../exceptions/exception.constants';
 import { CommentInputDto } from '../../../../dto/comments/input/comment.input.dto';
-import { CommentsRepository } from '../../../../infrastructure/comments/comments.repository';
+import { CommentsRepository } from '../../../../infrastructure/_mongoose/comments/comments.repository';
 
 export class CommentUpdateCommand {
   constructor(

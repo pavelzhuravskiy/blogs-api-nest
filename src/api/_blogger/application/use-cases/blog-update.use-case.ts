@@ -11,7 +11,7 @@ import { BlogsRepository } from '../../../infrastructure/blogs/blogs.repository'
 export class BlogUpdateCommand {
   constructor(
     public blogInputDto: BlogInputDto,
-    public blogId: number,
+    public blogId: string,
     public userId: number,
   ) {}
 }

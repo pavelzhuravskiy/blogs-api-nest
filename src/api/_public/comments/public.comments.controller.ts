@@ -8,7 +8,7 @@ import {
   Put,
   UseGuards,
 } from '@nestjs/common';
-import { CommentsQueryRepository } from '../../infrastructure/comments/comments.query.repository';
+import { CommentsQueryRepository } from '../../infrastructure/_mongoose/comments/comments.query.repository';
 import { exceptionHandler } from '../../../exceptions/exception.handler';
 import { ResultCode } from '../../../enums/result-code.enum';
 import {

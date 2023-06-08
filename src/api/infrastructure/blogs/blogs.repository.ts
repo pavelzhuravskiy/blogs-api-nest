@@ -4,6 +4,7 @@ import { DataSource } from 'typeorm';
 import { BlogInputDto } from '../../dto/blogs/input/blog.input.dto';
 import { Blog } from '../../entities/blogs/blog.entity';
 import { BlogOwner } from '../../entities/blogs/blog-owner.entity';
+import { idIsValid } from '../../../helpers/id-is-valid';
 
 @Injectable()
 export class BlogsRepository {
@@ -39,8 +40,8 @@ export class BlogsRepository {
     });
   }
 
-  async findBlog(blogId: number): Promise<(Blog & BlogOwner) | null> {
-    if (isNaN(blogId)) {
+  async findBlog(blogId: string): Promise<(Blog & BlogOwner) | null> {
+    if (!idIsValid(blogId)) {
       return null;
     }
 

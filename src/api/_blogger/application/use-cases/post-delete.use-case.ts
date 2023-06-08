@@ -12,8 +12,8 @@ import { PostsRepository } from '../../../infrastructure/posts/posts.repository'
 
 export class PostDeleteCommand {
   constructor(
-    public blogId: number,
-    public postId: number,
+    public blogId: string,
+    public postId: string,
     public userId: number,
   ) {}
 }

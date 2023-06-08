@@ -6,6 +6,7 @@ import { User } from '../../entities/users/user.entity';
 import { uuidIsValid } from '../../../helpers/uuid-is-valid';
 import { UserPasswordRecovery } from '../../entities/users/user-password-recovery.entity';
 import { UserEmailConfirmation } from '../../entities/users/user-email-confirmation.entity';
+import { idIsValid } from '../../../helpers/id-is-valid';
 
 @Injectable()
 export class UsersRepository {
@@ -67,8 +68,8 @@ export class UsersRepository {
     });
   }
 
-  async findUserById(userId: number): Promise<User | null> {
-    if (isNaN(userId)) {
+  async findUserById(userId: number | string): Promise<User | null> {
+    if (!idIsValid(userId)) {
       return null;
     }
 
@@ -276,7 +277,7 @@ export class UsersRepository {
     });
   }
 
-  async deleteUser(userId: number): Promise<boolean> {
+  async deleteUser(userId: string | number): Promise<boolean> {
     const result = await this.dataSource.query(
       `delete
        from public.users

@@ -10,15 +10,15 @@ import {
 import { ExceptionResultType } from '../../../../../exceptions/types/exception-result.type';
 import { PostsMongooseRepository } from '../../../../infrastructure/_mongoose/posts/posts.repository';
 import { BlogsMongooseRepository } from '../../../../infrastructure/_mongoose/blogs/blogs.repository';
-import { CommentsRepository } from '../../../../infrastructure/comments/comments.repository';
-import { LikesRepository } from '../../../../infrastructure/likes/likes.repository';
+import { CommentsRepository } from '../../../../infrastructure/_mongoose/comments/comments.repository';
+import { LikesRepository } from '../../../../infrastructure/_mongoose/likes/likes.repository';
 import { UsersRepository } from '../../../../infrastructure/users/users.repository';
 import { DevicesRepository } from '../../../../infrastructure/devices/devices.repository';
 
 export class SAUserBanCommand {
   constructor(
     public saUserBanInputDto: SAUserBanInputDto,
-    public userId: number,
+    public userId: string,
   ) {}
 }
 

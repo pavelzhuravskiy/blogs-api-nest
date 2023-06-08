@@ -5,7 +5,7 @@ import {
   commentIDField,
   commentNotFound,
 } from '../../../../../exceptions/exception.constants';
-import { CommentsRepository } from '../../../../infrastructure/comments/comments.repository';
+import { CommentsRepository } from '../../../../infrastructure/_mongoose/comments/comments.repository';
 
 export class CommentDeleteCommand {
   constructor(public commentId: string, public userId: string) {}

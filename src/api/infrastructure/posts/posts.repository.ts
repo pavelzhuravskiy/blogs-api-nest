@@ -3,6 +3,7 @@ import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { PostInputDto } from '../../dto/posts/input/post.input.dto';
 import { Post } from '../../entities/posts/post.entity';
+import { idIsValid } from '../../../helpers/id-is-valid';
 
 @Injectable()
 export class PostsRepository {
@@ -27,8 +28,8 @@ export class PostsRepository {
     return post[0].id;
   }
 
-  async findPost(id: number): Promise<Post | null> {
-    if (isNaN(id)) {
+  async findPost(postId: string): Promise<Post | null> {
+    if (!idIsValid(postId)) {
       return null;
     }
 
@@ -36,7 +37,7 @@ export class PostsRepository {
       `select id
        from public.posts
        where id = $1`,
-      [id],
+      [postId],
     );
 
     return posts[0];

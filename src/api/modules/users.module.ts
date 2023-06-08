@@ -13,9 +13,9 @@ import { BlogsMongooseRepository } from '../infrastructure/_mongoose/blogs/blogs
 import { PostsMongooseRepository } from '../infrastructure/_mongoose/posts/posts.repository';
 import { Blog, BlogSchema } from '../entities/_mongoose/blog.entity';
 import { Post, PostSchema } from '../entities/_mongoose/post.entity';
-import { CommentsRepository } from '../infrastructure/comments/comments.repository';
+import { CommentsRepository } from '../infrastructure/_mongoose/comments/comments.repository';
 import { Comment, CommentSchema } from '../entities/_mongoose/comment.entity';
-import { LikesRepository } from '../infrastructure/likes/likes.repository';
+import { LikesRepository } from '../infrastructure/_mongoose/likes/likes.repository';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from '../entities/users/user.entity';
 import { UserEmailConfirmation } from '../entities/users/user-email-confirmation.entity';

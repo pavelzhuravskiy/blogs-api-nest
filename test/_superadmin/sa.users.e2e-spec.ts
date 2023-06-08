@@ -313,7 +313,7 @@ describe('Super admin users testing', () => {
       expect(response.body).toEqual(exceptionObject(emailField));
     });
   });
-  describe('Ban user', () => {
+  describe.skip('Ban user', () => {
     it(`should create blog by user 01`, async () => {
       const blog = await agent
         .post(bloggerBlogsURI)

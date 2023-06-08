@@ -14,8 +14,8 @@ import { BlogsRepository } from '../../../infrastructure/blogs/blogs.repository'
 export class PostUpdateCommand {
   constructor(
     public postInputDto: PostInputDto,
-    public blogId: number,
-    public postId: number,
+    public blogId: string,
+    public postId: string,
     public userId: number,
   ) {}
 }
