@@ -21,6 +21,10 @@ export class BlogCreateUseCase implements ICommandHandler<BlogCreateCommand> {
       return null;
     }
 
-    return this.blogsRepository.createBlog(command.blogInputDto, user.id);
+    return this.blogsRepository.createBlog(
+      command.blogInputDto,
+      user.id,
+      user.login,
+    );
   }
 }

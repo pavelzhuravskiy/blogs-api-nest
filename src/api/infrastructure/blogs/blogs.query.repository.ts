@@ -28,7 +28,10 @@ export class BlogsQueryRepository {
               b."websiteUrl",
               b."createdAt",
               b."isMembership",
-              bo."ownerId"
+              b."isBanned",
+              bo."ownerId",
+              bo."ownerLogin",
+              bb."banDate"
        from public.blogs b
                 left join blog_owners bo on b.id = bo."blogId"
                 left join blog_bans bb on b.id = bb."blogId"

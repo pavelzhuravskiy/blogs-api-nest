@@ -18,9 +18,11 @@ export class PostsQueryRepository {
               p.content,
               b.id as "blogId",
               b.name as "blogName",
+              b."isBanned",
               p."createdAt"
        from public.posts p
                 left join public.blogs b on b.id = p."blogId"
+       where "isBanned" = false
        order by "${query.sortBy}" ${query.sortDirection}
        limit ${query.pageSize} offset (${query.pageNumber} - 1) * ${query.pageSize}`,
     );
@@ -28,7 +30,8 @@ export class PostsQueryRepository {
     const totalCount = await this.dataSource.query(
       `select count(*)
        from public.posts p
-                left join public.blogs b on b.id = p."blogId"`,
+                left join public.blogs b on b.id = p."blogId"
+                where "isBanned" = false`,
     );
 
     return Paginator.paginate({
@@ -54,10 +57,11 @@ export class PostsQueryRepository {
               p.content,
               b.id as "blogId",
               b.name as "blogName",
+              b."isBanned",
               p."createdAt"
        from public.posts p
                 left join public.blogs b on b.id = p."blogId"
-       where "blogId" = $1
+       where "blogId" = $1 and "isBanned" = false 
        order by "${query.sortBy}" ${query.sortDirection}
        limit ${query.pageSize} offset (${query.pageNumber} - 1) * ${query.pageSize}`,
       [blogId],
@@ -67,7 +71,7 @@ export class PostsQueryRepository {
       `select count(*)
        from public.posts p
                 left join public.blogs b on b.id = p."blogId"
-       where "blogId" = $1;`,
+       where "blogId" = $1 and "isBanned" = false;`,
       [blogId],
     );
 
@@ -79,7 +83,7 @@ export class PostsQueryRepository {
     });
   }
 
-  async findPost(postId: string): Promise<PostViewDto> {
+  async findPost(postId: string): Promise<PostViewDto | null> {
     if (!idIsValid(postId)) {
       return null;
     }
@@ -91,10 +95,11 @@ export class PostsQueryRepository {
               p.content,
               b.id as "blogId",
               b.name as "blogName",
+              b."isBanned",
               p."createdAt"
        from posts p
                 left join blogs b on b.id = p."blogId"
-       where p.id = $1`,
+       where p.id = $1 and "isBanned" = false`,
       [postId],
     );
 

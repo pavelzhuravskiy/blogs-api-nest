@@ -9,7 +9,6 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
-import { BlogsMongooseQueryRepository } from '../../infrastructure/_mongoose/blogs/blogs.query.repository';
 import { BlogQueryDto } from '../../dto/blogs/query/blog.query.dto';
 import { Role } from '../../../enums/role.enum';
 import { BasicAuthGuard } from '../../_auth/guards/basic-auth.guard';
@@ -18,12 +17,13 @@ import { exceptionHandler } from '../../../exceptions/exception.handler';
 import { BlogBindCommand } from './application/use-cases/blog-bind.use-case';
 import { SABlogBanInputDto } from '../../dto/users/input/superadmin/sa.blog-ban.input.dto';
 import { SABlogBanCommand } from './application/use-cases/blog-ban.use-case';
+import { BlogsQueryRepository } from '../../infrastructure/blogs/blogs.query.repository';
 
 @Controller('sa/blogs')
 export class SuperAdminBlogsController {
   constructor(
     private commandBus: CommandBus,
-    private readonly blogsQueryRepository: BlogsMongooseQueryRepository,
+    private readonly blogsQueryRepository: BlogsQueryRepository,
   ) {}
 
   @UseGuards(BasicAuthGuard)

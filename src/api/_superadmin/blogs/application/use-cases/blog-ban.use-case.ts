@@ -7,9 +7,8 @@ import {
   blogNotFound,
 } from '../../../../../exceptions/exception.constants';
 import { ExceptionResultType } from '../../../../../exceptions/types/exception-result.type';
-import { BlogsMongooseRepository } from '../../../../infrastructure/_mongoose/blogs/blogs.repository';
 import { SABlogBanInputDto } from '../../../../dto/users/input/superadmin/sa.blog-ban.input.dto';
-import { PostsMongooseRepository } from '../../../../infrastructure/_mongoose/posts/posts.repository';
+import { BlogsRepository } from '../../../../infrastructure/blogs/blogs.repository';
 
 export class SABlogBanCommand {
   constructor(
@@ -20,10 +19,7 @@ export class SABlogBanCommand {
 
 @CommandHandler(SABlogBanCommand)
 export class BlogBanUseCase implements ICommandHandler<SABlogBanCommand> {
-  constructor(
-    private readonly blogsRepository: BlogsMongooseRepository,
-    private readonly postsRepository: PostsMongooseRepository,
-  ) {}
+  constructor(private readonly blogsRepository: BlogsRepository) {}
 
   async execute(
     command: SABlogBanCommand,
@@ -39,7 +35,7 @@ export class BlogBanUseCase implements ICommandHandler<SABlogBanCommand> {
       };
     }
 
-    const banDBStatus = blog.banInfo.isBanned;
+    const banDBStatus = blog.isBanned;
 
     if (banDBStatus && command.saBlogBanInputDto.isBanned) {
       return {
@@ -60,14 +56,10 @@ export class BlogBanUseCase implements ICommandHandler<SABlogBanCommand> {
     }
 
     if (!banDBStatus) {
-      blog.banBlog();
-      await this.postsRepository.setPostsBanStatus(command.blogId, true);
+      await this.blogsRepository.banBlog(blog.id);
     } else {
-      blog.unbanBlog();
-      await this.postsRepository.setPostsBanStatus(command.blogId, false);
+      await this.blogsRepository.unbanBlog(blog.id);
     }
-
-    await this.blogsRepository.save(blog);
 
     return {
       data: true,
