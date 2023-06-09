@@ -21,11 +21,11 @@ import {
 } from '../utils/constants/exceptions.constants';
 import { AppModule } from '../../src/app.module';
 import {
+  banURI,
   bloggerUsersURI,
   saUsersURI,
   user01Email,
   user01Login,
-  banURI,
   userPassword,
 } from '../utils/constants/users.constants';
 import {
@@ -54,12 +54,12 @@ import {
   commentContent,
   publicCommentsURI,
 } from '../utils/constants/comments.constants';
-import { UsersMongooseRepository } from '../../src/api/infrastructure/_mongoose/users/users.mongoose.repository';
+import { UsersRepository } from '../../src/api/infrastructure/users/users.repository';
 
 describe('Blogger users ban testing', () => {
   let app: INestApplication;
   let agent: SuperAgentTest;
-  let usersRepository: UsersMongooseRepository;
+  let usersRepository: UsersRepository;
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -81,7 +81,7 @@ describe('Blogger users ban testing', () => {
       }),
     );
     app.useGlobalFilters(new HttpExceptionFilter());
-    usersRepository = app.get(UsersMongooseRepository);
+    usersRepository = app.get(UsersRepository);
 
     await app.init();
     agent = supertest.agent(app.getHttpServer());

@@ -1,6 +1,4 @@
-import { BlogsMongooseRepository } from '../../../../infrastructure/_mongoose/blogs/blogs.repository';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { UsersMongooseRepository } from '../../../../infrastructure/_mongoose/users/users.mongoose.repository';
 import { ResultCode } from '../../../../../enums/result-code.enum';
 import {
   blogIDField,
@@ -10,6 +8,8 @@ import {
   userNotFound,
 } from '../../../../../exceptions/exception.constants';
 import { ExceptionResultType } from '../../../../../exceptions/types/exception-result.type';
+import { BlogsRepository } from '../../../../infrastructure/blogs/blogs.repository';
+import { UsersRepository } from '../../../../infrastructure/users/users.repository';
 
 export class BlogBindCommand {
   constructor(public blogId: string, public userId: string) {}
@@ -18,8 +18,8 @@ export class BlogBindCommand {
 @CommandHandler(BlogBindCommand)
 export class BlogBindUseCase implements ICommandHandler<BlogBindCommand> {
   constructor(
-    private readonly blogsRepository: BlogsMongooseRepository,
-    private readonly usersRepository: UsersMongooseRepository,
+    private readonly blogsRepository: BlogsRepository,
+    private readonly usersRepository: UsersRepository,
   ) {}
 
   async execute(
@@ -47,7 +47,7 @@ export class BlogBindUseCase implements ICommandHandler<BlogBindCommand> {
       };
     }
 
-    const blogOwnerId = blog.blogOwnerInfo.userId;
+    const blogOwnerId = blog.ownerId;
     const blogOwner = await this.usersRepository.findUserById(blogOwnerId);
 
     if (blogOwner) {
@@ -59,8 +59,7 @@ export class BlogBindUseCase implements ICommandHandler<BlogBindCommand> {
       };
     }
 
-    blog.bindUser(user);
-    await this.blogsRepository.save(blog);
+    // await this.blogsRepository.bindBlog(blog);
 
     return {
       data: true,

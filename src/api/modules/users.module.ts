@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { UsersMongooseRepository } from '../infrastructure/_mongoose/users/users.mongoose.repository';
-import { UsersMongooseQueryRepository } from '../infrastructure/_mongoose/users/users.mongoose.query.repository';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UserMongoose, UserSchema } from '../entities/_mongoose/user.entity';
 import { IsLoginExistConstraint } from '../../exceptions/decorators/unique-login.decorator';
@@ -9,7 +8,6 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { UserCreateUseCase } from '../_superadmin/users/application/use-cases/user-create.use-case';
 import { UserDeleteUseCase } from '../_superadmin/users/application/use-cases/user-delete.use-case';
 import { UserBanUseCase } from '../_superadmin/users/application/use-cases/user-ban.use-case';
-import { BlogsMongooseRepository } from '../infrastructure/_mongoose/blogs/blogs.repository';
 import { PostsMongooseRepository } from '../infrastructure/_mongoose/posts/posts.repository';
 import { Blog, BlogSchema } from '../entities/_mongoose/blog.entity';
 import { Post, PostSchema } from '../entities/_mongoose/post.entity';
@@ -39,8 +37,6 @@ const entities = [
 
 const mongooseRepositories = [
   UsersMongooseRepository,
-  UsersMongooseQueryRepository,
-  BlogsMongooseRepository,
   PostsMongooseRepository,
   CommentsRepository,
   LikesRepository,

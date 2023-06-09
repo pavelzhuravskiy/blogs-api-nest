@@ -8,10 +8,6 @@ import {
   userNotFound,
 } from '../../../../../exceptions/exception.constants';
 import { ExceptionResultType } from '../../../../../exceptions/types/exception-result.type';
-import { PostsMongooseRepository } from '../../../../infrastructure/_mongoose/posts/posts.repository';
-import { BlogsMongooseRepository } from '../../../../infrastructure/_mongoose/blogs/blogs.repository';
-import { CommentsRepository } from '../../../../infrastructure/_mongoose/comments/comments.repository';
-import { LikesRepository } from '../../../../infrastructure/_mongoose/likes/likes.repository';
 import { UsersRepository } from '../../../../infrastructure/users/users.repository';
 import { DevicesRepository } from '../../../../infrastructure/devices/devices.repository';
 
@@ -28,10 +24,6 @@ export class UserBanUseCase implements ICommandHandler<SAUserBanCommand> {
     private commandBus: CommandBus,
     private readonly usersRepository: UsersRepository,
     private readonly devicesRepository: DevicesRepository,
-    private readonly blogsRepository: BlogsMongooseRepository,
-    private readonly postsRepository: PostsMongooseRepository,
-    private readonly commentsRepository: CommentsRepository,
-    private readonly likesRepository: LikesRepository,
   ) {}
 
   async execute(

@@ -7,11 +7,8 @@ import {
 import { PublicBlogsController } from '../_public/blogs/public.blogs.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Blog, BlogSchema } from '../entities/_mongoose/blog.entity';
-import { BlogsMongooseRepository } from '../infrastructure/_mongoose/blogs/blogs.repository';
-import { BlogsMongooseQueryRepository } from '../infrastructure/_mongoose/blogs/blogs.query.repository';
 import { PublicPostsController } from '../_public/posts/public.posts.controller';
 import { PostsMongooseRepository } from '../infrastructure/_mongoose/posts/posts.repository';
-import { PostsMongooseQueryRepository } from '../infrastructure/_mongoose/posts/posts.query.repository';
 import { Post, PostSchema } from '../entities/_mongoose/post.entity';
 import { Comment, CommentSchema } from '../entities/_mongoose/comment.entity';
 import { UsersMongooseRepository } from '../infrastructure/_mongoose/users/users.mongoose.repository';
@@ -41,7 +38,6 @@ import { LikeUpdateForPostUseCase } from '../_public/likes/application/use-cases
 import { LikeUpdateForCommentUseCase } from '../_public/likes/application/use-cases/like-update-for-comment-use.case';
 import { BloggerUserBanUseCase } from '../_blogger/application/use-cases/user-ban.use-case';
 import { BloggerUsersController } from '../_blogger/blogger.users.controller';
-import { UsersMongooseQueryRepository } from '../infrastructure/_mongoose/users/users.mongoose.query.repository';
 import { BlogBanUseCase } from '../_superadmin/blogs/application/use-cases/blog-ban.use-case';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { BlogOwner } from '../entities/blogs/blog-owner.entity';
@@ -93,19 +89,13 @@ const queryRepositories = [
 ];
 
 const mongooseRepositories = [
-  BlogsMongooseRepository,
   PostsMongooseRepository,
   CommentsRepository,
   UsersMongooseRepository,
   LikesRepository,
 ];
 
-const mongooseQueryRepositories = [
-  BlogsMongooseQueryRepository,
-  PostsMongooseQueryRepository,
-  CommentsQueryRepository,
-  UsersMongooseQueryRepository,
-];
+const mongooseQueryRepositories = [CommentsQueryRepository];
 
 @Module({
   imports: [

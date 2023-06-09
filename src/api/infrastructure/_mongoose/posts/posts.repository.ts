@@ -16,9 +16,6 @@ export class PostsMongooseRepository {
     @InjectModel(Blog.name)
     private BlogModel: BlogModelType,
   ) {}
-  async save(post: PostDocument) {
-    return post.save();
-  }
 
   async findPost(id: string): Promise<PostDocument | null> {
     if (!mongoose.isValidObjectId(id)) {
@@ -32,40 +29,5 @@ export class PostsMongooseRepository {
     }
 
     return post;
-  }
-
-  async deletePost(id: string): Promise<boolean> {
-    const post = await this.PostModel.deleteOne({ _id: id });
-    return post.deletedCount === 1;
-  }
-
-  async setPostsOwnerBanStatus(
-    userId: string,
-    banStatus: boolean,
-  ): Promise<boolean> {
-    const result = await this.PostModel.updateMany(
-      { 'blogInfo.blogOwnerId': userId },
-      {
-        $set: {
-          'blogInfo.blogOwnerIsBanned': banStatus,
-        },
-      },
-    );
-    return result.acknowledged === true;
-  }
-
-  async setPostsBanStatus(
-    blogId: string,
-    banStatus: boolean,
-  ): Promise<boolean> {
-    const result = await this.PostModel.updateMany(
-      { 'blogInfo.blogId': blogId },
-      {
-        $set: {
-          'blogInfo.blogIsBanned': banStatus,
-        },
-      },
-    );
-    return result.acknowledged === true;
   }
 }
