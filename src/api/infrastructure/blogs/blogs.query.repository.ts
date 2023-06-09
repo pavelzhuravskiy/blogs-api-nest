@@ -124,9 +124,7 @@ export class BlogsQueryRepository {
       [blogId],
     );
 
-    console.log(blogs);
-
-    if (blogs[0].isBanned) {
+    if (blogs.length === 0 || blogs[0].isBanned) {
       return null;
     }
 
