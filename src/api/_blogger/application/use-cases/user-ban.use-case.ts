@@ -1,5 +1,4 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { UsersMongooseRepository } from '../../../infrastructure/_mongoose/users/users.mongoose.repository';
 import { ResultCode } from '../../../../enums/result-code.enum';
 import {
   userIDField,
@@ -8,13 +7,14 @@ import {
 } from '../../../../exceptions/exception.constants';
 import { ExceptionResultType } from '../../../../exceptions/types/exception-result.type';
 import { BloggerUserBanInputDto } from '../../../dto/users/input/blogger/blogger.user-ban.input.dto';
-import { BlogsMongooseRepository } from '../../../infrastructure/_mongoose/blogs/blogs.repository';
+import { UsersRepository } from '../../../infrastructure/users/users.repository';
+import { BlogsRepository } from '../../../infrastructure/blogs/blogs.repository';
 
 export class BloggerUserBanCommand {
   constructor(
     public bloggerUserBanInputDto: BloggerUserBanInputDto,
-    public userToBanId: string,
-    public currentUserId: string,
+    public userToBanOrUnbanId: string,
+    public currentUserId: number,
   ) {}
 }
 
@@ -23,18 +23,18 @@ export class BloggerUserBanUseCase
   implements ICommandHandler<BloggerUserBanCommand>
 {
   constructor(
-    private readonly usersRepository: UsersMongooseRepository,
-    private readonly blogsRepository: BlogsMongooseRepository,
+    private readonly usersRepository: UsersRepository,
+    private readonly blogsRepository: BlogsRepository,
   ) {}
 
   async execute(
     command: BloggerUserBanCommand,
   ): Promise<ExceptionResultType<boolean>> {
-    const userToBan = await this.usersRepository.findUserById(
-      command.userToBanId,
+    const userToBanOrUnban = await this.usersRepository.findUserById(
+      command.userToBanOrUnbanId,
     );
 
-    if (!userToBan) {
+    if (!userToBanOrUnban) {
       return {
         data: false,
         code: ResultCode.NotFound,
@@ -47,7 +47,7 @@ export class BloggerUserBanUseCase
       command.bloggerUserBanInputDto.blogId,
     );
 
-    if (command.currentUserId !== blog.blogOwnerInfo.userId) {
+    if (blog.ownerId !== command.currentUserId) {
       return {
         data: false,
         code: ResultCode.Forbidden,
@@ -55,8 +55,8 @@ export class BloggerUserBanUseCase
     }
 
     const isAlreadyBanned = await this.usersRepository.findUserBanForBlog(
-      command.userToBanId,
-      command.bloggerUserBanInputDto.blogId,
+      userToBanOrUnban.id,
+      blog.id,
     );
 
     if (command.bloggerUserBanInputDto.isBanned) {
@@ -69,16 +69,15 @@ export class BloggerUserBanUseCase
         };
       }
 
-      await this.usersRepository.banUserForBlog(
-        command.bloggerUserBanInputDto.blogId,
-        command.userToBanId,
-        userToBan.accountData.login,
+      await this.usersRepository.banUserByBlogger(
+        userToBanOrUnban.id,
+        blog.id,
         command.bloggerUserBanInputDto.banReason,
       );
     } else {
-      await this.usersRepository.unbanUserForBlog(
-        command.bloggerUserBanInputDto.blogId,
-        command.userToBanId,
+      await this.usersRepository.unbanUserByBlogger(
+        userToBanOrUnban.id,
+        blog.id,
       );
     }
 

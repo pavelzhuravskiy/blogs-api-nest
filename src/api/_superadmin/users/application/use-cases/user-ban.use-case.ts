@@ -69,7 +69,7 @@ export class UserBanUseCase implements ICommandHandler<SAUserBanCommand> {
     }
 
     if (!banDBStatus) {
-      await this.usersRepository.banUser(
+      await this.usersRepository.banUserBySA(
         user.id,
         command.saUserBanInputDto.banReason,
       );
@@ -93,7 +93,7 @@ export class UserBanUseCase implements ICommandHandler<SAUserBanCommand> {
         this.CommentModel,
       );*/
     } else {
-      await this.usersRepository.unbanUser(user.id);
+      await this.usersRepository.unbanUserBySA(user.id);
       /*await this.blogsRepository.setBlogsOwnerBanStatus(command.userId, false);*/
       /*await this.postsRepository.setPostsOwnerBanStatus(command.userId, false);*/
       /*await this.commentsRepository.setCommentsOwnerBanStatus(

@@ -1,9 +1,11 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   Param,
   Put,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
@@ -12,16 +14,19 @@ import { ResultCode } from '../../enums/result-code.enum';
 import { JwtBearerGuard } from '../_auth/guards/jwt-bearer.guard';
 import { BloggerUserBanInputDto } from '../dto/users/input/blogger/blogger.user-ban.input.dto';
 import { BloggerUserBanCommand } from './application/use-cases/user-ban.use-case';
-import { BlogsMongooseQueryRepository } from '../infrastructure/_mongoose/blogs/blogs.query.repository';
-import { UsersMongooseQueryRepository } from '../infrastructure/_mongoose/users/users.mongoose.query.repository';
 import { UserIdFromGuard } from '../_auth/decorators/user-id-from-guard.decorator';
+import { UsersQueryRepository } from '../infrastructure/users/users.query.repository';
+import { BloggerUserBanQueryDto } from '../dto/users/query/blogger/blogger.user-ban.query.dto';
+import {
+  blogIDField,
+  blogNotFound,
+} from '../../exceptions/exception.constants';
 
 @Controller('blogger/users')
 export class BloggerUsersController {
   constructor(
     private commandBus: CommandBus,
-    private readonly blogsQueryRepository: BlogsMongooseQueryRepository,
-    private readonly usersQueryRepository: UsersMongooseQueryRepository,
+    private readonly usersQueryRepository: UsersQueryRepository,
   ) {}
 
   @UseGuards(JwtBearerGuard)
@@ -43,23 +48,18 @@ export class BloggerUsersController {
     return result;
   }
 
-  /*@UseGuards(JwtBearerGuard)
+  @UseGuards(JwtBearerGuard)
   @Get('blog/:id')
-  async findUsers(
-    @Query() query: BloggerUserBanQueryDto,
-    @Param('id') blogId,
-    @UserIdFromGuard() userId,
-  ) {
+  async findUsers(@Query() query: BloggerUserBanQueryDto, @Param('id') blogId) {
     const result = await this.usersQueryRepository.findUsersBannedByBlogger(
       query,
       blogId,
-      userId,
     );
 
-    if (result.code !== ResultCode.Success) {
-      return exceptionHandler(result.code, result.message, result.field);
+    if (!result) {
+      return exceptionHandler(ResultCode.NotFound, blogNotFound, blogIDField);
     }
 
-    return result.response;
-  }*/
+    return result;
+  }
 }

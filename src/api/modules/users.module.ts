@@ -20,15 +20,22 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from '../entities/users/user.entity';
 import { UserEmailConfirmation } from '../entities/users/user-email-confirmation.entity';
 import { UserPasswordRecovery } from '../entities/users/user-password-recovery.entity';
-import { UserBan } from '../entities/users/user-ban.entity';
+import { UserBanBySA } from '../entities/users/user-ban-by-sa.entity';
 import { UsersRepository } from '../infrastructure/users/users.repository';
 import { IsEmailExistConstraint } from '../../exceptions/decorators/unique-email.decorator';
 import { UsersQueryRepository } from '../infrastructure/users/users.query.repository';
 import { DevicesRepository } from '../infrastructure/devices/devices.repository';
+import { UserBanByBlogger } from '../entities/users/user-ban-by-blogger.entity';
 
 const useCases = [UserCreateUseCase, UserDeleteUseCase, UserBanUseCase];
 
-const entities = [User, UserEmailConfirmation, UserPasswordRecovery, UserBan];
+const entities = [
+  User,
+  UserEmailConfirmation,
+  UserPasswordRecovery,
+  UserBanBySA,
+  UserBanByBlogger,
+];
 
 const mongooseRepositories = [
   UsersMongooseRepository,

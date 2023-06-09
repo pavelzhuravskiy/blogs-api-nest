@@ -51,6 +51,7 @@ import { UsersRepository } from '../infrastructure/users/users.repository';
 import { BlogsQueryRepository } from '../infrastructure/blogs/blogs.query.repository';
 import { PostsRepository } from '../infrastructure/posts/posts.repository';
 import { PostsQueryRepository } from '../infrastructure/posts/posts.query.repository';
+import { UsersQueryRepository } from '../infrastructure/users/users.query.repository';
 
 const entities = [Blog, BlogOwner, BlogBan];
 
@@ -83,7 +84,11 @@ const useCases = [
 ];
 
 const repositories = [BlogsRepository, UsersRepository, PostsRepository];
-const queryRepositories = [BlogsQueryRepository, PostsQueryRepository];
+const queryRepositories = [
+  BlogsQueryRepository,
+  PostsQueryRepository,
+  UsersQueryRepository,
+];
 
 const mongooseRepositories = [
   BlogsMongooseRepository,

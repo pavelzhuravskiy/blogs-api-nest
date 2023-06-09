@@ -21,5 +21,9 @@ export class TestingController {
       `delete
        from public.blogs;`,
     );
+    await this.dataSource.query(
+      `delete
+       from public.posts;`,
+    );
   }
 }

@@ -25,7 +25,7 @@ export class UsersRepository {
       const userId = user[0].id;
 
       await this.dataSource.query(
-        `insert into public.user_bans ("userId")
+        `insert into public.user_bans_by_sa ("userId")
          values ($1);`,
         [userId],
       );
@@ -51,7 +51,7 @@ export class UsersRepository {
       const userId = user[0].id;
 
       await this.dataSource.query(
-        `insert into public.user_bans ("userId")
+        `insert into public.user_bans_by_sa ("userId")
          values ($1);`,
         [userId],
       );
@@ -287,7 +287,7 @@ export class UsersRepository {
     return result[1] === 1;
   }
 
-  async banUser(userId: number, banReason: string): Promise<boolean> {
+  async banUserBySA(userId: number, banReason: string): Promise<boolean> {
     return this.dataSource.transaction(async () => {
       await this.dataSource.query(
         `update public.users
@@ -297,7 +297,7 @@ export class UsersRepository {
       );
 
       const result = await this.dataSource.query(
-        `update public.user_bans
+        `update public.user_bans_by_sa
          set "banDate" = now(),
              "banReason"   = $2
          where "userId" = $1`,
@@ -307,7 +307,7 @@ export class UsersRepository {
     });
   }
 
-  async unbanUser(userId: number): Promise<boolean> {
+  async unbanUserBySA(userId: number): Promise<boolean> {
     return this.dataSource.transaction(async () => {
       await this.dataSource.query(
         `update public.users
@@ -317,13 +317,75 @@ export class UsersRepository {
       );
 
       const result = await this.dataSource.query(
-        `update public.user_bans
+        `update public.user_bans_by_sa
          set "banDate" = null,
              "banReason"   = null
          where "userId" = $1`,
         [userId],
       );
       return result[1] === 1;
+    });
+  }
+
+  async findUserBanForBlog(
+    userId: number,
+    blogId: number,
+  ): Promise<User[] | null> {
+    const users = await this.dataSource.query(
+      `select u.id
+       from public.users u
+                left join user_bans_by_blogger ubbb on u.id = ubbb."userId"
+       where u.id = $1
+         and u."isBannedByBlogger" = true
+         and ubbb."blogId" = $2`,
+      [userId, blogId],
+    );
+
+    if (users.length === 0) {
+      return null;
+    }
+
+    return users;
+  }
+
+  async banUserByBlogger(
+    userId: number,
+    blogId: number,
+    banReason: string,
+  ): Promise<number> {
+    return this.dataSource.transaction(async () => {
+      await this.dataSource.query(
+        `update public.users
+         set "isBannedByBlogger" = true
+         where id = $1`,
+        [userId],
+      );
+
+      const result = await this.dataSource.query(
+        `insert into user_bans_by_blogger ("userId", "blogId", "banDate", "banReason")
+         values ($1, $2, now(), $3) returning id`,
+        [userId, blogId, banReason],
+      );
+      return result[0].id;
+    });
+  }
+
+  async unbanUserByBlogger(userId: number, blogId: number): Promise<boolean> {
+    return this.dataSource.transaction(async () => {
+      await this.dataSource.query(
+        `update public.users
+         set "isBannedByBlogger" = false
+         where id = $1`,
+        [userId],
+      );
+
+      const result = await this.dataSource.query(
+        `delete
+         from public.user_bans_by_blogger
+         where "userId" = $1 and "blogId" = $2;`,
+        [userId, blogId],
+      );
+      return result[0].id;
     });
   }
 }
