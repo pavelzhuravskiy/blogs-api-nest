@@ -52,6 +52,7 @@ import { BlogsQueryRepository } from '../infrastructure/blogs/blogs.query.reposi
 import { PostsRepository } from '../infrastructure/posts/posts.repository';
 import { PostsQueryRepository } from '../infrastructure/posts/posts.query.repository';
 import { UsersQueryRepository } from '../infrastructure/users/users.query.repository';
+import { UsersGetBannedUseCase } from '../_blogger/application/use-cases/users-get-banned.use-case';
 
 const entities = [Blog, BlogOwner, BlogBan];
 
@@ -81,6 +82,7 @@ const useCases = [
   LikeUpdateForPostUseCase,
   LikeUpdateForCommentUseCase,
   BloggerUserBanUseCase,
+  UsersGetBannedUseCase,
 ];
 
 const repositories = [BlogsRepository, UsersRepository, PostsRepository];

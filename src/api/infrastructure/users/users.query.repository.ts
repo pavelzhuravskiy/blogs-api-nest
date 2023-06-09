@@ -8,7 +8,6 @@ import { filterUsers } from '../../../helpers/filters/filter-users';
 import { BloggerUserBanQueryDto } from '../../dto/users/query/blogger/blogger.user-ban.query.dto';
 import { filterUsersBannedByBlogger } from '../../../helpers/filters/filter-users-banned-by-blogger';
 import { UsersBannedByBloggerViewDto } from '../../dto/users/view/blogger/blogger.user-ban.view.dto';
-import { idIsValid } from '../../../helpers/id-is-valid';
 
 @Injectable()
 export class UsersQueryRepository {
@@ -58,12 +57,8 @@ export class UsersQueryRepository {
 
   async findUsersBannedByBlogger(
     query: BloggerUserBanQueryDto,
-    blogId: string,
+    blogId: number,
   ): Promise<Paginator<UsersBannedByBloggerViewDto[]>> {
-    if (!idIsValid(blogId)) {
-      return null;
-    }
-
     const filter = filterUsersBannedByBlogger(query.searchLoginTerm);
 
     const users = await this.dataSource.query(
@@ -144,7 +139,7 @@ export class UsersQueryRepository {
         id: u.id.toString(),
         login: u.login,
         banInfo: {
-          isBanned: u.isBanned,
+          isBanned: u.isBannedByBlogger,
           banDate: u.banDate,
           banReason: u.banReason,
         },
