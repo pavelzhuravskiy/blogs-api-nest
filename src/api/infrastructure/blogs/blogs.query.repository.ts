@@ -15,11 +15,12 @@ import { idIsValid } from '../../../helpers/id-is-valid';
 @Injectable()
 export class BlogsQueryRepository {
   constructor(@InjectDataSource() private dataSource: DataSource) {}
+
   async findBlogs(
     query: BlogQueryDto,
     role: string,
   ): Promise<Paginator<BlogViewDto[]>> {
-    const filter = filterBlogs(query.searchNameTerm);
+    const filter = filterBlogs(query.searchNameTerm, role);
 
     const blogs = await this.dataSource.query(
       `select b.id,
@@ -36,17 +37,19 @@ export class BlogsQueryRepository {
                 left join blog_owners bo on b.id = bo."blogId"
                 left join blog_bans bb on b.id = bb."blogId"
        where (b.name ilike $1)
+         and ("isBanned" = false or "isBanned" = $2)
        order by "${query.sortBy}" ${query.sortDirection}
        limit ${query.pageSize} offset (${query.pageNumber} - 1) * ${query.pageSize}`,
-      [filter],
+      [filter.nameFilter, filter.banFilter],
     );
 
     const totalCount = await this.dataSource.query(
       `select count(*)
        from public.blogs b
                 left join public.blog_owners bo on b.id = bo."blogId"
-       where (b.name ilike $1);`,
-      [filter],
+       where (b.name ilike $1)
+         and ("isBanned" = false or "isBanned" = $2);`,
+      [filter.nameFilter, filter.banFilter],
     );
 
     let items = await this.blogsMapping(blogs);
@@ -83,7 +86,7 @@ export class BlogsQueryRepository {
          and (b.name ilike $2)
        order by "${query.sortBy}" ${query.sortDirection}
        limit ${query.pageSize} offset (${query.pageNumber} - 1) * ${query.pageSize}`,
-      [userId, filter],
+      [userId, filter.nameFilter],
     );
 
     const totalCount = await this.dataSource.query(
@@ -92,7 +95,7 @@ export class BlogsQueryRepository {
                 left join public.blog_owners bo on b.id = bo."blogId"
        where (bo."ownerId" = $1)
          and (b.name ilike $2);`,
-      [userId, filter],
+      [userId, filter.nameFilter],
     );
 
     return Paginator.paginate({
@@ -109,11 +112,23 @@ export class BlogsQueryRepository {
     }
 
     const blogs = await this.dataSource.query(
-      `select id, name, description, "websiteUrl", "createdAt", "isMembership"
+      `select id,
+              name,
+              description,
+              "websiteUrl",
+              "createdAt",
+              "isMembership",
+              "isBanned"
        from public.blogs
        where id = $1`,
       [blogId],
     );
+
+    console.log(blogs);
+
+    if (blogs[0].isBanned) {
+      return null;
+    }
 
     let mappedBlogs = await this.blogsMapping(blogs);
 

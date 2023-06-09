@@ -14,7 +14,6 @@ import { Role } from '../../../enums/role.enum';
 import { BasicAuthGuard } from '../../_auth/guards/basic-auth.guard';
 import { ResultCode } from '../../../enums/result-code.enum';
 import { exceptionHandler } from '../../../exceptions/exception.handler';
-import { BlogBindCommand } from './application/use-cases/blog-bind.use-case';
 import { SABlogBanInputDto } from '../../dto/users/input/superadmin/sa.blog-ban.input.dto';
 import { SABlogBanCommand } from './application/use-cases/blog-ban.use-case';
 import { BlogsQueryRepository } from '../../infrastructure/blogs/blogs.query.repository';
@@ -33,7 +32,7 @@ export class SuperAdminBlogsController {
     return this.blogsQueryRepository.findBlogs(query, role);
   }
 
-  @UseGuards(BasicAuthGuard)
+  /*@UseGuards(BasicAuthGuard)
   @Put(':blogId/bind-with-user/:userId')
   @HttpCode(204)
   async bindBlog(@Param() params) {
@@ -46,7 +45,7 @@ export class SuperAdminBlogsController {
     }
 
     return result;
-  }
+  }*/
 
   @UseGuards(BasicAuthGuard)
   @Put(':id/ban')
