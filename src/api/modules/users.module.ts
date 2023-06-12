@@ -20,7 +20,6 @@ import {
   PostMongooseEntity,
   PostSchema,
 } from '../entities/_mongoose/post.entity';
-import { CommentsMongooseRepository } from '../infrastructure/_mongoose/comments/comments.repository';
 import {
   CommentMongooseEntity,
   CommentSchema,
@@ -50,7 +49,6 @@ const entities = [
 const mongooseRepositories = [
   UsersMongooseRepository,
   PostsMongooseRepository,
-  CommentsMongooseRepository,
   LikesRepository,
 ];
 

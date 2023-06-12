@@ -20,10 +20,6 @@ export class LikesRepository {
     @InjectModel(PostMongooseEntity.name)
     private PostModel: PostModelType,
   ) {}
-  async save(commentOrPost: CommentDocument | PostDocument) {
-    return commentOrPost.save();
-  }
-
   async findUserInLikesInfo(
     data: LikesDataType,
   ): Promise<CommentDocument | PostDocument | null> {
@@ -103,21 +99,5 @@ export class LikesRepository {
       },
     );
     return result.matchedCount === 1;
-  }
-
-  async setLikesOwnerBanStatus(
-    userId: string,
-    banStatus: boolean,
-    model: any,
-  ): Promise<boolean> {
-    const result = await model.updateMany(
-      { 'likesInfo.users.userId': userId },
-      {
-        $set: {
-          'likesInfo.users.$.isBanned': banStatus,
-        },
-      },
-    );
-    return result.acknowledged === true;
   }
 }

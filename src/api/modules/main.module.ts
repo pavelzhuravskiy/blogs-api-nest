@@ -25,8 +25,6 @@ import {
   UserMongooseEntity,
   UserSchema,
 } from '../entities/_mongoose/user.entity';
-import { CommentsMongooseRepository } from '../infrastructure/_mongoose/comments/comments.repository';
-import { CommentsMongooseQueryRepository } from '../infrastructure/_mongoose/comments/comments.query.repository';
 import { LikesService } from '../_public/likes/application/likes.service';
 import { LikesRepository } from '../infrastructure/_mongoose/likes/likes.repository';
 import { JwtService } from '@nestjs/jwt';
@@ -114,12 +112,9 @@ const queryRepositories = [
 
 const mongooseRepositories = [
   PostsMongooseRepository,
-  CommentsMongooseRepository,
   UsersMongooseRepository,
   LikesRepository,
 ];
-
-const mongooseQueryRepositories = [CommentsMongooseQueryRepository];
 
 @Module({
   imports: [
@@ -139,7 +134,6 @@ const mongooseQueryRepositories = [CommentsMongooseQueryRepository];
     ...repositories,
     ...queryRepositories,
     ...mongooseRepositories,
-    ...mongooseQueryRepositories,
     IsBlogExistConstraint,
   ],
 })
