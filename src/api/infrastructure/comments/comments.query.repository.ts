@@ -6,6 +6,7 @@ import { CommentViewDto } from '../../dto/comments/view/comment.view.dto';
 import { LikeStatus } from '../../../enums/like-status.enum';
 import { Paginator } from '../../../helpers/pagination/_paginator';
 import { CommentQueryDto } from '../../dto/comments/query/comment.query.dto';
+import { Role } from '../../../enums/role.enum';
 
 @Injectable()
 export class CommentsQueryRepository {
@@ -48,6 +49,56 @@ export class CommentsQueryRepository {
     });
   }
 
+  async findCommentsOfBloggerPosts(
+    query: CommentQueryDto,
+    userId: number,
+    role: string,
+  ): Promise<Paginator<CommentViewDto[]>> {
+    console.log(userId);
+    const comments = await this.dataSource.query(
+      `select c.id         ,
+              c.content    as "commentContent",
+              u.id         as "commentatorId",
+              u.login      as "commentatorLogin",
+              u."isBanned" as "userIsBanned",
+              c."createdAt",
+              c."postId",
+              p.title      as "postTitle",
+              p."blogId"   as "blogId",
+              b.name       as "blogName",
+              bo."ownerId" as "blogOwnerId"
+       from public.comments c
+                left join public.users u on u.id = c."commentatorId"
+                left join public.posts p on c."postId" = p.id
+                left join public.blogs b on p."blogId" = b.id
+                left join public.blog_owners bo on b.id = bo."blogId"
+       where bo."ownerId" = $1
+         and u."isBanned" = false`,
+      [userId],
+    );
+
+    console.log(comments);
+
+    const totalCount = await this.dataSource.query(
+      `select count(*)
+       from public.comments c
+                left join public.users u on u.id = c."commentatorId"
+                left join public.posts p on c."postId" = p.id
+                left join public.blogs b on p."blogId" = b.id
+                left join public.blog_owners bo on b.id = bo."blogId"
+       where bo."ownerId" = $1
+         and u."isBanned" = false;`,
+      [userId],
+    );
+
+    return Paginator.paginate({
+      pageNumber: query.pageNumber,
+      pageSize: query.pageSize,
+      totalCount: Number(totalCount[0].count),
+      items: await this.commentsMapping(comments, userId, role),
+    });
+  }
+
   async findComment(
     commentId: string | number,
     userId: number,
@@ -71,6 +122,7 @@ export class CommentsQueryRepository {
   private async commentsMapping(
     comments: any,
     userId: number,
+    role?: string,
   ): Promise<CommentViewDto[]> {
     return Promise.all(
       comments.map(async (c) => {
@@ -123,20 +175,47 @@ export class CommentsQueryRepository {
           status = findStatus[0].likeStatus;
         }
 
-        return {
-          id: c.id.toString(),
-          content: c.content,
-          commentatorInfo: {
-            userId: c.commentatorId.toString(),
-            userLogin: c.login,
-          },
-          createdAt: c.createdAt,
-          likesInfo: {
-            likesCount: Number(likesCount),
-            dislikesCount: Number(dislikesCount),
-            myStatus: status,
-          },
-        };
+        let output;
+
+        if (role === Role.Blogger) {
+          output = {
+            id: c.id.toString(),
+            content: c.commentContent,
+            commentatorInfo: {
+              userId: c.commentatorId.toString(),
+              userLogin: c.commentatorLogin,
+            },
+            createdAt: c.createdAt,
+            likesInfo: {
+              likesCount: Number(likesCount),
+              dislikesCount: Number(dislikesCount),
+              myStatus: status,
+            },
+            postInfo: {
+              id: c.postId.toString(),
+              title: c.postTitle,
+              blogId: c.blogId.toString(),
+              blogName: c.blogName,
+            },
+          };
+        } else {
+          output = {
+            id: c.id.toString(),
+            content: c.content,
+            commentatorInfo: {
+              userId: c.commentatorId.toString(),
+              userLogin: c.login,
+            },
+            createdAt: c.createdAt,
+            likesInfo: {
+              likesCount: Number(likesCount),
+              dislikesCount: Number(dislikesCount),
+              myStatus: status,
+            },
+          };
+        }
+
+        return output;
       }),
     );
   }

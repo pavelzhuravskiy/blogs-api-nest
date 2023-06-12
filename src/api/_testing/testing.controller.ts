@@ -11,19 +11,23 @@ export class TestingController {
   async deleteAll() {
     await this.dataSource.query(
       `delete
-       from public.devices;`,
-    );
-    await this.dataSource.query(
-      `delete
-       from public.users;`,
-    );
-    await this.dataSource.query(
-      `delete
        from public.blogs;`,
     );
     await this.dataSource.query(
       `delete
        from public.posts;`,
+    );
+    await this.dataSource.query(
+      `delete
+       from public.comments;`,
+    );
+    await this.dataSource.query(
+      `delete
+       from public.devices;`,
+    );
+    await this.dataSource.query(
+      `delete
+       from public.users;`,
     );
   }
 }

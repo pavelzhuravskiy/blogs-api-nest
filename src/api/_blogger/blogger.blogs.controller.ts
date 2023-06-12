@@ -27,10 +27,12 @@ import { PostInputDto } from '../dto/posts/input/post.input.dto';
 import { PostUpdateCommand } from './application/use-cases/post-update.use-case';
 import { PostCreateCommand } from './application/use-cases/post-create.use-case';
 import { PostDeleteCommand } from './application/use-cases/post-delete.use-case';
-import { CommentsMongooseQueryRepository } from '../infrastructure/_mongoose/comments/comments.query.repository';
 import { BlogsQueryRepository } from '../infrastructure/blogs/blogs.query.repository';
 import { BlogQueryDto } from '../dto/blogs/query/blog.query.dto';
 import { PostsQueryRepository } from '../infrastructure/posts/posts.query.repository';
+import { CommentQueryDto } from '../dto/comments/query/comment.query.dto';
+import { CommentsQueryRepository } from '../infrastructure/comments/comments.query.repository';
+import { Role } from '../../enums/role.enum';
 
 @Controller('blogger/blogs')
 export class BloggerBlogsController {
@@ -38,7 +40,7 @@ export class BloggerBlogsController {
     private commandBus: CommandBus,
     private readonly blogsQueryRepository: BlogsQueryRepository,
     private readonly postsQueryRepository: PostsQueryRepository,
-    private readonly commentsQueryRepository: CommentsMongooseQueryRepository,
+    private readonly commentsQueryRepository: CommentsQueryRepository,
   ) {}
 
   @UseGuards(JwtBearerGuard)
@@ -150,12 +152,17 @@ export class BloggerBlogsController {
     return result;
   }
 
-  /*@UseGuards(JwtBearerGuard)
+  @UseGuards(JwtBearerGuard)
   @Get('comments')
-  async findComments(@Query() query: QueryDto, @UserIdFromGuard() userId) {
-    return this.commentsQueryRepository.findCommentsOfBloggersPosts(
+  async findComments(
+    @Query() query: CommentQueryDto,
+    @UserIdFromGuard() userId,
+  ) {
+    const role = Role.Blogger;
+    return this.commentsQueryRepository.findCommentsOfBloggerPosts(
       query,
       userId,
+      role,
     );
-  }*/
+  }
 }
