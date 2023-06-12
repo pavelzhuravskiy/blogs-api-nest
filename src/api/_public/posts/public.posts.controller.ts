@@ -22,6 +22,7 @@ import { JwtBearerGuard } from '../../_auth/guards/jwt-bearer.guard';
 import { CommentInputDto } from '../../dto/comments/input/comment.input.dto';
 import { CommentCreateCommand } from '../comments/application/use-cases/comment-create.use-case';
 import { CommentsQueryRepository } from '../../infrastructure/comments/comments.query.repository';
+import { CommentQueryDto } from '../../dto/comments/query/comment.query.dto';
 
 @Controller('posts')
 export class PublicPostsController {
@@ -67,9 +68,9 @@ export class PublicPostsController {
     return this.commentsQueryRepository.findComment(result.response, userId);
   }
 
-  /*@Get(':id/comments')
+  @Get(':id/comments')
   async findComments(
-    @Query() query: QueryDto,
+    @Query() query: CommentQueryDto,
     @Param('id') postId,
     @UserIdFromHeaders() userId,
   ) {
@@ -84,7 +85,7 @@ export class PublicPostsController {
     }
 
     return result;
-  }*/
+  }
 
   /*@UseGuards(JwtBearerGuard)
   @Put(':id/like-status')

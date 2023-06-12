@@ -21,4 +21,14 @@ export class Comment {
 
   @CreateDateColumn({ type: 'timestamp with time zone' })
   createdAt: Date;
+
+  static checkSortingField(value: any) {
+    const c = new Comment();
+    c.id = 1;
+    c.content = '';
+    c.commentatorId = 1;
+    c.postId = 1;
+    c.createdAt = new Date();
+    return c.hasOwnProperty(value);
+  }
 }
