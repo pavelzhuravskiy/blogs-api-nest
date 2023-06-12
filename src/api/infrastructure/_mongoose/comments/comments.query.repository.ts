@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import mongoose from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import {
-  Comment,
+  CommentMongooseEntity,
   CommentLeanType,
   CommentModelType,
 } from '../../../entities/_mongoose/comment.entity';
@@ -14,9 +14,9 @@ import { LikeStatus } from '../../../../enums/like-status.enum';
 import { BloggerCommentViewDto } from '../../../dto/comments/view/blogger/blogger.comment.view.dto';
 
 @Injectable()
-export class CommentsQueryRepository {
+export class CommentsMongooseQueryRepository {
   constructor(
-    @InjectModel(Comment.name)
+    @InjectModel(CommentMongooseEntity.name)
     private CommentModel: CommentModelType,
     private postsRepository: PostsMongooseRepository,
   ) {}

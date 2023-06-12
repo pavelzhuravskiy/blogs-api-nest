@@ -6,15 +6,27 @@ import {
 } from '@nestjs/common';
 import { PublicBlogsController } from '../_public/blogs/public.blogs.controller';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Blog, BlogSchema } from '../entities/_mongoose/blog.entity';
+import {
+  BlogMongooseEntity,
+  BlogSchema,
+} from '../entities/_mongoose/blog.entity';
 import { PublicPostsController } from '../_public/posts/public.posts.controller';
 import { PostsMongooseRepository } from '../infrastructure/_mongoose/posts/posts.repository';
-import { Post, PostSchema } from '../entities/_mongoose/post.entity';
-import { Comment, CommentSchema } from '../entities/_mongoose/comment.entity';
+import {
+  PostMongooseEntity,
+  PostSchema,
+} from '../entities/_mongoose/post.entity';
+import {
+  CommentMongooseEntity,
+  CommentSchema,
+} from '../entities/_mongoose/comment.entity';
 import { UsersMongooseRepository } from '../infrastructure/_mongoose/users/users.mongoose.repository';
-import { UserMongoose, UserSchema } from '../entities/_mongoose/user.entity';
-import { CommentsRepository } from '../infrastructure/_mongoose/comments/comments.repository';
-import { CommentsQueryRepository } from '../infrastructure/_mongoose/comments/comments.query.repository';
+import {
+  UserMongooseEntity,
+  UserSchema,
+} from '../entities/_mongoose/user.entity';
+import { CommentsMongooseRepository } from '../infrastructure/_mongoose/comments/comments.repository';
+import { CommentsMongooseQueryRepository } from '../infrastructure/_mongoose/comments/comments.query.repository';
 import { LikesService } from '../_public/likes/application/likes.service';
 import { LikesRepository } from '../infrastructure/_mongoose/likes/likes.repository';
 import { JwtService } from '@nestjs/jwt';
@@ -49,8 +61,14 @@ import { PostsRepository } from '../infrastructure/posts/posts.repository';
 import { PostsQueryRepository } from '../infrastructure/posts/posts.query.repository';
 import { UsersQueryRepository } from '../infrastructure/users/users.query.repository';
 import { UsersGetBannedUseCase } from '../_blogger/application/use-cases/users-get-banned.use-case';
+import { CommentsQueryRepository } from '../infrastructure/comments/comments.query.repository';
+import { CommentsRepository } from '../infrastructure/comments/comments.repository';
+import { Blog } from '../entities/blogs/blog.entity';
+import { Post } from '../entities/posts/post.entity';
+import { Comment } from '../entities/comments/comment.entity';
+import { CommentLike } from '../entities/comments/comment-likes.entity';
 
-const entities = [Blog, BlogOwner, BlogBan];
+const entities = [Blog, BlogOwner, BlogBan, Post, Comment, CommentLike];
 
 const controllers = [
   SuperAdminBlogsController,
@@ -81,30 +99,36 @@ const useCases = [
   UsersGetBannedUseCase,
 ];
 
-const repositories = [BlogsRepository, UsersRepository, PostsRepository];
+const repositories = [
+  BlogsRepository,
+  PostsRepository,
+  UsersRepository,
+  CommentsRepository,
+];
 const queryRepositories = [
   BlogsQueryRepository,
   PostsQueryRepository,
   UsersQueryRepository,
+  CommentsQueryRepository,
 ];
 
 const mongooseRepositories = [
   PostsMongooseRepository,
-  CommentsRepository,
+  CommentsMongooseRepository,
   UsersMongooseRepository,
   LikesRepository,
 ];
 
-const mongooseQueryRepositories = [CommentsQueryRepository];
+const mongooseQueryRepositories = [CommentsMongooseQueryRepository];
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([...entities]),
     MongooseModule.forFeature([
-      { name: Blog.name, schema: BlogSchema },
-      { name: Post.name, schema: PostSchema },
-      { name: Comment.name, schema: CommentSchema },
-      { name: UserMongoose.name, schema: UserSchema },
+      { name: BlogMongooseEntity.name, schema: BlogSchema },
+      { name: PostMongooseEntity.name, schema: PostSchema },
+      { name: CommentMongooseEntity.name, schema: CommentSchema },
+      { name: UserMongooseEntity.name, schema: UserSchema },
     ]),
     CqrsModule,
   ],

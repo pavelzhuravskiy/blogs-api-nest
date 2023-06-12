@@ -27,7 +27,7 @@ import { PostInputDto } from '../dto/posts/input/post.input.dto';
 import { PostUpdateCommand } from './application/use-cases/post-update.use-case';
 import { PostCreateCommand } from './application/use-cases/post-create.use-case';
 import { PostDeleteCommand } from './application/use-cases/post-delete.use-case';
-import { CommentsQueryRepository } from '../infrastructure/_mongoose/comments/comments.query.repository';
+import { CommentsMongooseQueryRepository } from '../infrastructure/_mongoose/comments/comments.query.repository';
 import { BlogsQueryRepository } from '../infrastructure/blogs/blogs.query.repository';
 import { BlogQueryDto } from '../dto/blogs/query/blog.query.dto';
 import { PostsQueryRepository } from '../infrastructure/posts/posts.query.repository';
@@ -38,7 +38,7 @@ export class BloggerBlogsController {
     private commandBus: CommandBus,
     private readonly blogsQueryRepository: BlogsQueryRepository,
     private readonly postsQueryRepository: PostsQueryRepository,
-    private readonly commentsQueryRepository: CommentsQueryRepository,
+    private readonly commentsQueryRepository: CommentsMongooseQueryRepository,
   ) {}
 
   @UseGuards(JwtBearerGuard)

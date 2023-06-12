@@ -6,7 +6,7 @@ import {
   commentNotFound,
 } from '../../../../../exceptions/exception.constants';
 import { CommentInputDto } from '../../../../dto/comments/input/comment.input.dto';
-import { CommentsRepository } from '../../../../infrastructure/_mongoose/comments/comments.repository';
+import { CommentsMongooseRepository } from '../../../../infrastructure/_mongoose/comments/comments.repository';
 
 export class CommentUpdateCommand {
   constructor(
@@ -20,7 +20,9 @@ export class CommentUpdateCommand {
 export class CommentUpdateUseCase
   implements ICommandHandler<CommentUpdateCommand>
 {
-  constructor(private readonly commentsRepository: CommentsRepository) {}
+  constructor(
+    private readonly commentsRepository: CommentsMongooseRepository,
+  ) {}
 
   async execute(
     command: CommentUpdateCommand,

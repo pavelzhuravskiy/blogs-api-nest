@@ -1,19 +1,22 @@
-import { InjectModel } from '@nestjs/mongoose';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { LikesDataType } from '../../../../dto/likes/schemas/likes-data.type';
-import { LikesService } from '../likes.service';
 import { LikeStatusInputDto } from '../../../../dto/likes/input/like-status.input.dto';
-import { CommentsRepository } from '../../../../infrastructure/_mongoose/comments/comments.repository';
+import { CommentsRepository } from '../../../../infrastructure/comments/comments.repository';
+import { UsersRepository } from '../../../../infrastructure/users/users.repository';
+import { ResultCode } from '../../../../../enums/result-code.enum';
 import {
-  Comment,
-  CommentModelType,
-} from '../../../../entities/_mongoose/comment.entity';
+  commentIDField,
+  commentNotFound,
+  userIDField,
+  userNotFound,
+} from '../../../../../exceptions/exception.constants';
+import { ExceptionResultType } from '../../../../../exceptions/types/exception-result.type';
+import { LikeStatus } from '../../../../../enums/like-status.enum';
 
 export class LikeUpdateForCommentCommand {
   constructor(
     public likeStatusInputDto: LikeStatusInputDto,
     public commentId: string,
-    public userId: string,
+    public userId: number,
   ) {}
 }
 
@@ -22,31 +25,66 @@ export class LikeUpdateForCommentUseCase
   implements ICommandHandler<LikeUpdateForCommentCommand>
 {
   constructor(
-    @InjectModel(Comment.name)
-    private CommentModel: CommentModelType,
     private readonly commentsRepository: CommentsRepository,
-    private readonly likesService: LikesService,
+    private readonly usersRepository: UsersRepository,
   ) {}
 
-  async execute(command: LikeUpdateForCommentCommand): Promise<boolean | null> {
+  async execute(
+    command: LikeUpdateForCommentCommand,
+  ): Promise<ExceptionResultType<boolean>> {
     const comment = await this.commentsRepository.findComment(
       command.commentId,
     );
 
     if (!comment) {
-      return null;
+      return {
+        data: false,
+        code: ResultCode.NotFound,
+        field: commentIDField,
+        message: commentNotFound,
+      };
     }
 
-    const data: LikesDataType = {
-      commentOrPostId: command.commentId,
-      userId: command.userId,
-      userIsBanned: comment.commentatorInfo.isBanned,
-      likeStatus: command.likeStatusInputDto.likeStatus,
-      likesCount: comment.likesInfo.likesCount,
-      dislikesCount: comment.likesInfo.dislikesCount,
-      model: this.CommentModel,
-    };
+    const user = await this.usersRepository.findUserById(command.userId);
 
-    return this.likesService.updateLikesData(data);
+    if (!user) {
+      return {
+        data: false,
+        code: ResultCode.NotFound,
+        field: userIDField,
+        message: userNotFound,
+      };
+    }
+
+    const userCommentLikeRecord =
+      await this.commentsRepository.findUserCommentLikeRecord(
+        comment.id,
+        user.id,
+      );
+
+    if (userCommentLikeRecord) {
+      if (command.likeStatusInputDto.likeStatus === LikeStatus.None) {
+        await this.commentsRepository.deleteUserCommentLikeRecord(
+          comment.id,
+          user.id,
+        );
+      }
+      await this.commentsRepository.updateLikeStatus(
+        command.likeStatusInputDto.likeStatus,
+        comment.id,
+        user.id,
+      );
+    } else {
+      await this.commentsRepository.createUserCommentLikeRecord(
+        comment.id,
+        user.id,
+        command.likeStatusInputDto.likeStatus,
+      );
+    }
+
+    return {
+      data: true,
+      code: ResultCode.Success,
+    };
   }
 }

@@ -8,7 +8,6 @@ import {
   Put,
   UseGuards,
 } from '@nestjs/common';
-import { CommentsQueryRepository } from '../../infrastructure/_mongoose/comments/comments.query.repository';
 import { exceptionHandler } from '../../../exceptions/exception.handler';
 import { ResultCode } from '../../../enums/result-code.enum';
 import {
@@ -24,6 +23,7 @@ import { CommandBus } from '@nestjs/cqrs';
 import { CommentDeleteCommand } from './application/use-cases/comment-delete.use-case';
 import { LikeStatusInputDto } from '../../dto/likes/input/like-status.input.dto';
 import { LikeUpdateForCommentCommand } from '../likes/application/use-cases/like-update-for-comment-use.case';
+import { CommentsQueryRepository } from '../../infrastructure/comments/comments.query.repository';
 
 @Controller('comments')
 export class PublicCommentsController {
@@ -96,12 +96,8 @@ export class PublicCommentsController {
       new LikeUpdateForCommentCommand(likeStatusInputDto, commentId, userId),
     );
 
-    if (!result) {
-      return exceptionHandler(
-        ResultCode.NotFound,
-        commentNotFound,
-        commentIDField,
-      );
+    if (result.code !== ResultCode.Success) {
+      return exceptionHandler(result.code, result.message, result.field);
     }
 
     return result;

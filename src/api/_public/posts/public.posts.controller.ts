@@ -1,4 +1,12 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { exceptionHandler } from '../../../exceptions/exception.handler';
 import { ResultCode } from '../../../enums/result-code.enum';
 import {
@@ -7,9 +15,13 @@ import {
 } from '../../../exceptions/exception.constants';
 import { UserIdFromHeaders } from '../../_auth/decorators/user-id-from-headers.decorator';
 import { CommandBus } from '@nestjs/cqrs';
-import { CommentsQueryRepository } from '../../infrastructure/_mongoose/comments/comments.query.repository';
 import { PostsQueryRepository } from '../../infrastructure/posts/posts.query.repository';
 import { PostQueryDto } from '../../dto/posts/query/post.query.dto';
+import { UserIdFromGuard } from '../../_auth/decorators/user-id-from-guard.decorator';
+import { JwtBearerGuard } from '../../_auth/guards/jwt-bearer.guard';
+import { CommentInputDto } from '../../dto/comments/input/comment.input.dto';
+import { CommentCreateCommand } from '../comments/application/use-cases/comment-create.use-case';
+import { CommentsQueryRepository } from '../../infrastructure/comments/comments.query.repository';
 
 @Controller('posts')
 export class PublicPostsController {
@@ -37,7 +49,7 @@ export class PublicPostsController {
     return result;
   }
 
-  /*@UseGuards(JwtBearerGuard)
+  @UseGuards(JwtBearerGuard)
   @Post(':id/comments')
   async createComment(
     @Body() commentInputDto: CommentInputDto,
@@ -52,8 +64,8 @@ export class PublicPostsController {
       return exceptionHandler(result.code, result.message, result.field);
     }
 
-    return this.commentsQueryRepository.findComment(result.response);
-  }*/
+    return this.commentsQueryRepository.findComment(result.response, userId);
+  }
 
   /*@Get(':id/comments')
   async findComments(

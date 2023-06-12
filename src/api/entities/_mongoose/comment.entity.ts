@@ -7,8 +7,8 @@ import { PostDocument } from './post.entity';
 import { UserDocument } from './user.entity';
 import { PostInfoSchema } from '../../dto/comments/schemas/post-info.schema';
 
-export type CommentDocument = HydratedDocument<Comment>;
-export type CommentLeanType = Comment & { _id: Types.ObjectId };
+export type CommentDocument = HydratedDocument<CommentMongooseEntity>;
+export type CommentLeanType = CommentMongooseEntity & { _id: Types.ObjectId };
 
 export type CommentModelStaticType = {
   createComment: (
@@ -19,10 +19,11 @@ export type CommentModelStaticType = {
   ) => CommentDocument;
 };
 
-export type CommentModelType = Model<Comment> & CommentModelStaticType;
+export type CommentModelType = Model<CommentMongooseEntity> &
+  CommentModelStaticType;
 
 @Schema()
-export class Comment {
+export class CommentMongooseEntity {
   @Prop({ required: true })
   content: string;
 
@@ -73,14 +74,16 @@ export class Comment {
   }
 }
 
-export const CommentSchema = SchemaFactory.createForClass(Comment);
+export const CommentSchema = SchemaFactory.createForClass(
+  CommentMongooseEntity,
+);
 
 CommentSchema.methods = {
-  updateComment: Comment.prototype.updateComment,
+  updateComment: CommentMongooseEntity.prototype.updateComment,
 };
 
 const commentStaticMethods: CommentModelStaticType = {
-  createComment: Comment.createComment,
+  createComment: CommentMongooseEntity.createComment,
 };
 
 CommentSchema.statics = commentStaticMethods;

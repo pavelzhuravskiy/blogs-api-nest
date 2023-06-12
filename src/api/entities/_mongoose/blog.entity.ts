@@ -5,8 +5,8 @@ import { UserDocument } from './user.entity';
 import { BlogOwnerSchema } from '../../dto/blogs/schemas/blog-owner.schema';
 import { BlogBanInfoSchema } from '../../dto/blogs/schemas/blog-ban-info.schema';
 
-export type BlogDocument = HydratedDocument<Blog>;
-export type BlogLeanType = Blog & { _id: Types.ObjectId };
+export type BlogDocument = HydratedDocument<BlogMongooseEntity>;
+export type BlogLeanType = BlogMongooseEntity & { _id: Types.ObjectId };
 
 export type BlogModelStaticType = {
   createBlog: (
@@ -16,10 +16,10 @@ export type BlogModelStaticType = {
   ) => BlogDocument;
 };
 
-export type BlogModelType = Model<Blog> & BlogModelStaticType;
+export type BlogModelType = Model<BlogMongooseEntity> & BlogModelStaticType;
 
 @Schema()
-export class Blog {
+export class BlogMongooseEntity {
   @Prop({ required: true })
   name: string;
 
@@ -87,17 +87,17 @@ export class Blog {
   }
 }
 
-export const BlogSchema = SchemaFactory.createForClass(Blog);
+export const BlogSchema = SchemaFactory.createForClass(BlogMongooseEntity);
 
 BlogSchema.methods = {
-  updateBlog: Blog.prototype.updateBlog,
-  bindUser: Blog.prototype.bindUser,
-  banBlog: Blog.prototype.banBlog,
-  unbanBlog: Blog.prototype.unbanBlog,
+  updateBlog: BlogMongooseEntity.prototype.updateBlog,
+  bindUser: BlogMongooseEntity.prototype.bindUser,
+  banBlog: BlogMongooseEntity.prototype.banBlog,
+  unbanBlog: BlogMongooseEntity.prototype.unbanBlog,
 };
 
 const blogStaticMethods: BlogModelStaticType = {
-  createBlog: Blog.createBlog,
+  createBlog: BlogMongooseEntity.createBlog,
 };
 
 BlogSchema.statics = blogStaticMethods;

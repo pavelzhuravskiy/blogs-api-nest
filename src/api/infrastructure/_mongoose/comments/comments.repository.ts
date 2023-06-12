@@ -1,16 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import {
-  Comment,
+  CommentMongooseEntity,
   CommentDocument,
   CommentModelType,
 } from '../../../entities/_mongoose/comment.entity';
 import mongoose from 'mongoose';
 
 @Injectable()
-export class CommentsRepository {
+export class CommentsMongooseRepository {
   constructor(
-    @InjectModel(Comment.name)
+    @InjectModel(CommentMongooseEntity.name)
     private CommentModel: CommentModelType,
   ) {}
   async save(comment: CommentDocument) {

@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import {
-  Comment,
+  CommentMongooseEntity,
   CommentDocument,
   CommentModelType,
 } from '../../../entities/_mongoose/comment.entity';
 import {
-  Post,
+  PostMongooseEntity,
   PostDocument,
   PostModelType,
 } from '../../../entities/_mongoose/post.entity';
@@ -15,9 +15,9 @@ import { LikesDataType } from '../../../dto/likes/schemas/likes-data.type';
 @Injectable()
 export class LikesRepository {
   constructor(
-    @InjectModel(Comment.name)
+    @InjectModel(CommentMongooseEntity.name)
     private CommentModel: CommentModelType,
-    @InjectModel(Post.name)
+    @InjectModel(PostMongooseEntity.name)
     private PostModel: PostModelType,
   ) {}
   async save(commentOrPost: CommentDocument | PostDocument) {

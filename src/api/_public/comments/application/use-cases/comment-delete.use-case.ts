@@ -5,7 +5,7 @@ import {
   commentIDField,
   commentNotFound,
 } from '../../../../../exceptions/exception.constants';
-import { CommentsRepository } from '../../../../infrastructure/_mongoose/comments/comments.repository';
+import { CommentsMongooseRepository } from '../../../../infrastructure/_mongoose/comments/comments.repository';
 
 export class CommentDeleteCommand {
   constructor(public commentId: string, public userId: string) {}
@@ -15,7 +15,9 @@ export class CommentDeleteCommand {
 export class CommentDeleteUseCase
   implements ICommandHandler<CommentDeleteCommand>
 {
-  constructor(private readonly commentsRepository: CommentsRepository) {}
+  constructor(
+    private readonly commentsRepository: CommentsMongooseRepository,
+  ) {}
 
   async execute(
     command: CommentDeleteCommand,

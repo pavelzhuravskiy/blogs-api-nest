@@ -225,7 +225,7 @@ describe('Public blogs, posts, comments testing', () => {
       expect(post.body).toEqual(postObject);
     });
   });
-  describe.skip('Create comment', () => {
+  describe('Create comment', () => {
     // Validation errors [400]
     it(`should return 400 when trying to create comment without content`, async () => {
       const response = await agent

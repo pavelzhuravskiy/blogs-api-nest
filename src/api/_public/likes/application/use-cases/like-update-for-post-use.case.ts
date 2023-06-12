@@ -1,7 +1,7 @@
 import { InjectModel } from '@nestjs/mongoose';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import {
-  Post,
+  PostMongooseEntity,
   PostModelType,
 } from '../../../../entities/_mongoose/post.entity';
 import { PostsMongooseRepository } from '../../../../infrastructure/_mongoose/posts/posts.repository';
@@ -22,7 +22,7 @@ export class LikeUpdateForPostUseCase
   implements ICommandHandler<LikeUpdateForPostCommand>
 {
   constructor(
-    @InjectModel(Post.name)
+    @InjectModel(PostMongooseEntity.name)
     private PostModel: PostModelType,
     private readonly postsRepository: PostsMongooseRepository,
     private readonly likesService: LikesService,

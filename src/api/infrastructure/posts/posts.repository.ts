@@ -34,7 +34,7 @@ export class PostsRepository {
     }
 
     const posts = await this.dataSource.query(
-      `select id
+      `select id, "blogId"
        from public.posts
        where id = $1`,
       [postId],

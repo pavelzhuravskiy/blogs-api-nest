@@ -1,19 +1,22 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import {
-  Post,
+  PostMongooseEntity,
   PostDocument,
   PostModelType,
 } from '../../../entities/_mongoose/post.entity';
-import { Blog, BlogModelType } from '../../../entities/_mongoose/blog.entity';
+import {
+  BlogMongooseEntity,
+  BlogModelType,
+} from '../../../entities/_mongoose/blog.entity';
 import mongoose from 'mongoose';
 
 @Injectable()
 export class PostsMongooseRepository {
   constructor(
-    @InjectModel(Post.name)
+    @InjectModel(PostMongooseEntity.name)
     private PostModel: PostModelType,
-    @InjectModel(Blog.name)
+    @InjectModel(BlogMongooseEntity.name)
     private BlogModel: BlogModelType,
   ) {}
 

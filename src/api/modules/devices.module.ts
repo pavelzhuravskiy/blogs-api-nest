@@ -1,6 +1,9 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Device, DeviceSchema } from '../entities/_mongoose/device.entity';
+import {
+  DeviceMongooseEntity,
+  DeviceSchema,
+} from '../entities/_mongoose/device.entity';
 import { JwtService } from '@nestjs/jwt';
 import { PublicDevicesController } from '../_public/devices/public.devices.controller';
 import { DeviceDeleteForTerminateUseCase } from '../_public/devices/application/use-cases/device-delete-for-terminate.use-case';
@@ -14,7 +17,9 @@ const repositories = [DevicesRepository, DevicesQueryRepository];
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: Device.name, schema: DeviceSchema }]),
+    MongooseModule.forFeature([
+      { name: DeviceMongooseEntity.name, schema: DeviceSchema },
+    ]),
     CqrsModule,
   ],
   controllers: [PublicDevicesController],

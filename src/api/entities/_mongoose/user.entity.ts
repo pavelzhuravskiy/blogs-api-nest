@@ -9,8 +9,8 @@ import { UserBanSchema } from '../../dto/users/schemas/user-ban.schema';
 import { SAUserBanInputDto } from '../../dto/users/input/superadmin/sa.user-ban.input.dto';
 import { UserBanForBlogSchema } from '../../dto/users/schemas/user-ban-for-blog.schema';
 
-export type UserDocument = HydratedDocument<UserMongoose>;
-export type UserLeanType = UserMongoose & { _id: Types.ObjectId };
+export type UserDocument = HydratedDocument<UserMongooseEntity>;
+export type UserLeanType = UserMongooseEntity & { _id: Types.ObjectId };
 
 export type UserModelStaticType = {
   createUser: (
@@ -21,10 +21,10 @@ export type UserModelStaticType = {
   ) => UserDocument;
 };
 
-export type UserModelType = Model<UserMongoose> & UserModelStaticType;
+export type UserModelType = Model<UserMongooseEntity> & UserModelStaticType;
 
 @Schema()
-export class UserMongoose {
+export class UserMongooseEntity {
   @Prop({ required: true })
   accountData: UserAccountSchema;
 
@@ -127,22 +127,23 @@ export class UserMongoose {
   }
 }
 
-export const UserSchema = SchemaFactory.createForClass(UserMongoose);
+export const UserSchema = SchemaFactory.createForClass(UserMongooseEntity);
 
 UserSchema.methods = {
-  userCanBeConfirmed: UserMongoose.prototype.userCanBeConfirmed,
-  confirmUser: UserMongoose.prototype.confirmUser,
+  userCanBeConfirmed: UserMongooseEntity.prototype.userCanBeConfirmed,
+  confirmUser: UserMongooseEntity.prototype.confirmUser,
   updateEmailConfirmationData:
-    UserMongoose.prototype.updateEmailConfirmationData,
-  updatePasswordRecoveryData: UserMongoose.prototype.updatePasswordRecoveryData,
-  passwordCanBeUpdated: UserMongoose.prototype.passwordCanBeUpdated,
-  updatePassword: UserMongoose.prototype.updatePassword,
-  saBanUser: UserMongoose.prototype.saBanUser,
-  saUnbanUser: UserMongoose.prototype.saUnbanUser,
+    UserMongooseEntity.prototype.updateEmailConfirmationData,
+  updatePasswordRecoveryData:
+    UserMongooseEntity.prototype.updatePasswordRecoveryData,
+  passwordCanBeUpdated: UserMongooseEntity.prototype.passwordCanBeUpdated,
+  updatePassword: UserMongooseEntity.prototype.updatePassword,
+  saBanUser: UserMongooseEntity.prototype.saBanUser,
+  saUnbanUser: UserMongooseEntity.prototype.saUnbanUser,
 };
 
 const userStaticMethods: UserModelStaticType = {
-  createUser: UserMongoose.createUser,
+  createUser: UserMongooseEntity.createUser,
 };
 
 UserSchema.statics = userStaticMethods;

@@ -1,13 +1,5 @@
-import { InjectModel } from '@nestjs/mongoose';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { UsersMongooseRepository } from '../../../../infrastructure/_mongoose/users/users.mongoose.repository';
 import { CommentInputDto } from '../../../../dto/comments/input/comment.input.dto';
-import {
-  Comment,
-  CommentModelType,
-} from '../../../../entities/_mongoose/comment.entity';
-import { PostsMongooseRepository } from '../../../../infrastructure/_mongoose/posts/posts.repository';
-import { CommentsRepository } from '../../../../infrastructure/_mongoose/comments/comments.repository';
 import { ExceptionResultType } from '../../../../../exceptions/types/exception-result.type';
 import { ResultCode } from '../../../../../enums/result-code.enum';
 import {
@@ -17,12 +9,15 @@ import {
   userIsBanned,
   userNotFound,
 } from '../../../../../exceptions/exception.constants';
+import { PostsRepository } from '../../../../infrastructure/posts/posts.repository';
+import { UsersRepository } from '../../../../infrastructure/users/users.repository';
+import { CommentsRepository } from '../../../../infrastructure/comments/comments.repository';
 
 export class CommentCreateCommand {
   constructor(
     public commentInputDto: CommentInputDto,
     public postId: string,
-    public userId: string,
+    public userId: number,
   ) {}
 }
 
@@ -31,11 +26,9 @@ export class CommentCreateUseCase
   implements ICommandHandler<CommentCreateCommand>
 {
   constructor(
-    @InjectModel(Comment.name)
-    private CommentModel: CommentModelType,
     private readonly commentsRepository: CommentsRepository,
-    private readonly postsRepository: PostsMongooseRepository,
-    private readonly usersRepository: UsersMongooseRepository,
+    private readonly postsRepository: PostsRepository,
+    private readonly usersRepository: UsersRepository,
   ) {}
 
   async execute(
@@ -65,7 +58,7 @@ export class CommentCreateUseCase
 
     const isUserBannedByBlogger = await this.usersRepository.findUserBanForBlog(
       user.id,
-      post.blogInfo.blogId,
+      post.blogId,
     );
 
     if (isUserBannedByBlogger) {
@@ -76,18 +69,17 @@ export class CommentCreateUseCase
       };
     }
 
-    const comment = this.CommentModel.createComment(
-      this.CommentModel,
+    const commentId = await this.commentsRepository.createComment(
       command.commentInputDto,
-      post,
-      user,
+      user.id,
+      user.login,
+      post.id,
     );
 
-    await this.commentsRepository.save(comment);
     return {
       data: true,
       code: ResultCode.Success,
-      response: comment.id,
+      response: commentId,
     };
   }
 }

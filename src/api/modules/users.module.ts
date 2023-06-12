@@ -1,7 +1,10 @@
 import { Module } from '@nestjs/common';
 import { UsersMongooseRepository } from '../infrastructure/_mongoose/users/users.mongoose.repository';
 import { MongooseModule } from '@nestjs/mongoose';
-import { UserMongoose, UserSchema } from '../entities/_mongoose/user.entity';
+import {
+  UserMongooseEntity,
+  UserSchema,
+} from '../entities/_mongoose/user.entity';
 import { IsLoginExistConstraint } from '../../exceptions/decorators/unique-login.decorator';
 import { SuperAdminUsersController } from '../_superadmin/users/sa.users.controller';
 import { CqrsModule } from '@nestjs/cqrs';
@@ -9,10 +12,19 @@ import { UserCreateUseCase } from '../_superadmin/users/application/use-cases/us
 import { UserDeleteUseCase } from '../_superadmin/users/application/use-cases/user-delete.use-case';
 import { UserBanUseCase } from '../_superadmin/users/application/use-cases/user-ban.use-case';
 import { PostsMongooseRepository } from '../infrastructure/_mongoose/posts/posts.repository';
-import { Blog, BlogSchema } from '../entities/_mongoose/blog.entity';
-import { Post, PostSchema } from '../entities/_mongoose/post.entity';
-import { CommentsRepository } from '../infrastructure/_mongoose/comments/comments.repository';
-import { Comment, CommentSchema } from '../entities/_mongoose/comment.entity';
+import {
+  BlogMongooseEntity,
+  BlogSchema,
+} from '../entities/_mongoose/blog.entity';
+import {
+  PostMongooseEntity,
+  PostSchema,
+} from '../entities/_mongoose/post.entity';
+import { CommentsMongooseRepository } from '../infrastructure/_mongoose/comments/comments.repository';
+import {
+  CommentMongooseEntity,
+  CommentSchema,
+} from '../entities/_mongoose/comment.entity';
 import { LikesRepository } from '../infrastructure/_mongoose/likes/likes.repository';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from '../entities/users/user.entity';
@@ -38,7 +50,7 @@ const entities = [
 const mongooseRepositories = [
   UsersMongooseRepository,
   PostsMongooseRepository,
-  CommentsRepository,
+  CommentsMongooseRepository,
   LikesRepository,
 ];
 
@@ -52,11 +64,17 @@ const sqlRepositories = [
   imports: [
     TypeOrmModule.forFeature([...entities]),
     MongooseModule.forFeature([
-      { name: UserMongoose.name, schema: UserSchema },
+      { name: UserMongooseEntity.name, schema: UserSchema },
     ]),
-    MongooseModule.forFeature([{ name: Blog.name, schema: BlogSchema }]),
-    MongooseModule.forFeature([{ name: Post.name, schema: PostSchema }]),
-    MongooseModule.forFeature([{ name: Comment.name, schema: CommentSchema }]),
+    MongooseModule.forFeature([
+      { name: BlogMongooseEntity.name, schema: BlogSchema },
+    ]),
+    MongooseModule.forFeature([
+      { name: PostMongooseEntity.name, schema: PostSchema },
+    ]),
+    MongooseModule.forFeature([
+      { name: CommentMongooseEntity.name, schema: CommentSchema },
+    ]),
     CqrsModule,
   ],
   controllers: [SuperAdminUsersController],

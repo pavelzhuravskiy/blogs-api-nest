@@ -5,8 +5,8 @@ import { LikesInfoSchema } from '../../dto/likes/schemas/likes-info.schema';
 import { BlogDocument } from './blog.entity';
 import { BlogInfoSchema } from '../../dto/posts/schemas/blog-info.schema';
 
-export type PostDocument = HydratedDocument<Post>;
-export type PostLeanType = Post & { _id: Types.ObjectId };
+export type PostDocument = HydratedDocument<PostMongooseEntity>;
+export type PostLeanType = PostMongooseEntity & { _id: Types.ObjectId };
 
 export type PostModelStaticType = {
   createPost: (
@@ -16,10 +16,10 @@ export type PostModelStaticType = {
   ) => PostDocument;
 };
 
-export type PostModelType = Model<Post> & PostModelStaticType;
+export type PostModelType = Model<PostMongooseEntity> & PostModelStaticType;
 
 @Schema()
-export class Post {
+export class PostMongooseEntity {
   @Prop({ required: true })
   title: string;
 
@@ -72,14 +72,14 @@ export class Post {
   }
 }
 
-export const PostSchema = SchemaFactory.createForClass(Post);
+export const PostSchema = SchemaFactory.createForClass(PostMongooseEntity);
 
 PostSchema.methods = {
-  updatePost: Post.prototype.updatePost,
+  updatePost: PostMongooseEntity.prototype.updatePost,
 };
 
 const postStaticMethods: PostModelStaticType = {
-  createPost: Post.createPost,
+  createPost: PostMongooseEntity.createPost,
 };
 
 PostSchema.statics = postStaticMethods;
