@@ -5,19 +5,17 @@ import {
   commentIDField,
   commentNotFound,
 } from '../../../../../exceptions/exception.constants';
-import { CommentsMongooseRepository } from '../../../../infrastructure/_mongoose/comments/comments.repository';
+import { CommentsRepository } from '../../../../infrastructure/comments/comments.repository';
 
 export class CommentDeleteCommand {
-  constructor(public commentId: string, public userId: string) {}
+  constructor(public commentId: string, public userId: number) {}
 }
 
 @CommandHandler(CommentDeleteCommand)
 export class CommentDeleteUseCase
   implements ICommandHandler<CommentDeleteCommand>
 {
-  constructor(
-    private readonly commentsRepository: CommentsMongooseRepository,
-  ) {}
+  constructor(private readonly commentsRepository: CommentsRepository) {}
 
   async execute(
     command: CommentDeleteCommand,
@@ -35,14 +33,14 @@ export class CommentDeleteUseCase
       };
     }
 
-    if (comment.commentatorInfo.userId !== command.userId) {
+    if (comment.commentatorId !== command.userId) {
       return {
         data: false,
         code: ResultCode.Forbidden,
       };
     }
 
-    await this.commentsRepository.deleteComment(command.commentId);
+    await this.commentsRepository.deleteComment(comment.id);
 
     return {
       data: true,

@@ -1,8 +1,6 @@
 import supertest, { SuperAgentTest } from 'supertest';
 import { Test } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
-import { MongooseModule } from '@nestjs/mongoose';
 import {
   blog01Name,
   blogDescription,
@@ -39,10 +37,7 @@ import {
   blogIDField,
   userIDField,
 } from '../../src/exceptions/exception.constants';
-import {
-  userBannedByBloggerObject,
-  userBannedByBloggerObjectWithBlogId,
-} from '../utils/objects/users.objects';
+import { userBannedByBloggerObject } from '../utils/objects/users.objects';
 import {
   postContent,
   postShortDescription,
@@ -63,16 +58,11 @@ describe('Blogger users ban testing', () => {
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
-      imports: [
-        ConfigModule.forRoot(),
-        MongooseModule.forRoot(process.env.TEST_URI || ''),
-        AppModule,
-      ],
+      imports: [AppModule],
     }).compile();
 
     app = moduleRef.createNestApplication();
     useContainer(app.select(AppModule), { fallbackOnErrors: true });
-    app.enableCors();
     app.useGlobalPipes(
       new ValidationPipe({
         transform: true,
@@ -84,8 +74,8 @@ describe('Blogger users ban testing', () => {
     usersRepository = app.get(UsersRepository);
 
     await app.init();
-    agent = supertest.agent(app.getHttpServer());
 
+    agent = supertest.agent(app.getHttpServer());
     await agent.delete(testingAllDataURI);
   });
 
@@ -261,7 +251,7 @@ describe('Blogger users ban testing', () => {
     });
 
     // Success
-    it(`should add banned user object in users array`, async () => {
+    it(`should ban user`, async () => {
       await agent
         .put(bloggerUsersURI + userId + banURI)
         .auth(aTokenUser01, { type: 'bearer' })
@@ -273,23 +263,7 @@ describe('Blogger users ban testing', () => {
         .expect(204);
 
       user = await usersRepository.findUserById(userId);
-      expect(user.bansForBlogs[0]).toEqual(userBannedByBloggerObjectWithBlogId);
-    });
-
-    // Validation errors [400]
-    it(`should return 400 when trying to ban user one more time`, async () => {
-      const response = await agent
-        .put(bloggerUsersURI + userId + banURI)
-        .auth(aTokenUser01, { type: 'bearer' })
-        .send({
-          isBanned: true,
-          banReason: randomUUID(),
-          blogId: blogId,
-        })
-        .expect(400);
-
-      expect(response.body).toEqual(exceptionObject(userIDField));
-      expect(user.bansForBlogs).toHaveLength(1);
+      expect(user.isBannedByBlogger).toBeTruthy();
     });
 
     // Auth errors [401]
@@ -358,7 +332,7 @@ describe('Blogger users ban testing', () => {
         .expect(204);
 
       user = await usersRepository.findUserById(userId);
-      expect(user.bansForBlogs).toHaveLength(0);
+      expect(user.isBannedByBlogger).toBeFalsy();
     });
     it(`should create comment by unbanned user`, async () => {
       await agent

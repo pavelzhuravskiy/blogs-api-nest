@@ -51,13 +51,11 @@ import {
 } from '../utils/constants/posts.constants';
 import { postObject } from '../utils/objects/posts.objects';
 import { BlogsRepository } from '../../src/api/infrastructure/blogs/blogs.repository';
-import { PostsRepository } from '../../src/api/infrastructure/posts/posts.repository';
 
 describe('Super admin blogs testing', () => {
   let app: INestApplication;
   let agent: SuperAgentTest;
   let blogsRepository: BlogsRepository;
-  let postsRepository: PostsRepository;
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -76,7 +74,6 @@ describe('Super admin blogs testing', () => {
     app.useGlobalFilters(new HttpExceptionFilter());
 
     blogsRepository = app.get(BlogsRepository);
-    postsRepository = app.get(PostsRepository);
 
     await app.init();
 
@@ -358,15 +355,14 @@ describe('Super admin blogs testing', () => {
         .get(bloggerBlogsURI)
         .auth(aTokenUser02, { type: 'bearer' })
         .expect(200);
-      console.log(blogs.body);
 
-      /*expect(blogs.body).toEqual({
+      expect(blogs.body).toEqual({
         pagesCount: 1,
         page: 1,
         pageSize: 10,
         totalCount: 1,
         items: [blog01Object],
-      });*/
+      });
     });
     it(`should return created blogs for super admin`, async () => {
       const blogs = await agent
@@ -393,7 +389,7 @@ describe('Super admin blogs testing', () => {
         items: [],
       });
     });
-    it.skip(`should NOT return created blog by ID`, async () => {
+    it(`should NOT return created blog by ID`, async () => {
       return agent.get(publicBlogsURI + blogId).expect(404);
     });
     it(`should NOT return created posts after blog ban`, async () => {
@@ -426,7 +422,7 @@ describe('Super admin blogs testing', () => {
     });
 
     // Validation errors [400]
-    it.skip(`should return 400 when trying to ban blog one more time`, async () => {
+    it(`should return 400 when trying to ban blog one more time`, async () => {
       const response = await agent
         .put(saBlogsURI + blogId + banURI)
         .auth(basicAuthLogin, basicAuthPassword)

@@ -6,13 +6,13 @@ import {
   commentNotFound,
 } from '../../../../../exceptions/exception.constants';
 import { CommentInputDto } from '../../../../dto/comments/input/comment.input.dto';
-import { CommentsMongooseRepository } from '../../../../infrastructure/_mongoose/comments/comments.repository';
+import { CommentsRepository } from '../../../../infrastructure/comments/comments.repository';
 
 export class CommentUpdateCommand {
   constructor(
     public commentInputDto: CommentInputDto,
     public commentId: string,
-    public userId: string,
+    public userId: number,
   ) {}
 }
 
@@ -20,9 +20,7 @@ export class CommentUpdateCommand {
 export class CommentUpdateUseCase
   implements ICommandHandler<CommentUpdateCommand>
 {
-  constructor(
-    private readonly commentsRepository: CommentsMongooseRepository,
-  ) {}
+  constructor(private readonly commentsRepository: CommentsRepository) {}
 
   async execute(
     command: CommentUpdateCommand,
@@ -40,15 +38,17 @@ export class CommentUpdateUseCase
       };
     }
 
-    if (comment.commentatorInfo.userId !== command.userId) {
+    if (comment.commentatorId !== command.userId) {
       return {
         data: false,
         code: ResultCode.Forbidden,
       };
     }
 
-    await comment.updateComment(command.commentInputDto);
-    await comment.save();
+    await this.commentsRepository.updateComment(
+      command.commentInputDto,
+      comment.id,
+    );
 
     return {
       data: true,

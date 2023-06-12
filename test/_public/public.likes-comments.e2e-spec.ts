@@ -62,7 +62,6 @@ describe('Public likes for comments testing', () => {
 
     app = moduleRef.createNestApplication();
     useContainer(app.select(AppModule), { fallbackOnErrors: true });
-    app.enableCors();
     app.useGlobalPipes(
       new ValidationPipe({
         transform: true,
@@ -73,8 +72,8 @@ describe('Public likes for comments testing', () => {
     app.useGlobalFilters(new HttpExceptionFilter());
 
     await app.init();
-    agent = supertest.agent(app.getHttpServer());
 
+    agent = supertest.agent(app.getHttpServer());
     await agent.delete(testingAllDataURI);
   });
 

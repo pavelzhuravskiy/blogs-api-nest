@@ -272,7 +272,11 @@ describe('Public blogs, posts, comments testing', () => {
     // Not found errors [404]
     it(`should return 404 when trying to create comment for nonexistent post`, async () => {
       return agent
-        .get(publicPostsURI + invalidURI + publicCommentsURI)
+        .post(publicPostsURI + invalidURI + publicCommentsURI)
+        .send({
+          content: commentContent,
+        })
+        .auth(aTokenUser01, { type: 'bearer' })
         .expect(404);
     });
 
@@ -287,7 +291,7 @@ describe('Public blogs, posts, comments testing', () => {
         .expect(201);
     });
   });
-  describe.skip('Find comments', () => {
+  describe('Find comments', () => {
     // Not found errors [404]
     it(`should return 404 when trying to get nonexistent comment`, async () => {
       return agent.get(publicCommentsURI + randomUUID()).expect(404);
@@ -317,7 +321,7 @@ describe('Public blogs, posts, comments testing', () => {
       expect(comment.body).toEqual(commentObject);
     });
   });
-  describe.skip('Update comment', () => {
+  describe('Update comment', () => {
     // Auth errors [401]
     it(`should return 401 when trying to update comment with incorrect access token`, async () => {
       return agent
@@ -365,7 +369,7 @@ describe('Public blogs, posts, comments testing', () => {
       expect(check.body).toEqual(updatedCommentObject);
     });
   });
-  describe.skip('Delete comment', () => {
+  describe('Delete comment', () => {
     // Auth errors [401]
     it(`should return 401 when trying to delete comment with incorrect access token`, async () => {
       return agent

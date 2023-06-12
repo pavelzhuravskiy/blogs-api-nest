@@ -74,7 +74,7 @@ export class UsersRepository {
     }
 
     const users = await this.dataSource.query(
-      `select id, login, email, "isBanned"
+      `select id, login, email, "isBanned", "isBannedByBlogger"
        from public.users
        where id = $1`,
       [userId],

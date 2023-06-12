@@ -33,7 +33,7 @@ export class CommentsRepository {
     }
 
     const comments = await this.dataSource.query(
-      `select id
+      `select id, "commentatorId"
        from public.comments
        where id = $1;`,
       [commentId],
@@ -53,7 +53,8 @@ export class CommentsRepository {
     const comments = await this.dataSource.query(
       `select id
        from public.comment_likes
-       where "commentId" = $1 and "userId" = $2;`,
+       where "commentId" = $1
+         and "userId" = $2;`,
       [commentId, userId],
     );
 
@@ -71,7 +72,8 @@ export class CommentsRepository {
   ): Promise<number | null> {
     return this.dataSource.query(
       `insert into public.comment_likes("commentId", "userId", "likeStatus")
-         values ($1, $2, $3) returning id;`,
+       values ($1, $2, $3)
+       returning id;`,
       [commentId, userId, likeStatus],
     );
   }
@@ -83,7 +85,8 @@ export class CommentsRepository {
     const result = await this.dataSource.query(
       `delete
        from public.comment_likes
-       where "commentId" = $1 and "userId" = $2;`,
+       where "commentId" = $1
+         and "userId" = $2;`,
       [commentId, userId],
     );
     return result[1] === 1;
@@ -100,6 +103,29 @@ export class CommentsRepository {
        where "commentId" = $2
          and "userId" = $3`,
       [likeStatus, commentId, userId],
+    );
+    return result[1] === 1;
+  }
+
+  async updateComment(
+    commentInputDto: CommentInputDto,
+    commentId: number,
+  ): Promise<boolean> {
+    const result = await this.dataSource.query(
+      `update public.comments
+       set "content" = $1
+       where id = $2`,
+      [commentInputDto.content, commentId],
+    );
+    return result[1] === 1;
+  }
+
+  async deleteComment(commentId: number): Promise<boolean> {
+    const result = await this.dataSource.query(
+      `delete
+       from public.comments
+       where id = $1;`,
+      [commentId],
     );
     return result[1] === 1;
   }

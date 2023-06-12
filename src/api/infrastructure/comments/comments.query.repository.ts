@@ -54,9 +54,8 @@ export class CommentsQueryRepository {
     userId: number,
     role: string,
   ): Promise<Paginator<CommentViewDto[]>> {
-    console.log(userId);
     const comments = await this.dataSource.query(
-      `select c.id         ,
+      `select c.id,
               c.content    as "commentContent",
               u.id         as "commentatorId",
               u.login      as "commentatorLogin",
@@ -76,8 +75,6 @@ export class CommentsQueryRepository {
          and u."isBanned" = false`,
       [userId],
     );
-
-    console.log(comments);
 
     const totalCount = await this.dataSource.query(
       `select count(*)
