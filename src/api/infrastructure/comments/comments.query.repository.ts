@@ -160,7 +160,7 @@ export class CommentsQueryRepository {
 
         const findStatus = await this.dataSource.query(
           `select "likeStatus"
-           from comment_likes
+           from public.comment_likes
            where "commentId" = $1
              and "userId" = $2;`,
           [c.id, userId],

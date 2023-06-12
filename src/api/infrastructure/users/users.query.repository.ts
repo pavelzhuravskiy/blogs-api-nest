@@ -69,7 +69,7 @@ export class UsersQueryRepository {
               ubbb."banDate",
               ubbb."banReason"
        from public.users u
-                left join user_bans_by_blogger ubbb on u.id = ubbb."userId"
+                left join public.user_bans_by_blogger ubbb on u.id = ubbb."userId"
        where "blogId" = $2
          and ("isBannedByBlogger" = true)
          and (login ilike $1)
@@ -81,7 +81,7 @@ export class UsersQueryRepository {
     const totalCount = await this.dataSource.query(
       `select count(*)
        from public.users u
-                left join user_bans_by_blogger ubbb on u.id = ubbb."userId"
+                left join public.user_bans_by_blogger ubbb on u.id = ubbb."userId"
        where "blogId" = $2
          and ("isBannedByBlogger" = true)
          and (login ilike $1)`,

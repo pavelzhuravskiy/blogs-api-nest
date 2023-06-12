@@ -97,8 +97,8 @@ export class PostsQueryRepository {
               b.name as "blogName",
               b."isBanned",
               p."createdAt"
-       from posts p
-                left join blogs b on b.id = p."blogId"
+       from public.posts p
+                left join public.blogs b on b.id = p."blogId"
        where p.id = $1 and "isBanned" = false`,
       [postId],
     );

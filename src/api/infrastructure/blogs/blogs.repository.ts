@@ -48,8 +48,8 @@ export class BlogsRepository {
 
     const blogs = await this.dataSource.query(
       `select b.id, bo."ownerId", b."isBanned"
-       from blogs b
-                left join blog_owners bo on b.id = bo."blogId"
+       from public.blogs b
+                left join public.blog_owners bo on b.id = bo."blogId"
        where b.id = $1;`,
       [blogId],
     );

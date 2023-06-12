@@ -34,8 +34,8 @@ export class BlogsQueryRepository {
               bo."ownerLogin",
               bb."banDate"
        from public.blogs b
-                left join blog_owners bo on b.id = bo."blogId"
-                left join blog_bans bb on b.id = bb."blogId"
+                left join public.blog_owners bo on b.id = bo."blogId"
+                left join public.blog_bans bb on b.id = bb."blogId"
        where (b.name ilike $1)
          and ("isBanned" = false or "isBanned" = $2)
        order by "${query.sortBy}" ${query.sortDirection}
