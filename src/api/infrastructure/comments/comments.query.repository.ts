@@ -22,14 +22,36 @@ export class CommentsQueryRepository {
     }
 
     const comments = await this.dataSource.query(
-      `select c.id, content, "commentatorId", u.login, c."createdAt"
+      `select c.id,
+              content,
+              "commentatorId",
+              u.login,
+              c."createdAt",
+              ( select count("likeStatus")
+                from public.comment_likes
+                         left join public.users u
+                                   on u.id = public.comment_likes."userId"
+                where "likeStatus" = 'Like'
+                  and "commentId" = c.id
+                  and u."isBanned" = false ) as "likesCount",
+              ( select count("likeStatus")
+                from public.comment_likes
+                         left join public.users u
+                                   on u.id = public.comment_likes."userId"
+                where "likeStatus" = 'Dislike'
+                  and "commentId" = c.id
+                  and u."isBanned" = false ) as "dislikesCount",
+              ( select "likeStatus"
+                from public.comment_likes
+                where "commentId" = c.id
+                  and "userId" = $2 )        as "likeStatus"
        from public.comments c
                 left join public.users u on c."commentatorId" = u.id
        where "postId" = $1
          and "isBanned" = false
        order by "${query.sortBy}" ${query.sortDirection}
        limit ${query.pageSize} offset (${query.pageNumber} - 1) * ${query.pageSize}`,
-      [postId],
+      [postId, userId],
     );
 
     const totalCount = await this.dataSource.query(
@@ -45,7 +67,7 @@ export class CommentsQueryRepository {
       pageNumber: query.pageNumber,
       pageSize: query.pageSize,
       totalCount: Number(totalCount[0].count),
-      items: await this.commentsMapping(comments, userId),
+      items: await this.commentsMapping(comments),
     });
   }
 
@@ -65,7 +87,25 @@ export class CommentsQueryRepository {
               p.title      as "postTitle",
               p."blogId"   as "blogId",
               b.name       as "blogName",
-              bo."ownerId" as "blogOwnerId"
+              bo."ownerId" as "blogOwnerId",
+              ( select count("likeStatus")
+                from public.comment_likes
+                         left join public.users u
+                                   on u.id = public.comment_likes."userId"
+                where "likeStatus" = 'Like'
+                  and "commentId" = c.id
+                  and u."isBanned" = false ) as "likesCount",
+              ( select count("likeStatus")
+                from public.comment_likes
+                         left join public.users u
+                                   on u.id = public.comment_likes."userId"
+                where "likeStatus" = 'Dislike'
+                  and "commentId" = c.id
+                  and u."isBanned" = false ) as "dislikesCount",
+              ( select "likeStatus"
+                from public.comment_likes
+                where "commentId" = c.id
+                  and "userId" = $1 )        as "likeStatus"
        from public.comments c
                 left join public.users u on u.id = c."commentatorId"
                 left join public.posts p on c."postId" = p.id
@@ -92,7 +132,7 @@ export class CommentsQueryRepository {
       pageNumber: query.pageNumber,
       pageSize: query.pageSize,
       totalCount: Number(totalCount[0].count),
-      items: await this.commentsMapping(comments, userId, role),
+      items: await this.commentsMapping(comments, role),
     });
   }
 
@@ -105,115 +145,85 @@ export class CommentsQueryRepository {
     }
 
     const comments = await this.dataSource.query(
-      `select c.id, content, "commentatorId", u.login, c."createdAt"
+      `select c.id,
+              content,
+              "commentatorId",
+              u.login,
+              c."createdAt",
+              ( select count("likeStatus")
+                from public.comment_likes
+                         left join public.users u
+                                   on u.id = public.comment_likes."userId"
+                where "likeStatus" = 'Like'
+                  and "commentId" = c.id
+                  and u."isBanned" = false ) as "likesCount",
+              ( select count("likeStatus")
+                from public.comment_likes
+                         left join public.users u
+                                   on u.id = public.comment_likes."userId"
+                where "likeStatus" = 'Dislike'
+                  and "commentId" = c.id
+                  and u."isBanned" = false ) as "dislikesCount",
+              ( select "likeStatus"
+                from public.comment_likes
+                where "commentId" = c.id
+                  and "userId" = $2 )        as "likeStatus"
        from public.comments c
                 left join public.users u on c."commentatorId" = u.id
        where c.id = $1`,
-      [commentId],
+      [commentId, userId],
     );
 
-    const mappedComments = await this.commentsMapping(comments, userId);
+    const mappedComments = await this.commentsMapping(comments);
     return mappedComments[0];
   }
 
   private async commentsMapping(
     comments: any,
-    userId: number,
     role?: string,
   ): Promise<CommentViewDto[]> {
-    return Promise.all(
-      comments.map(async (c) => {
-        const likesCounter = await this.dataSource.query(
-          `select "commentId",
-                  ( select count("likeStatus")
-                    from public.comment_likes
-                             left join public.users u
-                                       on u.id = public.comment_likes."userId"
-                    where "likeStatus" = 'Like'
-                      and "commentId" = $1
-                      and u."isBanned" = false )  as "likesCount",
-                  ( select count("likeStatus")
-                    from public.comment_likes
-                             left join public.users u2
-                                       on u2.id = public.comment_likes."userId"
-                    where "likeStatus" = 'Dislike'
-                      and "commentId" = $1
-                      and u2."isBanned" = false ) as "dislikesCount"
-           from public.comment_likes
-           where "commentId" = $1
-           group by "commentId"`,
-          [c.id],
-        );
+    return comments.map((c) => {
+      let output;
 
-        let likesCount;
-        let dislikesCount;
+      if (role === Role.Blogger) {
+        output = {
+          id: c.id.toString(),
+          content: c.commentContent,
+          commentatorInfo: {
+            userId: c.commentatorId.toString(),
+            userLogin: c.commentatorLogin,
+          },
+          createdAt: c.createdAt,
+          likesInfo: {
+            likesCount: Number(c.likesCount),
+            dislikesCount: Number(c.dislikesCount),
+            myStatus: c.likeStatus || LikeStatus.None,
+          },
+          postInfo: {
+            id: c.postId.toString(),
+            title: c.postTitle,
+            blogId: c.blogId.toString(),
+            blogName: c.blogName,
+          },
+        };
+      } else {
+        output = {
+          id: c.id.toString(),
+          content: c.content,
+          commentatorInfo: {
+            userId: c.commentatorId.toString(),
+            userLogin: c.login,
+          },
+          createdAt: c.createdAt,
+          likesInfo: {
+            likesCount: Number(c.likesCount),
+            dislikesCount: Number(c.dislikesCount),
+            myStatus: c.likeStatus || LikeStatus.None,
+          },
+        };
+      }
 
-        if (likesCounter.length === 0) {
-          likesCount = 0;
-          dislikesCount = 0;
-        } else {
-          likesCount = likesCounter[0].likesCount;
-          dislikesCount = likesCounter[0].dislikesCount;
-        }
-
-        let status;
-
-        const findStatus = await this.dataSource.query(
-          `select "likeStatus"
-           from public.comment_likes
-           where "commentId" = $1
-             and "userId" = $2;`,
-          [c.id, userId],
-        );
-
-        if (findStatus.length === 0) {
-          status = LikeStatus.None;
-        } else {
-          status = findStatus[0].likeStatus;
-        }
-
-        let output;
-
-        if (role === Role.Blogger) {
-          output = {
-            id: c.id.toString(),
-            content: c.commentContent,
-            commentatorInfo: {
-              userId: c.commentatorId.toString(),
-              userLogin: c.commentatorLogin,
-            },
-            createdAt: c.createdAt,
-            likesInfo: {
-              likesCount: Number(likesCount),
-              dislikesCount: Number(dislikesCount),
-              myStatus: status,
-            },
-            postInfo: {
-              id: c.postId.toString(),
-              title: c.postTitle,
-              blogId: c.blogId.toString(),
-              blogName: c.blogName,
-            },
-          };
-        } else {
-          output = {
-            id: c.id.toString(),
-            content: c.content,
-            commentatorInfo: {
-              userId: c.commentatorId.toString(),
-              userLogin: c.login,
-            },
-            createdAt: c.createdAt,
-            likesInfo: {
-              likesCount: Number(likesCount),
-              dislikesCount: Number(dislikesCount),
-              myStatus: status,
-            },
-          };
-        }
-
-        return output;
-      }),
-    );
+      return output;
+    });
   }
 }

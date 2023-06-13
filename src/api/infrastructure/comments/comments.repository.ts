@@ -78,20 +78,6 @@ export class CommentsRepository {
     );
   }
 
-  async deleteUserCommentLikeRecord(
-    commentId: number,
-    userId: number,
-  ): Promise<boolean> {
-    const result = await this.dataSource.query(
-      `delete
-       from public.comment_likes
-       where "commentId" = $1
-         and "userId" = $2;`,
-      [commentId, userId],
-    );
-    return result[1] === 1;
-  }
-
   async updateLikeStatus(
     likeStatus: string,
     commentId: number,

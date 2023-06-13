@@ -10,7 +10,6 @@ import {
   userNotFound,
 } from '../../../../../exceptions/exception.constants';
 import { ExceptionResultType } from '../../../../../exceptions/types/exception-result.type';
-import { LikeStatus } from '../../../../../enums/like-status.enum';
 
 export class LikeUpdateForCommentCommand {
   constructor(
@@ -63,12 +62,6 @@ export class LikeUpdateForCommentUseCase
       );
 
     if (userCommentLikeRecord) {
-      if (command.likeStatusInputDto.likeStatus === LikeStatus.None) {
-        await this.commentsRepository.deleteUserCommentLikeRecord(
-          comment.id,
-          user.id,
-        );
-      }
       await this.commentsRepository.updateLikeStatus(
         command.likeStatusInputDto.likeStatus,
         comment.id,
