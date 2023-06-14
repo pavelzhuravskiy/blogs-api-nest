@@ -3,9 +3,9 @@ import { PostViewDto } from '../../dto/posts/view/post.view.dto';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { LikeStatus } from '../../../enums/like-status.enum';
-import { Paginator } from '../../../helpers/_paginator';
 import { PostQueryDto } from '../../dto/posts/query/post.query.dto';
 import { idIsValid } from '../../../helpers/id-is-valid';
+import { Paginator } from '../../../helpers/paginator';
 
 @Injectable()
 export class PostsQueryRepository {
@@ -15,6 +15,7 @@ export class PostsQueryRepository {
     query: PostQueryDto,
     userId: number,
   ): Promise<Paginator<PostViewDto[]>> {
+    console.log(query.sortBy);
     const posts = await this.dataSource.query(
       `select p.id,
               p.title,

@@ -4,7 +4,7 @@ import { DataSource } from 'typeorm';
 import { idIsValid } from '../../../helpers/id-is-valid';
 import { CommentViewDto } from '../../dto/comments/view/comment.view.dto';
 import { LikeStatus } from '../../../enums/like-status.enum';
-import { Paginator } from '../../../helpers/_paginator';
+import { Paginator } from '../../../helpers/paginator';
 import { CommentQueryDto } from '../../dto/comments/query/comment.query.dto';
 import { Role } from '../../../enums/role.enum';
 
