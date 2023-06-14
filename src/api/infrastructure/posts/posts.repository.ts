@@ -72,4 +72,51 @@ export class PostsRepository {
     );
     return result[1] === 1;
   }
+
+  async findUserPostLikeRecord(
+    postId: number,
+    userId: number,
+  ): Promise<number | null> {
+    const posts = await this.dataSource.query(
+      `select id
+       from public.post_likes
+       where "postId" = $1
+         and "userId" = $2;`,
+      [postId, userId],
+    );
+
+    if (posts.length === 0) {
+      return null;
+    }
+
+    return posts[0];
+  }
+
+  async updateLikeStatus(
+    likeStatus: string,
+    postId: number,
+    userId: number,
+  ): Promise<boolean> {
+    const result = await this.dataSource.query(
+      `update public.post_likes
+       set "likeStatus" = $1
+       where "postId" = $2
+         and "userId" = $3`,
+      [likeStatus, postId, userId],
+    );
+    return result[1] === 1;
+  }
+
+  async createUserPostLikeRecord(
+    postId: number,
+    userId: number,
+    likeStatus: string,
+  ): Promise<number | null> {
+    return this.dataSource.query(
+      `insert into public.post_likes("addedAt", "postId", "userId", "likeStatus")
+       values (now(), $1, $2, $3)
+       returning id;`,
+      [postId, userId, likeStatus],
+    );
+  }
 }

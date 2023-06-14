@@ -2,8 +2,10 @@ import {
   Body,
   Controller,
   Get,
+  HttpCode,
   Param,
   Post,
+  Put,
   Query,
   UseGuards,
 } from '@nestjs/common';
@@ -23,6 +25,8 @@ import { CommentInputDto } from '../../dto/comments/input/comment.input.dto';
 import { CommentCreateCommand } from '../comments/application/use-cases/comment-create.use-case';
 import { CommentsQueryRepository } from '../../infrastructure/comments/comments.query.repository';
 import { CommentQueryDto } from '../../dto/comments/query/comment.query.dto';
+import { LikeStatusInputDto } from '../../dto/likes/input/like-status.input.dto';
+import { LikeUpdateForPostCommand } from '../likes/application/use-cases/like-update-for-post-use.case';
 
 @Controller('posts')
 export class PublicPostsController {
@@ -34,14 +38,12 @@ export class PublicPostsController {
 
   @Get()
   async findPosts(@Query() query: PostQueryDto, @UserIdFromHeaders() userId) {
-    return this.postsQueryRepository.findPosts(query /*, userId*/);
+    return this.postsQueryRepository.findPosts(query, userId);
   }
 
   @Get(':id')
   async findPost(@Param('id') postId, @UserIdFromHeaders() userId) {
-    const result = await this.postsQueryRepository.findPost(
-      postId /*, userId*/,
-    );
+    const result = await this.postsQueryRepository.findPost(postId, userId);
 
     if (!result) {
       return exceptionHandler(ResultCode.NotFound, postNotFound, postIDField);
@@ -87,7 +89,7 @@ export class PublicPostsController {
     return result;
   }
 
-  /*@UseGuards(JwtBearerGuard)
+  @UseGuards(JwtBearerGuard)
   @Put(':id/like-status')
   @HttpCode(204)
   async updateLikeStatus(
@@ -104,5 +106,5 @@ export class PublicPostsController {
     }
 
     return result;
-  }*/
+  }
 }

@@ -15,16 +15,14 @@ export class CommentsRepository {
     userLogin: string,
     postId: number,
   ): Promise<number> {
-    return this.dataSource.transaction(async () => {
-      const comment = await this.dataSource.query(
-        `insert into public.comments(content, "commentatorId", "postId")
+    const comment = await this.dataSource.query(
+      `insert into public.comments(content, "commentatorId", "postId")
          values ($1, $2, $3)
          returning id;`,
-        [commentInputDto.content, userId, postId],
-      );
+      [commentInputDto.content, userId, postId],
+    );
 
-      return comment[0].id;
-    });
+    return comment[0].id;
   }
 
   async findComment(commentId: string): Promise<Comment | null> {

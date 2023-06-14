@@ -1,8 +1,6 @@
 import supertest, { SuperAgentTest } from 'supertest';
 import { Test } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
-import { MongooseModule } from '@nestjs/mongoose';
 import {
   blog01Name,
   blogDescription,
@@ -49,16 +47,11 @@ describe('Public likes for posts testing', () => {
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
-      imports: [
-        ConfigModule.forRoot(),
-        MongooseModule.forRoot(process.env.TEST_URI || ''),
-        AppModule,
-      ],
+      imports: [AppModule],
     }).compile();
 
     app = moduleRef.createNestApplication();
     useContainer(app.select(AppModule), { fallbackOnErrors: true });
-    app.enableCors();
     app.useGlobalPipes(
       new ValidationPipe({
         transform: true,
@@ -69,8 +62,8 @@ describe('Public likes for posts testing', () => {
     app.useGlobalFilters(new HttpExceptionFilter());
 
     await app.init();
-    agent = supertest.agent(app.getHttpServer());
 
+    agent = supertest.agent(app.getHttpServer());
     await agent.delete(testingAllDataURI);
   });
 

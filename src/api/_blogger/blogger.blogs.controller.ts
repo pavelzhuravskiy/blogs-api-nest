@@ -115,7 +115,7 @@ export class BloggerBlogsController {
       return exceptionHandler(result.code, result.message, result.field);
     }
 
-    return this.postsQueryRepository.findPost(result.response);
+    return this.postsQueryRepository.findPost(result.response, userId);
   }
 
   @UseGuards(JwtBearerGuard)

@@ -64,9 +64,18 @@ import { CommentsRepository } from '../infrastructure/comments/comments.reposito
 import { Blog } from '../entities/blogs/blog.entity';
 import { Post } from '../entities/posts/post.entity';
 import { Comment } from '../entities/comments/comment.entity';
-import { CommentLike } from '../entities/comments/comment-likes.entity';
+import { CommentLike } from '../entities/comments/comment-like.entity';
+import { PostLike } from '../entities/posts/post-like.entity';
 
-const entities = [Blog, BlogOwner, BlogBan, Post, Comment, CommentLike];
+const entities = [
+  Blog,
+  BlogOwner,
+  BlogBan,
+  Post,
+  PostLike,
+  Comment,
+  CommentLike,
+];
 
 const controllers = [
   SuperAdminBlogsController,

@@ -1,19 +1,19 @@
-import { InjectModel } from '@nestjs/mongoose';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import {
-  PostMongooseEntity,
-  PostModelType,
-} from '../../../../entities/_mongoose/post.entity';
-import { PostsMongooseRepository } from '../../../../infrastructure/_mongoose/posts/posts.repository';
-import { LikesDataType } from '../../../../dto/likes/schemas/likes-data.type';
-import { LikesService } from '../likes.service';
 import { LikeStatusInputDto } from '../../../../dto/likes/input/like-status.input.dto';
+import { PostsRepository } from '../../../../infrastructure/posts/posts.repository';
+import { ExceptionResultType } from '../../../../../exceptions/types/exception-result.type';
+import { ResultCode } from '../../../../../enums/result-code.enum';
+import {
+  userIDField,
+  userNotFound,
+} from '../../../../../exceptions/exception.constants';
+import { UsersRepository } from '../../../../infrastructure/users/users.repository';
 
 export class LikeUpdateForPostCommand {
   constructor(
     public likeStatusInputDto: LikeStatusInputDto,
     public postId: string,
-    public userId: string,
+    public userId: number,
   ) {}
 }
 
@@ -22,29 +22,50 @@ export class LikeUpdateForPostUseCase
   implements ICommandHandler<LikeUpdateForPostCommand>
 {
   constructor(
-    @InjectModel(PostMongooseEntity.name)
-    private PostModel: PostModelType,
-    private readonly postsRepository: PostsMongooseRepository,
-    private readonly likesService: LikesService,
+    private readonly postsRepository: PostsRepository,
+    private readonly usersRepository: UsersRepository,
   ) {}
 
-  async execute(command: LikeUpdateForPostCommand): Promise<boolean | null> {
+  async execute(
+    command: LikeUpdateForPostCommand,
+  ): Promise<ExceptionResultType<boolean>> {
     const post = await this.postsRepository.findPost(command.postId);
 
     if (!post) {
       return null;
     }
 
-    const data: LikesDataType = {
-      commentOrPostId: command.postId,
-      userId: command.userId,
-      userIsBanned: post.blogInfo.blogOwnerIsBanned,
-      likeStatus: command.likeStatusInputDto.likeStatus,
-      likesCount: post.likesInfo.likesCount,
-      dislikesCount: post.likesInfo.dislikesCount,
-      model: this.PostModel,
-    };
+    const user = await this.usersRepository.findUserById(command.userId);
 
-    return this.likesService.updateLikesData(data);
+    if (!user) {
+      return {
+        data: false,
+        code: ResultCode.NotFound,
+        field: userIDField,
+        message: userNotFound,
+      };
+    }
+
+    const userPostLikeRecord =
+      await this.postsRepository.findUserPostLikeRecord(post.id, user.id);
+
+    if (userPostLikeRecord) {
+      await this.postsRepository.updateLikeStatus(
+        command.likeStatusInputDto.likeStatus,
+        post.id,
+        user.id,
+      );
+    } else {
+      await this.postsRepository.createUserPostLikeRecord(
+        post.id,
+        user.id,
+        command.likeStatusInputDto.likeStatus,
+      );
+    }
+
+    return {
+      data: true,
+      code: ResultCode.Success,
+    };
   }
 }
