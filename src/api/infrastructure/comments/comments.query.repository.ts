@@ -4,7 +4,7 @@ import { DataSource } from 'typeorm';
 import { idIsValid } from '../../../helpers/id-is-valid';
 import { CommentViewDto } from '../../dto/comments/view/comment.view.dto';
 import { LikeStatus } from '../../../enums/like-status.enum';
-import { Paginator } from '../../../helpers/pagination/_paginator';
+import { Paginator } from '../../../helpers/_paginator';
 import { CommentQueryDto } from '../../dto/comments/query/comment.query.dto';
 import { Role } from '../../../enums/role.enum';
 
@@ -170,7 +170,8 @@ export class CommentsQueryRepository {
                   and "userId" = $2 )        as "likeStatus"
        from public.comments c
                 left join public.users u on c."commentatorId" = u.id
-       where c.id = $1`,
+       where c.id = $1
+         and "isBanned" = false`,
       [commentId, userId],
     );
 

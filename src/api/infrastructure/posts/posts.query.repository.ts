@@ -3,7 +3,7 @@ import { PostViewDto } from '../../dto/posts/view/post.view.dto';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { LikeStatus } from '../../../enums/like-status.enum';
-import { Paginator } from '../../../helpers/pagination/_paginator';
+import { Paginator } from '../../../helpers/_paginator';
 import { PostQueryDto } from '../../dto/posts/query/post.query.dto';
 import { idIsValid } from '../../../helpers/id-is-valid';
 

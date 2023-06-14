@@ -3,7 +3,7 @@ import { SuperAdminUserViewDto } from '../../dto/users/view/superadmin/sa.user.v
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { UserQueryDto } from '../../dto/users/query/user-query.dto';
-import { Paginator } from '../../../helpers/pagination/_paginator';
+import { Paginator } from '../../../helpers/_paginator';
 import { filterUsers } from '../../../helpers/filters/filter-users';
 import { BloggerUserBanQueryDto } from '../../dto/users/query/blogger/blogger.user-ban.query.dto';
 import { filterUsersBannedByBlogger } from '../../../helpers/filters/filter-users-banned-by-blogger';

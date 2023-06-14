@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { BlogViewDto } from '../../dto/blogs/view/blog.view.dto';
-import { Paginator } from '../../../helpers/pagination/_paginator';
+import { Paginator } from '../../../helpers/_paginator';
 import { BlogQueryDto } from '../../dto/blogs/query/blog.query.dto';
 import { filterBlogs } from '../../../helpers/filters/filter-blogs';
 import { Role } from '../../../enums/role.enum';

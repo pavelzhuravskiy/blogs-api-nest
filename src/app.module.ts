@@ -3,7 +3,6 @@ export const configModule = ConfigModule.forRoot();
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from './api/_auth/auth.module';
 import { UsersModule } from './api/modules/users.module';
 import { MainModule } from './api/modules/main.module';
@@ -17,7 +16,6 @@ import * as process from 'process';
 @Module({
   imports: [
     configModule,
-    MongooseModule.forRoot(process.env.MONGO_URI || ''),
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.PGHOST,

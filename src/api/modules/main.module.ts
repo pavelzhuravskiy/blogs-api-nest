@@ -5,28 +5,7 @@ import {
   RequestMethod,
 } from '@nestjs/common';
 import { PublicBlogsController } from '../_public/blogs/public.blogs.controller';
-import { MongooseModule } from '@nestjs/mongoose';
-import {
-  BlogMongooseEntity,
-  BlogSchema,
-} from '../entities/_mongoose/blog.entity';
 import { PublicPostsController } from '../_public/posts/public.posts.controller';
-import { PostsMongooseRepository } from '../infrastructure/_mongoose/posts/posts.repository';
-import {
-  PostMongooseEntity,
-  PostSchema,
-} from '../entities/_mongoose/post.entity';
-import {
-  CommentMongooseEntity,
-  CommentSchema,
-} from '../entities/_mongoose/comment.entity';
-import { UsersMongooseRepository } from '../infrastructure/_mongoose/users/users.mongoose.repository';
-import {
-  UserMongooseEntity,
-  UserSchema,
-} from '../entities/_mongoose/user.entity';
-import { LikesService } from '../_public/likes/application/likes.service';
-import { LikesRepository } from '../infrastructure/_mongoose/likes/likes.repository';
 import { JwtService } from '@nestjs/jwt';
 import { TokenParserMiddleware } from '../../middlewares/token-parser.middleware';
 import { IsBlogExistConstraint } from '../../exceptions/decorators/blog-exists.decorator';
@@ -86,7 +65,7 @@ const controllers = [
   PublicCommentsController,
 ];
 
-const services = [LikesService, JwtService];
+const services = [JwtService];
 
 const useCases = [
   BlogBanUseCase,
@@ -119,30 +98,14 @@ const queryRepositories = [
   CommentsQueryRepository,
 ];
 
-const mongooseRepositories = [
-  PostsMongooseRepository,
-  UsersMongooseRepository,
-  LikesRepository,
-];
-
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([...entities]),
-    MongooseModule.forFeature([
-      { name: BlogMongooseEntity.name, schema: BlogSchema },
-      { name: PostMongooseEntity.name, schema: PostSchema },
-      { name: CommentMongooseEntity.name, schema: CommentSchema },
-      { name: UserMongooseEntity.name, schema: UserSchema },
-    ]),
-    CqrsModule,
-  ],
+  imports: [TypeOrmModule.forFeature([...entities]), CqrsModule],
   controllers: [...controllers],
   providers: [
     ...services,
     ...useCases,
     ...repositories,
     ...queryRepositories,
-    ...mongooseRepositories,
     IsBlogExistConstraint,
   ],
 })
