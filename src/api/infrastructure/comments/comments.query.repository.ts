@@ -78,16 +78,16 @@ export class CommentsQueryRepository {
   ): Promise<Paginator<CommentViewDto[]>> {
     const comments = await this.dataSource.query(
       `select c.id,
-              c.content    as "commentContent",
-              u.id         as "commentatorId",
-              u.login      as "commentatorLogin",
-              u."isBanned" as "userIsBanned",
+              c.content                      as "commentContent",
+              u.id                           as "commentatorId",
+              u.login                        as "commentatorLogin",
+              u."isBanned"                   as "userIsBanned",
               c."createdAt",
               c."postId",
-              p.title      as "postTitle",
-              p."blogId"   as "blogId",
-              b.name       as "blogName",
-              bo."ownerId" as "blogOwnerId",
+              p.title                        as "postTitle",
+              p."blogId"                     as "blogId",
+              b.name                         as "blogName",
+              bo."ownerId"                   as "blogOwnerId",
               ( select count("likeStatus")
                 from public.comment_likes
                          left join public.users u
@@ -112,7 +112,9 @@ export class CommentsQueryRepository {
                 left join public.blogs b on p."blogId" = b.id
                 left join public.blog_owners bo on b.id = bo."blogId"
        where bo."ownerId" = $1
-         and u."isBanned" = false`,
+         and u."isBanned" = false
+       order by "${query.sortBy}" ${query.sortDirection}
+       limit ${query.pageSize} offset (${query.pageNumber} - 1) * ${query.pageSize}`,
       [userId],
     );
 
@@ -190,21 +192,21 @@ export class CommentsQueryRepository {
         output = {
           id: c.id.toString(),
           content: c.commentContent,
+          createdAt: c.createdAt,
           commentatorInfo: {
             userId: c.commentatorId.toString(),
             userLogin: c.commentatorLogin,
           },
-          createdAt: c.createdAt,
           likesInfo: {
             likesCount: Number(c.likesCount),
             dislikesCount: Number(c.dislikesCount),
             myStatus: c.likeStatus || LikeStatus.None,
           },
           postInfo: {
-            id: c.postId.toString(),
-            title: c.postTitle,
             blogId: c.blogId.toString(),
             blogName: c.blogName,
+            title: c.postTitle,
+            id: c.postId.toString(),
           },
         };
       } else {
