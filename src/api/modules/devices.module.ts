@@ -7,10 +7,11 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { DevicesRepository } from '../infrastructure/devices/devices.repository';
 import { DevicesQueryRepository } from '../infrastructure/devices/devices.query.repository';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Device } from '../entities/devices/device.entity';
 
 const useCases = [DeviceDeleteForTerminateUseCase, DevicesDeleteOldUseCase];
-const entities = [Device];
+const entities = [
+  /*Device*/
+];
 const repositories = [DevicesRepository, DevicesQueryRepository];
 
 @Module({

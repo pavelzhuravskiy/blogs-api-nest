@@ -2,8 +2,11 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { UserBanBySA } from './user-ban-by-sa.entity';
 
 @Entity()
 export class User {
@@ -22,11 +25,12 @@ export class User {
   @CreateDateColumn({ type: 'timestamp with time zone' })
   createdAt: Date;
 
-  @Column({ type: 'boolean' })
+  @Column({ type: 'bool' })
   isConfirmed: boolean;
 
-  @Column({ type: 'boolean' })
-  isBanned: boolean;
+  @OneToOne(() => UserBanBySA, { cascade: true, onDelete: 'CASCADE' })
+  @JoinColumn()
+  userBanBySA: UserBanBySA;
 
   static checkSortingField(value: any) {
     const u = new User();
@@ -34,7 +38,6 @@ export class User {
     u.login = '';
     u.email = '';
     u.createdAt = new Date();
-    u.isBanned = false;
     return u.hasOwnProperty(value);
   }
 }

@@ -1,8 +1,5 @@
-import supertest, { SuperAgentTest } from 'supertest';
-import { Test } from '@nestjs/testing';
+import { SuperAgentTest } from 'supertest';
 import { INestApplication } from '@nestjs/common';
-import { testingAllDataURI } from '../utils/constants/testing.constants';
-import { AppModule } from '../../src/app.module';
 import {
   saUsersURI,
   user01Email,
@@ -21,25 +18,19 @@ import {
   publicRefreshTokenURI,
 } from '../utils/constants/auth.constants';
 import { randomUUID } from 'crypto';
-import cookieParser from 'cookie-parser';
 import { deviceObject, userProfileObject } from '../utils/objects/auth.objects';
 import { invalidURI } from '../utils/constants/common.constants';
 import { sleep } from '../utils/functions/sleep';
+import { getAppAndClearDb } from '../utils/functions/get-app';
 
 describe('Public login, logout, devices testing', () => {
   let app: INestApplication;
   let agent: SuperAgentTest;
 
   beforeAll(async () => {
-    const moduleRef = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile();
-    app = moduleRef.createNestApplication();
-    app.use(cookieParser());
-    await app.init();
-
-    agent = supertest.agent(app.getHttpServer());
-    await agent.delete(testingAllDataURI);
+    const data = await getAppAndClearDb();
+    app = data.app;
+    agent = data.agent;
   });
 
   let aTokenUser01;

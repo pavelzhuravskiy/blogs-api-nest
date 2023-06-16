@@ -6,24 +6,21 @@ import { UserCreateUseCase } from '../_superadmin/users/application/use-cases/us
 import { UserDeleteUseCase } from '../_superadmin/users/application/use-cases/user-delete.use-case';
 import { UserBanUseCase } from '../_superadmin/users/application/use-cases/user-ban.use-case';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from '../entities/users/user.entity';
-import { UserEmailConfirmation } from '../entities/users/user-email-confirmation.entity';
-import { UserPasswordRecovery } from '../entities/users/user-password-recovery.entity';
-import { UserBanBySA } from '../entities/users/user-ban-by-sa.entity';
 import { UsersRepository } from '../infrastructure/users/users.repository';
 import { IsEmailExistConstraint } from '../../exceptions/decorators/unique-email.decorator';
 import { UsersQueryRepository } from '../infrastructure/users/users.query.repository';
 import { DevicesRepository } from '../infrastructure/devices/devices.repository';
-import { UserBanByBlogger } from '../entities/users/user-ban-by-blogger.entity';
+import { User } from '../entities/users/user.entity';
+import { UserBanBySA } from '../entities/users/user-ban-by-sa.entity';
 
 const useCases = [UserCreateUseCase, UserDeleteUseCase, UserBanUseCase];
 
 const entities = [
   User,
-  UserEmailConfirmation,
-  UserPasswordRecovery,
+  // UserEmailConfirmation,
+  // UserPasswordRecovery,
   UserBanBySA,
-  UserBanByBlogger,
+  // UserBanByBlogger,
 ];
 
 const sqlRepositories = [

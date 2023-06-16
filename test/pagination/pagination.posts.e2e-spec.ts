@@ -1,8 +1,5 @@
-import supertest, { SuperAgentTest } from 'supertest';
-import { Test } from '@nestjs/testing';
-import { INestApplication, ValidationPipe } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
-import { MongooseModule } from '@nestjs/mongoose';
+import { SuperAgentTest } from 'supertest';
+import { INestApplication } from '@nestjs/common';
 import {
   blog01Name,
   blogDescription,
@@ -10,11 +7,6 @@ import {
   blogWebsite,
   publicBlogsURI,
 } from '../utils/constants/blogs.constants';
-import { testingAllDataURI } from '../utils/constants/testing.constants';
-import { customExceptionFactory } from '../../src/exceptions/exception.factory';
-import { HttpExceptionFilter } from '../../src/exceptions/exception.filter';
-import { AppModule } from '../../src/app.module';
-import { useContainer } from 'class-validator';
 import {
   postContent,
   postShortDescription,
@@ -32,36 +24,16 @@ import {
   basicAuthPassword,
   publicLoginUri,
 } from '../utils/constants/auth.constants';
+import { getAppAndClearDb } from '../utils/functions/get-app';
 
 describe('Posts filtering, sorting, pagination', () => {
   let app: INestApplication;
   let agent: SuperAgentTest;
 
   beforeAll(async () => {
-    const moduleRef = await Test.createTestingModule({
-      imports: [
-        ConfigModule.forRoot(),
-        MongooseModule.forRoot(process.env.TEST_URI || ''),
-        AppModule,
-      ],
-    }).compile();
-
-    app = moduleRef.createNestApplication();
-    useContainer(app.select(AppModule), { fallbackOnErrors: true });
-    app.enableCors();
-    app.useGlobalPipes(
-      new ValidationPipe({
-        transform: true,
-        stopAtFirstError: true,
-        exceptionFactory: customExceptionFactory,
-      }),
-    );
-    app.useGlobalFilters(new HttpExceptionFilter());
-
-    await app.init();
-    agent = supertest.agent(app.getHttpServer());
-
-    await agent.delete(testingAllDataURI);
+    const data = await getAppAndClearDb();
+    app = data.app;
+    agent = data.agent;
   });
 
   let aTokenUser01;

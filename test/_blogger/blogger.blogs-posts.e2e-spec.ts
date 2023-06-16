@@ -1,6 +1,5 @@
-import supertest, { SuperAgentTest } from 'supertest';
-import { Test } from '@nestjs/testing';
-import { INestApplication, ValidationPipe } from '@nestjs/common';
+import { SuperAgentTest } from 'supertest';
+import { INestApplication } from '@nestjs/common';
 import {
   blog01Name,
   blog02Name,
@@ -12,7 +11,6 @@ import {
   blogWebsite,
   publicBlogsURI,
 } from '../utils/constants/blogs.constants';
-import { testingAllDataURI } from '../utils/constants/testing.constants';
 import {
   invalidURI,
   longString1013,
@@ -21,8 +19,6 @@ import {
   longString39,
   longString508,
 } from '../utils/constants/common.constants';
-import { customExceptionFactory } from '../../src/exceptions/exception.factory';
-import { HttpExceptionFilter } from '../../src/exceptions/exception.filter';
 import { exceptionObject } from '../utils/objects/common.objects';
 import {
   contentField,
@@ -32,7 +28,6 @@ import {
   titleField,
   urlField,
 } from '../utils/constants/exceptions.constants';
-import { AppModule } from '../../src/app.module';
 import {
   saUsersURI,
   user01Email,
@@ -46,7 +41,6 @@ import {
   basicAuthPassword,
   publicLoginUri,
 } from '../utils/constants/auth.constants';
-import { useContainer } from 'class-validator';
 import { randomUUID } from 'crypto';
 import {
   blog01Object,
@@ -63,30 +57,16 @@ import {
   publicPostsURI,
 } from '../utils/constants/posts.constants';
 import { postObject, updatedPostObject } from '../utils/objects/posts.objects';
+import { getAppAndClearDb } from '../utils/functions/get-app';
 
 describe('Blogger blogs and posts testing', () => {
   let app: INestApplication;
   let agent: SuperAgentTest;
 
   beforeAll(async () => {
-    const moduleRef = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile();
-
-    app = moduleRef.createNestApplication();
-    useContainer(app.select(AppModule), { fallbackOnErrors: true });
-    app.useGlobalPipes(
-      new ValidationPipe({
-        transform: true,
-        stopAtFirstError: true,
-        exceptionFactory: customExceptionFactory,
-      }),
-    );
-    app.useGlobalFilters(new HttpExceptionFilter());
-    await app.init();
-
-    agent = supertest.agent(app.getHttpServer());
-    await agent.delete(testingAllDataURI);
+    const data = await getAppAndClearDb();
+    app = data.app;
+    agent = data.agent;
   });
 
   let blog01Id;

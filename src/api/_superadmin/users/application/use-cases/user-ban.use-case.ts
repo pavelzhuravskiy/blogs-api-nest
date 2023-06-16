@@ -40,7 +40,7 @@ export class UserBanUseCase implements ICommandHandler<SAUserBanCommand> {
       };
     }
 
-    const banDBStatus = user.isBanned;
+    const banDBStatus = `user.isBanned`;
 
     if (banDBStatus && command.saUserBanInputDto.isBanned) {
       return {

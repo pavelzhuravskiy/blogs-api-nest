@@ -1,12 +1,5 @@
-import supertest, { SuperAgentTest } from 'supertest';
-import { Test } from '@nestjs/testing';
-import { INestApplication, ValidationPipe } from '@nestjs/common';
-
-import { useContainer } from 'class-validator';
-import { AppModule } from '../../src/app.module';
-import { customExceptionFactory } from '../../src/exceptions/exception.factory';
-import { HttpExceptionFilter } from '../../src/exceptions/exception.filter';
-import { testingAllDataURI } from '../utils/constants/testing.constants';
+import { SuperAgentTest } from 'supertest';
+import { INestApplication } from '@nestjs/common';
 import {
   banURI,
   saUsersURI,
@@ -51,6 +44,7 @@ import {
 } from '../utils/constants/posts.constants';
 import { postObject } from '../utils/objects/posts.objects';
 import { BlogsRepository } from '../../src/api/infrastructure/blogs/blogs.repository';
+import { getAppAndClearDb } from '../utils/functions/get-app';
 
 describe('Super admin blogs testing', () => {
   let app: INestApplication;
@@ -58,27 +52,10 @@ describe('Super admin blogs testing', () => {
   let blogsRepository: BlogsRepository;
 
   beforeAll(async () => {
-    const moduleRef = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile();
-
-    app = moduleRef.createNestApplication();
-    useContainer(app.select(AppModule), { fallbackOnErrors: true });
-    app.useGlobalPipes(
-      new ValidationPipe({
-        transform: true,
-        stopAtFirstError: true,
-        exceptionFactory: customExceptionFactory,
-      }),
-    );
-    app.useGlobalFilters(new HttpExceptionFilter());
-
+    const data = await getAppAndClearDb();
+    app = data.app;
+    agent = data.agent;
     blogsRepository = app.get(BlogsRepository);
-
-    await app.init();
-
-    agent = supertest.agent(app.getHttpServer());
-    await agent.delete(testingAllDataURI);
   });
 
   let aTokenUser01;

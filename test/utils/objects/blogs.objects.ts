@@ -1,11 +1,11 @@
 import {
-  blogDescription,
   blog01Name,
+  blog02Name,
+  blogDescription,
   blogUpdatedDescription,
   blogUpdatedName,
   blogUpdatedWebsite,
   blogWebsite,
-  blog02Name,
 } from '../constants/blogs.constants';
 
 export const blog01Object = {

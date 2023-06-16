@@ -1,12 +1,12 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity()
 export class UserBanBySA {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryColumn({ type: 'integer' })
+  userId: number;
 
-  @Column({ type: 'integer' })
-  userId: number; // FK 🔑
+  @Column({ type: 'bool' })
+  isBanned: boolean;
 
   @Column({ type: 'timestamp with time zone', nullable: true })
   banDate: Date | null;
