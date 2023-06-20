@@ -39,6 +39,7 @@ export class SuperAdminUsersController {
     const userId = await this.commandBus.execute(
       new UserCreateCommand(userInputDto),
     );
+    // console.log(`controller ${userId}`);
     return this.usersQueryRepository.findUserById(userId);
   }
 

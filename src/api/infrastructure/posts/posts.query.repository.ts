@@ -62,6 +62,8 @@ export class PostsQueryRepository {
       [userId],
     );
 
+    console.log(posts);
+
     const totalCount = await this.dataSource.query(
       `select count(*)
        from public.posts p

@@ -1,37 +1,32 @@
 import { Injectable } from '@nestjs/common';
 import { UserInputDto } from '../../dto/users/input/user-input.dto';
-import { InjectDataSource } from '@nestjs/typeorm';
-import { DataSource } from 'typeorm';
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
+import { DataSource, EntityManager, Repository } from 'typeorm';
 import { User } from '../../entities/users/user.entity';
 import { uuidIsValid } from '../../../helpers/uuid-is-valid';
 import { UserPasswordRecovery } from '../../entities/users/user-password-recovery.entity';
 import { UserEmailConfirmation } from '../../entities/users/user-email-confirmation.entity';
 import { idIsValid } from '../../../helpers/id-is-valid';
+import { UserBanBySA } from '../../entities/users/user-ban-by-sa.entity';
 
 @Injectable()
 export class UsersRepository {
-  constructor(@InjectDataSource() private dataSource: DataSource) {}
+  constructor(
+    @InjectRepository(User) private readonly userRepository: Repository<User>,
+    @InjectRepository(UserBanBySA)
+    private readonly userBanBySARepository: Repository<UserBanBySA>,
+    @InjectDataSource() private dataSource: DataSource,
+  ) {}
 
-  async createUser(userInputDto: UserInputDto, hash: string): Promise<number> {
-    return this.dataSource.transaction(async () => {
-      const user = await this.dataSource.query(
-        `insert into public.users (login, "passwordHash", email, "isConfirmed",
-                                   "isBanned")
-         values ($1, $2, $3, $4, $5)
-         returning id;`,
-        [userInputDto.login, hash, userInputDto.email, true, false],
-      );
+  async save(user: User, queryRunnerManager: EntityManager): Promise<User> {
+    return queryRunnerManager.save(user);
+  }
 
-      const userId = user[0].id;
-
-      await this.dataSource.query(
-        `insert into public.user_bans_by_sa ("userId")
-         values ($1);`,
-        [userId],
-      );
-
-      return userId;
-    });
+  async createUserBanRecord(
+    userBanBySA: UserBanBySA,
+    manager: EntityManager,
+  ): Promise<UserBanBySA> {
+    return manager.save(userBanBySA);
   }
 
   async registerUser(

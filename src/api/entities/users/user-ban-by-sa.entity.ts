@@ -1,16 +1,33 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { User } from './user.entity';
 
-@Entity()
+@Entity('user_bans_by_sa')
 export class UserBanBySA {
-  @PrimaryColumn({ type: 'integer' })
-  userId: number;
+  @PrimaryGeneratedColumn()
+  id: number;
 
-  @Column({ type: 'bool' })
+  @Column({ name: 'is_banned', type: 'bool' })
   isBanned: boolean;
 
-  @Column({ type: 'timestamp with time zone', nullable: true })
+  @Column({
+    name: 'ban_date',
+    type: 'timestamp with time zone',
+    nullable: true,
+  })
   banDate: Date | null;
 
-  @Column({ type: 'varchar', nullable: true })
+  @Column({ name: 'ban_reason', type: 'varchar', nullable: true })
   banReason: string | null;
+
+  @OneToOne(() => User, (user) => user.userBanBySA, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn()
+  user: User;
 }

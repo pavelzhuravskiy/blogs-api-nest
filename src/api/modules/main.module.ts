@@ -38,6 +38,7 @@ import { UsersQueryRepository } from '../infrastructure/users/users.query.reposi
 import { UsersGetBannedUseCase } from '../_blogger/application/use-cases/users-get-banned.use-case';
 import { CommentsQueryRepository } from '../infrastructure/comments/comments.query.repository';
 import { CommentsRepository } from '../infrastructure/comments/comments.repository';
+import { UsersModule } from './users.module';
 
 const entities = [
   // Blog,
@@ -92,7 +93,7 @@ const queryRepositories = [
 ];
 
 @Module({
-  imports: [TypeOrmModule.forFeature([...entities]), CqrsModule],
+  imports: [TypeOrmModule.forFeature([...entities]), UsersModule, CqrsModule],
   controllers: [...controllers],
   providers: [
     ...services,

@@ -2,13 +2,12 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  JoinColumn,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { UserBanBySA } from './user-ban-by-sa.entity';
 
-@Entity()
+@Entity('users')
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
@@ -16,28 +15,27 @@ export class User {
   @Column({ type: 'varchar', width: 10, unique: true })
   login: string;
 
-  @Column({ type: 'varchar' })
+  @Column({ name: 'password_hash', type: 'varchar' })
   passwordHash: string;
 
   @Column({ type: 'varchar', unique: true })
   email: string;
 
-  @CreateDateColumn({ type: 'timestamp with time zone' })
+  @CreateDateColumn({ name: 'created_at', type: 'timestamp with time zone' })
   createdAt: Date;
 
-  @Column({ type: 'bool' })
+  @Column({ name: 'is_confirmed', type: 'bool' })
   isConfirmed: boolean;
 
-  @OneToOne(() => UserBanBySA, { cascade: true, onDelete: 'CASCADE' })
-  @JoinColumn()
+  @OneToOne(() => UserBanBySA, (userBanBySA) => userBanBySA.user)
   userBanBySA: UserBanBySA;
 
-  static checkSortingField(value: any) {
+  /*static checkSortingField(value: any) {
     const u = new User();
     u.id = 1;
     u.login = '';
     u.email = '';
     u.createdAt = new Date();
     return u.hasOwnProperty(value);
-  }
+  }*/
 }

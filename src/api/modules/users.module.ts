@@ -23,20 +23,17 @@ const entities = [
   // UserBanByBlogger,
 ];
 
-const sqlRepositories = [
-  UsersRepository,
-  UsersQueryRepository,
-  DevicesRepository,
-];
+const repositories = [UsersRepository, UsersQueryRepository, DevicesRepository];
 
 @Module({
   imports: [TypeOrmModule.forFeature([...entities]), CqrsModule],
   controllers: [SuperAdminUsersController],
   providers: [
     ...useCases,
-    ...sqlRepositories,
+    ...repositories,
     IsLoginExistConstraint,
     IsEmailExistConstraint,
   ],
+  exports: [TypeOrmModule],
 })
 export class UsersModule {}

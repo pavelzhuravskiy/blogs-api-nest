@@ -21,6 +21,9 @@ import { ValidateLoginAndPasswordUseCase } from '../_auth/application/use-cases/
 import { TokensCreateUseCase } from '../_auth/application/use-cases/tokens/tokens-create.use-case';
 import { UsersRepository } from '../infrastructure/users/users.repository';
 import { DevicesRepository } from '../infrastructure/devices/devices.repository';
+import { Repository } from 'typeorm';
+import { User } from '../entities/users/user.entity';
+import { UsersModule } from './users.module';
 
 const services = [JwtService];
 
@@ -39,6 +42,7 @@ const useCases = [
 ];
 
 const repositories = [UsersRepository, DevicesRepository];
+const typeORMRepositories = [Repository<User>];
 
 const strategies = [
   BasicStrategy,
@@ -55,8 +59,15 @@ const strategies = [
     }),
     CqrsModule,
     PassportModule,
+    UsersModule,
   ],
   controllers: [PublicAuthController],
-  providers: [...services, ...useCases, ...repositories, ...strategies],
+  providers: [
+    ...services,
+    ...useCases,
+    ...repositories,
+    ...typeORMRepositories,
+    ...strategies,
+  ],
 })
 export class AuthModule {}
