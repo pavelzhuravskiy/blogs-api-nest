@@ -18,15 +18,31 @@ export class UsersRepository {
     @InjectDataSource() private dataSource: DataSource,
   ) {}
 
-  async save(user: User, queryRunnerManager: EntityManager): Promise<User> {
-    return queryRunnerManager.save(user);
+  async save(
+    entity: User | UserBanBySA,
+    queryRunnerManager: EntityManager,
+  ): Promise<User | UserBanBySA> {
+    return queryRunnerManager.save(entity);
   }
 
-  async createUserBanRecord(
-    userBanBySA: UserBanBySA,
-    manager: EntityManager,
-  ): Promise<UserBanBySA> {
-    return manager.save(userBanBySA);
+  async findExistingLogin(login: string): Promise<User | null> {
+    const user = await this.userRepository.findOneBy({ login: login });
+
+    if (!user) {
+      return null;
+    }
+
+    return user;
+  }
+
+  async findExistingEmail(email: string): Promise<User | null> {
+    const user = await this.userRepository.findOneBy({ email: email });
+
+    if (!user) {
+      return null;
+    }
+
+    return user;
   }
 
   async registerUser(
@@ -95,36 +111,6 @@ export class UsersRepository {
     }
 
     return users[0];
-  }
-
-  async findExistingLogin(login: string): Promise<User[] | null> {
-    const users = await this.dataSource.query(
-      `select id
-       from public.users
-       where login = $1`,
-      [login],
-    );
-
-    if (users.length === 0) {
-      return null;
-    }
-
-    return users;
-  }
-
-  async findExistingEmail(email: string): Promise<User[] | null> {
-    const users = await this.dataSource.query(
-      `select id
-       from public.users
-       where email = $1`,
-      [email],
-    );
-
-    if (users.length === 0) {
-      return null;
-    }
-
-    return users;
   }
 
   async findUserForLoginValidation(loginOrEmail: string): Promise<User | null> {

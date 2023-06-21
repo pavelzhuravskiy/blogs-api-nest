@@ -42,10 +42,7 @@ export class UserCreateUseCase implements ICommandHandler<UserCreateCommand> {
       const userBanBySA = new UserBanBySA();
       userBanBySA.user = user;
       userBanBySA.isBanned = false;
-      await this.usersRepository.createUserBanRecord(
-        userBanBySA,
-        queryRunnerManager,
-      );
+      await this.usersRepository.save(userBanBySA, queryRunnerManager);
 
       // Commit transaction
       await queryRunner.commitTransaction();

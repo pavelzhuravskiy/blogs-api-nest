@@ -3,15 +3,15 @@ import { Transform } from 'class-transformer';
 export class QueryDto {
   @Transform(({ value }) => {
     if (value.toLowerCase() === 'asc') {
-      return value;
+      return 'ASC';
     } else {
-      return 'desc';
+      return 'DESC';
     }
   })
-  sortDirection = 'desc';
+  sortDirection: 'ASC' | 'DESC' = 'DESC';
 
   @Transform(({ value }) => {
-    if (!isNaN(Number(value))) {
+    if (Number(value)) {
       return Number(value);
     } else {
       return 1;
@@ -20,7 +20,7 @@ export class QueryDto {
   pageNumber = 1;
 
   @Transform(({ value }) => {
-    if (!isNaN(Number(value))) {
+    if (Number(value)) {
       return Number(value);
     } else {
       return 10;

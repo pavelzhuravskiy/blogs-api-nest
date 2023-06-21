@@ -4,7 +4,6 @@ import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 import { UserQueryDto } from '../../dto/users/query/user-query.dto';
 import { Paginator } from '../../../helpers/paginator';
-import { filterUsers } from '../../../helpers/filters/filter-users';
 import { BloggerUserBanQueryDto } from '../../dto/users/query/blogger/blogger.user-ban.query.dto';
 import { filterUsersBannedByBlogger } from '../../../helpers/filters/filter-users-banned-by-blogger';
 import { UsersBannedByBloggerViewDto } from '../../dto/users/view/blogger/blogger.user-ban.view.dto';
@@ -19,12 +18,6 @@ export class UsersQueryRepository {
 
   async findUserById(userId: number): Promise<SuperAdminUserViewDto> {
     const users = await this.userRepository.find({
-      select: {
-        id: true,
-        login: true,
-        email: true,
-        createdAt: true,
-      },
       where: {
         id: userId,
       },
@@ -40,41 +33,61 @@ export class UsersQueryRepository {
   async findUsers(
     query: UserQueryDto,
   ): Promise<Paginator<SuperAdminUserViewDto[]>> {
-    const filter = filterUsers(
-      query.banStatus,
-      query.searchLoginTerm,
-      query.searchEmailTerm,
-    );
+    const users = await this.userRepository
+      .createQueryBuilder('u')
+      .where(
+        `${
+          query.banStatus === true || query.banStatus === false
+            ? 'ubsa.isBanned = :banStatus'
+            : 'ubsa.isBanned is not null'
+        }`,
+        { banStatus: query.banStatus },
+      )
+      .andWhere(
+        `${
+          query.searchLoginTerm || query.searchEmailTerm
+            ? `(u.login ilike :loginTerm OR u.email ilike :emailTerm)`
+            : 'u.login is not null'
+        }`,
+        {
+          loginTerm: `%${query.searchLoginTerm}%`,
+          emailTerm: `%${query.searchEmailTerm}%`,
+        },
+      )
+      .leftJoinAndSelect('u.userBanBySA', 'ubsa')
+      .orderBy(`u.${query.sortBy}`, query.sortDirection)
+      .skip((query.pageNumber - 1) * query.pageSize)
+      .take(query.pageSize)
+      .getMany();
 
-    const users = await this.dataSource.query(
-      `select u.id,
-              u.login,
-              u.email,
-              u."createdAt",
-              u."isBanned",
-              ub."banDate",
-              ub."banReason"
-       from public.users u
-                left join public.user_bans_by_sa ub on u.id = ub."userId"
-       where ("isBanned" = $1 or "isBanned" = $2)
-         and (login ilike $3 or email ilike $4)
-       order by "${query.sortBy}" ${query.sortDirection}
-       limit ${query.pageSize} offset (${query.pageNumber} - 1) * ${query.pageSize}`,
-      [filter.banStatus01, filter.banStatus02, filter.login, filter.email],
-    );
-
-    const totalCount = await this.dataSource.query(
-      `select count(*)
-       from public.users
-       where ("isBanned" = $1 or "isBanned" = $2)
-         and (login ilike $3 or email ilike $4);`,
-      [filter.banStatus01, filter.banStatus02, filter.login, filter.email],
-    );
+    const totalCount = await this.userRepository
+      .createQueryBuilder('u')
+      .where(
+        `${
+          query.banStatus === true || query.banStatus === false
+            ? 'ubsa.isBanned = :banStatus'
+            : 'ubsa.isBanned is not null'
+        }`,
+        { banStatus: query.banStatus },
+      )
+      .andWhere(
+        `${
+          query.searchLoginTerm || query.searchEmailTerm
+            ? `(u.login ilike :loginTerm OR u.email ilike :emailTerm)`
+            : 'u.login is not null'
+        }`,
+        {
+          loginTerm: `%${query.searchLoginTerm}%`,
+          emailTerm: `%${query.searchEmailTerm}%`,
+        },
+      )
+      .leftJoinAndSelect('u.userBanBySA', 'ubsa')
+      .getCount();
 
     return Paginator.paginate({
       pageNumber: query.pageNumber,
       pageSize: query.pageSize,
-      totalCount: Number(totalCount[0].count),
+      totalCount: totalCount,
       items: await this.usersMapping(users),
     });
   }

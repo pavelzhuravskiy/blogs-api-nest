@@ -30,12 +30,12 @@ export class User {
   @OneToOne(() => UserBanBySA, (userBanBySA) => userBanBySA.user)
   userBanBySA: UserBanBySA;
 
-  /*static checkSortingField(value: any) {
+  static checkSortingField(value: any) {
     const u = new User();
     u.id = 1;
     u.login = '';
     u.email = '';
     u.createdAt = new Date();
     return u.hasOwnProperty(value);
-  }*/
+  }
 }
