@@ -4,8 +4,8 @@ import { PublicDevicesController } from '../_public/devices/public.devices.contr
 import { DeviceDeleteForTerminateUseCase } from '../_public/devices/application/use-cases/device-delete-for-terminate.use-case';
 import { DevicesDeleteOldUseCase } from '../_public/devices/application/use-cases/devices-delete-old.use-case';
 import { CqrsModule } from '@nestjs/cqrs';
-import { DevicesRepository } from '../infrastructure/devices/devices.repository';
-import { DevicesQueryRepository } from '../infrastructure/devices/devices.query.repository';
+import { DevicesRepository } from '../infrastructure/repositories/devices/devices.repository';
+import { DevicesQueryRepository } from '../infrastructure/repositories/devices/devices.query.repository';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 const useCases = [DeviceDeleteForTerminateUseCase, DevicesDeleteOldUseCase];

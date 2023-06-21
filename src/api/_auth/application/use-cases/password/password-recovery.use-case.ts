@@ -1,8 +1,8 @@
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { randomUUID } from 'crypto';
 import { EmailInputDto } from '../../../dto/email.input.dto';
-import { SendPasswordRecoveryMailCommand } from '../../../../../mail/application/use-cases/send-pass-recovery-mail.use-case';
-import { UsersRepository } from '../../../../infrastructure/users/users.repository';
+import { SendPasswordRecoveryMailCommand } from '../../../../infrastructure/mail/application/use-cases/send-pass-recovery-mail.use-case';
+import { UsersRepository } from '../../../../infrastructure/repositories/users/users.repository';
 
 export class PasswordRecoveryCommand {
   constructor(public emailInputDto: EmailInputDto) {}

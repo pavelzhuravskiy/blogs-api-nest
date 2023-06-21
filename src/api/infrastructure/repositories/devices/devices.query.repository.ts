@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { DeviceViewDto } from '../../dto/devices/view/device.view.dto';
+import { DeviceViewDto } from '../../../dto/devices/view/device.view.dto';
 
 @Injectable()
 export class DevicesQueryRepository {

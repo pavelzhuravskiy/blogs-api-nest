@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { PostViewDto } from '../../dto/posts/view/post.view.dto';
+import { PostViewDto } from '../../../dto/posts/view/post.view.dto';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { LikeStatus } from '../../../enums/like-status.enum';
-import { PostQueryDto } from '../../dto/posts/query/post.query.dto';
-import { idIsValid } from '../../../helpers/id-is-valid';
-import { Paginator } from '../../../helpers/paginator';
+import { LikeStatus } from '../../../../enums/like-status.enum';
+import { PostQueryDto } from '../../../dto/posts/query/post.query.dto';
+import { idIsValid } from '../../../../helpers/id-is-valid';
+import { Paginator } from '../../../../helpers/paginator';
 
 @Injectable()
 export class PostsQueryRepository {

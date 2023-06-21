@@ -9,9 +9,9 @@ import {
   userIsBanned,
   userNotFound,
 } from '../../../../../exceptions/exception.constants';
-import { PostsRepository } from '../../../../infrastructure/posts/posts.repository';
-import { UsersRepository } from '../../../../infrastructure/users/users.repository';
-import { CommentsRepository } from '../../../../infrastructure/comments/comments.repository';
+import { PostsRepository } from '../../../../infrastructure/repositories/posts/posts.repository';
+import { UsersRepository } from '../../../../infrastructure/repositories/users/users.repository';
+import { CommentsRepository } from '../../../../infrastructure/repositories/comments/comments.repository';
 
 export class CommentCreateCommand {
   constructor(

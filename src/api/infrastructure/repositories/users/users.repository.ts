@@ -1,12 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { UserInputDto } from '../../dto/users/input/user-input.dto';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { DataSource, EntityManager, Repository } from 'typeorm';
-import { User } from '../../entities/users/user.entity';
-import { uuidIsValid } from '../../../helpers/uuid-is-valid';
-import { UserPasswordRecovery } from '../../entities/users/user-password-recovery.entity';
-import { UserEmailConfirmation } from '../../entities/users/user-email-confirmation.entity';
-import { UserBanBySA } from '../../entities/users/user-ban-by-sa.entity';
+import { User } from '../../../entities/users/user.entity';
+import { uuidIsValid } from '../../../../helpers/uuid-is-valid';
+import { UserPasswordRecovery } from '../../../entities/users/user-password-recovery.entity';
+import { UserEmailConfirmation } from '../../../entities/users/user-email-confirmation.entity';
+import { UserBanBySA } from '../../../entities/users/user-ban-by-sa.entity';
 
 @Injectable()
 export class UsersRepository {
@@ -17,46 +16,54 @@ export class UsersRepository {
     @InjectDataSource() private dataSource: DataSource,
   ) {}
 
-  // ***** TypeORM SAVE *****
+  // ***** TypeORM query runner transaction SAVE *****
 
-  async save(
-    entity: User | UserBanBySA,
+  async queryRunnerSave(
+    entity: User | UserBanBySA | UserEmailConfirmation,
     queryRunnerManager: EntityManager,
-  ): Promise<User | UserBanBySA> {
+  ): Promise<User | UserBanBySA | UserEmailConfirmation> {
     return queryRunnerManager.save(entity);
   }
 
-  // ***** Unique login and email check *****
+  // ***** TypeORM data source manager SAVE *****
 
-  async findExistingLogin(login: string): Promise<User | null> {
-    const user = await this.userRepository.findOneBy({ login: login });
-
-    if (!user) {
-      return null;
-    }
-
-    return user;
+  async dataSourceSave(
+    entity: UserEmailConfirmation,
+  ): Promise<UserEmailConfirmation> {
+    return this.dataSource.manager.save(entity);
   }
 
-  async findExistingEmail(email: string): Promise<User | null> {
-    const user = await this.userRepository.findOneBy({ email: email });
+  // ***** Unique login and email checks *****
 
-    if (!user) {
-      return null;
-    }
-
-    return user;
+  async checkLogin(login: string): Promise<User | null> {
+    return this.userRepository.findOneBy({ login: login });
   }
 
-  // ***** Find operations *****
+  async checkEmail(email: string): Promise<User | null> {
+    return this.userRepository.findOneBy({ email: email });
+  }
 
-  async findUserById(userId: number): Promise<User> {
-    return this.userRepository.findOneBy({ id: userId });
+  // ***** Find user operations *****
+
+  async findUserById(userId: number): Promise<User | null> {
+    try {
+      return await this.userRepository.findOneBy({ id: userId });
+    } catch (e) {
+      console.log(e);
+      return null;
+    }
+  }
+
+  async findUserForEmailResend(email: string): Promise<User | null> {
+    return this.userRepository.findOne({
+      where: { email: email },
+      relations: { userEmailConfirmation: true },
+    });
   }
 
   // ***** Delete operations *****
 
-  async deleteUser(userId: string | number): Promise<boolean> {
+  async deleteUser(userId: number): Promise<boolean> {
     const result = await this.userRepository
       .createQueryBuilder('u')
       .delete()
@@ -64,40 +71,6 @@ export class UsersRepository {
       .where('id = :userId', { userId: userId })
       .execute();
     return result.affected === 1;
-  }
-
-  async registerUser(
-    userInputDto: UserInputDto,
-    hash: string,
-    confirmationCode: string,
-  ): Promise<number> {
-    return this.dataSource.transaction(async () => {
-      const user = await this.dataSource.query(
-        `insert into public.users (login,
-                                   "passwordHash", email, "isConfirmed",
-                                   "isBanned")
-         values ($1, $2, $3, $4, $5)
-         returning id;`,
-        [userInputDto.login, hash, userInputDto.email, false, false],
-      );
-      const userId = user[0].id;
-
-      await this.dataSource.query(
-        `insert into public.user_bans_by_sa ("userId")
-         values ($1);`,
-        [userId],
-      );
-
-      await this.dataSource.query(
-        `insert into public.user_email_confirmations ("userId",
-                                                      "confirmationCode",
-                                                      "expirationDate")
-         values ($1, $2, now() + interval '3 hours');`,
-        [userId, confirmationCode],
-      );
-
-      return userId;
-    });
   }
 
   async findUserByEmail(email: string): Promise<User | null> {
@@ -122,23 +95,6 @@ export class UsersRepository {
        where login = $1
           or email = $1;`,
       [loginOrEmail],
-    );
-
-    if (users.length === 0) {
-      return null;
-    }
-
-    return users[0];
-  }
-
-  async findUserForEmailResend(email: string): Promise<User | null> {
-    const users = await this.dataSource.query(
-      `select u.id, u.login, u.email, u."isConfirmed", uec."confirmationCode"
-       from public.users u
-                left join public.user_email_confirmations uec
-                          on u.id = uec."userId"
-       where email = $1`,
-      [email],
     );
 
     if (users.length === 0) {
@@ -193,20 +149,6 @@ export class UsersRepository {
     }
 
     return users[0];
-  }
-
-  async updateEmailConfirmationData(
-    confirmationCode: string,
-    userId: number,
-  ): Promise<boolean> {
-    const result = await this.dataSource.query(
-      `update public.user_email_confirmations
-       set "confirmationCode" = $1,
-           "expirationDate"   = now() + interval '3 hours'
-       where "userId" = $2`,
-      [confirmationCode, userId],
-    );
-    return result[1] === 1;
   }
 
   async confirmUser(userId: number): Promise<boolean> {

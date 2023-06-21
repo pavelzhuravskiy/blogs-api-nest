@@ -29,15 +29,15 @@ import { BloggerUserBanUseCase } from '../_blogger/application/use-cases/user-ba
 import { BloggerUsersController } from '../_blogger/blogger.users.controller';
 import { BlogBanUseCase } from '../_superadmin/blogs/application/use-cases/blog-ban.use-case';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { BlogsRepository } from '../infrastructure/blogs/blogs.repository';
-import { UsersRepository } from '../infrastructure/users/users.repository';
-import { BlogsQueryRepository } from '../infrastructure/blogs/blogs.query.repository';
-import { PostsRepository } from '../infrastructure/posts/posts.repository';
-import { PostsQueryRepository } from '../infrastructure/posts/posts.query.repository';
-import { UsersQueryRepository } from '../infrastructure/users/users.query.repository';
+import { BlogsRepository } from '../infrastructure/repositories/blogs/blogs.repository';
+import { UsersRepository } from '../infrastructure/repositories/users/users.repository';
+import { BlogsQueryRepository } from '../infrastructure/repositories/blogs/blogs.query.repository';
+import { PostsRepository } from '../infrastructure/repositories/posts/posts.repository';
+import { PostsQueryRepository } from '../infrastructure/repositories/posts/posts.query.repository';
+import { UsersQueryRepository } from '../infrastructure/repositories/users/users.query.repository';
 import { UsersGetBannedUseCase } from '../_blogger/application/use-cases/users-get-banned.use-case';
-import { CommentsQueryRepository } from '../infrastructure/comments/comments.query.repository';
-import { CommentsRepository } from '../infrastructure/comments/comments.repository';
+import { CommentsQueryRepository } from '../infrastructure/repositories/comments/comments.query.repository';
+import { CommentsRepository } from '../infrastructure/repositories/comments/comments.repository';
 import { UsersModule } from './users.module';
 
 const entities = [

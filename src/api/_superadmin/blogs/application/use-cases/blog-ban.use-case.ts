@@ -8,7 +8,7 @@ import {
 } from '../../../../../exceptions/exception.constants';
 import { ExceptionResultType } from '../../../../../exceptions/types/exception-result.type';
 import { SABlogBanInputDto } from '../../../../dto/users/input/superadmin/sa.blog-ban.input.dto';
-import { BlogsRepository } from '../../../../infrastructure/blogs/blogs.repository';
+import { BlogsRepository } from '../../../../infrastructure/repositories/blogs/blogs.repository';
 
 export class SABlogBanCommand {
   constructor(

@@ -23,7 +23,7 @@ import { CommandBus } from '@nestjs/cqrs';
 import { CommentDeleteCommand } from './application/use-cases/comment-delete.use-case';
 import { LikeStatusInputDto } from '../../dto/likes/input/like-status.input.dto';
 import { LikeUpdateForCommentCommand } from '../likes/application/use-cases/like-update-for-comment-use.case';
-import { CommentsQueryRepository } from '../../infrastructure/comments/comments.query.repository';
+import { CommentsQueryRepository } from '../../infrastructure/repositories/comments/comments.query.repository';
 
 @Controller('comments')
 export class PublicCommentsController {

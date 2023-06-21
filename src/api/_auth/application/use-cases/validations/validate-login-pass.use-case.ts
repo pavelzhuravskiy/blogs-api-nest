@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import bcrypt from 'bcrypt';
-import { UsersRepository } from '../../../../infrastructure/users/users.repository';
+import { UsersRepository } from '../../../../infrastructure/repositories/users/users.repository';
 
 export class ValidateLoginAndPasswordCommand {
   constructor(public loginOrEmail: string, public password: string) {}

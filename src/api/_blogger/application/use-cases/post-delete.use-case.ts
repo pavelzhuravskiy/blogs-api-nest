@@ -7,8 +7,8 @@ import {
   postIDField,
   postNotFound,
 } from '../../../../exceptions/exception.constants';
-import { BlogsRepository } from '../../../infrastructure/blogs/blogs.repository';
-import { PostsRepository } from '../../../infrastructure/posts/posts.repository';
+import { BlogsRepository } from '../../../infrastructure/repositories/blogs/blogs.repository';
+import { PostsRepository } from '../../../infrastructure/repositories/posts/posts.repository';
 
 export class PostDeleteCommand {
   constructor(

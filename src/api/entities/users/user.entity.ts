@@ -6,6 +6,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { UserBanBySA } from './user-ban-by-sa.entity';
+import { UserEmailConfirmation } from './user-email-confirmation.entity';
 
 @Entity('users')
 export class User {
@@ -29,6 +30,12 @@ export class User {
 
   @OneToOne(() => UserBanBySA, (userBanBySA) => userBanBySA.user)
   userBanBySA: UserBanBySA;
+
+  @OneToOne(
+    () => UserEmailConfirmation,
+    (userEmailConfirmation) => userEmailConfirmation.user,
+  )
+  userEmailConfirmation: UserEmailConfirmation;
 
   static checkSortingField(value: any) {
     const u = new User();

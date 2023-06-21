@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import bcrypt from 'bcrypt';
 import { UserInputDto } from '../../../../dto/users/input/user-input.dto';
-import { UsersRepository } from '../../../../infrastructure/users/users.repository';
+import { UsersRepository } from '../../../../infrastructure/repositories/users/users.repository';
 import { User } from '../../../../entities/users/user.entity';
 import { UserBanBySA } from '../../../../entities/users/user-ban-by-sa.entity';
 import { DataSource } from 'typeorm';
@@ -33,7 +33,7 @@ export class UserCreateUseCase implements ICommandHandler<UserCreateCommand> {
       );
       user.email = command.userInputDto.email;
       user.isConfirmed = true;
-      const savedUser = await this.usersRepository.save(
+      const savedUser = await this.usersRepository.queryRunnerSave(
         user,
         queryRunnerManager,
       );
@@ -42,7 +42,10 @@ export class UserCreateUseCase implements ICommandHandler<UserCreateCommand> {
       const userBanBySA = new UserBanBySA();
       userBanBySA.user = user;
       userBanBySA.isBanned = false;
-      await this.usersRepository.save(userBanBySA, queryRunnerManager);
+      await this.usersRepository.queryRunnerSave(
+        userBanBySA,
+        queryRunnerManager,
+      );
 
       // Commit transaction
       await queryRunner.commitTransaction();

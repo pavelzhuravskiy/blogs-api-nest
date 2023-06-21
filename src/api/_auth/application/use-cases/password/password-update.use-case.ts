@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { NewPasswordInputDto } from '../../../dto/new-password.input.dto';
 import bcrypt from 'bcrypt';
-import { UsersRepository } from '../../../../infrastructure/users/users.repository';
+import { UsersRepository } from '../../../../infrastructure/repositories/users/users.repository';
 
 export class PasswordUpdateCommand {
   constructor(public newPasswordDto: NewPasswordInputDto) {}

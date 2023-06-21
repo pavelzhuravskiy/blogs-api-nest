@@ -7,12 +7,12 @@ import { AuthModule } from './api/modules/auth.module';
 import { UsersModule } from './api/modules/users.module';
 import { MainModule } from './api/modules/main.module';
 import { TestingModule } from './api/modules/testing.module';
-import { MailModule } from './mail/mail.module';
 import { CqrsModule } from '@nestjs/cqrs';
 import { DevicesModule } from './api/modules/devices.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import * as process from 'process';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm/dist/interfaces/typeorm-options.interface';
+import { MailModule } from './api/infrastructure/mail/mail.module';
 
 export const options: TypeOrmModuleOptions = {
   type: 'postgres',

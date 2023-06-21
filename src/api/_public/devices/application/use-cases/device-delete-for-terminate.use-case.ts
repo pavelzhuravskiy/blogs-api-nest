@@ -5,7 +5,7 @@ import {
   deviceNotFound,
 } from '../../../../../exceptions/exception.constants';
 import { ExceptionResultType } from '../../../../../exceptions/types/exception-result.type';
-import { DevicesRepository } from '../../../../infrastructure/devices/devices.repository';
+import { DevicesRepository } from '../../../../infrastructure/repositories/devices/devices.repository';
 
 export class DeviceDeleteForTerminateCommand {
   constructor(public deviceId: string, public userId: string) {}

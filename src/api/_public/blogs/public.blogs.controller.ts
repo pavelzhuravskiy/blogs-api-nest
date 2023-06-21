@@ -8,10 +8,10 @@ import {
 } from '../../../exceptions/exception.constants';
 import { ResultCode } from '../../../enums/result-code.enum';
 import { CommandBus } from '@nestjs/cqrs';
-import { BlogsQueryRepository } from '../../infrastructure/blogs/blogs.query.repository';
+import { BlogsQueryRepository } from '../../infrastructure/repositories/blogs/blogs.query.repository';
 import { PostQueryDto } from '../../dto/posts/query/post.query.dto';
 import { UserIdFromHeaders } from '../../_auth/decorators/user-id-from-headers.decorator';
-import { PostsQueryRepository } from '../../infrastructure/posts/posts.query.repository';
+import { PostsQueryRepository } from '../../infrastructure/repositories/posts/posts.query.repository';
 
 @Controller('blogs')
 export class PublicBlogsController {

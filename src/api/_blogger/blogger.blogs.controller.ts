@@ -27,11 +27,11 @@ import { PostInputDto } from '../dto/posts/input/post.input.dto';
 import { PostUpdateCommand } from './application/use-cases/post-update.use-case';
 import { PostCreateCommand } from './application/use-cases/post-create.use-case';
 import { PostDeleteCommand } from './application/use-cases/post-delete.use-case';
-import { BlogsQueryRepository } from '../infrastructure/blogs/blogs.query.repository';
+import { BlogsQueryRepository } from '../infrastructure/repositories/blogs/blogs.query.repository';
 import { BlogQueryDto } from '../dto/blogs/query/blog.query.dto';
-import { PostsQueryRepository } from '../infrastructure/posts/posts.query.repository';
+import { PostsQueryRepository } from '../infrastructure/repositories/posts/posts.query.repository';
 import { CommentQueryDto } from '../dto/comments/query/comment.query.dto';
-import { CommentsQueryRepository } from '../infrastructure/comments/comments.query.repository';
+import { CommentsQueryRepository } from '../infrastructure/repositories/comments/comments.query.repository';
 import { Role } from '../../enums/role.enum';
 
 @Controller('blogger/blogs')

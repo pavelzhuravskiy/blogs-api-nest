@@ -1,5 +1,5 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { DevicesRepository } from '../../../../infrastructure/devices/devices.repository';
+import { DevicesRepository } from '../../../../infrastructure/repositories/devices/devices.repository';
 
 export class DeviceUpdateForTokensCommand {
   constructor(public token: any, public ip: string, public userAgent: string) {}

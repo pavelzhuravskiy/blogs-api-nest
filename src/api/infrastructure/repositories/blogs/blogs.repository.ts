@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { BlogInputDto } from '../../dto/blogs/input/blog.input.dto';
-import { Blog } from '../../entities/blogs/blog.entity';
-import { BlogOwner } from '../../entities/blogs/blog-owner.entity';
-import { idIsValid } from '../../../helpers/id-is-valid';
+import { BlogInputDto } from '../../../dto/blogs/input/blog.input.dto';
+import { Blog } from '../../../entities/blogs/blog.entity';
+import { BlogOwner } from '../../../entities/blogs/blog-owner.entity';
+import { idIsValid } from '../../../../helpers/id-is-valid';
 
 @Injectable()
 export class BlogsRepository {

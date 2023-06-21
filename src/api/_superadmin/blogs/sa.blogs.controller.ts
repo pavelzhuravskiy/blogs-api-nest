@@ -16,7 +16,7 @@ import { ResultCode } from '../../../enums/result-code.enum';
 import { exceptionHandler } from '../../../exceptions/exception.handler';
 import { SABlogBanInputDto } from '../../dto/users/input/superadmin/sa.blog-ban.input.dto';
 import { SABlogBanCommand } from './application/use-cases/blog-ban.use-case';
-import { BlogsQueryRepository } from '../../infrastructure/blogs/blogs.query.repository';
+import { BlogsQueryRepository } from '../../infrastructure/repositories/blogs/blogs.query.repository';
 
 @Controller('sa/blogs')
 export class SuperAdminBlogsController {

@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { SuperAdminUserViewDto } from '../../dto/users/view/superadmin/sa.user.view.dto';
+import { SuperAdminUserViewDto } from '../../../dto/users/view/superadmin/sa.user.view.dto';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
-import { UserQueryDto } from '../../dto/users/query/user-query.dto';
-import { Paginator } from '../../../helpers/paginator';
-import { BloggerUserBanQueryDto } from '../../dto/users/query/blogger/blogger.user-ban.query.dto';
-import { filterUsersBannedByBlogger } from '../../../helpers/filters/filter-users-banned-by-blogger';
-import { UsersBannedByBloggerViewDto } from '../../dto/users/view/blogger/blogger.user-ban.view.dto';
-import { User } from '../../entities/users/user.entity';
+import { UserQueryDto } from '../../../dto/users/query/user-query.dto';
+import { Paginator } from '../../../../helpers/paginator';
+import { BloggerUserBanQueryDto } from '../../../dto/users/query/blogger/blogger.user-ban.query.dto';
+import { filterUsersBannedByBlogger } from '../../../../helpers/filters/filter-users-banned-by-blogger';
+import { UsersBannedByBloggerViewDto } from '../../../dto/users/view/blogger/blogger.user-ban.view.dto';
+import { User } from '../../../entities/users/user.entity';
 
 @Injectable()
 export class UsersQueryRepository {

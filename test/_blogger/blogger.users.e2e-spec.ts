@@ -43,7 +43,7 @@ import {
   commentContent,
   publicCommentsURI,
 } from '../utils/constants/comments.constants';
-import { UsersRepository } from '../../src/api/infrastructure/users/users.repository';
+import { UsersRepository } from '../../src/api/infrastructure/repositories/users/users.repository';
 import { getAppAndClearDb } from '../utils/functions/get-app';
 
 describe('Blogger users ban testing', () => {

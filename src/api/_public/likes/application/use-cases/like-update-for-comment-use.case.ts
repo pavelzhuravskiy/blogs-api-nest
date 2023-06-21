@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { LikeStatusInputDto } from '../../../../dto/likes/input/like-status.input.dto';
-import { CommentsRepository } from '../../../../infrastructure/comments/comments.repository';
-import { UsersRepository } from '../../../../infrastructure/users/users.repository';
+import { CommentsRepository } from '../../../../infrastructure/repositories/comments/comments.repository';
+import { UsersRepository } from '../../../../infrastructure/repositories/users/users.repository';
 import { ResultCode } from '../../../../../enums/result-code.enum';
 import {
   commentIDField,

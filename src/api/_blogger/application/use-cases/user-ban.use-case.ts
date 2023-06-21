@@ -7,8 +7,8 @@ import {
 } from '../../../../exceptions/exception.constants';
 import { ExceptionResultType } from '../../../../exceptions/types/exception-result.type';
 import { BloggerUserBanInputDto } from '../../../dto/users/input/blogger/blogger.user-ban.input.dto';
-import { UsersRepository } from '../../../infrastructure/users/users.repository';
-import { BlogsRepository } from '../../../infrastructure/blogs/blogs.repository';
+import { UsersRepository } from '../../../infrastructure/repositories/users/users.repository';
+import { BlogsRepository } from '../../../infrastructure/repositories/blogs/blogs.repository';
 
 export class BloggerUserBanCommand {
   constructor(

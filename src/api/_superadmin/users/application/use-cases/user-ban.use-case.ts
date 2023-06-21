@@ -8,8 +8,8 @@ import {
   userNotFound,
 } from '../../../../../exceptions/exception.constants';
 import { ExceptionResultType } from '../../../../../exceptions/types/exception-result.type';
-import { UsersRepository } from '../../../../infrastructure/users/users.repository';
-import { DevicesRepository } from '../../../../infrastructure/devices/devices.repository';
+import { UsersRepository } from '../../../../infrastructure/repositories/users/users.repository';
+import { DevicesRepository } from '../../../../infrastructure/repositories/devices/devices.repository';
 
 export class SAUserBanCommand {
   constructor(

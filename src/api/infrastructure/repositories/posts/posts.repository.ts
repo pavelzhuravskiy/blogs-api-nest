@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { PostInputDto } from '../../dto/posts/input/post.input.dto';
-import { Post } from '../../entities/posts/post.entity';
-import { idIsValid } from '../../../helpers/id-is-valid';
+import { PostInputDto } from '../../../dto/posts/input/post.input.dto';
+import { Post } from '../../../entities/posts/post.entity';
+import { idIsValid } from '../../../../helpers/id-is-valid';
 
 @Injectable()
 export class PostsRepository {

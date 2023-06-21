@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { Device } from '../../entities/devices/device.entity';
-import { uuidIsValid } from '../../../helpers/uuid-is-valid';
+import { Device } from '../../../entities/devices/device.entity';
+import { uuidIsValid } from '../../../../helpers/uuid-is-valid';
 
 @Injectable()
 export class DevicesRepository {

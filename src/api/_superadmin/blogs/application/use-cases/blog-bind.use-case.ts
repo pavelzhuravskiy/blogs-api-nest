@@ -8,8 +8,8 @@ import {
   userNotFound,
 } from '../../../../../exceptions/exception.constants';
 import { ExceptionResultType } from '../../../../../exceptions/types/exception-result.type';
-import { BlogsRepository } from '../../../../infrastructure/blogs/blogs.repository';
-import { UsersRepository } from '../../../../infrastructure/users/users.repository';
+import { BlogsRepository } from '../../../../infrastructure/repositories/blogs/blogs.repository';
+import { UsersRepository } from '../../../../infrastructure/repositories/users/users.repository';
 
 export class BlogBindCommand {
   constructor(public blogId: string, public userId: string) {}

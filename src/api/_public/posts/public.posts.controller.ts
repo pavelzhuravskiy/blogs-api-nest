@@ -17,13 +17,13 @@ import {
 } from '../../../exceptions/exception.constants';
 import { UserIdFromHeaders } from '../../_auth/decorators/user-id-from-headers.decorator';
 import { CommandBus } from '@nestjs/cqrs';
-import { PostsQueryRepository } from '../../infrastructure/posts/posts.query.repository';
+import { PostsQueryRepository } from '../../infrastructure/repositories/posts/posts.query.repository';
 import { PostQueryDto } from '../../dto/posts/query/post.query.dto';
 import { UserIdFromGuard } from '../../_auth/decorators/user-id-from-guard.decorator';
 import { JwtBearerGuard } from '../../_auth/guards/jwt-bearer.guard';
 import { CommentInputDto } from '../../dto/comments/input/comment.input.dto';
 import { CommentCreateCommand } from '../comments/application/use-cases/comment-create.use-case';
-import { CommentsQueryRepository } from '../../infrastructure/comments/comments.query.repository';
+import { CommentsQueryRepository } from '../../infrastructure/repositories/comments/comments.query.repository';
 import { CommentQueryDto } from '../../dto/comments/query/comment.query.dto';
 import { LikeStatusInputDto } from '../../dto/likes/input/like-status.input.dto';
 import { LikeUpdateForPostCommand } from '../likes/application/use-cases/like-update-for-post-use.case';

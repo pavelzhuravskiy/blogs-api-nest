@@ -43,7 +43,7 @@ import {
   publicPostsURI,
 } from '../utils/constants/posts.constants';
 import { postObject } from '../utils/objects/posts.objects';
-import { BlogsRepository } from '../../src/api/infrastructure/blogs/blogs.repository';
+import { BlogsRepository } from '../../src/api/infrastructure/repositories/blogs/blogs.repository';
 import { getAppAndClearDb } from '../utils/functions/get-app';
 
 describe('Super admin blogs testing', () => {

@@ -1,13 +1,13 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { LikeStatusInputDto } from '../../../../dto/likes/input/like-status.input.dto';
-import { PostsRepository } from '../../../../infrastructure/posts/posts.repository';
+import { PostsRepository } from '../../../../infrastructure/repositories/posts/posts.repository';
 import { ExceptionResultType } from '../../../../../exceptions/types/exception-result.type';
 import { ResultCode } from '../../../../../enums/result-code.enum';
 import {
   userIDField,
   userNotFound,
 } from '../../../../../exceptions/exception.constants';
-import { UsersRepository } from '../../../../infrastructure/users/users.repository';
+import { UsersRepository } from '../../../../infrastructure/repositories/users/users.repository';
 
 export class LikeUpdateForPostCommand {
   constructor(

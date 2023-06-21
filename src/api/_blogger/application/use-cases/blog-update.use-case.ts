@@ -6,7 +6,7 @@ import {
   blogIDField,
   blogNotFound,
 } from '../../../../exceptions/exception.constants';
-import { BlogsRepository } from '../../../infrastructure/blogs/blogs.repository';
+import { BlogsRepository } from '../../../infrastructure/repositories/blogs/blogs.repository';
 
 export class BlogUpdateCommand {
   constructor(

@@ -5,9 +5,9 @@ import {
   blogIDField,
   blogNotFound,
 } from '../../../../exceptions/exception.constants';
-import { BlogsRepository } from '../../../infrastructure/blogs/blogs.repository';
+import { BlogsRepository } from '../../../infrastructure/repositories/blogs/blogs.repository';
 import { BloggerUserBanQueryDto } from '../../../dto/users/query/blogger/blogger.user-ban.query.dto';
-import { UsersQueryRepository } from '../../../infrastructure/users/users.query.repository';
+import { UsersQueryRepository } from '../../../infrastructure/repositories/users/users.query.repository';
 import { idIsValid } from '../../../../helpers/id-is-valid';
 
 export class UsersGetBannedQuery {

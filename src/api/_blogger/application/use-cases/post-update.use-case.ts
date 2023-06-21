@@ -8,8 +8,8 @@ import {
   postNotFound,
 } from '../../../../exceptions/exception.constants';
 import { PostInputDto } from '../../../dto/posts/input/post.input.dto';
-import { PostsRepository } from '../../../infrastructure/posts/posts.repository';
-import { BlogsRepository } from '../../../infrastructure/blogs/blogs.repository';
+import { PostsRepository } from '../../../infrastructure/repositories/posts/posts.repository';
+import { BlogsRepository } from '../../../infrastructure/repositories/blogs/blogs.repository';
 
 export class PostUpdateCommand {
   constructor(

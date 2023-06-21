@@ -5,14 +5,14 @@ import {
   ValidatorConstraintInterface,
 } from 'class-validator';
 import { Injectable } from '@nestjs/common';
-import { UsersRepository } from '../../api/infrastructure/users/users.repository';
+import { UsersRepository } from '../../api/infrastructure/repositories/users/users.repository';
 
 @ValidatorConstraint({ name: 'IsLoginExist', async: true })
 @Injectable()
 export class IsLoginExistConstraint implements ValidatorConstraintInterface {
   constructor(private readonly usersRepository: UsersRepository) {}
   async validate(login: string) {
-    const user = await this.usersRepository.findExistingLogin(login);
+    const user = await this.usersRepository.checkLogin(login);
     return !user;
   }
 }

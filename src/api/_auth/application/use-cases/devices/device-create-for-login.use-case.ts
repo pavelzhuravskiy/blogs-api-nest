@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { JwtService } from '@nestjs/jwt';
-import { DevicesRepository } from '../../../../infrastructure/devices/devices.repository';
+import { DevicesRepository } from '../../../../infrastructure/repositories/devices/devices.repository';
 
 export class DeviceCreateForLoginCommand {
   constructor(

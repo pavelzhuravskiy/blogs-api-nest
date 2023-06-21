@@ -15,7 +15,7 @@ import { RefreshToken } from '../../_auth/decorators/refresh-token.decorator';
 import { CommandBus } from '@nestjs/cqrs';
 import { DeviceDeleteForTerminateCommand } from './application/use-cases/device-delete-for-terminate.use-case';
 import { DevicesDeleteOldCommand } from './application/use-cases/devices-delete-old.use-case';
-import { DevicesQueryRepository } from '../../infrastructure/devices/devices.query.repository';
+import { DevicesQueryRepository } from '../../infrastructure/repositories/devices/devices.query.repository';
 
 @Controller('security')
 export class PublicDevicesController {

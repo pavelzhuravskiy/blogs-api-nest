@@ -19,15 +19,17 @@ import { DeviceDeleteForLogoutUseCase } from '../_auth/application/use-cases/dev
 import { ValidateRefreshTokenUseCase } from '../_auth/application/use-cases/validations/validate-refresh-token.use-case';
 import { ValidateLoginAndPasswordUseCase } from '../_auth/application/use-cases/validations/validate-login-pass.use-case';
 import { TokensCreateUseCase } from '../_auth/application/use-cases/tokens/tokens-create.use-case';
-import { UsersRepository } from '../infrastructure/users/users.repository';
-import { DevicesRepository } from '../infrastructure/devices/devices.repository';
+import { UsersRepository } from '../infrastructure/repositories/users/users.repository';
+import { DevicesRepository } from '../infrastructure/repositories/devices/devices.repository';
 import { Repository } from 'typeorm';
 import { User } from '../entities/users/user.entity';
 import { UsersModule } from './users.module';
+import { MailAdapter } from '../infrastructure/mail/mail-adapter';
 
 const services = [JwtService];
 
 const useCases = [
+  MailAdapter,
   RegistrationUseCase,
   RegistrationEmailResendUseCase,
   RegistrationConfirmationUseCase,

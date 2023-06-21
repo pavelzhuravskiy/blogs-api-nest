@@ -23,7 +23,7 @@ import {
 } from '../../../exceptions/exception.constants';
 import { SAUserBanInputDto } from '../../dto/users/input/superadmin/sa.user-ban.input.dto';
 import { SAUserBanCommand } from './application/use-cases/user-ban.use-case';
-import { UsersQueryRepository } from '../../infrastructure/users/users.query.repository';
+import { UsersQueryRepository } from '../../infrastructure/repositories/users/users.query.repository';
 import { UserQueryDto } from '../../dto/users/query/user-query.dto';
 
 @Controller('sa/users')
