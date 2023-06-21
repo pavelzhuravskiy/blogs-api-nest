@@ -31,7 +31,7 @@ export class BloggerUserBanUseCase
     command: BloggerUserBanCommand,
   ): Promise<ExceptionResultType<boolean>> {
     const userToBanOrUnban = await this.usersRepository.findUserById(
-      command.userToBanOrUnbanId,
+      +command.userToBanOrUnbanId,
     );
 
     if (!userToBanOrUnban) {

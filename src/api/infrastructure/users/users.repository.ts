@@ -6,7 +6,6 @@ import { User } from '../../entities/users/user.entity';
 import { uuidIsValid } from '../../../helpers/uuid-is-valid';
 import { UserPasswordRecovery } from '../../entities/users/user-password-recovery.entity';
 import { UserEmailConfirmation } from '../../entities/users/user-email-confirmation.entity';
-import { idIsValid } from '../../../helpers/id-is-valid';
 import { UserBanBySA } from '../../entities/users/user-ban-by-sa.entity';
 
 @Injectable()
@@ -18,12 +17,16 @@ export class UsersRepository {
     @InjectDataSource() private dataSource: DataSource,
   ) {}
 
+  // ***** TypeORM SAVE *****
+
   async save(
     entity: User | UserBanBySA,
     queryRunnerManager: EntityManager,
   ): Promise<User | UserBanBySA> {
     return queryRunnerManager.save(entity);
   }
+
+  // ***** Unique login and email check *****
 
   async findExistingLogin(login: string): Promise<User | null> {
     const user = await this.userRepository.findOneBy({ login: login });
@@ -43,6 +46,24 @@ export class UsersRepository {
     }
 
     return user;
+  }
+
+  // ***** Find operations *****
+
+  async findUserById(userId: number): Promise<User> {
+    return this.userRepository.findOneBy({ id: userId });
+  }
+
+  // ***** Delete operations *****
+
+  async deleteUser(userId: string | number): Promise<boolean> {
+    const result = await this.userRepository
+      .createQueryBuilder('u')
+      .delete()
+      .from(User)
+      .where('id = :userId', { userId: userId })
+      .execute();
+    return result.affected === 1;
   }
 
   async registerUser(
@@ -77,25 +98,6 @@ export class UsersRepository {
 
       return userId;
     });
-  }
-
-  async findUserById(userId: number | string): Promise<User | null> {
-    if (!idIsValid(userId)) {
-      return null;
-    }
-
-    const users = await this.dataSource.query(
-      `select id, login, email, "isBanned", "isBannedByBlogger"
-       from public.users
-       where id = $1`,
-      [userId],
-    );
-
-    if (users.length === 0) {
-      return null;
-    }
-
-    return users[0];
   }
 
   async findUserByEmail(email: string): Promise<User | null> {
@@ -256,16 +258,6 @@ export class UsersRepository {
       );
       return result[1] === 1;
     });
-  }
-
-  async deleteUser(userId: string | number): Promise<boolean> {
-    const result = await this.dataSource.query(
-      `delete
-       from public.users
-       where id = $1;`,
-      [userId],
-    );
-    return result[1] === 1;
   }
 
   async banUserBySA(userId: number, banReason: string): Promise<boolean> {

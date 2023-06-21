@@ -36,7 +36,7 @@ export class BlogBindUseCase implements ICommandHandler<BlogBindCommand> {
       };
     }
 
-    const user = await this.usersRepository.findUserById(command.userId);
+    const user = await this.usersRepository.findUserById(+command.userId);
 
     if (!user) {
       return {

@@ -29,7 +29,7 @@ export class UserBanUseCase implements ICommandHandler<SAUserBanCommand> {
   async execute(
     command: SAUserBanCommand,
   ): Promise<ExceptionResultType<boolean>> {
-    const user = await this.usersRepository.findUserById(command.userId);
+    const user = await this.usersRepository.findUserById(+command.userId);
 
     if (!user) {
       return {
