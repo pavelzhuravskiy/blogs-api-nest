@@ -16,7 +16,9 @@ export class RegistrationConfirmationUseCase
     private dataSource: DataSource,
   ) {}
 
-  async execute(command: RegistrationConfirmationCommand): Promise<any | null> {
+  async execute(
+    command: RegistrationConfirmationCommand,
+  ): Promise<boolean | null> {
     const user = await this.usersRepository.findUserForEmailConfirm(
       command.confirmCodeInputDto.code,
     );
@@ -44,7 +46,7 @@ export class RegistrationConfirmationUseCase
       await queryRunner.commitTransaction();
 
       // Return user id
-      return user.id;
+      return true;
     } catch (e) {
       // since we have errors - rollback the changes
       console.error(e);
@@ -53,6 +55,5 @@ export class RegistrationConfirmationUseCase
       // release a queryRunner which was manually instantiated
       await queryRunner.release();
     }
-    return true;
   }
 }

@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { DataSource, EntityManager, Repository } from 'typeorm';
 import { User } from '../../../entities/users/user.entity';
-import { uuidIsValid } from '../../../../helpers/uuid-is-valid';
 import { UserPasswordRecovery } from '../../../entities/users/user-password-recovery.entity';
 import { UserEmailConfirmation } from '../../../entities/users/user-email-confirmation.entity';
 import { UserBanBySA } from '../../../entities/users/user-ban-by-sa.entity';
@@ -14,6 +13,8 @@ export class UsersRepository {
     private readonly usersRepository: Repository<User>,
     @InjectRepository(UserEmailConfirmation)
     private readonly userEmailConfirmationsRepository: Repository<UserEmailConfirmation>,
+    @InjectRepository(UserPasswordRecovery)
+    private readonly userPasswordRecoveriesRepository: Repository<UserPasswordRecovery>,
     @InjectDataSource() private dataSource: DataSource,
   ) {}
 
@@ -29,8 +30,8 @@ export class UsersRepository {
   // ***** TypeORM data source manager SAVE *****
 
   async dataSourceSave(
-    entity: UserEmailConfirmation,
-  ): Promise<UserEmailConfirmation> {
+    entity: UserEmailConfirmation | UserPasswordRecovery,
+  ): Promise<UserEmailConfirmation | UserPasswordRecovery> {
     return this.dataSource.manager.save(entity);
   }
 
@@ -77,6 +78,26 @@ export class UsersRepository {
     }
   }
 
+  async findUserForPasswordRecovery(email: string): Promise<User | null> {
+    return this.usersRepository.findOne({
+      where: { email: email },
+    });
+  }
+
+  async findUserForPasswordUpdate(recoveryCode: string): Promise<User | null> {
+    try {
+      return await this.usersRepository
+        .createQueryBuilder('u')
+        .where(`upr.recoveryCode = :recoveryCode`)
+        .leftJoinAndSelect('u.userPasswordRecovery', 'upr')
+        .setParameter('recoveryCode', recoveryCode)
+        .getOne();
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
+  }
+
   // ***** Delete operations *****
 
   async deleteUser(userId: number): Promise<boolean> {
@@ -99,22 +120,17 @@ export class UsersRepository {
     return result.affected === 1;
   }
 
-  // ---------------------------------------
-
-  async findUserByEmail(email: string): Promise<User | null> {
-    const users = await this.dataSource.query(
-      `select id, email, login
-       from public.users
-       where email = $1`,
-      [email],
-    );
-
-    if (users.length === 0) {
-      return null;
-    }
-
-    return users[0];
+  async deletePasswordRecoveryRecord(userId: number): Promise<boolean> {
+    const result = await this.userPasswordRecoveriesRepository
+      .createQueryBuilder('upr')
+      .delete()
+      .from(UserPasswordRecovery)
+      .where('userId = :userId', { userId: userId })
+      .execute();
+    return result.affected === 1;
   }
+
+  // ---------------------------------------
 
   async findUserForLoginValidation(loginOrEmail: string): Promise<User | null> {
     const users = await this.dataSource.query(
@@ -130,59 +146,6 @@ export class UsersRepository {
     }
 
     return users[0];
-  }
-
-  async findPasswordRecoveryRecord(
-    code: string,
-  ): Promise<UserPasswordRecovery> {
-    if (!uuidIsValid(code)) {
-      return null;
-    }
-
-    const users = await this.dataSource.query(
-      `select *
-       from user_password_recoveries
-       where "recoveryCode" = $1`,
-      [code],
-    );
-
-    if (users.length === 0) {
-      return null;
-    }
-
-    return users[0];
-  }
-
-  async createPasswordRecoveryRecord(
-    recoveryCode: string,
-    userId: number,
-  ): Promise<number> {
-    const result = await this.dataSource.query(
-      `insert into public.user_password_recoveries("userId", "recoveryCode", "expirationDate") 
-       values ($1, $2, now() + interval '3 hours') returning id;`,
-      [userId, recoveryCode],
-    );
-
-    return result[0].id;
-  }
-
-  async updatePassword(userId: number, hash: string): Promise<boolean> {
-    return this.dataSource.transaction(async () => {
-      await this.dataSource.query(
-        `update public.users
-         set "passwordHash" = $2
-         where id = $1`,
-        [userId, hash],
-      );
-
-      const result = await this.dataSource.query(
-        `delete
-         from public.user_password_recoveries
-         where "userId" = $1;`,
-        [userId],
-      );
-      return result[1] === 1;
-    });
   }
 
   async banUserBySA(userId: number, banReason: string): Promise<boolean> {

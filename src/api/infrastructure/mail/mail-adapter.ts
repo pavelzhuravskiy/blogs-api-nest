@@ -22,4 +22,23 @@ export class MailAdapter {
       },
     });
   }
+
+  async sendPasswordRecoveryMail(
+    login: string,
+    email: string,
+    recoveryCode: string,
+  ) {
+    const url = `https://somesite.com/password-recovery?recoveryCode=${recoveryCode}`;
+
+    await this.mailerService.sendMail({
+      to: email,
+      subject: 'Password recovery',
+      template: './password-recovery', // `.hbs` extension is appended automatically
+      context: {
+        // ✏️ filling curly brackets with content
+        login: login,
+        url,
+      },
+    });
+  }
 }

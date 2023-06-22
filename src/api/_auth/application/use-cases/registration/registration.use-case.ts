@@ -20,7 +20,7 @@ export class RegistrationUseCase
 {
   constructor(
     private readonly usersRepository: UsersRepository,
-    private readonly emailAdapter: MailAdapter,
+    private readonly mailAdapter: MailAdapter,
     private dataSource: DataSource,
   ) {}
 
@@ -66,7 +66,12 @@ export class RegistrationUseCase
         queryRunnerManager,
       );
 
-      await this.sendRegistrationMail(command, confirmationCode, savedUser.id);
+      await this.sendRegistrationMail(
+        user.login,
+        user.email,
+        confirmationCode,
+        user.id,
+      );
 
       // Commit transaction
       await queryRunner.commitTransaction();
@@ -84,14 +89,15 @@ export class RegistrationUseCase
   }
 
   private async sendRegistrationMail(
-    command: RegistrationCommand,
+    login: string,
+    email: string,
     confirmationCode: string,
     userId: number,
   ): Promise<any> {
     try {
-      await this.emailAdapter.sendRegistrationMail(
-        command.userInputDto.login,
-        command.userInputDto.email,
+      await this.mailAdapter.sendRegistrationMail(
+        login,
+        email,
         confirmationCode,
       );
     } catch (e) {

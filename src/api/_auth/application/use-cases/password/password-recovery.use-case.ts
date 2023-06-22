@@ -1,8 +1,10 @@
-import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { randomUUID } from 'crypto';
 import { EmailInputDto } from '../../../dto/email.input.dto';
-import { SendPasswordRecoveryMailCommand } from '../../../../infrastructure/mail/application/use-cases/send-pass-recovery-mail.use-case';
 import { UsersRepository } from '../../../../infrastructure/repositories/users/users.repository';
+import { MailAdapter } from '../../../../infrastructure/mail/mail-adapter';
+import { add } from 'date-fns';
+import { UserPasswordRecovery } from '../../../../entities/users/user-password-recovery.entity';
 
 export class PasswordRecoveryCommand {
   constructor(public emailInputDto: EmailInputDto) {}
@@ -13,12 +15,12 @@ export class PasswordRecoveryUseCase
   implements ICommandHandler<PasswordRecoveryCommand>
 {
   constructor(
-    private commandBus: CommandBus,
     private readonly usersRepository: UsersRepository,
+    private readonly mailAdapter: MailAdapter,
   ) {}
 
-  async execute(command: PasswordRecoveryCommand): Promise<number> {
-    const user = await this.usersRepository.findUserByEmail(
+  async execute(command: PasswordRecoveryCommand): Promise<boolean | null> {
+    const user = await this.usersRepository.findUserForPasswordRecovery(
       command.emailInputDto.email,
     );
 
@@ -28,24 +30,30 @@ export class PasswordRecoveryUseCase
 
     const recoveryCode = randomUUID();
 
-    const result = await this.usersRepository.createPasswordRecoveryRecord(
-      recoveryCode,
-      user.id,
-    );
+    const userPasswordRecovery = new UserPasswordRecovery();
+    userPasswordRecovery.user = user;
+    userPasswordRecovery.recoveryCode = recoveryCode;
+    userPasswordRecovery.expirationDate = add(new Date(), { hours: 1 });
 
+    await this.usersRepository.dataSourceSave(userPasswordRecovery);
+    await this.sendPasswordRecoveryMail(user.login, user.email, recoveryCode);
+    return true;
+  }
+
+  private async sendPasswordRecoveryMail(
+    login: string,
+    email: string,
+    confirmationCode: string,
+  ): Promise<any> {
     try {
-      await this.commandBus.execute(
-        new SendPasswordRecoveryMailCommand(
-          user.login,
-          user.email,
-          recoveryCode,
-        ),
+      await this.mailAdapter.sendPasswordRecoveryMail(
+        login,
+        email,
+        confirmationCode,
       );
     } catch (e) {
       console.error(e);
       return null;
     }
-
-    return result;
   }
 }

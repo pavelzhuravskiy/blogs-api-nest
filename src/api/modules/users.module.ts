@@ -13,13 +13,14 @@ import { DevicesRepository } from '../infrastructure/repositories/devices/device
 import { User } from '../entities/users/user.entity';
 import { UserBanBySA } from '../entities/users/user-ban-by-sa.entity';
 import { UserEmailConfirmation } from '../entities/users/user-email-confirmation.entity';
+import { UserPasswordRecovery } from '../entities/users/user-password-recovery.entity';
 
 const useCases = [UserCreateUseCase, UserDeleteUseCase, UserBanUseCase];
 
 const entities = [
   User,
   UserEmailConfirmation,
-  // UserPasswordRecovery,
+  UserPasswordRecovery,
   UserBanBySA,
   // UserBanByBlogger,
 ];

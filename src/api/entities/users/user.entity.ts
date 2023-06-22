@@ -7,6 +7,7 @@ import {
 } from 'typeorm';
 import { UserBanBySA } from './user-ban-by-sa.entity';
 import { UserEmailConfirmation } from './user-email-confirmation.entity';
+import { UserPasswordRecovery } from './user-password-recovery.entity';
 
 @Entity('users')
 export class User {
@@ -36,6 +37,12 @@ export class User {
     (userEmailConfirmation) => userEmailConfirmation.user,
   )
   userEmailConfirmation: UserEmailConfirmation;
+
+  @OneToOne(
+    () => UserPasswordRecovery,
+    (userPasswordRecovery) => userPasswordRecovery.user,
+  )
+  userPasswordRecovery: UserPasswordRecovery;
 
   static checkSortingField(value: any) {
     const u = new User();

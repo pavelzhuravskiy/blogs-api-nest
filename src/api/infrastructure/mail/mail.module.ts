@@ -28,6 +28,6 @@ import { MailAdapter } from './mail-adapter';
       },
     }),
   ],
-  providers: [MailAdapter /*, SendPasswordRecoveryUseCase*/],
+  providers: [MailAdapter],
 })
 export class MailModule {}
