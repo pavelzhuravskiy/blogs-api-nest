@@ -12,19 +12,18 @@ import { User } from '../../../entities/users/user.entity';
 @Injectable()
 export class UsersQueryRepository {
   constructor(
-    @InjectRepository(User) private readonly userRepository: Repository<User>,
+    @InjectRepository(User) private readonly usersRepository: Repository<User>,
     @InjectDataSource() private dataSource: DataSource,
   ) {}
 
   async findUserById(userId: number): Promise<SuperAdminUserViewDto> {
-    const users = await this.userRepository.find({
-      where: {
-        id: userId,
-      },
-      relations: {
-        userBanBySA: true,
-      },
-    });
+    const users = await this.usersRepository
+      .createQueryBuilder('u')
+      .where(`u.id = :userId`, {
+        userId: userId,
+      })
+      .leftJoinAndSelect('u.userBanBySA', 'ubsa')
+      .getMany();
 
     const mappedUsers = await this.usersMapping(users);
     return mappedUsers[0];
@@ -33,7 +32,7 @@ export class UsersQueryRepository {
   async findUsers(
     query: UserQueryDto,
   ): Promise<Paginator<SuperAdminUserViewDto[]>> {
-    const users = await this.userRepository
+    const users = await this.usersRepository
       .createQueryBuilder('u')
       .where(
         `${
@@ -60,7 +59,7 @@ export class UsersQueryRepository {
       .take(query.pageSize)
       .getMany();
 
-    const totalCount = await this.userRepository
+    const totalCount = await this.usersRepository
       .createQueryBuilder('u')
       .where(
         `${

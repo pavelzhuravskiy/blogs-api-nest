@@ -38,18 +38,27 @@ export class UsersRepository {
   // ***** Unique login and email checks *****
 
   async checkLogin(login: string): Promise<User | null> {
-    return this.usersRepository.findOneBy({ login: login });
+    return this.usersRepository
+      .createQueryBuilder('u')
+      .where(`u.login = :login`, { login: login })
+      .getOne();
   }
 
   async checkEmail(email: string): Promise<User | null> {
-    return this.usersRepository.findOneBy({ email: email });
+    return this.usersRepository
+      .createQueryBuilder('u')
+      .where(`u.email = :email`, { email: email })
+      .getOne();
   }
 
   // ***** Find user operations *****
 
   async findUserById(userId: number): Promise<User | null> {
     try {
-      return await this.usersRepository.findOneBy({ id: userId });
+      return await this.usersRepository
+        .createQueryBuilder('u')
+        .where(`u.id = :userId`, { userId: userId })
+        .getOne();
     } catch (e) {
       console.log(e);
       return null;
@@ -57,10 +66,13 @@ export class UsersRepository {
   }
 
   async findUserForEmailResend(email: string): Promise<User | null> {
-    return this.usersRepository.findOne({
-      where: { email: email },
-      relations: { userEmailConfirmation: true },
-    });
+    return this.usersRepository
+      .createQueryBuilder('u')
+      .where(`u.email = :email`, {
+        email: email,
+      })
+      .leftJoinAndSelect('u.userEmailConfirmation', 'uec')
+      .getOne();
   }
 
   async findUserForEmailConfirm(
@@ -69,7 +81,9 @@ export class UsersRepository {
     try {
       return await this.usersRepository
         .createQueryBuilder('u')
-        .where(`uec.confirmationCode = '${confirmationCode}'`)
+        .where(`uec.confirmationCode = :confirmationCode`, {
+          confirmationCode: confirmationCode,
+        })
         .leftJoinAndSelect('u.userEmailConfirmation', 'uec')
         .getOne();
     } catch (e) {
@@ -79,23 +93,43 @@ export class UsersRepository {
   }
 
   async findUserForPasswordRecovery(email: string): Promise<User | null> {
-    return this.usersRepository.findOne({
-      where: { email: email },
-    });
+    return this.usersRepository
+      .createQueryBuilder('u')
+      .where(`u.email = :email`, {
+        email: email,
+      })
+      .getOne();
   }
 
   async findUserForPasswordUpdate(recoveryCode: string): Promise<User | null> {
     try {
       return await this.usersRepository
         .createQueryBuilder('u')
-        .where(`upr.recoveryCode = :recoveryCode`)
+        .where(`upr.recoveryCode = :recoveryCode`, {
+          recoveryCode: recoveryCode,
+        })
         .leftJoinAndSelect('u.userPasswordRecovery', 'upr')
-        .setParameter('recoveryCode', recoveryCode)
         .getOne();
     } catch (e) {
       console.error(e);
       return null;
     }
+  }
+
+  async findUserForLoginValidation(loginOrEmail: string): Promise<User | null> {
+    const users = await this.dataSource.query(
+      `select id, "passwordHash", "isConfirmed", "isBanned"
+       from public.users
+       where login = $1
+          or email = $1;`,
+      [loginOrEmail],
+    );
+
+    if (users.length === 0) {
+      return null;
+    }
+
+    return users[0];
   }
 
   // ***** Delete operations *****
@@ -131,22 +165,6 @@ export class UsersRepository {
   }
 
   // ---------------------------------------
-
-  async findUserForLoginValidation(loginOrEmail: string): Promise<User | null> {
-    const users = await this.dataSource.query(
-      `select id, "passwordHash", "isConfirmed", "isBanned"
-       from public.users
-       where login = $1
-          or email = $1;`,
-      [loginOrEmail],
-    );
-
-    if (users.length === 0) {
-      return null;
-    }
-
-    return users[0];
-  }
 
   async banUserBySA(userId: number, banReason: string): Promise<boolean> {
     return this.dataSource.transaction(async () => {
