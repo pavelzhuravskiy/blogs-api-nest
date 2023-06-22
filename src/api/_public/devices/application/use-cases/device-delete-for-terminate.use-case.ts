@@ -8,7 +8,7 @@ import { ExceptionResultType } from '../../../../../exceptions/types/exception-r
 import { DevicesRepository } from '../../../../infrastructure/repositories/devices/devices.repository';
 
 export class DeviceDeleteForTerminateCommand {
-  constructor(public deviceId: string, public userId: string) {}
+  constructor(public deviceId: string, public userId: number) {}
 }
 
 @CommandHandler(DeviceDeleteForTerminateCommand)
@@ -31,12 +31,12 @@ export class DeviceDeleteForTerminateUseCase
       };
     }
 
-    /*if (device.userId !== command.userId) {
+    if (device.user.id !== command.userId) {
       return {
         data: false,
         code: ResultCode.Forbidden,
       };
-    }*/
+    }
 
     await this.devicesRepository.deleteDevice(command.deviceId);
 

@@ -17,29 +17,38 @@ export class DevicesRepository {
 
   // ***** Find device operations *****
   async findDevice(deviceId: string): Promise<Device | null> {
-    return this.devicesRepository
-      .createQueryBuilder('d')
-      .where(`d.deviceId = :deviceId`, { deviceId: deviceId })
-      .getOne();
+    try {
+      return await this.devicesRepository
+        .createQueryBuilder('d')
+        .where(`d.deviceId = :deviceId`, { deviceId: deviceId })
+        .leftJoinAndSelect('d.user', 'u')
+        .getOne();
+    } catch (e) {
+      console.log(e);
+      return null;
+    }
   }
 
-  async deleteOldDevices(deviceId: string): Promise<boolean> {
-    return this.dataSource.query(
-      `delete
-       from public.devices
-       where "deviceId" != $1;`,
-      [deviceId],
-    );
-  }
-
+  // ***** Delete device operations *****
   async deleteDevice(deviceId: string): Promise<boolean> {
-    const result = await this.dataSource.query(
-      `delete
-       from public.devices
-       where "deviceId" = $1;`,
-      [deviceId],
-    );
-    return result[1] === 1;
+    const result = await this.devicesRepository
+      .createQueryBuilder('d')
+      .delete()
+      .from(Device)
+      .where('deviceId = :deviceId', { deviceId: deviceId })
+      .execute();
+    return result.affected === 1;
+  }
+
+  async deleteOldDevices(deviceId: string, userId: number): Promise<boolean> {
+    const result = await this.devicesRepository
+      .createQueryBuilder('d')
+      .delete()
+      .from(Device)
+      .where('userId = :userId', { userId: userId })
+      .andWhere('deviceId != :deviceId', { deviceId: deviceId })
+      .execute();
+    return result.affected === 1;
   }
 
   async deleteBannedUserDevices(userId: number): Promise<boolean> {

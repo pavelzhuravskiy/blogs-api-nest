@@ -34,10 +34,15 @@ export class PublicDevicesController {
   @UseGuards(JwtRefreshGuard)
   @Delete('devices')
   @HttpCode(204)
-  async deleteOldDevices(@RefreshToken() refreshToken) {
+  async deleteOldDevices(
+    @RefreshToken() refreshToken,
+    @UserIdFromGuard() userId,
+  ) {
     const decodedToken: any = this.jwtService.decode(refreshToken);
     const deviceId = decodedToken?.deviceId;
-    return this.commandBus.execute(new DevicesDeleteOldCommand(deviceId));
+    return this.commandBus.execute(
+      new DevicesDeleteOldCommand(deviceId, userId),
+    );
   }
 
   @UseGuards(JwtRefreshGuard)
