@@ -28,8 +28,8 @@ export class UsersRepository {
 
   // ***** TypeORM data source manager SAVE *****
   async dataSourceSave(
-    entity: UserEmailConfirmation | UserPasswordRecovery,
-  ): Promise<UserEmailConfirmation | UserPasswordRecovery> {
+    entity: UserBanBySA | UserEmailConfirmation | UserPasswordRecovery,
+  ): Promise<UserBanBySA | UserEmailConfirmation | UserPasswordRecovery> {
     return this.dataSource.manager.save(entity);
   }
 
@@ -120,6 +120,19 @@ export class UsersRepository {
       })
       .leftJoinAndSelect('u.userBanBySA', 'ubsa')
       .getOne();
+  }
+
+  async findUserForBan(userId: string): Promise<User | null> {
+    try {
+      return await this.usersRepository
+        .createQueryBuilder('u')
+        .where(`u.id = :userId`, { userId: userId })
+        .leftJoinAndSelect('u.userBanBySA', 'ubsa')
+        .getOne();
+    } catch (e) {
+      console.log(e);
+      return null;
+    }
   }
 
   // ***** Delete operations *****

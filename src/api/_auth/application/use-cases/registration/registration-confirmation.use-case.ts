@@ -44,13 +44,12 @@ export class RegistrationConfirmationUseCase
 
       // Commit transaction
       await queryRunner.commitTransaction();
-
-      // Return user id
       return true;
     } catch (e) {
       // since we have errors - rollback the changes
       console.error(e);
       await queryRunner.rollbackTransaction();
+      return null;
     } finally {
       // release a queryRunner which was manually instantiated
       await queryRunner.release();

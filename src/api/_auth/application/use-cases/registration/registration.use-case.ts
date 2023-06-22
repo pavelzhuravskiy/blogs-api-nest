@@ -82,6 +82,7 @@ export class RegistrationUseCase
       // Since we have errors - rollback the changes
       console.error(e);
       await queryRunner.rollbackTransaction();
+      return null;
     } finally {
       // Release a queryRunner which was manually instantiated
       await queryRunner.release();

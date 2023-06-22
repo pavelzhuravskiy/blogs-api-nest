@@ -72,9 +72,13 @@ export class SuperAdminUsersController {
       new SAUserBanCommand(saUserBanInputDto, userId),
     );
 
-    if (result.code !== ResultCode.Success) {
-      return exceptionHandler(result.code, result.message, result.field);
+    if (!result) {
+      return exceptionHandler(ResultCode.NotFound, userNotFound, userIDField);
     }
+
+    /*if (result.code !== ResultCode.Success) {
+      return exceptionHandler(result.code, result.message, result.field);
+    }*/
 
     return result;
   }

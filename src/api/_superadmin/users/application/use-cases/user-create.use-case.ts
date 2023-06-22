@@ -17,7 +17,7 @@ export class UserCreateUseCase implements ICommandHandler<UserCreateCommand> {
     private dataSource: DataSource,
   ) {}
 
-  async execute(command: UserCreateCommand): Promise<number> {
+  async execute(command: UserCreateCommand): Promise<number | null> {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -56,6 +56,7 @@ export class UserCreateUseCase implements ICommandHandler<UserCreateCommand> {
       // since we have errors - rollback the changes
       console.error(e);
       await queryRunner.rollbackTransaction();
+      return null;
     } finally {
       // release a queryRunner which was manually instantiated
       await queryRunner.release();

@@ -52,11 +52,12 @@ export class DevicesRepository {
   }
 
   async deleteBannedUserDevices(userId: number): Promise<boolean> {
-    return this.dataSource.query(
-      `delete
-       from public.devices
-       where "userId" = $1;`,
-      [userId],
-    );
+    const result = await this.devicesRepository
+      .createQueryBuilder('d')
+      .delete()
+      .from(Device)
+      .where('userId = :userId', { userId: userId })
+      .execute();
+    return result.affected === 1;
   }
 }

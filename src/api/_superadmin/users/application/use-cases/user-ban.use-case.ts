@@ -1,15 +1,8 @@
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { SAUserBanInputDto } from '../../../../dto/users/input/superadmin/sa.user-ban.input.dto';
-import { ResultCode } from '../../../../../enums/result-code.enum';
-import {
-  userIDField,
-  userIsAlreadyBanned,
-  userIsAlreadyUnbanned,
-  userNotFound,
-} from '../../../../../exceptions/exception.constants';
-import { ExceptionResultType } from '../../../../../exceptions/types/exception-result.type';
 import { UsersRepository } from '../../../../infrastructure/repositories/users/users.repository';
 import { DevicesRepository } from '../../../../infrastructure/repositories/devices/devices.repository';
+import { DataSource } from 'typeorm';
 
 export class SAUserBanCommand {
   constructor(
@@ -24,89 +17,53 @@ export class UserBanUseCase implements ICommandHandler<SAUserBanCommand> {
     private commandBus: CommandBus,
     private readonly usersRepository: UsersRepository,
     private readonly devicesRepository: DevicesRepository,
+    private dataSource: DataSource,
   ) {}
 
-  async execute(
-    command: SAUserBanCommand,
-  ): Promise<ExceptionResultType<boolean>> {
-    const user = await this.usersRepository.findUserById(+command.userId);
+  async execute(command: SAUserBanCommand): Promise<boolean | null> {
+    const user = await this.usersRepository.findUserForBan(command.userId);
 
     if (!user) {
-      return {
-        data: false,
-        code: ResultCode.BadRequest,
-        field: userIDField,
-        message: userNotFound,
-      };
+      return null;
     }
 
-    const banDBStatus = `user.isBanned`;
+    if (command.saUserBanInputDto.isBanned) {
+      const queryRunner = this.dataSource.createQueryRunner();
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
+      const queryRunnerManager = queryRunner.manager;
 
-    if (banDBStatus && command.saUserBanInputDto.isBanned) {
-      return {
-        data: false,
-        code: ResultCode.BadRequest,
-        field: userIDField,
-        message: userIsAlreadyBanned,
-      };
-    }
+      try {
+        // Ban user
+        user.userBanBySA.isBanned = true;
+        user.userBanBySA.banReason = command.saUserBanInputDto.banReason;
+        user.userBanBySA.banDate = new Date();
+        await this.usersRepository.queryRunnerSave(
+          user.userBanBySA,
+          queryRunnerManager,
+        );
 
-    if (!banDBStatus && !command.saUserBanInputDto.isBanned) {
-      return {
-        data: false,
-        code: ResultCode.BadRequest,
-        field: userIDField,
-        message: userIsAlreadyUnbanned,
-      };
-    }
+        // Delete user's devices
+        await this.devicesRepository.deleteBannedUserDevices(user.id);
 
-    if (!banDBStatus) {
-      await this.usersRepository.banUserBySA(
-        user.id,
-        command.saUserBanInputDto.banReason,
-      );
-
-      await this.devicesRepository.deleteBannedUserDevices(user.id);
-
-      /*await this.blogsRepository.setBlogsOwnerBanStatus(command.userId, true);*/
-      /*await this.postsRepository.setPostsOwnerBanStatus(command.userId, true);*/
-      /*await this.commentsRepository.setCommentsOwnerBanStatus(
-        command.userId,
-        true,
-      );*/
-      /*await this.likesRepository.setLikesOwnerBanStatus(
-        command.userId,
-        true,
-        this.PostModel,
-      );*/
-      /*await this.likesRepository.setLikesOwnerBanStatus(
-        command.userId,
-        true,
-        this.CommentModel,
-      );*/
+        // Commit transaction
+        await queryRunner.commitTransaction();
+        return true;
+      } catch (e) {
+        // since we have errors - rollback the changes
+        console.error(e);
+        await queryRunner.rollbackTransaction();
+        return null;
+      } finally {
+        // release a queryRunner which was manually instantiated
+        await queryRunner.release();
+      }
     } else {
-      await this.usersRepository.unbanUserBySA(user.id);
-      /*await this.blogsRepository.setBlogsOwnerBanStatus(command.userId, false);*/
-      /*await this.postsRepository.setPostsOwnerBanStatus(command.userId, false);*/
-      /*await this.commentsRepository.setCommentsOwnerBanStatus(
-        command.userId,
-        false,
-      );*/
-      /*await this.likesRepository.setLikesOwnerBanStatus(
-        command.userId,
-        false,
-        this.PostModel,
-      );*/
-      /*await this.likesRepository.setLikesOwnerBanStatus(
-        command.userId,
-        false,
-        this.CommentModel,
-      );*/
+      user.userBanBySA.isBanned = false;
+      user.userBanBySA.banReason = null;
+      user.userBanBySA.banDate = null;
+      await this.usersRepository.dataSourceSave(user.userBanBySA);
+      return true;
     }
-
-    return {
-      data: true,
-      code: ResultCode.Success,
-    };
   }
 }
