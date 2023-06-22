@@ -17,7 +17,7 @@ export class ValidateLoginAndPasswordUseCase
       command.loginOrEmail,
     );
 
-    if (!user || !user.isConfirmed /*|| user.isBanned*/) {
+    if (!user || !user.isConfirmed || user.userBanBySA.isBanned) {
       return null;
     }
 

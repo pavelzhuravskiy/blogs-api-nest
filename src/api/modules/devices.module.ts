@@ -7,16 +7,16 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { DevicesRepository } from '../infrastructure/repositories/devices/devices.repository';
 import { DevicesQueryRepository } from '../infrastructure/repositories/devices/devices.query.repository';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { Device } from '../entities/devices/device.entity';
 
 const useCases = [DeviceDeleteForTerminateUseCase, DevicesDeleteOldUseCase];
-const entities = [
-  /*Device*/
-];
+const entities = [Device];
 const repositories = [DevicesRepository, DevicesQueryRepository];
 
 @Module({
   imports: [TypeOrmModule.forFeature([...entities]), CqrsModule],
   controllers: [PublicDevicesController],
   providers: [JwtService, ...useCases, ...repositories],
+  exports: [TypeOrmModule],
 })
 export class DevicesModule {}

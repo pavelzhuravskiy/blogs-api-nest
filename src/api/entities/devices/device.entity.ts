@@ -1,14 +1,18 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { User } from '../users/user.entity';
 
-@Entity()
+@Entity('devices')
 export class Device {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'integer' })
-  userId: string; // FK 🔑
-
-  @Column({ type: 'uuid' })
+  @Column({ name: 'device_id', type: 'uuid' })
   deviceId: string;
 
   @Column({ type: 'varchar' })
@@ -17,9 +21,15 @@ export class Device {
   @Column({ type: 'varchar' })
   title: string;
 
-  @Column({ type: 'timestamp with time zone' })
+  @Column({ name: 'last_active_date', type: 'bigint' })
   lastActiveDate: number;
 
-  @Column({ type: 'timestamp with time zone' })
+  @Column({ name: 'expiration_date', type: 'bigint' })
   expirationDate: number;
+
+  @ManyToOne(() => User, (user) => user.device, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn()
+  user: User;
 }

@@ -25,6 +25,7 @@ import { Repository } from 'typeorm';
 import { User } from '../entities/users/user.entity';
 import { UsersModule } from './users.module';
 import { MailAdapter } from '../infrastructure/mail/mail-adapter';
+import { DevicesModule } from './devices.module';
 
 const services = [JwtService];
 
@@ -62,6 +63,7 @@ const strategies = [
     CqrsModule,
     PassportModule,
     UsersModule,
+    DevicesModule,
   ],
   controllers: [PublicAuthController],
   providers: [

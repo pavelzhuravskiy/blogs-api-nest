@@ -19,7 +19,6 @@ export class UsersRepository {
   ) {}
 
   // ***** TypeORM query runner transaction SAVE *****
-
   async queryRunnerSave(
     entity: User | UserBanBySA | UserEmailConfirmation,
     queryRunnerManager: EntityManager,
@@ -28,7 +27,6 @@ export class UsersRepository {
   }
 
   // ***** TypeORM data source manager SAVE *****
-
   async dataSourceSave(
     entity: UserEmailConfirmation | UserPasswordRecovery,
   ): Promise<UserEmailConfirmation | UserPasswordRecovery> {
@@ -36,7 +34,6 @@ export class UsersRepository {
   }
 
   // ***** Unique login and email checks *****
-
   async checkLogin(login: string): Promise<User | null> {
     return this.usersRepository
       .createQueryBuilder('u')
@@ -52,7 +49,6 @@ export class UsersRepository {
   }
 
   // ***** Find user operations *****
-
   async findUserById(userId: number): Promise<User | null> {
     try {
       return await this.usersRepository
@@ -117,23 +113,16 @@ export class UsersRepository {
   }
 
   async findUserForLoginValidation(loginOrEmail: string): Promise<User | null> {
-    const users = await this.dataSource.query(
-      `select id, "passwordHash", "isConfirmed", "isBanned"
-       from public.users
-       where login = $1
-          or email = $1;`,
-      [loginOrEmail],
-    );
-
-    if (users.length === 0) {
-      return null;
-    }
-
-    return users[0];
+    return this.usersRepository
+      .createQueryBuilder('u')
+      .where(`u.login = :loginOrEmail OR u.email = :loginOrEmail`, {
+        loginOrEmail: loginOrEmail,
+      })
+      .leftJoinAndSelect('u.userBanBySA', 'ubsa')
+      .getOne();
   }
 
   // ***** Delete operations *****
-
   async deleteUser(userId: number): Promise<boolean> {
     const result = await this.usersRepository
       .createQueryBuilder('u')

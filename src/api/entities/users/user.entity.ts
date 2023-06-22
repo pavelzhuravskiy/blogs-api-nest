@@ -2,12 +2,14 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { UserBanBySA } from './user-ban-by-sa.entity';
 import { UserEmailConfirmation } from './user-email-confirmation.entity';
 import { UserPasswordRecovery } from './user-password-recovery.entity';
+import { Device } from '../devices/device.entity';
 
 @Entity('users')
 export class User {
@@ -43,6 +45,9 @@ export class User {
     (userPasswordRecovery) => userPasswordRecovery.user,
   )
   userPasswordRecovery: UserPasswordRecovery;
+
+  @OneToMany(() => Device, (device) => device.user)
+  device: Device;
 
   static checkSortingField(value: any) {
     const u = new User();

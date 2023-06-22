@@ -31,12 +31,12 @@ export class DeviceDeleteForTerminateUseCase
       };
     }
 
-    if (device.userId !== command.userId) {
+    /*if (device.userId !== command.userId) {
       return {
         data: false,
         code: ResultCode.Forbidden,
       };
-    }
+    }*/
 
     await this.devicesRepository.deleteDevice(command.deviceId);
 
