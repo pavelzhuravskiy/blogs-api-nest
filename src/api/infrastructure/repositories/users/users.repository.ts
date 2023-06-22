@@ -10,9 +10,10 @@ import { UserBanBySA } from '../../../entities/users/user-ban-by-sa.entity';
 @Injectable()
 export class UsersRepository {
   constructor(
-    @InjectRepository(User) private readonly userRepository: Repository<User>,
-    @InjectRepository(UserBanBySA)
-    private readonly userBanBySARepository: Repository<UserBanBySA>,
+    @InjectRepository(User)
+    private readonly usersRepository: Repository<User>,
+    @InjectRepository(UserEmailConfirmation)
+    private readonly userEmailConfirmationsRepository: Repository<UserEmailConfirmation>,
     @InjectDataSource() private dataSource: DataSource,
   ) {}
 
@@ -36,18 +37,18 @@ export class UsersRepository {
   // ***** Unique login and email checks *****
 
   async checkLogin(login: string): Promise<User | null> {
-    return this.userRepository.findOneBy({ login: login });
+    return this.usersRepository.findOneBy({ login: login });
   }
 
   async checkEmail(email: string): Promise<User | null> {
-    return this.userRepository.findOneBy({ email: email });
+    return this.usersRepository.findOneBy({ email: email });
   }
 
   // ***** Find user operations *****
 
   async findUserById(userId: number): Promise<User | null> {
     try {
-      return await this.userRepository.findOneBy({ id: userId });
+      return await this.usersRepository.findOneBy({ id: userId });
     } catch (e) {
       console.log(e);
       return null;
@@ -55,16 +56,31 @@ export class UsersRepository {
   }
 
   async findUserForEmailResend(email: string): Promise<User | null> {
-    return this.userRepository.findOne({
+    return this.usersRepository.findOne({
       where: { email: email },
       relations: { userEmailConfirmation: true },
     });
   }
 
+  async findUserForEmailConfirm(
+    confirmationCode: string,
+  ): Promise<User | null> {
+    try {
+      return await this.usersRepository
+        .createQueryBuilder('u')
+        .where(`uec.confirmationCode = '${confirmationCode}'`)
+        .leftJoinAndSelect('u.userEmailConfirmation', 'uec')
+        .getOne();
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
+  }
+
   // ***** Delete operations *****
 
   async deleteUser(userId: number): Promise<boolean> {
-    const result = await this.userRepository
+    const result = await this.usersRepository
       .createQueryBuilder('u')
       .delete()
       .from(User)
@@ -72,6 +88,18 @@ export class UsersRepository {
       .execute();
     return result.affected === 1;
   }
+
+  async deleteEmailConfirmationRecord(userId: number): Promise<boolean> {
+    const result = await this.userEmailConfirmationsRepository
+      .createQueryBuilder('uec')
+      .delete()
+      .from(UserEmailConfirmation)
+      .where('userId = :userId', { userId: userId })
+      .execute();
+    return result.affected === 1;
+  }
+
+  // ---------------------------------------
 
   async findUserByEmail(email: string): Promise<User | null> {
     const users = await this.dataSource.query(
@@ -104,32 +132,6 @@ export class UsersRepository {
     return users[0];
   }
 
-  async findUserForEmailConfirm(
-    code: string,
-  ): Promise<(User & UserEmailConfirmation) | null> {
-    if (!uuidIsValid(code)) {
-      return null;
-    }
-
-    const users = await this.dataSource.query(
-      `select u.id,
-              u."isConfirmed",
-              uec."confirmationCode",
-              uec."expirationDate"
-       from public.users u
-                left join public.user_email_confirmations uec
-                          on u.id = uec."userId"
-       where uec."confirmationCode" = $1`,
-      [code],
-    );
-
-    if (users.length === 0) {
-      return null;
-    }
-
-    return users[0];
-  }
-
   async findPasswordRecoveryRecord(
     code: string,
   ): Promise<UserPasswordRecovery> {
@@ -149,25 +151,6 @@ export class UsersRepository {
     }
 
     return users[0];
-  }
-
-  async confirmUser(userId: number): Promise<boolean> {
-    return this.dataSource.transaction(async () => {
-      await this.dataSource.query(
-        `update public.users
-         set "isConfirmed" = true
-         where id = $1`,
-        [userId],
-      );
-
-      const result = await this.dataSource.query(
-        `delete
-         from public.user_email_confirmations
-         where "userId" = $1;`,
-        [userId],
-      );
-      return result[1] === 1;
-    });
   }
 
   async createPasswordRecoveryRecord(

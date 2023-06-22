@@ -52,8 +52,9 @@ export class UserCreateUseCase implements ICommandHandler<UserCreateCommand> {
 
       // Return user id
       return savedUser.id;
-    } catch (err) {
+    } catch (e) {
       // since we have errors - rollback the changes
+      console.error(e);
       await queryRunner.rollbackTransaction();
     } finally {
       // release a queryRunner which was manually instantiated

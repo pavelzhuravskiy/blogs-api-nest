@@ -41,8 +41,8 @@ export class PasswordRecoveryUseCase
           recoveryCode,
         ),
       );
-    } catch (error) {
-      console.error(error);
+    } catch (e) {
+      console.error(e);
       return null;
     }
 

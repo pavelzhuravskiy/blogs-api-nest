@@ -73,11 +73,12 @@ export class RegistrationUseCase
 
       // Return user id
       return savedUser.id;
-    } catch (err) {
-      // since we have errors - rollback the changes
+    } catch (e) {
+      // Since we have errors - rollback the changes
+      console.error(e);
       await queryRunner.rollbackTransaction();
     } finally {
-      // release a queryRunner which was manually instantiated
+      // Release a queryRunner which was manually instantiated
       await queryRunner.release();
     }
   }
@@ -93,8 +94,8 @@ export class RegistrationUseCase
         command.userInputDto.email,
         confirmationCode,
       );
-    } catch (error) {
-      console.error(error);
+    } catch (e) {
+      console.error(e);
       await this.usersRepository.deleteUser(userId);
       return null;
     }

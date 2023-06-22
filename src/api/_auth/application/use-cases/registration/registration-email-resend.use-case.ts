@@ -17,7 +17,7 @@ export class RegistrationEmailResendUseCase
   constructor(
     private commandBus: CommandBus,
     private readonly usersRepository: UsersRepository,
-    private readonly emailAdapter: MailAdapter,
+    private readonly mailAdapter: MailAdapter,
   ) {}
 
   async execute(
@@ -27,11 +27,7 @@ export class RegistrationEmailResendUseCase
       command.emailInputDto.email,
     );
 
-    if (
-      !user ||
-      user.isConfirmed ||
-      user.userEmailConfirmation.expirationDate < new Date()
-    ) {
+    if (!user || user.isConfirmed) {
       return null;
     }
 
@@ -53,13 +49,13 @@ export class RegistrationEmailResendUseCase
     login: string,
   ): Promise<any> {
     try {
-      await this.emailAdapter.sendRegistrationMail(
+      await this.mailAdapter.sendRegistrationMail(
         login,
         command.emailInputDto.email,
         confirmationCode,
       );
-    } catch (error) {
-      console.error(error);
+    } catch (e) {
+      console.error(e);
       return null;
     }
   }

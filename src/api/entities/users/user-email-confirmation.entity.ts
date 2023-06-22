@@ -12,11 +12,15 @@ export class UserEmailConfirmation {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ name: 'confirmation_code', type: 'uuid' })
-  confirmationCode: string;
+  @Column({ name: 'confirmation_code', nullable: true, type: 'uuid' })
+  confirmationCode: string | null;
 
-  @Column({ name: 'expiration_date', type: 'timestamp with time zone' })
-  expirationDate: Date;
+  @Column({
+    name: 'expiration_date',
+    nullable: true,
+    type: 'timestamp with time zone',
+  })
+  expirationDate: Date | null;
 
   @OneToOne(() => User, (user) => user.userEmailConfirmation, {
     onDelete: 'CASCADE',
