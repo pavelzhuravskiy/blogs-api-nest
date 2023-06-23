@@ -2,10 +2,13 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { BlogBan } from './blog-ban.entity';
+import { BlogOwner } from './blog-owner.entity';
 
-@Entity()
+@Entity('blogs')
 export class Blog {
   @PrimaryGeneratedColumn()
   id: number;
@@ -16,17 +19,20 @@ export class Blog {
   @Column({ type: 'varchar', width: 500 })
   description: string;
 
-  @Column({ type: 'varchar' })
+  @Column({ name: 'website_url', type: 'varchar' })
   websiteUrl: string;
 
-  @CreateDateColumn({ type: 'timestamp with time zone' })
+  @CreateDateColumn({ name: 'created_at', type: 'timestamp with time zone' })
   createdAt: Date;
 
-  @Column({ type: 'boolean' })
+  @Column({ name: 'is_membership', type: 'boolean', default: false })
   isMembership: boolean;
 
-  @Column({ type: 'boolean' })
-  isBanned: boolean;
+  @OneToOne(() => BlogBan, (blogBan) => blogBan.blog)
+  blogBan: BlogBan;
+
+  @OneToOne(() => BlogOwner, (blogOwner) => blogOwner.blog)
+  blogOwner: BlogOwner;
 
   static checkSortingField(value: any) {
     const b = new Blog();
@@ -36,7 +42,6 @@ export class Blog {
     b.websiteUrl = '';
     b.createdAt = new Date();
     b.isMembership = false;
-    b.isBanned = false;
     return b.hasOwnProperty(value);
   }
 }

@@ -1,12 +1,4 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { ResultCode } from '../../../../../enums/result-code.enum';
-import {
-  blogIDField,
-  blogIsAlreadyBanned,
-  blogIsAlreadyUnbanned,
-  blogNotFound,
-} from '../../../../../exceptions/exception.constants';
-import { ExceptionResultType } from '../../../../../exceptions/types/exception-result.type';
 import { SABlogBanInputDto } from '../../../../dto/users/input/superadmin/sa.blog-ban.input.dto';
 import { BlogsRepository } from '../../../../infrastructure/repositories/blogs/blogs.repository';
 
@@ -21,49 +13,25 @@ export class SABlogBanCommand {
 export class BlogBanUseCase implements ICommandHandler<SABlogBanCommand> {
   constructor(private readonly blogsRepository: BlogsRepository) {}
 
-  async execute(
-    command: SABlogBanCommand,
-  ): Promise<ExceptionResultType<boolean>> {
-    const blog = await this.blogsRepository.findBlog(command.blogId);
+  async execute(command: SABlogBanCommand): Promise<boolean | null> {
+    const blog = await this.blogsRepository.findBlogForBlogBan(command.blogId);
 
     if (!blog) {
-      return {
-        data: false,
-        code: ResultCode.BadRequest,
-        field: blogIDField,
-        message: blogNotFound,
-      };
+      return null;
     }
 
-    const banDBStatus = blog.isBanned;
-
-    if (banDBStatus && command.saBlogBanInputDto.isBanned) {
-      return {
-        data: false,
-        code: ResultCode.BadRequest,
-        field: blogIDField,
-        message: blogIsAlreadyBanned,
-      };
-    }
-
-    if (!banDBStatus && !command.saBlogBanInputDto.isBanned) {
-      return {
-        data: false,
-        code: ResultCode.BadRequest,
-        field: blogIDField,
-        message: blogIsAlreadyUnbanned,
-      };
-    }
-
-    if (!banDBStatus) {
-      await this.blogsRepository.banBlog(blog.id);
+    if (command.saBlogBanInputDto.isBanned) {
+      blog.blogBan.blog = blog;
+      blog.blogBan.isBanned = true;
+      blog.blogBan.banDate = new Date();
+      await this.blogsRepository.dataSourceSave(blog.blogBan);
     } else {
-      await this.blogsRepository.unbanBlog(blog.id);
+      blog.blogBan.blog = blog;
+      blog.blogBan.isBanned = false;
+      blog.blogBan.banDate = null;
+      await this.blogsRepository.dataSourceSave(blog.blogBan);
     }
 
-    return {
-      data: true,
-      code: ResultCode.Success,
-    };
+    return true;
   }
 }

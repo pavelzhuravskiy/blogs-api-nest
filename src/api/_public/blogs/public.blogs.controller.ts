@@ -1,6 +1,5 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
 import { BlogQueryDto } from '../../dto/blogs/query/blog.query.dto';
-import { Role } from '../../../enums/role.enum';
 import { exceptionHandler } from '../../../exceptions/exception.handler';
 import {
   blogIDField,
@@ -23,14 +22,12 @@ export class PublicBlogsController {
 
   @Get()
   async findBlogs(@Query() query: BlogQueryDto) {
-    const role = Role.User;
-    return this.blogsQueryRepository.findBlogs(query, role);
+    return this.blogsQueryRepository.findBlogsForPublicUser(query);
   }
 
   @Get(':id')
   async findBlog(@Param('id') id) {
-    const role = Role.User;
-    const result = await this.blogsQueryRepository.findBlog(id, role);
+    const result = await this.blogsQueryRepository.findBlog(id);
 
     if (!result) {
       return exceptionHandler(ResultCode.NotFound, blogNotFound, blogIDField);

@@ -1,16 +1,27 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { User } from '../users/user.entity';
+import { Blog } from './blog.entity';
 
-@Entity()
+@Entity('blog_owners')
 export class BlogOwner {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'integer' })
-  blogId: number; // FK 🔑
+  @OneToOne(() => Blog, (blog) => blog.blogOwner, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn()
+  blog: Blog;
 
-  @Column({ type: 'integer' })
-  ownerId: number; // FK 🔑
-
-  @Column({ type: 'varchar' })
-  ownerLogin: string; // FK 🔑
+  @ManyToOne(() => User, (user) => user.blogOwner, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn()
+  user: User;
 }

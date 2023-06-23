@@ -39,11 +39,14 @@ import { UsersGetBannedUseCase } from '../_blogger/application/use-cases/users-g
 import { CommentsQueryRepository } from '../infrastructure/repositories/comments/comments.query.repository';
 import { CommentsRepository } from '../infrastructure/repositories/comments/comments.repository';
 import { UsersModule } from './users.module';
+import { Blog } from '../entities/blogs/blog.entity';
+import { BlogOwner } from '../entities/blogs/blog-owner.entity';
+import { BlogBan } from '../entities/blogs/blog-ban.entity';
 
 const entities = [
-  // Blog,
-  // BlogOwner,
-  // BlogBan,
+  Blog,
+  BlogOwner,
+  BlogBan,
   // Post,
   // PostLike,
   // Comment,

@@ -38,12 +38,12 @@ export class PostCreateUseCase implements ICommandHandler<PostCreateCommand> {
       };
     }
 
-    if (blog.ownerId !== command.userId) {
+    /*if (blog.ownerId !== command.userId) {
       return {
         data: false,
         code: ResultCode.Forbidden,
       };
-    }
+    }*/
 
     const postId = await this.postsRepository.createPost(
       command.postInputDto,

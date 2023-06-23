@@ -1,68 +1,66 @@
 import { Injectable } from '@nestjs/common';
-import { InjectDataSource } from '@nestjs/typeorm';
-import { DataSource } from 'typeorm';
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { BlogViewDto } from '../../../dto/blogs/view/blog.view.dto';
 import { Paginator } from '../../../../helpers/paginator';
 import { BlogQueryDto } from '../../../dto/blogs/query/blog.query.dto';
-import { filterBlogs } from '../../../../helpers/filters/filter-blogs';
-import { Role } from '../../../../enums/role.enum';
 import { SuperAdminBlogViewDto } from '../../../dto/blogs/view/superadmin/sa.blog.view.dto';
 import { Blog } from '../../../entities/blogs/blog.entity';
-import { BlogOwner } from '../../../entities/blogs/blog-owner.entity';
-import { BlogBan } from '../../../entities/blogs/blog-ban.entity';
-import { idIsValid } from '../../../../helpers/id-is-valid';
 
 @Injectable()
 export class BlogsQueryRepository {
-  constructor(@InjectDataSource() private dataSource: DataSource) {}
+  constructor(
+    @InjectRepository(Blog)
+    private readonly blogsRepository: Repository<Blog>,
+    @InjectDataSource() private dataSource: DataSource,
+  ) {}
 
-  async findBlogs(
-    query: BlogQueryDto,
-    role: string,
-  ): Promise<Paginator<BlogViewDto[]>> {
-    const filter = filterBlogs(query.searchNameTerm, role);
+  async findBlog(blogId: number | string): Promise<BlogViewDto> {
+    try {
+      const blogs = await this.blogsRepository
+        .createQueryBuilder('b')
+        .where(`b.id = :blogId`, {
+          blogId: blogId,
+        })
+        .getMany();
 
-    const blogs = await this.dataSource.query(
-      `select b.id,
-              b.name,
-              b.description,
-              b."websiteUrl",
-              b."createdAt",
-              b."isMembership",
-              b."isBanned",
-              bo."ownerId",
-              bo."ownerLogin",
-              bb."banDate"
-       from public.blogs b
-                left join public.blog_owners bo on b.id = bo."blogId"
-                left join public.blog_bans bb on b.id = bb."blogId"
-       where (b.name ilike $1)
-         and ("isBanned" = false or "isBanned" = $2)
-       order by "${query.sortBy}" ${query.sortDirection}
-       limit ${query.pageSize} offset (${query.pageNumber} - 1) * ${query.pageSize}`,
-      [filter.nameFilter, filter.banFilter],
-    );
-
-    const totalCount = await this.dataSource.query(
-      `select count(*)
-       from public.blogs b
-                left join public.blog_owners bo on b.id = bo."blogId"
-       where (b.name ilike $1)
-         and ("isBanned" = false or "isBanned" = $2);`,
-      [filter.nameFilter, filter.banFilter],
-    );
-
-    let items = await this.blogsMapping(blogs);
-
-    if (role === Role.SuperAdmin) {
-      items = await this.blogsMappingForSA(blogs);
+      const mappedBlogs = await this.blogsMapping(blogs);
+      return mappedBlogs[0];
+    } catch (e) {
+      console.log(e);
+      return null;
     }
+  }
+
+  async findBlogsForPublicUser(
+    query: BlogQueryDto,
+  ): Promise<Paginator<BlogViewDto[]>> {
+    const blogs = await this.blogsRepository
+      .createQueryBuilder('b')
+      .where(`${query.searchNameTerm ? 'b.name ilike :nameTerm' : ''}`, {
+        nameTerm: `%${query.searchNameTerm}%`,
+      })
+      .andWhere(`bb.isBanned = false`)
+      .leftJoinAndSelect('b.blogBan', 'bb')
+      .orderBy(`b.${query.sortBy}`, query.sortDirection)
+      .skip((query.pageNumber - 1) * query.pageSize)
+      .take(query.pageSize)
+      .getMany();
+
+    const totalCount = await this.blogsRepository
+      .createQueryBuilder('b')
+      .where(`${query.searchNameTerm ? 'b.name ilike :nameTerm' : ''}`, {
+        nameTerm: `%${query.searchNameTerm}%`,
+      })
+      .andWhere(`bb.isBanned = false`)
+      .leftJoinAndSelect('b.blogBan', 'bb')
+      .getCount();
 
     return Paginator.paginate({
       pageNumber: query.pageNumber,
       pageSize: query.pageSize,
-      totalCount: Number(totalCount[0].count),
-      items: items,
+      totalCount: totalCount,
+      items: await this.blogsMapping(blogs),
     });
   }
 
@@ -70,88 +68,86 @@ export class BlogsQueryRepository {
     query: BlogQueryDto,
     userId: number,
   ): Promise<Paginator<BlogViewDto[]>> {
-    const filter = filterBlogs(query.searchNameTerm);
+    const blogs = await this.blogsRepository
+      .createQueryBuilder('b')
+      .where(`${query.searchNameTerm ? 'b.name ilike :nameTerm' : ''}`, {
+        nameTerm: `%${query.searchNameTerm}%`,
+      })
+      .andWhere(`bo.userId = :userId`, {
+        userId: userId,
+      })
+      .leftJoinAndSelect('b.blogOwner', 'bo')
+      .orderBy(`b.${query.sortBy}`, query.sortDirection)
+      .skip((query.pageNumber - 1) * query.pageSize)
+      .take(query.pageSize)
+      .getMany();
 
-    const blogs = await this.dataSource.query(
-      `select b.id,
-              b.name,
-              b.description,
-              b."websiteUrl",
-              b."createdAt",
-              b."isMembership",
-              bo."ownerId"
-       from public.blogs b
-                left join public.blog_owners bo on b.id = bo."blogId"
-       where (bo."ownerId" = $1)
-         and (b.name ilike $2)
-       order by "${query.sortBy}" ${query.sortDirection}
-       limit ${query.pageSize} offset (${query.pageNumber} - 1) * ${query.pageSize}`,
-      [userId, filter.nameFilter],
-    );
-
-    const totalCount = await this.dataSource.query(
-      `select count(*)
-       from public.blogs b
-                left join public.blog_owners bo on b.id = bo."blogId"
-       where (bo."ownerId" = $1)
-         and (b.name ilike $2);`,
-      [userId, filter.nameFilter],
-    );
+    const totalCount = await this.blogsRepository
+      .createQueryBuilder('b')
+      .where(`${query.searchNameTerm ? 'b.name ilike :nameTerm' : ''}`, {
+        nameTerm: `%${query.searchNameTerm}%`,
+      })
+      .andWhere(`bo.userId = :userId`, {
+        userId: userId,
+      })
+      .leftJoinAndSelect('b.blogOwner', 'bo')
+      .getCount();
 
     return Paginator.paginate({
       pageNumber: query.pageNumber,
       pageSize: query.pageSize,
-      totalCount: Number(totalCount[0].count),
+      totalCount: totalCount,
       items: await this.blogsMapping(blogs),
     });
   }
 
-  async findBlog(blogId: string, role?: string): Promise<BlogViewDto> {
-    if (!idIsValid(blogId)) {
-      return null;
-    }
+  async findBlogsForSA(query: BlogQueryDto): Promise<Paginator<BlogViewDto[]>> {
+    const blogs = await this.blogsRepository
+      .createQueryBuilder('b')
+      .where(`${query.searchNameTerm ? 'b.name ilike :nameTerm' : ''}`, {
+        nameTerm: `%${query.searchNameTerm}%`,
+      })
+      .leftJoinAndSelect('b.blogOwner', 'bo')
+      .leftJoinAndSelect('b.blogBan', 'bb')
+      .leftJoinAndSelect('bo.user', 'u')
+      .orderBy(`b.${query.sortBy}`, query.sortDirection)
+      .skip((query.pageNumber - 1) * query.pageSize)
+      .take(query.pageSize)
+      .getMany();
 
-    const blogs = await this.dataSource.query(
-      `select id,
-              name,
-              description,
-              "websiteUrl",
-              "createdAt",
-              "isMembership",
-              "isBanned"
-       from public.blogs
-       where id = $1`,
-      [blogId],
-    );
+    const totalCount = await this.blogsRepository
+      .createQueryBuilder('b')
+      .where(`${query.searchNameTerm ? 'b.name ilike :nameTerm' : ''}`, {
+        nameTerm: `%${query.searchNameTerm}%`,
+      })
+      .leftJoinAndSelect('b.blogOwner', 'bo')
+      .leftJoinAndSelect('b.blogBan', 'bb')
+      .leftJoinAndSelect('bo.user', 'u')
+      .getCount();
 
-    if (blogs.length === 0 || blogs[0].isBanned) {
-      return null;
-    }
-
-    let mappedBlogs = await this.blogsMapping(blogs);
-
-    if (role === Role.SuperAdmin) {
-      mappedBlogs = await this.blogsMappingForSA(blogs);
-    }
-
-    return mappedBlogs[0];
+    return Paginator.paginate({
+      pageNumber: query.pageNumber,
+      pageSize: query.pageSize,
+      totalCount: totalCount,
+      items: await this.blogsMappingForSA(blogs),
+    });
   }
 
-  private async blogsMapping(blogs: any): Promise<BlogViewDto[]> {
+  private async blogsMapping(blogs: Blog[]): Promise<BlogViewDto[]> {
     return blogs.map((b) => {
       return {
         id: b.id.toString(),
         name: b.name,
         description: b.description,
         websiteUrl: b.websiteUrl,
-        createdAt: b.createdAt.toISOString(),
+        createdAt: b.createdAt,
         isMembership: b.isMembership,
       };
     });
   }
 
   private async blogsMappingForSA(
-    blogs: Array<Blog & BlogOwner & BlogBan>,
+    blogs: Blog[],
   ): Promise<SuperAdminBlogViewDto[]> {
     return blogs.map((b) => {
       return {
@@ -162,12 +158,12 @@ export class BlogsQueryRepository {
         createdAt: b.createdAt,
         isMembership: b.isMembership,
         blogOwnerInfo: {
-          userId: b.ownerId.toString(),
-          userLogin: b.ownerLogin,
+          userId: b.blogOwner.user.id.toString(),
+          userLogin: b.blogOwner.user.login,
         },
         banInfo: {
-          isBanned: b.isBanned,
-          banDate: b.banDate,
+          isBanned: b.blogBan.isBanned,
+          banDate: b.blogBan.banDate,
         },
       };
     });

@@ -34,12 +34,12 @@ export class BlogUpdateUseCase implements ICommandHandler<BlogUpdateCommand> {
       };
     }
 
-    if (blog.ownerId !== command.userId) {
+    /*if (blog.ownerId !== command.userId) {
       return {
         data: false,
         code: ResultCode.Forbidden,
       };
-    }
+    }*/
 
     await this.blogsRepository.updateBlog(command.blogInputDto, blog.id);
 

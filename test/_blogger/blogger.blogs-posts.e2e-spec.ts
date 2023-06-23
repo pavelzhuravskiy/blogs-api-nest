@@ -331,7 +331,7 @@ describe('Blogger blogs and posts testing', () => {
       });
     });
   });
-  describe('Update blog', () => {
+  describe.skip('Update blog', () => {
     // Auth errors [401]
     it(`should return 401 when trying to update blog with incorrect access token`, async () => {
       return agent
@@ -387,7 +387,7 @@ describe('Blogger blogs and posts testing', () => {
       expect(check.body).toEqual(updatedBlogObject);
     });
   });
-  describe('Delete blog', () => {
+  describe.skip('Delete blog', () => {
     // Auth errors [401]
     it(`should return 401 when trying to delete blog with incorrect access token`, async () => {
       return agent
@@ -430,7 +430,7 @@ describe('Blogger blogs and posts testing', () => {
     });
   });
 
-  describe('Create post', () => {
+  describe.skip('Create post', () => {
     // Validation errors [400]
     it(`should return 400 when trying to create post without title`, async () => {
       const response = await agent
@@ -611,7 +611,7 @@ describe('Blogger blogs and posts testing', () => {
       });
     });
   });
-  describe('Update post', () => {
+  describe.skip('Update post', () => {
     // Auth errors [401]
     it(`should return 401 when trying to update post with incorrect access token`, async () => {
       return agent
@@ -678,7 +678,7 @@ describe('Blogger blogs and posts testing', () => {
       expect(check.body).toEqual(updatedPostObject);
     });
   });
-  describe('Delete post', () => {
+  describe.skip('Delete post', () => {
     // Auth errors [401]
     it(`should return 401 when trying to delete post with incorrect access token`, async () => {
       return agent

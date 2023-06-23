@@ -29,12 +29,12 @@ export class BlogDeleteUseCase implements ICommandHandler<BlogDeleteCommand> {
       };
     }
 
-    if (blog.ownerId !== command.userId) {
+    /*if (blog.ownerId !== command.userId) {
       return {
         data: false,
         code: ResultCode.Forbidden,
       };
-    }
+    }*/
 
     await this.blogsRepository.deleteBlog(blog.id);
 

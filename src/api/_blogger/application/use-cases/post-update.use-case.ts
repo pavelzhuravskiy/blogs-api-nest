@@ -52,12 +52,12 @@ export class PostUpdateUseCase implements ICommandHandler<PostUpdateCommand> {
       };
     }
 
-    if (blog.ownerId !== command.userId) {
+    /*if (blog.ownerId !== command.userId) {
       return {
         data: false,
         code: ResultCode.Forbidden,
       };
-    }
+    }*/
 
     await this.postsRepository.updatePost(command.postInputDto, post.id);
 

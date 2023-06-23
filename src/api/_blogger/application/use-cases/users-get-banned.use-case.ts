@@ -41,12 +41,12 @@ export class UsersGetBannedUseCase
       };
     }
 
-    if (blog.ownerId !== query.userId) {
+    /*if (blog.ownerId !== query.userId) {
       return {
         data: false,
         code: ResultCode.Forbidden,
       };
-    }
+    }*/
 
     const response = await this.usersQueryRepository.findUsersBannedByBlogger(
       query.bloggerUserBanQueryDto,

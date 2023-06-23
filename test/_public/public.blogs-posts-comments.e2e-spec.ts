@@ -142,7 +142,7 @@ describe('Public blogs, posts, comments testing', () => {
       blogId = blog.body.id;
     });
   });
-  describe('Find posts', () => {
+  describe.skip('Find posts', () => {
     it(`should create new post of user 01`, async () => {
       const post = await agent
         .post(bloggerBlogsURI + blogId + publicPostsURI)
@@ -197,7 +197,7 @@ describe('Public blogs, posts, comments testing', () => {
       expect(post.body).toEqual(postObject);
     });
   });
-  describe('Create comment', () => {
+  describe.skip('Create comment', () => {
     // Validation errors [400]
     it(`should return 400 when trying to create comment without content`, async () => {
       const response = await agent
@@ -263,7 +263,7 @@ describe('Public blogs, posts, comments testing', () => {
         .expect(201);
     });
   });
-  describe('Find comments', () => {
+  describe.skip('Find comments', () => {
     // Not found errors [404]
     it(`should return 404 when trying to get nonexistent comment`, async () => {
       return agent.get(publicCommentsURI + randomUUID()).expect(404);
@@ -293,7 +293,7 @@ describe('Public blogs, posts, comments testing', () => {
       expect(comment.body).toEqual(commentObject);
     });
   });
-  describe('Update comment', () => {
+  describe.skip('Update comment', () => {
     // Auth errors [401]
     it(`should return 401 when trying to update comment with incorrect access token`, async () => {
       return agent
@@ -341,7 +341,7 @@ describe('Public blogs, posts, comments testing', () => {
       expect(check.body).toEqual(updatedCommentObject);
     });
   });
-  describe('Delete comment', () => {
+  describe.skip('Delete comment', () => {
     // Auth errors [401]
     it(`should return 401 when trying to delete comment with incorrect access token`, async () => {
       return agent

@@ -1,13 +1,30 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { Blog } from './blog.entity';
 
-@Entity()
+@Entity('blog_bans')
 export class BlogBan {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'integer' })
-  blogId: number; // FK 🔑
+  @Column({ name: 'is_banned', type: 'bool' })
+  isBanned: boolean;
 
-  @Column({ type: 'timestamp with time zone', nullable: true })
-  banDate: Date | null;
+  @Column({
+    name: 'ban_date',
+    type: 'timestamp with time zone',
+    nullable: true,
+  })
+  banDate: Date;
+
+  @OneToOne(() => Blog, (blog) => blog.blogBan, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn()
+  blog: Blog;
 }

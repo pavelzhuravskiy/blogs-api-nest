@@ -10,6 +10,7 @@ import { UserBanBySA } from './user-ban-by-sa.entity';
 import { UserEmailConfirmation } from './user-email-confirmation.entity';
 import { UserPasswordRecovery } from './user-password-recovery.entity';
 import { Device } from '../devices/device.entity';
+import { BlogOwner } from '../blogs/blog-owner.entity';
 
 @Entity('users')
 export class User {
@@ -48,6 +49,9 @@ export class User {
 
   @OneToMany(() => Device, (device) => device.user)
   device: Device;
+
+  @OneToMany(() => BlogOwner, (blogOwner) => blogOwner.user)
+  blogOwner: BlogOwner;
 
   static checkSortingField(value: any) {
     const u = new User();

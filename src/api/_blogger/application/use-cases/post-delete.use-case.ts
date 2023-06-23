@@ -50,12 +50,12 @@ export class PostDeleteUseCase implements ICommandHandler<PostDeleteCommand> {
       };
     }
 
-    if (blog.ownerId !== command.userId) {
+    /*if (blog.ownerId !== command.userId) {
       return {
         data: false,
         code: ResultCode.Forbidden,
       };
-    }
+    }*/
 
     await this.postsRepository.deletePost(post.id);
 

@@ -47,12 +47,12 @@ export class BloggerUserBanUseCase
       command.bloggerUserBanInputDto.blogId,
     );
 
-    if (blog.ownerId !== command.currentUserId) {
+    /*if (blog.ownerId !== command.currentUserId) {
       return {
         data: false,
         code: ResultCode.Forbidden,
       };
-    }
+    }*/
 
     const isAlreadyBanned = await this.usersRepository.findUserBanForBlog(
       userToBanOrUnban.id,

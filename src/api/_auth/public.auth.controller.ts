@@ -52,16 +52,16 @@ export class PublicAuthController {
     private readonly usersRepository: UsersRepository,
   ) {}
 
-  @UseGuards(ThrottlerGuard)
-  @Throttle(5, 10)
+  // @UseGuards(ThrottlerGuard)
+  // @Throttle(5, 10)
   @Post('registration')
   @HttpCode(204)
   async registerUser(@Body() userInputDto: UserInputDto) {
     return this.commandBus.execute(new RegistrationCommand(userInputDto));
   }
 
-  @UseGuards(ThrottlerGuard)
-  @Throttle(5, 10)
+  // @UseGuards(ThrottlerGuard)
+  // @Throttle(5, 10)
   @Post('registration-email-resending')
   @HttpCode(204)
   async resendEmail(@Body() emailInputDto: EmailInputDto) {
@@ -80,8 +80,8 @@ export class PublicAuthController {
     return result;
   }
 
-  @UseGuards(ThrottlerGuard)
-  @Throttle(5, 10)
+  // @UseGuards(ThrottlerGuard)
+  // @Throttle(5, 10)
   @Post('registration-confirmation')
   @HttpCode(204)
   async confirmUser(@Body() confirmCodeInputDto: ConfirmCodeInputDto) {
@@ -100,16 +100,16 @@ export class PublicAuthController {
     return result;
   }
 
-  @UseGuards(ThrottlerGuard)
-  @Throttle(5, 10)
+  // @UseGuards(ThrottlerGuard)
+  // @Throttle(5, 10)
   @Post('password-recovery')
   @HttpCode(204)
   async recoverPassword(@Body() emailInputDto: EmailInputDto) {
     return this.commandBus.execute(new PasswordRecoveryCommand(emailInputDto));
   }
 
-  @UseGuards(ThrottlerGuard)
-  @Throttle(5, 10)
+  // @UseGuards(ThrottlerGuard)
+  // @Throttle(5, 10)
   @Post('new-password')
   @HttpCode(204)
   async updatePassword(@Body() newPasswordDto: NewPasswordInputDto) {
@@ -128,8 +128,8 @@ export class PublicAuthController {
     return result;
   }
 
-  @UseGuards(ThrottlerGuard, LocalAuthGuard)
-  @Throttle(5, 10)
+  @UseGuards(/*ThrottlerGuard, */ LocalAuthGuard)
+  // @Throttle(5, 10)
   @Post('login')
   @HttpCode(200)
   async login(

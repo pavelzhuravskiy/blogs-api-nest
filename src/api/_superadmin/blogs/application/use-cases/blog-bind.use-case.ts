@@ -2,7 +2,6 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { ResultCode } from '../../../../../enums/result-code.enum';
 import {
   blogIDField,
-  blogIsBound,
   blogNotFound,
   userIDField,
   userNotFound,
@@ -47,7 +46,7 @@ export class BlogBindUseCase implements ICommandHandler<BlogBindCommand> {
       };
     }
 
-    const blogOwnerId = blog.ownerId;
+    /*const blogOwnerId = blog.ownerId;
     const blogOwner = await this.usersRepository.findUserById(blogOwnerId);
 
     if (blogOwner) {
@@ -57,7 +56,7 @@ export class BlogBindUseCase implements ICommandHandler<BlogBindCommand> {
         field: blogIDField,
         message: blogIsBound,
       };
-    }
+    }*/
 
     // await this.blogsRepository.bindBlog(blog);
 

@@ -10,13 +10,13 @@ import {
 } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { BlogQueryDto } from '../../dto/blogs/query/blog.query.dto';
-import { Role } from '../../../enums/role.enum';
 import { BasicAuthGuard } from '../../_auth/guards/basic-auth.guard';
 import { ResultCode } from '../../../enums/result-code.enum';
 import { exceptionHandler } from '../../../exceptions/exception.handler';
 import { SABlogBanInputDto } from '../../dto/users/input/superadmin/sa.blog-ban.input.dto';
 import { SABlogBanCommand } from './application/use-cases/blog-ban.use-case';
 import { BlogsQueryRepository } from '../../infrastructure/repositories/blogs/blogs.query.repository';
+import { blogNotFound } from '../../../exceptions/exception.constants';
 
 @Controller('sa/blogs')
 export class SuperAdminBlogsController {
@@ -28,8 +28,7 @@ export class SuperAdminBlogsController {
   @UseGuards(BasicAuthGuard)
   @Get()
   async findBlogs(@Query() query: BlogQueryDto) {
-    const role = Role.SuperAdmin;
-    return this.blogsQueryRepository.findBlogs(query, role);
+    return this.blogsQueryRepository.findBlogsForSA(query);
   }
 
   /*@UseGuards(BasicAuthGuard)
@@ -58,8 +57,8 @@ export class SuperAdminBlogsController {
       new SABlogBanCommand(saBlogBanInputDto, blogId),
     );
 
-    if (result.code !== ResultCode.Success) {
-      return exceptionHandler(result.code, result.message, result.field);
+    if (!result) {
+      return exceptionHandler(ResultCode.NotFound, blogNotFound, blogId);
     }
 
     return result;
