@@ -331,7 +331,7 @@ describe('Blogger blogs and posts testing', () => {
       });
     });
   });
-  describe.skip('Update blog', () => {
+  describe('Update blog', () => {
     // Auth errors [401]
     it(`should return 401 when trying to update blog with incorrect access token`, async () => {
       return agent
@@ -387,7 +387,7 @@ describe('Blogger blogs and posts testing', () => {
       expect(check.body).toEqual(updatedBlogObject);
     });
   });
-  describe.skip('Delete blog', () => {
+  describe('Delete blog', () => {
     // Auth errors [401]
     it(`should return 401 when trying to delete blog with incorrect access token`, async () => {
       return agent

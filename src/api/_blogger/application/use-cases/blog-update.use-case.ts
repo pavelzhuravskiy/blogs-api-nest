@@ -23,7 +23,7 @@ export class BlogUpdateUseCase implements ICommandHandler<BlogUpdateCommand> {
   async execute(
     command: BlogUpdateCommand,
   ): Promise<ExceptionResultType<boolean>> {
-    const blog = await this.blogsRepository.findBlog(command.blogId);
+    const blog = await this.blogsRepository.findBlogWithOwner(command.blogId);
 
     if (!blog) {
       return {
@@ -34,14 +34,17 @@ export class BlogUpdateUseCase implements ICommandHandler<BlogUpdateCommand> {
       };
     }
 
-    /*if (blog.ownerId !== command.userId) {
+    if (blog.blogOwner.user.id !== command.userId) {
       return {
         data: false,
         code: ResultCode.Forbidden,
       };
-    }*/
+    }
 
-    await this.blogsRepository.updateBlog(command.blogInputDto, blog.id);
+    blog.name = command.blogInputDto.name;
+    blog.description = command.blogInputDto.description;
+    blog.websiteUrl = command.blogInputDto.websiteUrl;
+    await this.blogsRepository.dataSourceSave(blog);
 
     return {
       data: true,
