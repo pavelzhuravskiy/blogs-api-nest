@@ -3,7 +3,6 @@ import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 import { PostInputDto } from '../../../dto/posts/input/post.input.dto';
 import { Post } from '../../../entities/posts/post.entity';
-import { idIsValid } from '../../../../helpers/id-is-valid';
 
 @Injectable()
 export class PostsRepository {
@@ -17,38 +16,19 @@ export class PostsRepository {
     return this.dataSource.manager.save(entity);
   }
 
-  async createPost(
-    postInputDto: PostInputDto,
-    blogId: number,
-  ): Promise<number> {
-    const post = await this.dataSource.query(
-      `insert into public.posts (title, "shortDescription", content,
-                                 "blogId")
-       values ($1, $2, $3, $4)
-       returning id;`,
-      [
-        postInputDto.title,
-        postInputDto.shortDescription,
-        postInputDto.content,
-        blogId,
-      ],
-    );
-    return post[0].id;
-  }
-
+  // ***** Find post operations *****
   async findPost(postId: string): Promise<Post | null> {
-    if (!idIsValid(postId)) {
+    try {
+      return await this.postsRepository
+        .createQueryBuilder('p')
+        .where(`p.id = :postId`, {
+          postId: postId,
+        })
+        .getOne();
+    } catch (e) {
+      console.log(e);
       return null;
     }
-
-    const posts = await this.dataSource.query(
-      `select id, "blogId"
-       from public.posts
-       where id = $1`,
-      [postId],
-    );
-
-    return posts[0];
   }
 
   async updatePost(
@@ -71,14 +51,15 @@ export class PostsRepository {
     return result[1] === 1;
   }
 
+  // ***** Delete operations *****
   async deletePost(postId: number): Promise<boolean> {
-    const result = await this.dataSource.query(
-      `delete
-       from public.posts
-       where id = $1;`,
-      [postId],
-    );
-    return result[1] === 1;
+    const result = await this.postsRepository
+      .createQueryBuilder('p')
+      .delete()
+      .from(Post)
+      .where('id = :postId', { postId: postId })
+      .execute();
+    return result.affected === 1;
   }
 
   async findUserPostLikeRecord(
