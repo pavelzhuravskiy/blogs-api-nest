@@ -42,12 +42,13 @@ import { UsersModule } from './users.module';
 import { Blog } from '../entities/blogs/blog.entity';
 import { BlogOwner } from '../entities/blogs/blog-owner.entity';
 import { BlogBan } from '../entities/blogs/blog-ban.entity';
+import { Post } from '../entities/posts/post.entity';
 
 const entities = [
   Blog,
   BlogOwner,
   BlogBan,
-  // Post,
+  Post,
   // PostLike,
   // Comment,
   // CommentLike,

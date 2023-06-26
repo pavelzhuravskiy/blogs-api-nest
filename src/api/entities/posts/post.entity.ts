@@ -2,10 +2,13 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
+  ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { Blog } from '../blogs/blog.entity';
 
-@Entity()
+@Entity('posts')
 export class Post {
   @PrimaryGeneratedColumn()
   id: number;
@@ -13,17 +16,20 @@ export class Post {
   @Column({ type: 'varchar', width: 30 })
   title: string;
 
-  @Column({ type: 'varchar', width: 100 })
+  @Column({ name: 'short_description', type: 'varchar', width: 100 })
   shortDescription: string;
 
   @Column({ type: 'varchar', width: 1000 })
   content: string;
 
-  @CreateDateColumn({ type: 'timestamp with time zone' })
+  @CreateDateColumn({ name: 'created_at', type: 'timestamp with time zone' })
   createdAt: Date;
 
-  @Column({ type: 'integer' })
-  blogId: number; // FK 🔑
+  @ManyToOne(() => Blog, (blog) => blog.post, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn()
+  blog: Blog;
 
   static checkSortingField(value: any) {
     const p = new Post();

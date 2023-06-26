@@ -142,7 +142,7 @@ describe('Public blogs, posts, comments testing', () => {
       blogId = blog.body.id;
     });
   });
-  describe.skip('Find posts', () => {
+  describe('Find posts', () => {
     it(`should create new post of user 01`, async () => {
       const post = await agent
         .post(bloggerBlogsURI + blogId + publicPostsURI)

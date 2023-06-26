@@ -56,7 +56,7 @@ export class CommentCreateUseCase
       };
     }
 
-    const isUserBannedByBlogger = await this.usersRepository.findUserBanForBlog(
+    /*const isUserBannedByBlogger = await this.usersRepository.findUserBanForBlog(
       user.id,
       post.blogId,
     );
@@ -67,7 +67,7 @@ export class CommentCreateUseCase
         code: ResultCode.Forbidden,
         message: userIsBanned,
       };
-    }
+    }*/
 
     const commentId = await this.commentsRepository.createComment(
       command.commentInputDto,

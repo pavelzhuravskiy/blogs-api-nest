@@ -1,13 +1,21 @@
 import { Injectable } from '@nestjs/common';
-import { InjectDataSource } from '@nestjs/typeorm';
-import { DataSource } from 'typeorm';
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { PostInputDto } from '../../../dto/posts/input/post.input.dto';
 import { Post } from '../../../entities/posts/post.entity';
 import { idIsValid } from '../../../../helpers/id-is-valid';
 
 @Injectable()
 export class PostsRepository {
-  constructor(@InjectDataSource() private dataSource: DataSource) {}
+  constructor(
+    @InjectRepository(Post) private readonly postsRepository: Repository<Post>,
+    @InjectDataSource() private dataSource: DataSource,
+  ) {}
+
+  // ***** TypeORM data source manager SAVE *****
+  async dataSourceSave(entity: Post): Promise<Post> {
+    return this.dataSource.manager.save(entity);
+  }
 
   async createPost(
     postInputDto: PostInputDto,

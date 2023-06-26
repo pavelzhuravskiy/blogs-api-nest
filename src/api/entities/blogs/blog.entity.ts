@@ -2,11 +2,13 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { BlogBan } from './blog-ban.entity';
 import { BlogOwner } from './blog-owner.entity';
+import { Post } from '../posts/post.entity';
 
 @Entity('blogs')
 export class Blog {
@@ -33,6 +35,9 @@ export class Blog {
 
   @OneToOne(() => BlogOwner, (blogOwner) => blogOwner.blog)
   blogOwner: BlogOwner;
+
+  @OneToMany(() => Post, (post) => post.blog)
+  post: Post;
 
   static checkSortingField(value: any) {
     const b = new Blog();
