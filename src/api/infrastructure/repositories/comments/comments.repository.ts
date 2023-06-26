@@ -1,8 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
-import { CommentInputDto } from '../../../dto/comments/input/comment.input.dto';
-import { idIsValid } from '../../../../helpers/id-is-valid';
 import { Comment } from '../../../entities/comments/comment.entity';
 
 @Injectable()
@@ -18,24 +16,34 @@ export class CommentsRepository {
     return this.dataSource.manager.save(entity);
   }
 
+  // ***** Find comment operations *****
   async findComment(commentId: string): Promise<Comment | null> {
-    if (!idIsValid(commentId)) {
+    try {
+      return await this.commentsRepository
+        .createQueryBuilder('c')
+        .where(`c.id = :commentId`, {
+          commentId: commentId,
+        })
+        .leftJoinAndSelect('c.user', 'u')
+        .getOne();
+    } catch (e) {
+      console.log(e);
       return null;
     }
-
-    const comments = await this.dataSource.query(
-      `select id, "commentatorId"
-       from public.comments
-       where id = $1;`,
-      [commentId],
-    );
-
-    if (comments.length === 0) {
-      return null;
-    }
-
-    return comments[0];
   }
+
+  // ***** Delete comment operations *****
+  async deleteComment(commentId: number): Promise<boolean> {
+    const result = await this.commentsRepository
+      .createQueryBuilder('c')
+      .delete()
+      .from(Comment)
+      .where('id = :commentId', { commentId: commentId })
+      .execute();
+    return result.affected === 1;
+  }
+
+  // ------------------------------------
 
   async findUserCommentLikeRecord(
     commentId: number,
@@ -80,29 +88,6 @@ export class CommentsRepository {
        where "commentId" = $2
          and "userId" = $3`,
       [likeStatus, commentId, userId],
-    );
-    return result[1] === 1;
-  }
-
-  async updateComment(
-    commentInputDto: CommentInputDto,
-    commentId: number,
-  ): Promise<boolean> {
-    const result = await this.dataSource.query(
-      `update public.comments
-       set "content" = $1
-       where id = $2`,
-      [commentInputDto.content, commentId],
-    );
-    return result[1] === 1;
-  }
-
-  async deleteComment(commentId: number): Promise<boolean> {
-    const result = await this.dataSource.query(
-      `delete
-       from public.comments
-       where id = $1;`,
-      [commentId],
     );
     return result[1] === 1;
   }

@@ -38,17 +38,15 @@ export class CommentUpdateUseCase
       };
     }
 
-    /*if (comment.commentatorId !== command.userId) {
+    if (comment.user.id !== command.userId) {
       return {
         data: false,
         code: ResultCode.Forbidden,
       };
-    }*/
+    }
 
-    await this.commentsRepository.updateComment(
-      command.commentInputDto,
-      comment.id,
-    );
+    comment.content = command.commentInputDto.content;
+    await this.commentsRepository.dataSourceSave(comment);
 
     return {
       data: true,
