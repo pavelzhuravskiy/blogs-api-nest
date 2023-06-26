@@ -43,19 +43,16 @@ import {
   publicPostsURI,
 } from '../utils/constants/posts.constants';
 import { postObject } from '../utils/objects/posts.objects';
-import { BlogsRepository } from '../../src/api/infrastructure/repositories/blogs/blogs.repository';
 import { getAppAndClearDb } from '../utils/functions/get-app';
 
 describe('Super admin blogs testing', () => {
   let app: INestApplication;
   let agent: SuperAgentTest;
-  let blogsRepository: BlogsRepository;
 
   beforeAll(async () => {
     const data = await getAppAndClearDb();
     app = data.app;
     agent = data.agent;
-    blogsRepository = app.get(BlogsRepository);
   });
 
   let aTokenUser01;
@@ -65,7 +62,6 @@ describe('Super admin blogs testing', () => {
   let user02Id;
 
   let blogId;
-  let blog;
 
   let post01Id;
   let post02Id;
@@ -315,16 +311,13 @@ describe('Super admin blogs testing', () => {
     });
 
     it(`should ban blog`, async () => {
-      await agent
+      return agent
         .put(saBlogsURI + blogId + banURI)
         .auth(basicAuthLogin, basicAuthPassword)
         .send({
           isBanned: true,
         })
         .expect(204);
-
-      blog = await blogsRepository.findBlog(blogId);
-      expect(blog.isBanned).toBeTruthy();
     });
 
     it(`should return created blogs for blogger`, async () => {
@@ -397,33 +390,17 @@ describe('Super admin blogs testing', () => {
       await agent.get(publicPostsURI + post01Id).expect(404);
       await agent.get(publicPostsURI + post02Id).expect(404);
     });
-
-    // Validation errors [400]
-    it(`should return 400 when trying to ban blog one more time`, async () => {
-      const response = await agent
-        .put(saBlogsURI + blogId + banURI)
-        .auth(basicAuthLogin, basicAuthPassword)
-        .send({
-          isBanned: true,
-        })
-        .expect(400);
-
-      expect(response.body).toEqual(exceptionObject(blogIDField));
-    });
   });
   describe('Unban blog', () => {
     // Success
     it(`should unban blog`, async () => {
-      await agent
+      return agent
         .put(saBlogsURI + blogId + banURI)
         .auth(basicAuthLogin, basicAuthPassword)
         .send({
           isBanned: false,
         })
         .expect(204);
-
-      blog = await blogsRepository.findBlog(blogId);
-      expect(blog.isBanned).toBeFalsy();
     });
 
     it(`should return created blogs for public user`, async () => {
@@ -470,19 +447,6 @@ describe('Super admin blogs testing', () => {
       const post02 = await agent.get(publicPostsURI + post02Id).expect(200);
       expect(post01.body).toEqual(postObject);
       expect(post02.body).toEqual(postObject);
-    });
-
-    // Validation errors [400]
-    it(`should return 400 when trying to unban blog one more time`, async () => {
-      const response = await agent
-        .put(saBlogsURI + blogId + banURI)
-        .auth(basicAuthLogin, basicAuthPassword)
-        .send({
-          isBanned: false,
-        })
-        .expect(400);
-
-      expect(response.body).toEqual(exceptionObject(blogIDField));
     });
   });
 

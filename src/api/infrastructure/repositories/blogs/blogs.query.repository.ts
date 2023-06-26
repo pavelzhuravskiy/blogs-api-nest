@@ -22,6 +22,8 @@ export class BlogsQueryRepository {
         .where(`b.id = :blogId`, {
           blogId: blogId,
         })
+        .andWhere(`bb.isBanned = false`)
+        .leftJoinAndSelect('b.blogBan', 'bb')
         .getMany();
 
       const mappedBlogs = await this.blogsMapping(blogs);

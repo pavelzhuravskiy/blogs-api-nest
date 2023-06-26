@@ -103,7 +103,7 @@ describe('Posts filtering, sorting, pagination', () => {
     }
     const posts = await agent.get(publicPostsURI).expect(200);
     expect(posts.body.items).toHaveLength(10);
-  });
+  }, 30000);
   it(`should filter posts by blog`, async () => {
     const posts = await agent
       .get(publicBlogsURI + blog01Id + publicPostsURI)

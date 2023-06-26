@@ -54,6 +54,9 @@ export class CommentsQueryRepository {
         .leftJoinAndSelect('c.post', 'p')
         .leftJoinAndSelect('c.user', 'u')
         .leftJoinAndSelect('u.userBanBySA', 'ubsa')
+        .orderBy(`c.${query.sortBy}`, query.sortDirection)
+        .skip((query.pageNumber - 1) * query.pageSize)
+        .take(query.pageSize)
         .getMany();
 
       const totalCount = await this.commentsRepository
@@ -95,6 +98,9 @@ export class CommentsQueryRepository {
         .leftJoinAndSelect('b.blogOwner', 'bo')
         .leftJoinAndSelect('bo.user', 'u')
         .leftJoinAndSelect('u.userBanBySA', 'ubsa')
+        .orderBy(`c.${query.sortBy}`, query.sortDirection)
+        .skip((query.pageNumber - 1) * query.pageSize)
+        .take(query.pageSize)
         .getMany();
 
       const totalCount = await this.commentsRepository

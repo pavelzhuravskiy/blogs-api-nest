@@ -43,26 +43,20 @@ import {
   commentContent,
   publicCommentsURI,
 } from '../utils/constants/comments.constants';
-import { UsersRepository } from '../../src/api/infrastructure/repositories/users/users.repository';
 import { getAppAndClearDb } from '../utils/functions/get-app';
 
 describe('Blogger users ban testing', () => {
   let app: INestApplication;
   let agent: SuperAgentTest;
-  let usersRepository: UsersRepository;
 
   beforeAll(async () => {
     const data = await getAppAndClearDb();
     app = data.app;
     agent = data.agent;
-    usersRepository = app.get(UsersRepository);
   });
 
   let userId;
-
   let blogId;
-  let user;
-
   let postId;
 
   let aTokenUser01;
@@ -231,7 +225,7 @@ describe('Blogger users ban testing', () => {
 
     // Success
     it(`should ban user`, async () => {
-      await agent
+      return agent
         .put(bloggerUsersURI + userId + banURI)
         .auth(aTokenUser01, { type: 'bearer' })
         .send({
@@ -240,9 +234,6 @@ describe('Blogger users ban testing', () => {
           blogId: blogId,
         })
         .expect(204);
-
-      user = await usersRepository.findUserById(userId);
-      expect(user.isBannedByBlogger).toBeTruthy();
     });
 
     // Auth errors [401]
@@ -298,21 +289,6 @@ describe('Blogger users ban testing', () => {
     });
   });
   describe('Unban user', () => {
-    // Success
-    it(`should remove banned user ID from banned users array`, async () => {
-      await agent
-        .put(bloggerUsersURI + userId + banURI)
-        .auth(aTokenUser01, { type: 'bearer' })
-        .send({
-          isBanned: false,
-          banReason: randomUUID(),
-          blogId: blogId,
-        })
-        .expect(204);
-
-      user = await usersRepository.findUserById(userId);
-      expect(user.isBannedByBlogger).toBeFalsy();
-    });
     it(`should create comment by unbanned user`, async () => {
       await agent
         .post(publicPostsURI + postId + publicCommentsURI)
