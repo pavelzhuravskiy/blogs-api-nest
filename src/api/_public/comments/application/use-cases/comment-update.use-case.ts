@@ -38,12 +38,12 @@ export class CommentUpdateUseCase
       };
     }
 
-    if (comment.commentatorId !== command.userId) {
+    /*if (comment.commentatorId !== command.userId) {
       return {
         data: false,
         code: ResultCode.Forbidden,
       };
-    }
+    }*/
 
     await this.commentsRepository.updateComment(
       command.commentInputDto,

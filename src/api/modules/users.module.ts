@@ -15,6 +15,7 @@ import { UserBanBySA } from '../entities/users/user-ban-by-sa.entity';
 import { UserEmailConfirmation } from '../entities/users/user-email-confirmation.entity';
 import { UserPasswordRecovery } from '../entities/users/user-password-recovery.entity';
 import { DevicesModule } from './devices.module';
+import { UserBanByBlogger } from '../entities/users/user-ban-by-blogger.entity';
 
 const useCases = [UserCreateUseCase, UserDeleteUseCase, UserBanUseCase];
 
@@ -23,7 +24,7 @@ const entities = [
   UserEmailConfirmation,
   UserPasswordRecovery,
   UserBanBySA,
-  // UserBanByBlogger,
+  UserBanByBlogger,
 ];
 
 const repositories = [UsersRepository, UsersQueryRepository, DevicesRepository];

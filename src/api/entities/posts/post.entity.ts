@@ -4,9 +4,11 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Blog } from '../blogs/blog.entity';
+import { Comment } from '../comments/comment.entity';
 
 @Entity('posts')
 export class Post {
@@ -30,6 +32,9 @@ export class Post {
   })
   @JoinColumn()
   blog: Blog;
+
+  @OneToMany(() => Comment, (comment) => comment.post)
+  comment: Comment;
 
   static checkSortingField(value: any) {
     const p = new Post();

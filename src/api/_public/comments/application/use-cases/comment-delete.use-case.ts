@@ -33,12 +33,12 @@ export class CommentDeleteUseCase
       };
     }
 
-    if (comment.commentatorId !== command.userId) {
+    /*if (comment.commentatorId !== command.userId) {
       return {
         data: false,
         code: ResultCode.Forbidden,
       };
-    }
+    }*/
 
     await this.commentsRepository.deleteComment(comment.id);
 

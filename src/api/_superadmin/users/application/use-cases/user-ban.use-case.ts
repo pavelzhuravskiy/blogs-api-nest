@@ -21,7 +21,7 @@ export class UserBanUseCase implements ICommandHandler<SAUserBanCommand> {
   ) {}
 
   async execute(command: SAUserBanCommand): Promise<boolean | null> {
-    const user = await this.usersRepository.findUserForBan(command.userId);
+    const user = await this.usersRepository.findUserForBanBySA(command.userId);
 
     if (!user) {
       return null;

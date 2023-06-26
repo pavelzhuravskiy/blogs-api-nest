@@ -9,6 +9,7 @@ import {
 import { BlogBan } from './blog-ban.entity';
 import { BlogOwner } from './blog-owner.entity';
 import { Post } from '../posts/post.entity';
+import { UserBanByBlogger } from '../users/user-ban-by-blogger.entity';
 
 @Entity('blogs')
 export class Blog {
@@ -38,6 +39,12 @@ export class Blog {
 
   @OneToMany(() => Post, (post) => post.blog)
   post: Post;
+
+  @OneToMany(
+    () => UserBanByBlogger,
+    (userBanByBlogger) => userBanByBlogger.blog,
+  )
+  userBanByBlogger: UserBanByBlogger;
 
   static checkSortingField(value: any) {
     const b = new Blog();

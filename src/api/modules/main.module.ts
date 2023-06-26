@@ -43,6 +43,7 @@ import { Blog } from '../entities/blogs/blog.entity';
 import { BlogOwner } from '../entities/blogs/blog-owner.entity';
 import { BlogBan } from '../entities/blogs/blog-ban.entity';
 import { Post } from '../entities/posts/post.entity';
+import { Comment } from '../entities/comments/comment.entity';
 
 const entities = [
   Blog,
@@ -50,7 +51,7 @@ const entities = [
   BlogBan,
   Post,
   // PostLike,
-  // Comment,
+  Comment,
   // CommentLike,
 ];
 

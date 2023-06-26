@@ -2,7 +2,6 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { ResultCode } from '../../../../enums/result-code.enum';
 import {
   userIDField,
-  userIsAlreadyBanned,
   userNotFound,
 } from '../../../../exceptions/exception.constants';
 import { ExceptionResultType } from '../../../../exceptions/types/exception-result.type';
@@ -30,8 +29,8 @@ export class BloggerUserBanUseCase
   async execute(
     command: BloggerUserBanCommand,
   ): Promise<ExceptionResultType<boolean>> {
-    const userToBanOrUnban = await this.usersRepository.findUserById(
-      +command.userToBanOrUnbanId,
+    const userToBanOrUnban = await this.usersRepository.findUserForBanByBlogger(
+      command.userToBanOrUnbanId,
     );
 
     if (!userToBanOrUnban) {
@@ -43,41 +42,33 @@ export class BloggerUserBanUseCase
       };
     }
 
-    const blog = await this.blogsRepository.findBlog(
+    const blog = await this.blogsRepository.findBlogWithOwner(
       command.bloggerUserBanInputDto.blogId,
     );
 
-    /*if (blog.ownerId !== command.currentUserId) {
+    if (blog.blogOwner.user.id !== command.currentUserId) {
       return {
         data: false,
         code: ResultCode.Forbidden,
       };
-    }*/
-
-    const isAlreadyBanned = await this.usersRepository.findUserBanForBlog(
-      userToBanOrUnban.id,
-      blog.id,
-    );
+    }
 
     if (command.bloggerUserBanInputDto.isBanned) {
-      if (isAlreadyBanned) {
-        return {
-          data: false,
-          code: ResultCode.BadRequest,
-          field: userIDField,
-          message: userIsAlreadyBanned,
-        };
-      }
-
-      await this.usersRepository.banUserByBlogger(
-        userToBanOrUnban.id,
-        blog.id,
-        command.bloggerUserBanInputDto.banReason,
+      userToBanOrUnban.userBanByBlogger.user = userToBanOrUnban;
+      userToBanOrUnban.userBanByBlogger.blog = blog;
+      userToBanOrUnban.userBanByBlogger.isBanned = true;
+      userToBanOrUnban.userBanByBlogger.banReason =
+        command.bloggerUserBanInputDto.banReason;
+      userToBanOrUnban.userBanByBlogger.banDate = new Date();
+      await this.usersRepository.dataSourceSave(
+        userToBanOrUnban.userBanByBlogger,
       );
     } else {
-      await this.usersRepository.unbanUserByBlogger(
-        userToBanOrUnban.id,
-        blog.id,
+      userToBanOrUnban.userBanByBlogger.isBanned = false;
+      userToBanOrUnban.userBanByBlogger.banReason = null;
+      userToBanOrUnban.userBanByBlogger.banDate = null;
+      await this.usersRepository.dataSourceSave(
+        userToBanOrUnban.userBanByBlogger,
       );
     }
 

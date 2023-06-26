@@ -11,6 +11,8 @@ import { UserEmailConfirmation } from './user-email-confirmation.entity';
 import { UserPasswordRecovery } from './user-password-recovery.entity';
 import { Device } from '../devices/device.entity';
 import { BlogOwner } from '../blogs/blog-owner.entity';
+import { Comment } from '../comments/comment.entity';
+import { UserBanByBlogger } from './user-ban-by-blogger.entity';
 
 @Entity('users')
 export class User {
@@ -52,6 +54,15 @@ export class User {
 
   @OneToMany(() => BlogOwner, (blogOwner) => blogOwner.user)
   blogOwner: BlogOwner;
+
+  @OneToMany(
+    () => UserBanByBlogger,
+    (userBanByBlogger) => userBanByBlogger.user,
+  )
+  userBanByBlogger: UserBanByBlogger;
+
+  @OneToMany(() => Comment, (comment) => comment.user)
+  comment: Comment;
 
   static checkSortingField(value: any) {
     const u = new User();

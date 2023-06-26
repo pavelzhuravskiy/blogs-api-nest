@@ -5,7 +5,6 @@ import { DataSource, Repository } from 'typeorm';
 import { UserQueryDto } from '../../../dto/users/query/user-query.dto';
 import { Paginator } from '../../../../helpers/paginator';
 import { BloggerUserBanQueryDto } from '../../../dto/users/query/blogger/blogger.user-ban.query.dto';
-import { filterUsersBannedByBlogger } from '../../../../helpers/filters/filter-users-banned-by-blogger';
 import { UsersBannedByBloggerViewDto } from '../../../dto/users/view/blogger/blogger.user-ban.view.dto';
 import { User } from '../../../entities/users/user.entity';
 
@@ -95,39 +94,39 @@ export class UsersQueryRepository {
     query: BloggerUserBanQueryDto,
     blogId: number,
   ): Promise<Paginator<UsersBannedByBloggerViewDto[]>> {
-    const filter = filterUsersBannedByBlogger(query.searchLoginTerm);
+    const users = await this.usersRepository
+      .createQueryBuilder('u')
+      .where(`${query.searchLoginTerm ? 'u.login ilike :loginTerm' : ''}`, {
+        loginTerm: `%${query.searchLoginTerm}%`,
+      })
+      .andWhere(`ubb.isBanned = true`)
+      .andWhere(`b.id = :blogId`, {
+        blogId: blogId,
+      })
+      .leftJoinAndSelect('u.userBanByBlogger', 'ubb')
+      .leftJoinAndSelect('ubb.blog', 'b')
+      .orderBy(`u.${query.sortBy}`, query.sortDirection)
+      .skip((query.pageNumber - 1) * query.pageSize)
+      .take(query.pageSize)
+      .getMany();
 
-    const users = await this.dataSource.query(
-      `select u.id,
-              u.login,
-              u."isBannedByBlogger",
-              ubbb."blogId",
-              ubbb."banDate",
-              ubbb."banReason"
-       from public.users u
-                left join public.user_bans_by_blogger ubbb on u.id = ubbb."userId"
-       where "blogId" = $2
-         and ("isBannedByBlogger" = true)
-         and (login ilike $1)
-       order by "${query.sortBy}" ${query.sortDirection}
-       limit ${query.pageSize} offset (${query.pageNumber} - 1) * ${query.pageSize}`,
-      [filter, blogId],
-    );
-
-    const totalCount = await this.dataSource.query(
-      `select count(*)
-       from public.users u
-                left join public.user_bans_by_blogger ubbb on u.id = ubbb."userId"
-       where "blogId" = $2
-         and ("isBannedByBlogger" = true)
-         and (login ilike $1)`,
-      [filter, blogId],
-    );
+    const totalCount = await this.usersRepository
+      .createQueryBuilder('u')
+      .where(`${query.searchLoginTerm ? 'u.login ilike :loginTerm' : ''}`, {
+        loginTerm: `%${query.searchLoginTerm}%`,
+      })
+      .andWhere(`ubb.isBanned = true`)
+      .andWhere(`b.id = :blogId`, {
+        blogId: blogId,
+      })
+      .leftJoinAndSelect('u.userBanByBlogger', 'ubb')
+      .leftJoinAndSelect('ubb.blog', 'b')
+      .getCount();
 
     return Paginator.paginate({
       pageNumber: query.pageNumber,
       pageSize: query.pageSize,
-      totalCount: Number(totalCount[0].count),
+      totalCount: totalCount,
       items: await this.usersBannedByBloggerMapping(users),
     });
   }

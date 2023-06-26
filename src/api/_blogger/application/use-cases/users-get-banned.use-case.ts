@@ -8,7 +8,6 @@ import {
 import { BlogsRepository } from '../../../infrastructure/repositories/blogs/blogs.repository';
 import { BloggerUserBanQueryDto } from '../../../dto/users/query/blogger/blogger.user-ban.query.dto';
 import { UsersQueryRepository } from '../../../infrastructure/repositories/users/users.query.repository';
-import { idIsValid } from '../../../../helpers/id-is-valid';
 
 export class UsersGetBannedQuery {
   constructor(
@@ -30,9 +29,9 @@ export class UsersGetBannedUseCase
   async execute(
     query: UsersGetBannedQuery,
   ): Promise<ExceptionResultType<boolean>> {
-    const blog = await this.blogsRepository.findBlog(query.blogId);
+    const blog = await this.blogsRepository.findBlogWithOwner(query.blogId);
 
-    if (!idIsValid(query.blogId) || !blog) {
+    if (!blog) {
       return {
         data: false,
         code: ResultCode.NotFound,
@@ -41,12 +40,12 @@ export class UsersGetBannedUseCase
       };
     }
 
-    /*if (blog.ownerId !== query.userId) {
+    if (blog.blogOwner.user.id !== query.userId) {
       return {
         data: false,
         code: ResultCode.Forbidden,
       };
-    }*/
+    }
 
     const response = await this.usersQueryRepository.findUsersBannedByBlogger(
       query.bloggerUserBanQueryDto,
