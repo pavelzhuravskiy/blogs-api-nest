@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
-import { PostInputDto } from '../../../dto/posts/input/post.input.dto';
 import { Post } from '../../../entities/posts/post.entity';
 
 @Injectable()
@@ -31,26 +30,6 @@ export class PostsRepository {
     }
   }
 
-  async updatePost(
-    postInputDto: PostInputDto,
-    postId: number,
-  ): Promise<boolean> {
-    const result = await this.dataSource.query(
-      `update public.posts
-       set "title"            = $1,
-           "shortDescription" = $2,
-           "content"          = $3
-       where "id" = $4`,
-      [
-        postInputDto.title,
-        postInputDto.shortDescription,
-        postInputDto.content,
-        postId,
-      ],
-    );
-    return result[1] === 1;
-  }
-
   // ***** Delete operations *****
   async deletePost(postId: number): Promise<boolean> {
     const result = await this.postsRepository
@@ -61,6 +40,8 @@ export class PostsRepository {
       .execute();
     return result.affected === 1;
   }
+
+  // --------------------------
 
   async findUserPostLikeRecord(
     postId: number,
