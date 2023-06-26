@@ -32,7 +32,6 @@ import { BlogQueryDto } from '../dto/blogs/query/blog.query.dto';
 import { PostsQueryRepository } from '../infrastructure/repositories/posts/posts.query.repository';
 import { CommentQueryDto } from '../dto/comments/query/comment.query.dto';
 import { CommentsQueryRepository } from '../infrastructure/repositories/comments/comments.query.repository';
-import { Role } from '../../enums/role.enum';
 
 @Controller('blogger/blogs')
 export class BloggerBlogsController {
@@ -158,11 +157,9 @@ export class BloggerBlogsController {
     @Query() query: CommentQueryDto,
     @UserIdFromGuard() userId,
   ) {
-    const role = Role.Blogger;
     return this.commentsQueryRepository.findCommentsOfBloggerPosts(
       query,
       userId,
-      role,
     );
   }
 }

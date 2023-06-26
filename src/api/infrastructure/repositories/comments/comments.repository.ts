@@ -1,28 +1,21 @@
 import { Injectable } from '@nestjs/common';
-import { InjectDataSource } from '@nestjs/typeorm';
-import { DataSource } from 'typeorm';
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { CommentInputDto } from '../../../dto/comments/input/comment.input.dto';
 import { idIsValid } from '../../../../helpers/id-is-valid';
 import { Comment } from '../../../entities/comments/comment.entity';
 
 @Injectable()
 export class CommentsRepository {
-  constructor(@InjectDataSource() private dataSource: DataSource) {}
+  constructor(
+    @InjectRepository(Comment)
+    private readonly commentsRepository: Repository<Comment>,
+    @InjectDataSource() private dataSource: DataSource,
+  ) {}
 
-  async createComment(
-    commentInputDto: CommentInputDto,
-    userId: number,
-    userLogin: string,
-    postId: number,
-  ): Promise<number> {
-    const comment = await this.dataSource.query(
-      `insert into public.comments(content, "commentatorId", "postId")
-         values ($1, $2, $3)
-         returning id;`,
-      [commentInputDto.content, userId, postId],
-    );
-
-    return comment[0].id;
+  // ***** TypeORM data source manager SAVE *****
+  async dataSourceSave(entity: Comment): Promise<Comment> {
+    return this.dataSource.manager.save(entity);
   }
 
   async findComment(commentId: string): Promise<Comment | null> {

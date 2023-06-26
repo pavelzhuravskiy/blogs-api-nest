@@ -12,6 +12,7 @@ import {
 import { PostsRepository } from '../../../../infrastructure/repositories/posts/posts.repository';
 import { UsersRepository } from '../../../../infrastructure/repositories/users/users.repository';
 import { CommentsRepository } from '../../../../infrastructure/repositories/comments/comments.repository';
+import { Comment } from '../../../../entities/comments/comment.entity';
 
 export class CommentCreateCommand {
   constructor(
@@ -45,7 +46,9 @@ export class CommentCreateUseCase
       };
     }
 
-    const user = await this.usersRepository.findUserById(command.userId);
+    const user = await this.usersRepository.findUserForBanByBlogger(
+      command.userId,
+    );
 
     if (!user) {
       return {
@@ -56,30 +59,25 @@ export class CommentCreateUseCase
       };
     }
 
-    /*const isUserBannedByBlogger = await this.usersRepository.findUserBanForBlog(
-      user.id,
-      post.blogId,
-    );
-
-    if (isUserBannedByBlogger) {
+    if (user.userBanByBlogger.isBanned) {
       return {
         data: false,
         code: ResultCode.Forbidden,
         message: userIsBanned,
       };
-    }*/
+    }
 
-    const commentId = await this.commentsRepository.createComment(
-      command.commentInputDto,
-      user.id,
-      user.login,
-      post.id,
-    );
+    const comment = new Comment();
+    comment.post = post;
+    comment.user = user;
+    comment.content = command.commentInputDto.content;
+    comment.createdAt = new Date();
+    await this.commentsRepository.dataSourceSave(comment);
 
     return {
       data: true,
       code: ResultCode.Success,
-      response: commentId,
+      response: comment.id,
     };
   }
 }

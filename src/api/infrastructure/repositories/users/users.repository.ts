@@ -145,7 +145,7 @@ export class UsersRepository {
     }
   }
 
-  async findUserForBanByBlogger(userId: string): Promise<User | null> {
+  async findUserForBanByBlogger(userId: string | number): Promise<User | null> {
     try {
       return await this.usersRepository
         .createQueryBuilder('u')

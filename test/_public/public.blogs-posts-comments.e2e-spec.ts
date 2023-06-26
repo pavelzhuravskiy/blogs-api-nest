@@ -197,7 +197,7 @@ describe('Public blogs, posts, comments testing', () => {
       expect(post.body).toEqual(postObject);
     });
   });
-  describe.skip('Create comment', () => {
+  describe('Create comment', () => {
     // Validation errors [400]
     it(`should return 400 when trying to create comment without content`, async () => {
       const response = await agent
@@ -263,7 +263,7 @@ describe('Public blogs, posts, comments testing', () => {
         .expect(201);
     });
   });
-  describe.skip('Find comments', () => {
+  describe('Find comments', () => {
     // Not found errors [404]
     it(`should return 404 when trying to get nonexistent comment`, async () => {
       return agent.get(publicCommentsURI + randomUUID()).expect(404);

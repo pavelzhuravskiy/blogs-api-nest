@@ -125,7 +125,7 @@ export class PostsQueryRepository {
     }
   }
 
-  private async postsMapping(posts: any): Promise<PostViewDto[]> {
+  private async postsMapping(posts: Post[]): Promise<PostViewDto[]> {
     return posts.map((p) => {
       return {
         id: p.id.toString(),
