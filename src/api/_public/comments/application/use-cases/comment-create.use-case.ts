@@ -6,6 +6,7 @@ import {
   postIDField,
   postNotFound,
   userIDField,
+  userIsBanned,
   userNotFound,
 } from '../../../../../exceptions/exception.constants';
 import { PostsRepository } from '../../../../infrastructure/repositories/posts/posts.repository';
@@ -58,15 +59,13 @@ export class CommentCreateUseCase
       };
     }
 
-    console.log(user);
-
-    /*if (user.userBanByBlogger.length  && user.userBanByBlogger[0].isBanned) {
+    if (user.userBanByBlogger.isBanned) {
       return {
         data: false,
         code: ResultCode.Forbidden,
         message: userIsBanned,
       };
-    }*/
+    }
 
     const comment = new Comment();
     comment.post = post;

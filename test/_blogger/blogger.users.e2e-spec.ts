@@ -236,8 +236,8 @@ describe('Blogger users ban testing', () => {
         .expect(204);
     });
 
-    // Auth errors [401]
-    it(`should return 401 when trying to create comment by banned user`, async () => {
+    // Forbidden errors [403]
+    it(`should return 403 when trying to create comment by banned user`, async () => {
       await agent
         .post(publicPostsURI + postId + publicCommentsURI)
         .auth(aTokenUser01, { type: 'bearer' })
@@ -289,6 +289,17 @@ describe('Blogger users ban testing', () => {
     });
   });
   describe('Unban user', () => {
+    it(`should unban user`, async () => {
+      return agent
+        .put(bloggerUsersURI + userId + banURI)
+        .auth(aTokenUser01, { type: 'bearer' })
+        .send({
+          isBanned: false,
+          banReason: randomUUID(),
+          blogId: blogId,
+        })
+        .expect(204);
+    });
     it(`should create comment by unbanned user`, async () => {
       await agent
         .post(publicPostsURI + postId + publicCommentsURI)

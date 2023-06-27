@@ -148,16 +148,16 @@ export class UsersQueryRepository {
   }
 
   private async usersBannedByBloggerMapping(
-    array: any,
+    array: User[],
   ): Promise<UsersBannedByBloggerViewDto[]> {
     return array.map((u) => {
       return {
         id: u.id.toString(),
         login: u.login,
         banInfo: {
-          isBanned: u.isBannedByBlogger,
-          banDate: u.banDate,
-          banReason: u.banReason,
+          isBanned: u.userBanByBlogger.isBanned,
+          banDate: u.userBanByBlogger.banDate,
+          banReason: u.userBanByBlogger.banReason,
         },
       };
     });

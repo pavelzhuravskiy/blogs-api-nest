@@ -21,9 +21,9 @@ export class UsersRepository {
 
   // ***** TypeORM query runner transaction SAVE *****
   async queryRunnerSave(
-    entity: User | UserBanBySA | UserEmailConfirmation,
+    entity: User | UserBanBySA | UserBanByBlogger | UserEmailConfirmation,
     queryRunnerManager: EntityManager,
-  ): Promise<User | UserBanBySA | UserEmailConfirmation> {
+  ): Promise<User | UserBanBySA | UserBanByBlogger | UserEmailConfirmation> {
     return queryRunnerManager.save(entity);
   }
 

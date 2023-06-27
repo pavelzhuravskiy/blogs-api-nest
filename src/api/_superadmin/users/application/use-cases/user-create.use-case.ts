@@ -5,6 +5,7 @@ import { UsersRepository } from '../../../../infrastructure/repositories/users/u
 import { User } from '../../../../entities/users/user.entity';
 import { UserBanBySA } from '../../../../entities/users/user-ban-by-sa.entity';
 import { DataSource } from 'typeorm';
+import { UserBanByBlogger } from '../../../../entities/users/user-ban-by-blogger.entity';
 
 export class UserCreateCommand {
   constructor(public userInputDto: UserInputDto) {}
@@ -38,12 +39,21 @@ export class UserCreateUseCase implements ICommandHandler<UserCreateCommand> {
         queryRunnerManager,
       );
 
-      // Create user ban record
+      // Create user ban by SA record
       const userBanBySA = new UserBanBySA();
       userBanBySA.user = user;
       userBanBySA.isBanned = false;
       await this.usersRepository.queryRunnerSave(
         userBanBySA,
+        queryRunnerManager,
+      );
+
+      // Create user ban by blogger record
+      const userBanByBlogger = new UserBanByBlogger();
+      userBanByBlogger.user = user;
+      userBanByBlogger.isBanned = false;
+      await this.usersRepository.queryRunnerSave(
+        userBanByBlogger,
         queryRunnerManager,
       );
 
