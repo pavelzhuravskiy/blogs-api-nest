@@ -26,8 +26,7 @@ export class PostsQueryRepository {
         .andWhere(`ubsa.isBanned = false`)
         .leftJoinAndSelect('p.blog', 'b')
         .leftJoinAndSelect('b.blogBan', 'bb')
-        .leftJoinAndSelect('b.blogOwner', 'bo')
-        .leftJoinAndSelect('bo.user', 'u')
+        .leftJoinAndSelect('b.user', 'u')
         .leftJoinAndSelect('u.userBanBySA', 'ubsa')
         .getMany();
 
@@ -49,8 +48,7 @@ export class PostsQueryRepository {
       .andWhere(`ubsa.isBanned = false`)
       .leftJoinAndSelect('p.blog', 'b')
       .leftJoinAndSelect('b.blogBan', 'bb')
-      .leftJoinAndSelect('b.blogOwner', 'bo')
-      .leftJoinAndSelect('bo.user', 'u')
+      .leftJoinAndSelect('b.user', 'u')
       .leftJoinAndSelect('u.userBanBySA', 'ubsa')
       .orderBy(`p.${query.sortBy}`, query.sortDirection)
       .skip((query.pageNumber - 1) * query.pageSize)
@@ -63,8 +61,7 @@ export class PostsQueryRepository {
       .andWhere(`ubsa.isBanned = false`)
       .leftJoinAndSelect('p.blog', 'b')
       .leftJoinAndSelect('b.blogBan', 'bb')
-      .leftJoinAndSelect('b.blogOwner', 'bo')
-      .leftJoinAndSelect('bo.user', 'u')
+      .leftJoinAndSelect('b.user', 'u')
       .leftJoinAndSelect('u.userBanBySA', 'ubsa')
       .getCount();
 
@@ -91,8 +88,7 @@ export class PostsQueryRepository {
         .andWhere(`ubsa.isBanned = false`)
         .leftJoinAndSelect('p.blog', 'b')
         .leftJoinAndSelect('b.blogBan', 'bb')
-        .leftJoinAndSelect('b.blogOwner', 'bo')
-        .leftJoinAndSelect('bo.user', 'u')
+        .leftJoinAndSelect('b.user', 'u')
         .leftJoinAndSelect('u.userBanBySA', 'ubsa')
         .orderBy(`p.${query.sortBy}`, query.sortDirection)
         .skip((query.pageNumber - 1) * query.pageSize)
@@ -108,8 +104,7 @@ export class PostsQueryRepository {
         .andWhere(`ubsa.isBanned = false`)
         .leftJoinAndSelect('p.blog', 'b')
         .leftJoinAndSelect('b.blogBan', 'bb')
-        .leftJoinAndSelect('b.blogOwner', 'bo')
-        .leftJoinAndSelect('bo.user', 'u')
+        .leftJoinAndSelect('b.user', 'u')
         .leftJoinAndSelect('u.userBanBySA', 'ubsa')
         .getCount();
 

@@ -40,7 +40,7 @@ export class UsersGetBannedUseCase
       };
     }
 
-    if (blog.blogOwner.user.id !== query.userId) {
+    if (blog.user.id !== query.userId) {
       return {
         data: false,
         code: ResultCode.Forbidden,

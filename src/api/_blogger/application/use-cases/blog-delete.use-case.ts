@@ -29,7 +29,7 @@ export class BlogDeleteUseCase implements ICommandHandler<BlogDeleteCommand> {
       };
     }
 
-    if (blog.blogOwner.user.id !== command.userId) {
+    if (blog.user.id !== command.userId) {
       return {
         data: false,
         code: ResultCode.Forbidden,

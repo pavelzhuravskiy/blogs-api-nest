@@ -95,8 +95,7 @@ export class CommentsQueryRepository {
         .andWhere(`ubsa.isBanned = false`)
         .leftJoinAndSelect('c.post', 'p')
         .leftJoinAndSelect('p.blog', 'b')
-        .leftJoinAndSelect('b.blogOwner', 'bo')
-        .leftJoinAndSelect('bo.user', 'u')
+        .leftJoinAndSelect('b.user', 'u')
         .leftJoinAndSelect('u.userBanBySA', 'ubsa')
         .orderBy(`c.${query.sortBy}`, query.sortDirection)
         .skip((query.pageNumber - 1) * query.pageSize)
@@ -111,8 +110,7 @@ export class CommentsQueryRepository {
         .andWhere(`ubsa.isBanned = false`)
         .leftJoinAndSelect('c.post', 'p')
         .leftJoinAndSelect('p.blog', 'b')
-        .leftJoinAndSelect('b.blogOwner', 'bo')
-        .leftJoinAndSelect('bo.user', 'u')
+        .leftJoinAndSelect('b.user', 'u')
         .leftJoinAndSelect('u.userBanBySA', 'ubsa')
         .getCount();
 
@@ -158,8 +156,8 @@ export class CommentsQueryRepository {
         content: c.content,
         createdAt: c.createdAt,
         commentatorInfo: {
-          userId: c.post.blog.blogOwner.user.id.toString(),
-          userLogin: c.post.blog.blogOwner.user.login,
+          userId: c.post.blog.user.id.toString(),
+          userLogin: c.post.blog.user.login,
         },
         likesInfo: {
           likesCount: 0,

@@ -2,14 +2,15 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  ManyToOne,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { BlogBan } from './blog-ban.entity';
-import { BlogOwner } from './blog-owner.entity';
 import { Post } from '../posts/post.entity';
 import { UserBanByBlogger } from '../users/user-ban-by-blogger.entity';
+import { User } from '../users/user.entity';
 
 @Entity('blogs')
 export class Blog {
@@ -34,8 +35,8 @@ export class Blog {
   @OneToOne(() => BlogBan, (blogBan) => blogBan.blog)
   blogBan: BlogBan;
 
-  @OneToOne(() => BlogOwner, (blogOwner) => blogOwner.blog)
-  blogOwner: BlogOwner;
+  @ManyToOne(() => User, (user) => user.blog)
+  user: User;
 
   @OneToMany(() => Post, (post) => post.blog)
   post: Post;

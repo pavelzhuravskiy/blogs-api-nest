@@ -3,6 +3,7 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { User } from './user.entity';
@@ -26,7 +27,7 @@ export class UserBanByBlogger {
   @Column({ name: 'ban_reason', type: 'varchar', nullable: true })
   banReason: string | null;
 
-  @ManyToOne(() => User, (user) => user.userBanByBlogger, {
+  @OneToOne(() => User, (user) => user.userBanByBlogger, {
     onDelete: 'CASCADE',
   })
   @JoinColumn()

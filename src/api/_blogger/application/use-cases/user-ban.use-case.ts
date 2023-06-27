@@ -8,6 +8,7 @@ import { ExceptionResultType } from '../../../../exceptions/types/exception-resu
 import { BloggerUserBanInputDto } from '../../../dto/users/input/blogger/blogger.user-ban.input.dto';
 import { UsersRepository } from '../../../infrastructure/repositories/users/users.repository';
 import { BlogsRepository } from '../../../infrastructure/repositories/blogs/blogs.repository';
+import { UserBanByBlogger } from '../../../entities/users/user-ban-by-blogger.entity';
 
 export class BloggerUserBanCommand {
   constructor(
@@ -46,7 +47,7 @@ export class BloggerUserBanUseCase
       command.bloggerUserBanInputDto.blogId,
     );
 
-    if (blog.blogOwner.user.id !== command.currentUserId) {
+    if (blog.user.id !== command.currentUserId) {
       return {
         data: false,
         code: ResultCode.Forbidden,
@@ -54,16 +55,22 @@ export class BloggerUserBanUseCase
     }
 
     if (command.bloggerUserBanInputDto.isBanned) {
-      userToBanOrUnban.userBanByBlogger.user = userToBanOrUnban;
-      userToBanOrUnban.userBanByBlogger.blog = blog;
-      userToBanOrUnban.userBanByBlogger.isBanned = true;
-      userToBanOrUnban.userBanByBlogger.banReason =
-        command.bloggerUserBanInputDto.banReason;
-      userToBanOrUnban.userBanByBlogger.banDate = new Date();
-      await this.usersRepository.dataSourceSave(
-        userToBanOrUnban.userBanByBlogger,
-      );
+      let bannedUser;
+
+      if (!userToBanOrUnban.userBanByBlogger) {
+        bannedUser = new UserBanByBlogger();
+      } else {
+        bannedUser = userToBanOrUnban.userBanByBlogger;
+      }
+
+      bannedUser.user = userToBanOrUnban;
+      bannedUser.blog = blog;
+      bannedUser.isBanned = true;
+      bannedUser.banReason = command.bloggerUserBanInputDto.banReason;
+      bannedUser.banDate = new Date();
+      await this.usersRepository.dataSourceSave(bannedUser);
     } else {
+      console.log(userToBanOrUnban.userBanByBlogger);
       userToBanOrUnban.userBanByBlogger.isBanned = false;
       userToBanOrUnban.userBanByBlogger.banReason = null;
       userToBanOrUnban.userBanByBlogger.banDate = null;

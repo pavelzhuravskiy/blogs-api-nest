@@ -10,9 +10,9 @@ import { UserBanBySA } from './user-ban-by-sa.entity';
 import { UserEmailConfirmation } from './user-email-confirmation.entity';
 import { UserPasswordRecovery } from './user-password-recovery.entity';
 import { Device } from '../devices/device.entity';
-import { BlogOwner } from '../blogs/blog-owner.entity';
 import { Comment } from '../comments/comment.entity';
 import { UserBanByBlogger } from './user-ban-by-blogger.entity';
+import { Blog } from '../blogs/blog.entity';
 
 @Entity('users')
 export class User {
@@ -37,6 +37,9 @@ export class User {
   @OneToOne(() => UserBanBySA, (userBanBySA) => userBanBySA.user)
   userBanBySA: UserBanBySA;
 
+  @OneToOne(() => UserBanByBlogger, (userBanByBlogger) => userBanByBlogger.user)
+  userBanByBlogger: UserBanByBlogger;
+
   @OneToOne(
     () => UserEmailConfirmation,
     (userEmailConfirmation) => userEmailConfirmation.user,
@@ -52,14 +55,8 @@ export class User {
   @OneToMany(() => Device, (device) => device.user)
   device: Device;
 
-  @OneToMany(() => BlogOwner, (blogOwner) => blogOwner.user)
-  blogOwner: BlogOwner;
-
-  @OneToMany(
-    () => UserBanByBlogger,
-    (userBanByBlogger) => userBanByBlogger.user,
-  )
-  userBanByBlogger: UserBanByBlogger;
+  @OneToMany(() => Blog, (blog) => blog.user)
+  blog: Blog;
 
   @OneToMany(() => Comment, (comment) => comment.user)
   comment: Comment;

@@ -40,14 +40,12 @@ import { CommentsQueryRepository } from '../infrastructure/repositories/comments
 import { CommentsRepository } from '../infrastructure/repositories/comments/comments.repository';
 import { UsersModule } from './users.module';
 import { Blog } from '../entities/blogs/blog.entity';
-import { BlogOwner } from '../entities/blogs/blog-owner.entity';
 import { BlogBan } from '../entities/blogs/blog-ban.entity';
 import { Post } from '../entities/posts/post.entity';
 import { Comment } from '../entities/comments/comment.entity';
 
 const entities = [
   Blog,
-  BlogOwner,
   BlogBan,
   Post,
   // PostLike,

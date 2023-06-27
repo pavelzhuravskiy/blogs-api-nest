@@ -4,7 +4,6 @@ import { UsersRepository } from '../../../infrastructure/repositories/users/user
 import { BlogsRepository } from '../../../infrastructure/repositories/blogs/blogs.repository';
 import { Blog } from '../../../entities/blogs/blog.entity';
 import { BlogBan } from '../../../entities/blogs/blog-ban.entity';
-import { BlogOwner } from '../../../entities/blogs/blog-owner.entity';
 import { DataSource } from 'typeorm';
 
 export class BlogCreateCommand {
@@ -34,6 +33,7 @@ export class BlogCreateUseCase implements ICommandHandler<BlogCreateCommand> {
     try {
       // Create blog
       const blog = new Blog();
+      blog.user = user;
       blog.name = command.blogInputDto.name;
       blog.description = command.blogInputDto.description;
       blog.websiteUrl = command.blogInputDto.websiteUrl;
@@ -50,12 +50,6 @@ export class BlogCreateUseCase implements ICommandHandler<BlogCreateCommand> {
       blogBan.isBanned = false;
       blogBan.banDate = null;
       await this.blogsRepository.queryRunnerSave(blogBan, queryRunnerManager);
-
-      // Create blog owner record
-      const blogOwner = new BlogOwner();
-      blogOwner.blog = blog;
-      blogOwner.user = user;
-      await this.blogsRepository.queryRunnerSave(blogOwner, queryRunnerManager);
 
       // Commit transaction
       await queryRunner.commitTransaction();

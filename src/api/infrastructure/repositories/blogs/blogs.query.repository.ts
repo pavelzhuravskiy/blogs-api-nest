@@ -75,10 +75,10 @@ export class BlogsQueryRepository {
       .where(`${query.searchNameTerm ? 'b.name ilike :nameTerm' : ''}`, {
         nameTerm: `%${query.searchNameTerm}%`,
       })
-      .andWhere(`bo.userId = :userId`, {
+      .andWhere(`u.id = :userId`, {
         userId: userId,
       })
-      .leftJoinAndSelect('b.blogOwner', 'bo')
+      .leftJoinAndSelect('b.user', 'u')
       .orderBy(`b.${query.sortBy}`, query.sortDirection)
       .skip((query.pageNumber - 1) * query.pageSize)
       .take(query.pageSize)
@@ -89,10 +89,10 @@ export class BlogsQueryRepository {
       .where(`${query.searchNameTerm ? 'b.name ilike :nameTerm' : ''}`, {
         nameTerm: `%${query.searchNameTerm}%`,
       })
-      .andWhere(`bo.userId = :userId`, {
+      .andWhere(`u.id = :userId`, {
         userId: userId,
       })
-      .leftJoinAndSelect('b.blogOwner', 'bo')
+      .leftJoinAndSelect('b.user', 'u')
       .getCount();
 
     return Paginator.paginate({
@@ -109,9 +109,8 @@ export class BlogsQueryRepository {
       .where(`${query.searchNameTerm ? 'b.name ilike :nameTerm' : ''}`, {
         nameTerm: `%${query.searchNameTerm}%`,
       })
-      .leftJoinAndSelect('b.blogOwner', 'bo')
       .leftJoinAndSelect('b.blogBan', 'bb')
-      .leftJoinAndSelect('bo.user', 'u')
+      .leftJoinAndSelect('b.user', 'u')
       .orderBy(`b.${query.sortBy}`, query.sortDirection)
       .skip((query.pageNumber - 1) * query.pageSize)
       .take(query.pageSize)
@@ -122,9 +121,8 @@ export class BlogsQueryRepository {
       .where(`${query.searchNameTerm ? 'b.name ilike :nameTerm' : ''}`, {
         nameTerm: `%${query.searchNameTerm}%`,
       })
-      .leftJoinAndSelect('b.blogOwner', 'bo')
       .leftJoinAndSelect('b.blogBan', 'bb')
-      .leftJoinAndSelect('bo.user', 'u')
+      .leftJoinAndSelect('b.user', 'u')
       .getCount();
 
     return Paginator.paginate({
@@ -160,8 +158,8 @@ export class BlogsQueryRepository {
         createdAt: b.createdAt,
         isMembership: b.isMembership,
         blogOwnerInfo: {
-          userId: b.blogOwner.user.id.toString(),
-          userLogin: b.blogOwner.user.login,
+          userId: b.user.id.toString(),
+          userLogin: b.user.login,
         },
         banInfo: {
           isBanned: b.blogBan.isBanned,

@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { DataSource, EntityManager, Repository } from 'typeorm';
 import { Blog } from '../../../entities/blogs/blog.entity';
-import { BlogOwner } from '../../../entities/blogs/blog-owner.entity';
 import { BlogBan } from '../../../entities/blogs/blog-ban.entity';
 
 @Injectable()
@@ -15,9 +14,9 @@ export class BlogsRepository {
 
   // ***** TypeORM query runner transaction SAVE *****
   async queryRunnerSave(
-    entity: Blog | BlogBan | BlogOwner,
+    entity: Blog | BlogBan,
     queryRunnerManager: EntityManager,
-  ): Promise<Blog | BlogBan | BlogOwner> {
+  ): Promise<Blog | BlogBan> {
     return queryRunnerManager.save(entity);
   }
 
@@ -44,8 +43,7 @@ export class BlogsRepository {
       return await this.blogsRepository
         .createQueryBuilder('b')
         .where(`b.id = :blogId`, { blogId: blogId })
-        .leftJoinAndSelect('b.blogOwner', 'bo')
-        .leftJoinAndSelect('bo.user', 'u')
+        .leftJoinAndSelect('b.user', 'u')
         .getOne();
     } catch (e) {
       console.log(e);
