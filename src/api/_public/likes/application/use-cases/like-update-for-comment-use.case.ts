@@ -10,6 +10,7 @@ import {
   userNotFound,
 } from '../../../../../exceptions/exception.constants';
 import { ExceptionResultType } from '../../../../../exceptions/types/exception-result.type';
+import { CommentLike } from '../../../../entities/comments/comment-like.entity';
 
 export class LikeUpdateForCommentCommand {
   constructor(
@@ -61,19 +62,19 @@ export class LikeUpdateForCommentUseCase
         user.id,
       );
 
+    let likeRecord;
+
     if (userCommentLikeRecord) {
-      await this.commentsRepository.updateLikeStatus(
-        command.likeStatusInputDto.likeStatus,
-        comment.id,
-        user.id,
-      );
+      likeRecord = userCommentLikeRecord;
     } else {
-      await this.commentsRepository.createUserCommentLikeRecord(
-        comment.id,
-        user.id,
-        command.likeStatusInputDto.likeStatus,
-      );
+      likeRecord = new CommentLike();
     }
+
+    likeRecord.comment = comment;
+    likeRecord.user = user;
+    likeRecord.likeStatus = command.likeStatusInputDto.likeStatus;
+
+    await this.commentsRepository.dataSourceSave(likeRecord);
 
     return {
       data: true,

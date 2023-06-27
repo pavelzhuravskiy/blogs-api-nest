@@ -43,6 +43,7 @@ import { Blog } from '../entities/blogs/blog.entity';
 import { BlogBan } from '../entities/blogs/blog-ban.entity';
 import { Post } from '../entities/posts/post.entity';
 import { Comment } from '../entities/comments/comment.entity';
+import { CommentLike } from '../entities/comments/comment-like.entity';
 
 const entities = [
   Blog,
@@ -50,7 +51,7 @@ const entities = [
   Post,
   // PostLike,
   Comment,
-  // CommentLike,
+  CommentLike,
 ];
 
 const controllers = [

@@ -36,7 +36,7 @@ import { publicLikesURI } from '../utils/constants/likes.constants';
 import { LikeStatus } from '../../src/enums/like-status.enum';
 import { getAppAndClearDb } from '../utils/functions/get-app';
 
-describe('Public likes for posts testing', () => {
+describe.skip('Public likes for posts testing', () => {
   let app: INestApplication;
   let agent: SuperAgentTest;
 

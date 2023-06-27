@@ -4,10 +4,12 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { User } from '../users/user.entity';
 import { Post } from '../posts/post.entity';
+import { CommentLike } from './comment-like.entity';
 
 @Entity('comments')
 export class Comment {
@@ -31,6 +33,9 @@ export class Comment {
   })
   @JoinColumn()
   post: Post;
+
+  @OneToMany(() => CommentLike, (commentLike) => commentLike.comment)
+  commentLike: CommentLike;
 
   static checkSortingField(value: any) {
     const c = new Comment();

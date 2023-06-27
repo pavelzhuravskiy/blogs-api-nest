@@ -7,6 +7,7 @@ import { Paginator } from '../../../../helpers/paginator';
 import { CommentQueryDto } from '../../../dto/comments/query/comment.query.dto';
 import { Comment } from '../../../entities/comments/comment.entity';
 import { BloggerCommentViewDto } from '../../../dto/comments/view/blogger/blogger.comment.view.dto';
+import { CommentLike } from '../../../entities/comments/comment-like.entity';
 
 @Injectable()
 export class CommentsQueryRepository {
@@ -23,13 +24,42 @@ export class CommentsQueryRepository {
     try {
       const comments = await this.commentsRepository
         .createQueryBuilder('c')
+        .addSelect(
+          (qb) =>
+            qb
+              .select('count(*)')
+              .from(CommentLike, 'cl')
+              .where('cl.commentId = c.id')
+              .andWhere('ubsa.isBanned = false')
+              .andWhere(`cl.likeStatus = 'Like'`),
+          'likes_count',
+        )
+        .addSelect(
+          (qb) =>
+            qb
+              .select('count(*)')
+              .from(CommentLike, 'cl')
+              .where('cl.commentId = c.id')
+              .andWhere('ubsa.isBanned = false')
+              .andWhere(`cl.likeStatus = 'Dislike'`),
+          'dislikes_count',
+        )
+        .addSelect(
+          (qb) =>
+            qb
+              .select('cl.likeStatus')
+              .from(CommentLike, 'cl')
+              .where('cl.commentId = c.id')
+              .andWhere('cl.userId = :userId', { userId: userId }),
+          'like_status',
+        )
         .where(`c.id = :commentId`, {
           commentId: commentId,
         })
         .andWhere(`ubsa.isBanned = false`)
         .leftJoinAndSelect('c.user', 'u')
         .leftJoinAndSelect('u.userBanBySA', 'ubsa')
-        .getMany();
+        .getRawMany();
 
       const mappedComments = await this.commentsMapping(comments);
       return mappedComments[0];
@@ -47,6 +77,35 @@ export class CommentsQueryRepository {
     try {
       const comments = await this.commentsRepository
         .createQueryBuilder('c')
+        .addSelect(
+          (qb) =>
+            qb
+              .select('count(*)')
+              .from(CommentLike, 'cl')
+              .where('cl.commentId = c.id')
+              .andWhere('ubsa.isBanned = false')
+              .andWhere(`cl.likeStatus = 'Like'`),
+          'likes_count',
+        )
+        .addSelect(
+          (qb) =>
+            qb
+              .select('count(*)')
+              .from(CommentLike, 'cl')
+              .where('cl.commentId = c.id')
+              .andWhere('ubsa.isBanned = false')
+              .andWhere(`cl.likeStatus = 'Dislike'`),
+          'dislikes_count',
+        )
+        .addSelect(
+          (qb) =>
+            qb
+              .select('cl.likeStatus')
+              .from(CommentLike, 'cl')
+              .where('cl.commentId = c.id')
+              .andWhere('cl.userId = :userId', { userId: userId }),
+          'like_status',
+        )
         .where(`p.id = :postId`, {
           postId: postId,
         })
@@ -57,7 +116,7 @@ export class CommentsQueryRepository {
         .orderBy(`c.${query.sortBy}`, query.sortDirection)
         .skip((query.pageNumber - 1) * query.pageSize)
         .take(query.pageSize)
-        .getMany();
+        .getRawMany();
 
       const totalCount = await this.commentsRepository
         .createQueryBuilder('c')
@@ -89,6 +148,35 @@ export class CommentsQueryRepository {
     try {
       const comments = await this.commentsRepository
         .createQueryBuilder('c')
+        .addSelect(
+          (qb) =>
+            qb
+              .select('count(*)')
+              .from(CommentLike, 'cl')
+              .where('cl.commentId = c.id')
+              .andWhere('ubsa.isBanned = false')
+              .andWhere(`cl.likeStatus = 'Like'`),
+          'likes_count',
+        )
+        .addSelect(
+          (qb) =>
+            qb
+              .select('count(*)')
+              .from(CommentLike, 'cl')
+              .where('cl.commentId = c.id')
+              .andWhere('ubsa.isBanned = false')
+              .andWhere(`cl.likeStatus = 'Dislike'`),
+          'dislikes_count',
+        )
+        .addSelect(
+          (qb) =>
+            qb
+              .select('cl.likeStatus')
+              .from(CommentLike, 'cl')
+              .where('cl.commentId = c.id')
+              .andWhere('cl.userId = :userId', { userId: userId }),
+          'like_status',
+        )
         .where(`u.id = :userId`, {
           userId: userId,
         })
@@ -100,7 +188,7 @@ export class CommentsQueryRepository {
         .orderBy(`c.${query.sortBy}`, query.sortDirection)
         .skip((query.pageNumber - 1) * query.pageSize)
         .take(query.pageSize)
-        .getMany();
+        .getRawMany();
 
       const totalCount = await this.commentsRepository
         .createQueryBuilder('c')
@@ -126,49 +214,47 @@ export class CommentsQueryRepository {
     }
   }
 
-  private async commentsMapping(
-    comments: Comment[],
-  ): Promise<CommentViewDto[]> {
+  private async commentsMapping(comments: any): Promise<CommentViewDto[]> {
     return comments.map((c) => {
       return {
-        id: c.id.toString(),
-        content: c.content,
+        id: c.c_id.toString(),
+        content: c.c_content,
         commentatorInfo: {
-          userId: c.user.id.toString(),
-          userLogin: c.user.login,
+          userId: c.u_id.toString(),
+          userLogin: c.u_login,
         },
-        createdAt: c.createdAt,
+        createdAt: c.c_created_at,
         likesInfo: {
-          likesCount: 0,
-          dislikesCount: 0,
-          myStatus: LikeStatus.None,
+          likesCount: Number(c.likes_count),
+          dislikesCount: Number(c.dislikes_count),
+          myStatus: c.like_status || LikeStatus.None,
         },
       };
     });
   }
 
   private async commentsOfBloggerMapping(
-    comments: Comment[],
+    comments: any[],
   ): Promise<BloggerCommentViewDto[]> {
     return comments.map((c) => {
       return {
-        id: c.id.toString(),
-        content: c.content,
-        createdAt: c.createdAt,
+        id: c.c_id.toString(),
+        content: c.c_content,
+        createdAt: c.c_created_at,
         commentatorInfo: {
-          userId: c.post.blog.user.id.toString(),
-          userLogin: c.post.blog.user.login,
+          userId: c.u_id.toString(),
+          userLogin: c.u_login,
         },
         likesInfo: {
-          likesCount: 0,
-          dislikesCount: 0,
-          myStatus: LikeStatus.None,
+          likesCount: Number(c.likes_count),
+          dislikesCount: Number(c.dislikes_count),
+          myStatus: c.like_status || LikeStatus.None,
         },
         postInfo: {
-          blogId: c.post.blog.id.toString(),
-          blogName: c.post.blog.name,
-          id: c.post.id.toString(),
-          title: c.post.title,
+          blogId: c.b_id.toString(),
+          blogName: c.b_name,
+          id: c.p_id.toString(),
+          title: c.p_title,
         },
       };
     });

@@ -2,6 +2,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   ManyToOne,
   OneToMany,
   OneToOne,
@@ -36,6 +37,7 @@ export class Blog {
   blogBan: BlogBan;
 
   @ManyToOne(() => User, (user) => user.blog)
+  @JoinColumn()
   user: User;
 
   @OneToMany(() => Post, (post) => post.blog)

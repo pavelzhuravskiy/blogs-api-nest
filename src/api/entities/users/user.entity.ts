@@ -13,6 +13,7 @@ import { Device } from '../devices/device.entity';
 import { Comment } from '../comments/comment.entity';
 import { UserBanByBlogger } from './user-ban-by-blogger.entity';
 import { Blog } from '../blogs/blog.entity';
+import { CommentLike } from '../comments/comment-like.entity';
 
 @Entity('users')
 export class User {
@@ -60,6 +61,9 @@ export class User {
 
   @OneToMany(() => Comment, (comment) => comment.user)
   comment: Comment;
+
+  @OneToMany(() => CommentLike, (commentLike) => commentLike.user)
+  commentLike: CommentLike;
 
   static checkSortingField(value: any) {
     const u = new User();

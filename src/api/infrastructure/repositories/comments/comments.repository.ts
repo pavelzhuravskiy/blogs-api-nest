@@ -2,17 +2,22 @@ import { Injectable } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 import { Comment } from '../../../entities/comments/comment.entity';
+import { CommentLike } from '../../../entities/comments/comment-like.entity';
 
 @Injectable()
 export class CommentsRepository {
   constructor(
     @InjectRepository(Comment)
     private readonly commentsRepository: Repository<Comment>,
+    @InjectRepository(CommentLike)
+    private readonly commentLikesRepository: Repository<CommentLike>,
     @InjectDataSource() private dataSource: DataSource,
   ) {}
 
   // ***** TypeORM data source manager SAVE *****
-  async dataSourceSave(entity: Comment): Promise<Comment> {
+  async dataSourceSave(
+    entity: Comment | CommentLike,
+  ): Promise<Comment | CommentLike> {
     return this.dataSource.manager.save(entity);
   }
 
@@ -43,52 +48,21 @@ export class CommentsRepository {
     return result.affected === 1;
   }
 
-  // ------------------------------------
-
+  // ***** Likes for comment operations *****
   async findUserCommentLikeRecord(
     commentId: number,
     userId: number,
-  ): Promise<number | null> {
-    const comments = await this.dataSource.query(
-      `select id
-       from public.comment_likes
-       where "commentId" = $1
-         and "userId" = $2;`,
-      [commentId, userId],
-    );
-
-    if (comments.length === 0) {
-      return null;
-    }
-
-    return comments[0];
-  }
-
-  async createUserCommentLikeRecord(
-    commentId: number,
-    userId: number,
-    likeStatus: string,
-  ): Promise<number | null> {
-    return this.dataSource.query(
-      `insert into public.comment_likes("commentId", "userId", "likeStatus")
-       values ($1, $2, $3)
-       returning id;`,
-      [commentId, userId, likeStatus],
-    );
-  }
-
-  async updateLikeStatus(
-    likeStatus: string,
-    commentId: number,
-    userId: number,
-  ): Promise<boolean> {
-    const result = await this.dataSource.query(
-      `update public.comment_likes
-       set "likeStatus" = $1
-       where "commentId" = $2
-         and "userId" = $3`,
-      [likeStatus, commentId, userId],
-    );
-    return result[1] === 1;
+  ): Promise<CommentLike | null> {
+    return this.commentLikesRepository
+      .createQueryBuilder('cl')
+      .where(`c.id = :commentId`, {
+        commentId: commentId,
+      })
+      .andWhere(`u.id = :userId`, {
+        userId: userId,
+      })
+      .leftJoinAndSelect('cl.comment', 'c')
+      .leftJoinAndSelect('cl.user', 'u')
+      .getOne();
   }
 }
