@@ -1,19 +1,33 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { User } from '../users/user.entity';
+import { Post } from './post.entity';
 
-@Entity()
+@Entity('post_likes')
 export class PostLike {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'timestamp with time zone' })
+  @Column({ name: 'like_status', type: 'varchar' })
+  likeStatus: string;
+
+  @Column({ name: 'added_at', type: 'timestamp with time zone' })
   addedAt: Date;
 
-  @Column({ type: 'integer' })
-  postId: number; // FK 🔑;
+  @ManyToOne(() => Post, (post) => post.postLike, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn()
+  post: Post;
 
-  @Column({ type: 'integer' })
-  userId: number; // FK 🔑;
-
-  @Column({ type: 'varchar' })
-  likeStatus: string;
+  @ManyToOne(() => User, (user) => user.commentLike, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn()
+  user: User;
 }

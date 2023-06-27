@@ -2,16 +2,19 @@ import { Injectable } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 import { Post } from '../../../entities/posts/post.entity';
+import { PostLike } from '../../../entities/posts/post-like.entity';
 
 @Injectable()
 export class PostsRepository {
   constructor(
     @InjectRepository(Post) private readonly postsRepository: Repository<Post>,
+    @InjectRepository(PostLike)
+    private readonly postLikesRepository: Repository<PostLike>,
     @InjectDataSource() private dataSource: DataSource,
   ) {}
 
   // ***** TypeORM data source manager SAVE *****
-  async dataSourceSave(entity: Post): Promise<Post> {
+  async dataSourceSave(entity: Post | PostLike): Promise<Post | PostLike> {
     return this.dataSource.manager.save(entity);
   }
 
@@ -30,7 +33,7 @@ export class PostsRepository {
     }
   }
 
-  // ***** Delete operations *****
+  // ***** Delete post operations *****
   async deletePost(postId: number): Promise<boolean> {
     const result = await this.postsRepository
       .createQueryBuilder('p')
@@ -41,52 +44,21 @@ export class PostsRepository {
     return result.affected === 1;
   }
 
-  // --------------------------
-
+  // ***** Likes for post operations *****
   async findUserPostLikeRecord(
     postId: number,
     userId: number,
-  ): Promise<number | null> {
-    const posts = await this.dataSource.query(
-      `select id
-       from public.post_likes
-       where "postId" = $1
-         and "userId" = $2;`,
-      [postId, userId],
-    );
-
-    if (posts.length === 0) {
-      return null;
-    }
-
-    return posts[0];
-  }
-
-  async updateLikeStatus(
-    likeStatus: string,
-    postId: number,
-    userId: number,
-  ): Promise<boolean> {
-    const result = await this.dataSource.query(
-      `update public.post_likes
-       set "likeStatus" = $1
-       where "postId" = $2
-         and "userId" = $3`,
-      [likeStatus, postId, userId],
-    );
-    return result[1] === 1;
-  }
-
-  async createUserPostLikeRecord(
-    postId: number,
-    userId: number,
-    likeStatus: string,
-  ): Promise<number | null> {
-    return this.dataSource.query(
-      `insert into public.post_likes("addedAt", "postId", "userId", "likeStatus")
-       values (now(), $1, $2, $3)
-       returning id;`,
-      [postId, userId, likeStatus],
-    );
+  ): Promise<PostLike | null> {
+    return this.postLikesRepository
+      .createQueryBuilder('pl')
+      .where(`p.id = :postId`, {
+        postId: postId,
+      })
+      .andWhere(`u.id = :userId`, {
+        userId: userId,
+      })
+      .leftJoinAndSelect('pl.post', 'p')
+      .leftJoinAndSelect('pl.user', 'u')
+      .getOne();
   }
 }

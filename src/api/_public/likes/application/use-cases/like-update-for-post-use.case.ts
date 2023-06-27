@@ -8,6 +8,7 @@ import {
   userNotFound,
 } from '../../../../../exceptions/exception.constants';
 import { UsersRepository } from '../../../../infrastructure/repositories/users/users.repository';
+import { PostLike } from '../../../../entities/posts/post-like.entity';
 
 export class LikeUpdateForPostCommand {
   constructor(
@@ -49,19 +50,20 @@ export class LikeUpdateForPostUseCase
     const userPostLikeRecord =
       await this.postsRepository.findUserPostLikeRecord(post.id, user.id);
 
+    let likeRecord;
+
     if (userPostLikeRecord) {
-      await this.postsRepository.updateLikeStatus(
-        command.likeStatusInputDto.likeStatus,
-        post.id,
-        user.id,
-      );
+      likeRecord = userPostLikeRecord;
     } else {
-      await this.postsRepository.createUserPostLikeRecord(
-        post.id,
-        user.id,
-        command.likeStatusInputDto.likeStatus,
-      );
+      likeRecord = new PostLike();
     }
+
+    likeRecord.post = post;
+    likeRecord.user = user;
+    likeRecord.likeStatus = command.likeStatusInputDto.likeStatus;
+    likeRecord.addedAt = new Date();
+
+    await this.postsRepository.dataSourceSave(likeRecord);
 
     return {
       data: true,

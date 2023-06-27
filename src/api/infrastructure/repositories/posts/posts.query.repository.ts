@@ -6,6 +6,7 @@ import { LikeStatus } from '../../../../enums/like-status.enum';
 import { PostQueryDto } from '../../../dto/posts/query/post.query.dto';
 import { Post } from '../../../entities/posts/post.entity';
 import { Paginator } from '../../../../helpers/paginator';
+import { PostLike } from '../../../entities/posts/post-like.entity';
 
 @Injectable()
 export class PostsQueryRepository {
@@ -19,6 +20,35 @@ export class PostsQueryRepository {
     try {
       const posts = await this.postsRepository
         .createQueryBuilder('p')
+        .addSelect(
+          (qb) =>
+            qb
+              .select('count(*)')
+              .from(PostLike, 'pl')
+              .where('pl.postId = p.id')
+              .andWhere('ubsa.isBanned = false')
+              .andWhere(`pl.likeStatus = 'Like'`),
+          'likes_count',
+        )
+        .addSelect(
+          (qb) =>
+            qb
+              .select('count(*)')
+              .from(PostLike, 'pl')
+              .where('pl.postId = p.id')
+              .andWhere('ubsa.isBanned = false')
+              .andWhere(`pl.likeStatus = 'Dislike'`),
+          'dislikes_count',
+        )
+        .addSelect(
+          (qb) =>
+            qb
+              .select('pl.likeStatus')
+              .from(PostLike, 'pl')
+              .where('pl.postId = p.id')
+              .andWhere('pl.userId = :userId', { userId: userId }),
+          'like_status',
+        )
         .where(`p.id = :postId`, {
           postId: postId,
         })
@@ -28,7 +58,7 @@ export class PostsQueryRepository {
         .leftJoinAndSelect('b.blogBan', 'bb')
         .leftJoinAndSelect('b.user', 'u')
         .leftJoinAndSelect('u.userBanBySA', 'ubsa')
-        .getMany();
+        .getRawMany();
 
       const mappedPosts = await this.postsMapping(posts);
       return mappedPosts[0];
@@ -44,6 +74,41 @@ export class PostsQueryRepository {
   ): Promise<Paginator<PostViewDto[]>> {
     const posts = await this.postsRepository
       .createQueryBuilder('p')
+      .addSelect(
+        (qb) =>
+          qb
+            .select('count(*)')
+            .from(PostLike, 'pl')
+            .where('pl.postId = p.id')
+            .andWhere('ubsa.isBanned = false')
+            .andWhere(`pl.likeStatus = 'Like'`),
+        'likes_count',
+      )
+      .addSelect(
+        (qb) =>
+          qb
+            .select('count(*)')
+            .from(PostLike, 'pl')
+            .where('pl.postId = p.id')
+            .andWhere('ubsa.isBanned = false')
+            .andWhere(`pl.likeStatus = 'Dislike'`),
+        'dislikes_count',
+      )
+      .addSelect(
+        (qb) =>
+          qb
+            .select('pl.likeStatus')
+            .from(PostLike, 'pl')
+            .where('pl.postId = p.id')
+            .andWhere('pl.userId = :userId', { userId: userId }),
+        'like_status',
+      )
+      .addSelect(
+        (qb) => qb.select('*').from(PostLike, 'pl'),
+        // .where('pl.postId = p.id')
+        // .andWhere('pl.userId = :userId', { userId: userId }),
+        'newest_likes',
+      )
       .where(`bb.isBanned = false`)
       .andWhere(`ubsa.isBanned = false`)
       .leftJoinAndSelect('p.blog', 'b')
@@ -53,7 +118,7 @@ export class PostsQueryRepository {
       .orderBy(`p.${query.sortBy}`, query.sortDirection)
       .skip((query.pageNumber - 1) * query.pageSize)
       .take(query.pageSize)
-      .getMany();
+      .getRawMany();
 
     const totalCount = await this.postsRepository
       .createQueryBuilder('p')
@@ -81,6 +146,35 @@ export class PostsQueryRepository {
     try {
       const posts = await this.postsRepository
         .createQueryBuilder('p')
+        .addSelect(
+          (qb) =>
+            qb
+              .select('count(*)')
+              .from(PostLike, 'pl')
+              .where('pl.postId = p.id')
+              .andWhere('ubsa.isBanned = false')
+              .andWhere(`pl.likeStatus = 'Like'`),
+          'likes_count',
+        )
+        .addSelect(
+          (qb) =>
+            qb
+              .select('count(*)')
+              .from(PostLike, 'pl')
+              .where('pl.postId = p.id')
+              .andWhere('ubsa.isBanned = false')
+              .andWhere(`pl.likeStatus = 'Dislike'`),
+          'dislikes_count',
+        )
+        .addSelect(
+          (qb) =>
+            qb
+              .select('pl.likeStatus')
+              .from(PostLike, 'pl')
+              .where('pl.postId = p.id')
+              .andWhere('pl.userId = :userId', { userId: userId }),
+          'like_status',
+        )
         .where(`b.id = :blogId`, {
           blogId: blogId,
         })
@@ -93,7 +187,7 @@ export class PostsQueryRepository {
         .orderBy(`p.${query.sortBy}`, query.sortDirection)
         .skip((query.pageNumber - 1) * query.pageSize)
         .take(query.pageSize)
-        .getMany();
+        .getRawMany();
 
       const totalCount = await this.postsRepository
         .createQueryBuilder('p')
@@ -120,20 +214,20 @@ export class PostsQueryRepository {
     }
   }
 
-  private async postsMapping(posts: Post[]): Promise<PostViewDto[]> {
+  private async postsMapping(posts: any[]): Promise<PostViewDto[]> {
     return posts.map((p) => {
       return {
-        id: p.id.toString(),
-        title: p.title,
-        shortDescription: p.shortDescription,
-        content: p.content,
-        blogId: p.blog.id.toString(),
-        blogName: p.blog.name,
-        createdAt: p.createdAt,
+        id: p.p_id.toString(),
+        title: p.p_title,
+        shortDescription: p.p_short_description,
+        content: p.p_content,
+        blogId: p.b_id.toString(),
+        blogName: p.b_name,
+        createdAt: p.p_created_at,
         extendedLikesInfo: {
-          likesCount: 0,
-          dislikesCount: 0,
-          myStatus: LikeStatus.None,
+          likesCount: Number(p.likes_count),
+          dislikesCount: Number(p.dislikes_count),
+          myStatus: p.like_status || LikeStatus.None,
           newestLikes: [],
         },
       };

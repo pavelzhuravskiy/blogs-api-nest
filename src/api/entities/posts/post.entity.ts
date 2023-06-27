@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import { Blog } from '../blogs/blog.entity';
 import { Comment } from '../comments/comment.entity';
+import { PostLike } from './post-like.entity';
 
 @Entity('posts')
 export class Post {
@@ -35,6 +36,9 @@ export class Post {
 
   @OneToMany(() => Comment, (comment) => comment.post)
   comment: Comment;
+
+  @OneToMany(() => PostLike, (postLike) => postLike.post)
+  postLike: PostLike;
 
   static checkSortingField(value: any) {
     const p = new Post();

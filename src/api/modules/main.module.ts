@@ -44,15 +44,9 @@ import { BlogBan } from '../entities/blogs/blog-ban.entity';
 import { Post } from '../entities/posts/post.entity';
 import { Comment } from '../entities/comments/comment.entity';
 import { CommentLike } from '../entities/comments/comment-like.entity';
+import { PostLike } from '../entities/posts/post-like.entity';
 
-const entities = [
-  Blog,
-  BlogBan,
-  Post,
-  // PostLike,
-  Comment,
-  CommentLike,
-];
+const entities = [Blog, BlogBan, Post, PostLike, Comment, CommentLike];
 
 const controllers = [
   SuperAdminBlogsController,
