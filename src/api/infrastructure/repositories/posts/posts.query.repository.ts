@@ -23,8 +23,10 @@ export class PostsQueryRepository {
         .addSelect(
           (qb) =>
             qb
-              .select('count(*)')
+              .select(`count(*)`)
               .from(PostLike, 'pl')
+              .leftJoin('pl.user', 'u')
+              .leftJoin('u.userBanBySA', 'ubsa')
               .where('pl.postId = p.id')
               .andWhere('ubsa.isBanned = false')
               .andWhere(`pl.likeStatus = 'Like'`),
@@ -33,8 +35,10 @@ export class PostsQueryRepository {
         .addSelect(
           (qb) =>
             qb
-              .select('count(*)')
+              .select(`count(*)`)
               .from(PostLike, 'pl')
+              .leftJoin('pl.user', 'u')
+              .leftJoin('u.userBanBySA', 'ubsa')
               .where('pl.postId = p.id')
               .andWhere('ubsa.isBanned = false')
               .andWhere(`pl.likeStatus = 'Dislike'`),
@@ -77,8 +81,10 @@ export class PostsQueryRepository {
       .addSelect(
         (qb) =>
           qb
-            .select('count(*)')
+            .select(`count(*)`)
             .from(PostLike, 'pl')
+            .leftJoin('pl.user', 'u')
+            .leftJoin('u.userBanBySA', 'ubsa')
             .where('pl.postId = p.id')
             .andWhere('ubsa.isBanned = false')
             .andWhere(`pl.likeStatus = 'Like'`),
@@ -87,8 +93,10 @@ export class PostsQueryRepository {
       .addSelect(
         (qb) =>
           qb
-            .select('count(*)')
+            .select(`count(*)`)
             .from(PostLike, 'pl')
+            .leftJoin('pl.user', 'u')
+            .leftJoin('u.userBanBySA', 'ubsa')
             .where('pl.postId = p.id')
             .andWhere('ubsa.isBanned = false')
             .andWhere(`pl.likeStatus = 'Dislike'`),
@@ -104,9 +112,26 @@ export class PostsQueryRepository {
         'like_status',
       )
       .addSelect(
-        (qb) => qb.select('*').from(PostLike, 'pl'),
-        // .where('pl.postId = p.id')
-        // .andWhere('pl.userId = :userId', { userId: userId }),
+        (qb) =>
+          qb
+            .select(
+              `jsonb_agg(json_build_object('addedAt', to_char(
+            agg.added_at::timestamp at time zone 'UTC',
+            'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'), 'userId', agg.id, 'login', agg.login)
+                 )`,
+            )
+            .from((qb) => {
+              return qb
+                .select(`added_at, u.id, u.login`)
+                .from(PostLike, 'pl')
+                .leftJoin('pl.user', 'u')
+                .leftJoin('u.userBanBySA', 'ubsa')
+                .where('pl.postId = p.id')
+                .andWhere('ubsa.isBanned = false')
+                .orderBy('added_at', 'DESC')
+                .limit(3);
+            }, 'agg'),
+
         'newest_likes',
       )
       .where(`bb.isBanned = false`)
@@ -119,6 +144,8 @@ export class PostsQueryRepository {
       .skip((query.pageNumber - 1) * query.pageSize)
       .take(query.pageSize)
       .getRawMany();
+
+    console.log(posts);
 
     const totalCount = await this.postsRepository
       .createQueryBuilder('p')
@@ -149,8 +176,10 @@ export class PostsQueryRepository {
         .addSelect(
           (qb) =>
             qb
-              .select('count(*)')
+              .select(`count(*)`)
               .from(PostLike, 'pl')
+              .leftJoin('pl.user', 'u')
+              .leftJoin('u.userBanBySA', 'ubsa')
               .where('pl.postId = p.id')
               .andWhere('ubsa.isBanned = false')
               .andWhere(`pl.likeStatus = 'Like'`),
@@ -159,8 +188,10 @@ export class PostsQueryRepository {
         .addSelect(
           (qb) =>
             qb
-              .select('count(*)')
+              .select(`count(*)`)
               .from(PostLike, 'pl')
+              .leftJoin('pl.user', 'u')
+              .leftJoin('u.userBanBySA', 'ubsa')
               .where('pl.postId = p.id')
               .andWhere('ubsa.isBanned = false')
               .andWhere(`pl.likeStatus = 'Dislike'`),

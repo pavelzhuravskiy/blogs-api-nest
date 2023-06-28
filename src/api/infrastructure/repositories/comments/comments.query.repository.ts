@@ -27,8 +27,10 @@ export class CommentsQueryRepository {
         .addSelect(
           (qb) =>
             qb
-              .select('count(*)')
+              .select(`count(*)`)
               .from(CommentLike, 'cl')
+              .leftJoin('cl.user', 'u')
+              .leftJoin('u.userBanBySA', 'ubsa')
               .where('cl.commentId = c.id')
               .andWhere('ubsa.isBanned = false')
               .andWhere(`cl.likeStatus = 'Like'`),
@@ -37,8 +39,10 @@ export class CommentsQueryRepository {
         .addSelect(
           (qb) =>
             qb
-              .select('count(*)')
+              .select(`count(*)`)
               .from(CommentLike, 'cl')
+              .leftJoin('cl.user', 'u')
+              .leftJoin('u.userBanBySA', 'ubsa')
               .where('cl.commentId = c.id')
               .andWhere('ubsa.isBanned = false')
               .andWhere(`cl.likeStatus = 'Dislike'`),
@@ -61,6 +65,8 @@ export class CommentsQueryRepository {
         .leftJoinAndSelect('u.userBanBySA', 'ubsa')
         .getRawMany();
 
+      console.log(comments);
+
       const mappedComments = await this.commentsMapping(comments);
       return mappedComments[0];
     } catch (e) {
@@ -80,8 +86,10 @@ export class CommentsQueryRepository {
         .addSelect(
           (qb) =>
             qb
-              .select('count(*)')
+              .select(`count(*)`)
               .from(CommentLike, 'cl')
+              .leftJoin('cl.user', 'u')
+              .leftJoin('u.userBanBySA', 'ubsa')
               .where('cl.commentId = c.id')
               .andWhere('ubsa.isBanned = false')
               .andWhere(`cl.likeStatus = 'Like'`),
@@ -90,8 +98,10 @@ export class CommentsQueryRepository {
         .addSelect(
           (qb) =>
             qb
-              .select('count(*)')
+              .select(`count(*)`)
               .from(CommentLike, 'cl')
+              .leftJoin('cl.user', 'u')
+              .leftJoin('u.userBanBySA', 'ubsa')
               .where('cl.commentId = c.id')
               .andWhere('ubsa.isBanned = false')
               .andWhere(`cl.likeStatus = 'Dislike'`),
@@ -151,8 +161,10 @@ export class CommentsQueryRepository {
         .addSelect(
           (qb) =>
             qb
-              .select('count(*)')
+              .select(`count(*)`)
               .from(CommentLike, 'cl')
+              .leftJoin('cl.user', 'u')
+              .leftJoin('u.userBanBySA', 'ubsa')
               .where('cl.commentId = c.id')
               .andWhere('ubsa.isBanned = false')
               .andWhere(`cl.likeStatus = 'Like'`),
@@ -161,8 +173,10 @@ export class CommentsQueryRepository {
         .addSelect(
           (qb) =>
             qb
-              .select('count(*)')
+              .select(`count(*)`)
               .from(CommentLike, 'cl')
+              .leftJoin('cl.user', 'u')
+              .leftJoin('u.userBanBySA', 'ubsa')
               .where('cl.commentId = c.id')
               .andWhere('ubsa.isBanned = false')
               .andWhere(`cl.likeStatus = 'Dislike'`),
@@ -214,7 +228,7 @@ export class CommentsQueryRepository {
     }
   }
 
-  private async commentsMapping(comments: any): Promise<CommentViewDto[]> {
+  private async commentsMapping(comments: any[]): Promise<CommentViewDto[]> {
     return comments.map((c) => {
       return {
         id: c.c_id.toString(),
