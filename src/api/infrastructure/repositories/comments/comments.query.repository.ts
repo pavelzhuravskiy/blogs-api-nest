@@ -65,8 +65,6 @@ export class CommentsQueryRepository {
         .leftJoinAndSelect('u.userBanBySA', 'ubsa')
         .getRawMany();
 
-      console.log(comments);
-
       const mappedComments = await this.commentsMapping(comments);
       return mappedComments[0];
     } catch (e) {
@@ -124,8 +122,8 @@ export class CommentsQueryRepository {
         .leftJoinAndSelect('c.user', 'u')
         .leftJoinAndSelect('u.userBanBySA', 'ubsa')
         .orderBy(`c.${query.sortBy}`, query.sortDirection)
-        .skip((query.pageNumber - 1) * query.pageSize)
-        .take(query.pageSize)
+        .limit(query.pageSize)
+        .offset((query.pageNumber - 1) * query.pageSize)
         .getRawMany();
 
       const totalCount = await this.commentsRepository
@@ -200,8 +198,8 @@ export class CommentsQueryRepository {
         .leftJoinAndSelect('b.user', 'u')
         .leftJoinAndSelect('u.userBanBySA', 'ubsa')
         .orderBy(`c.${query.sortBy}`, query.sortDirection)
-        .skip((query.pageNumber - 1) * query.pageSize)
-        .take(query.pageSize)
+        .limit(query.pageSize)
+        .offset((query.pageNumber - 1) * query.pageSize)
         .getRawMany();
 
       const totalCount = await this.commentsRepository

@@ -53,6 +53,30 @@ export class PostsQueryRepository {
               .andWhere('pl.userId = :userId', { userId: userId }),
           'like_status',
         )
+        .addSelect(
+          (qb) =>
+            qb
+              .select(
+                `jsonb_agg(json_build_object('addedAt', to_char(
+            agg.added_at::timestamp at time zone 'UTC',
+            'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'), 'userId', cast(agg.id as varchar), 'login', agg.login)
+                 )`,
+              )
+              .from((qb) => {
+                return qb
+                  .select(`added_at, u.id, u.login`)
+                  .from(PostLike, 'pl')
+                  .leftJoin('pl.user', 'u')
+                  .leftJoin('u.userBanBySA', 'ubsa')
+                  .where('pl.postId = p.id')
+                  .andWhere(`pl.like_status = 'Like'`)
+                  .andWhere('ubsa.isBanned = false')
+                  .orderBy('added_at', 'DESC')
+                  .limit(3);
+              }, 'agg'),
+
+          'newest_likes',
+        )
         .where(`p.id = :postId`, {
           postId: postId,
         })
@@ -117,7 +141,7 @@ export class PostsQueryRepository {
             .select(
               `jsonb_agg(json_build_object('addedAt', to_char(
             agg.added_at::timestamp at time zone 'UTC',
-            'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'), 'userId', agg.id, 'login', agg.login)
+            'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'), 'userId', cast(agg.id as varchar), 'login', agg.login)
                  )`,
             )
             .from((qb) => {
@@ -127,6 +151,7 @@ export class PostsQueryRepository {
                 .leftJoin('pl.user', 'u')
                 .leftJoin('u.userBanBySA', 'ubsa')
                 .where('pl.postId = p.id')
+                .andWhere(`pl.like_status = 'Like'`)
                 .andWhere('ubsa.isBanned = false')
                 .orderBy('added_at', 'DESC')
                 .limit(3);
@@ -141,11 +166,9 @@ export class PostsQueryRepository {
       .leftJoinAndSelect('b.user', 'u')
       .leftJoinAndSelect('u.userBanBySA', 'ubsa')
       .orderBy(`p.${query.sortBy}`, query.sortDirection)
-      .skip((query.pageNumber - 1) * query.pageSize)
-      .take(query.pageSize)
+      .limit(query.pageSize)
+      .offset((query.pageNumber - 1) * query.pageSize)
       .getRawMany();
-
-    console.log(posts);
 
     const totalCount = await this.postsRepository
       .createQueryBuilder('p')
@@ -206,6 +229,30 @@ export class PostsQueryRepository {
               .andWhere('pl.userId = :userId', { userId: userId }),
           'like_status',
         )
+        .addSelect(
+          (qb) =>
+            qb
+              .select(
+                `jsonb_agg(json_build_object('addedAt', to_char(
+            agg.added_at::timestamp at time zone 'UTC',
+            'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'), 'userId', cast(agg.id as varchar), 'login', agg.login)
+                 )`,
+              )
+              .from((qb) => {
+                return qb
+                  .select(`added_at, u.id, u.login`)
+                  .from(PostLike, 'pl')
+                  .leftJoin('pl.user', 'u')
+                  .leftJoin('u.userBanBySA', 'ubsa')
+                  .where('pl.postId = p.id')
+                  .andWhere(`pl.like_status = 'Like'`)
+                  .andWhere('ubsa.isBanned = false')
+                  .orderBy('added_at', 'DESC')
+                  .limit(3);
+              }, 'agg'),
+
+          'newest_likes',
+        )
         .where(`b.id = :blogId`, {
           blogId: blogId,
         })
@@ -216,8 +263,8 @@ export class PostsQueryRepository {
         .leftJoinAndSelect('b.user', 'u')
         .leftJoinAndSelect('u.userBanBySA', 'ubsa')
         .orderBy(`p.${query.sortBy}`, query.sortDirection)
-        .skip((query.pageNumber - 1) * query.pageSize)
-        .take(query.pageSize)
+        .limit(query.pageSize)
+        .offset((query.pageNumber - 1) * query.pageSize)
         .getRawMany();
 
       const totalCount = await this.postsRepository
@@ -259,7 +306,7 @@ export class PostsQueryRepository {
           likesCount: Number(p.likes_count),
           dislikesCount: Number(p.dislikes_count),
           myStatus: p.like_status || LikeStatus.None,
-          newestLikes: [],
+          newestLikes: p.newest_likes || [],
         },
       };
     });
