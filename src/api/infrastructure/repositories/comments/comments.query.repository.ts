@@ -189,18 +189,21 @@ export class CommentsQueryRepository {
               .andWhere('cl.userId = :userId', { userId: userId }),
           'like_status',
         )
-        .where(`u.id = :userId`, {
+        .where(`bu.id = :userId`, {
           userId: userId,
         })
         .andWhere(`ubsa.isBanned = false`)
         .leftJoinAndSelect('c.post', 'p')
+        .leftJoinAndSelect('c.user', 'u')
         .leftJoinAndSelect('p.blog', 'b')
-        .leftJoinAndSelect('b.user', 'u')
-        .leftJoinAndSelect('u.userBanBySA', 'ubsa')
+        .leftJoinAndSelect('b.user', 'bu')
+        .leftJoinAndSelect('bu.userBanBySA', 'ubsa')
         .orderBy(`c.${query.sortBy}`, query.sortDirection)
         .limit(query.pageSize)
         .offset((query.pageNumber - 1) * query.pageSize)
         .getRawMany();
+
+      console.log(comments);
 
       const totalCount = await this.commentsRepository
         .createQueryBuilder('c')
