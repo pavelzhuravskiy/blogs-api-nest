@@ -203,8 +203,6 @@ export class CommentsQueryRepository {
         .offset((query.pageNumber - 1) * query.pageSize)
         .getRawMany();
 
-      console.log(comments);
-
       const totalCount = await this.commentsRepository
         .createQueryBuilder('c')
         .where(`u.id = :userId`, {

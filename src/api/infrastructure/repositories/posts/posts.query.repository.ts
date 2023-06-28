@@ -165,7 +165,10 @@ export class PostsQueryRepository {
       .leftJoinAndSelect('b.blogBan', 'bb')
       .leftJoinAndSelect('b.user', 'u')
       .leftJoinAndSelect('u.userBanBySA', 'ubsa')
-      .orderBy(`p.${query.sortBy}`, query.sortDirection)
+      .orderBy(
+        `${query.sortBy === 'blogName' ? 'b.name' : `p.${query.sortBy}`}`,
+        query.sortDirection,
+      )
       .limit(query.pageSize)
       .offset((query.pageNumber - 1) * query.pageSize)
       .getRawMany();
