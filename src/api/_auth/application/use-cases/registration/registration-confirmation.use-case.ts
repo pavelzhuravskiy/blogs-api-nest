@@ -1,23 +1,28 @@
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { CommandHandler } from '@nestjs/cqrs';
 import { ConfirmCodeInputDto } from '../../../dto/confirm-code.input.dto';
 import { UsersRepository } from '../../../../infrastructure/repositories/users/users.repository';
-import { DataSource } from 'typeorm';
+import { DataSource, EntityManager } from 'typeorm';
+import { TransactionBaseUseCase } from '../../../../_common/application/use-cases/transaction-base.use-case';
 
 export class RegistrationConfirmationCommand {
   constructor(public confirmCodeInputDto: ConfirmCodeInputDto) {}
 }
 
 @CommandHandler(RegistrationConfirmationCommand)
-export class RegistrationConfirmationUseCase
-  implements ICommandHandler<RegistrationConfirmationCommand>
-{
+export class RegistrationConfirmationUseCase extends TransactionBaseUseCase<
+  RegistrationConfirmationCommand,
+  boolean | null
+> {
   constructor(
-    private readonly usersRepository: UsersRepository,
-    private dataSource: DataSource,
-  ) {}
+    protected readonly dataSource: DataSource,
+    protected readonly usersRepository: UsersRepository,
+  ) {
+    super(dataSource);
+  }
 
-  async execute(
+  async doLogic(
     command: RegistrationConfirmationCommand,
+    manager: EntityManager,
   ): Promise<boolean | null> {
     const user = await this.usersRepository.findUserForEmailConfirm(
       command.confirmCodeInputDto.code,
@@ -31,28 +36,9 @@ export class RegistrationConfirmationUseCase
       return null;
     }
 
-    const queryRunner = this.dataSource.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
-    const queryRunnerManager = queryRunner.manager;
-
-    try {
-      // Confirm user
-      user.isConfirmed = true;
-      await this.usersRepository.queryRunnerSave(user, queryRunnerManager);
-      await this.usersRepository.deleteEmailConfirmationRecord(user.id);
-
-      // Commit transaction
-      await queryRunner.commitTransaction();
-      return true;
-    } catch (e) {
-      // since we have errors - rollback the changes
-      console.error(e);
-      await queryRunner.rollbackTransaction();
-      return null;
-    } finally {
-      // release a queryRunner which was manually instantiated
-      await queryRunner.release();
-    }
+    // Confirm user
+    user.isConfirmed = true;
+    await this.usersRepository.queryRunnerSave(user, manager);
+    return this.usersRepository.deleteEmailConfirmationRecord(user.id);
   }
 }

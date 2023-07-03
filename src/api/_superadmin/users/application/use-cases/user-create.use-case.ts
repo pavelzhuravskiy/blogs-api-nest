@@ -1,75 +1,65 @@
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { CommandHandler } from '@nestjs/cqrs';
 import bcrypt from 'bcrypt';
 import { UserInputDto } from '../../../../dto/users/input/user-input.dto';
 import { UsersRepository } from '../../../../infrastructure/repositories/users/users.repository';
 import { User } from '../../../../entities/users/user.entity';
 import { UserBanBySA } from '../../../../entities/users/user-ban-by-sa.entity';
-import { DataSource } from 'typeorm';
+import { DataSource, EntityManager } from 'typeorm';
 import { UserBanByBlogger } from '../../../../entities/users/user-ban-by-blogger.entity';
+import { TransactionBaseUseCase } from '../../../../_common/application/use-cases/transaction-base.use-case';
+import { InjectDataSource } from '@nestjs/typeorm';
 
 export class UserCreateCommand {
   constructor(public userInputDto: UserInputDto) {}
 }
 
 @CommandHandler(UserCreateCommand)
-export class UserCreateUseCase implements ICommandHandler<UserCreateCommand> {
+export class UserCreateUseCase extends TransactionBaseUseCase<
+  UserCreateCommand,
+  number
+> {
   constructor(
-    private readonly usersRepository: UsersRepository,
-    private dataSource: DataSource,
-  ) {}
+    @InjectDataSource()
+    protected readonly dataSource: DataSource,
+    protected readonly usersRepository: UsersRepository,
+  ) {
+    super(dataSource);
+  }
 
-  async execute(command: UserCreateCommand): Promise<number | null> {
-    const queryRunner = this.dataSource.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
-    const queryRunnerManager = queryRunner.manager;
+  async doLogic(
+    command: UserCreateCommand,
+    manager: EntityManager,
+  ): Promise<number> {
+    // Create user
+    const user = new User();
+    user.login = command.userInputDto.login;
+    user.passwordHash = await bcrypt.hash(
+      command.userInputDto.password,
+      Number(process.env.HASH_ROUNDS),
+    );
+    user.email = command.userInputDto.email;
+    user.isConfirmed = true;
 
-    try {
-      // Create user
-      const user = new User();
-      user.login = command.userInputDto.login;
-      user.passwordHash = await bcrypt.hash(
-        command.userInputDto.password,
-        Number(process.env.HASH_ROUNDS),
-      );
-      user.email = command.userInputDto.email;
-      user.isConfirmed = true;
-      const savedUser = await this.usersRepository.queryRunnerSave(
-        user,
-        queryRunnerManager,
-      );
+    const savedUser = await this.usersRepository.queryRunnerSave(user, manager);
 
-      // Create user ban by SA record
-      const userBanBySA = new UserBanBySA();
-      userBanBySA.user = user;
-      userBanBySA.isBanned = false;
-      await this.usersRepository.queryRunnerSave(
-        userBanBySA,
-        queryRunnerManager,
-      );
+    // Create user ban by SA record
+    const userBanBySA = new UserBanBySA();
+    userBanBySA.user = user;
+    userBanBySA.isBanned = false;
 
-      // Create user ban by blogger record
-      const userBanByBlogger = new UserBanByBlogger();
-      userBanByBlogger.user = user;
-      userBanByBlogger.isBanned = false;
-      await this.usersRepository.queryRunnerSave(
-        userBanByBlogger,
-        queryRunnerManager,
-      );
+    await this.usersRepository.queryRunnerSave(userBanBySA, manager);
 
-      // Commit transaction
-      await queryRunner.commitTransaction();
+    // Create user ban by blogger record
+    const userBanByBlogger = new UserBanByBlogger();
+    userBanByBlogger.user = user;
+    userBanByBlogger.isBanned = false;
 
-      // Return user id
-      return savedUser.id;
-    } catch (e) {
-      // since we have errors - rollback the changes
-      console.error(e);
-      await queryRunner.rollbackTransaction();
-      return null;
-    } finally {
-      // release a queryRunner which was manually instantiated
-      await queryRunner.release();
-    }
+    await this.usersRepository.queryRunnerSave(userBanByBlogger, manager);
+
+    return savedUser.id;
+  }
+
+  public async execute(command: UserCreateCommand) {
+    return super.execute(command);
   }
 }

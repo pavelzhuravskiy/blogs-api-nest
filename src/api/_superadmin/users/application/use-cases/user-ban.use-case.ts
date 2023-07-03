@@ -1,8 +1,9 @@
-import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { CommandHandler } from '@nestjs/cqrs';
 import { SAUserBanInputDto } from '../../../../dto/users/input/superadmin/sa.user-ban.input.dto';
 import { UsersRepository } from '../../../../infrastructure/repositories/users/users.repository';
 import { DevicesRepository } from '../../../../infrastructure/repositories/devices/devices.repository';
-import { DataSource } from 'typeorm';
+import { DataSource, EntityManager } from 'typeorm';
+import { TransactionBaseUseCase } from '../../../../_common/application/use-cases/transaction-base.use-case';
 
 export class SAUserBanCommand {
   constructor(
@@ -12,15 +13,22 @@ export class SAUserBanCommand {
 }
 
 @CommandHandler(SAUserBanCommand)
-export class UserBanUseCase implements ICommandHandler<SAUserBanCommand> {
+export class UserBanUseCase extends TransactionBaseUseCase<
+  SAUserBanCommand,
+  boolean | null
+> {
   constructor(
-    private commandBus: CommandBus,
-    private readonly usersRepository: UsersRepository,
-    private readonly devicesRepository: DevicesRepository,
-    private dataSource: DataSource,
-  ) {}
+    protected readonly dataSource: DataSource,
+    protected readonly usersRepository: UsersRepository,
+    protected readonly devicesRepository: DevicesRepository,
+  ) {
+    super(dataSource);
+  }
 
-  async execute(command: SAUserBanCommand): Promise<boolean | null> {
+  async doLogic(
+    command: SAUserBanCommand,
+    manager: EntityManager,
+  ): Promise<boolean | null> {
     const user = await this.usersRepository.findUserForBanBySA(command.userId);
 
     if (!user) {
@@ -28,36 +36,14 @@ export class UserBanUseCase implements ICommandHandler<SAUserBanCommand> {
     }
 
     if (command.saUserBanInputDto.isBanned) {
-      const queryRunner = this.dataSource.createQueryRunner();
-      await queryRunner.connect();
-      await queryRunner.startTransaction();
-      const queryRunnerManager = queryRunner.manager;
+      // Ban user
+      user.userBanBySA.isBanned = true;
+      user.userBanBySA.banReason = command.saUserBanInputDto.banReason;
+      user.userBanBySA.banDate = new Date();
+      await this.usersRepository.queryRunnerSave(user.userBanBySA, manager);
 
-      try {
-        // Ban user
-        user.userBanBySA.isBanned = true;
-        user.userBanBySA.banReason = command.saUserBanInputDto.banReason;
-        user.userBanBySA.banDate = new Date();
-        await this.usersRepository.queryRunnerSave(
-          user.userBanBySA,
-          queryRunnerManager,
-        );
-
-        // Delete user's devices
-        await this.devicesRepository.deleteBannedUserDevices(user.id);
-
-        // Commit transaction
-        await queryRunner.commitTransaction();
-        return true;
-      } catch (e) {
-        // since we have errors - rollback the changes
-        console.error(e);
-        await queryRunner.rollbackTransaction();
-        return null;
-      } finally {
-        // release a queryRunner which was manually instantiated
-        await queryRunner.release();
-      }
+      // Delete user's devices
+      return this.devicesRepository.deleteBannedUserDevices(user.id);
     } else {
       user.userBanBySA.isBanned = false;
       user.userBanBySA.banReason = null;

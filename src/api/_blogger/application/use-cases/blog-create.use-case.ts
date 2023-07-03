@@ -1,69 +1,57 @@
 import { BlogInputDto } from '../../../dto/blogs/input/blog.input.dto';
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { CommandHandler } from '@nestjs/cqrs';
 import { UsersRepository } from '../../../infrastructure/repositories/users/users.repository';
 import { BlogsRepository } from '../../../infrastructure/repositories/blogs/blogs.repository';
 import { Blog } from '../../../entities/blogs/blog.entity';
 import { BlogBan } from '../../../entities/blogs/blog-ban.entity';
-import { DataSource } from 'typeorm';
+import { DataSource, EntityManager } from 'typeorm';
+import { TransactionBaseUseCase } from '../../../_common/application/use-cases/transaction-base.use-case';
 
 export class BlogCreateCommand {
   constructor(public blogInputDto: BlogInputDto, public userId: number) {}
 }
 
 @CommandHandler(BlogCreateCommand)
-export class BlogCreateUseCase implements ICommandHandler<BlogCreateCommand> {
+export class BlogCreateUseCase extends TransactionBaseUseCase<
+  BlogCreateCommand,
+  number | null
+> {
   constructor(
-    private readonly blogsRepository: BlogsRepository,
-    private readonly usersRepository: UsersRepository,
-    private dataSource: DataSource,
-  ) {}
+    protected readonly dataSource: DataSource,
+    protected readonly blogsRepository: BlogsRepository,
+    protected readonly usersRepository: UsersRepository,
+  ) {
+    super(dataSource);
+  }
 
-  async execute(command: BlogCreateCommand): Promise<number | null> {
+  async doLogic(
+    command: BlogCreateCommand,
+    manager: EntityManager,
+  ): Promise<number | null> {
     const user = await this.usersRepository.findUserById(command.userId);
 
     if (!user) {
       return null;
     }
 
-    const queryRunner = this.dataSource.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
-    const queryRunnerManager = queryRunner.manager;
+    // Create blog
+    const blog = new Blog();
+    blog.user = user;
+    blog.name = command.blogInputDto.name;
+    blog.description = command.blogInputDto.description;
+    blog.websiteUrl = command.blogInputDto.websiteUrl;
+    blog.createdAt = new Date();
 
-    try {
-      // Create blog
-      const blog = new Blog();
-      blog.user = user;
-      blog.name = command.blogInputDto.name;
-      blog.description = command.blogInputDto.description;
-      blog.websiteUrl = command.blogInputDto.websiteUrl;
-      blog.createdAt = new Date();
+    const savedBlog = await this.blogsRepository.queryRunnerSave(blog, manager);
 
-      const savedBlog = await this.blogsRepository.queryRunnerSave(
-        blog,
-        queryRunnerManager,
-      );
+    // Create blog ban record
+    const blogBan = new BlogBan();
+    blogBan.blog = blog;
+    blogBan.isBanned = false;
+    blogBan.banDate = null;
+    await this.blogsRepository.queryRunnerSave(blogBan, manager);
 
-      // Create blog ban record
-      const blogBan = new BlogBan();
-      blogBan.blog = blog;
-      blogBan.isBanned = false;
-      blogBan.banDate = null;
-      await this.blogsRepository.queryRunnerSave(blogBan, queryRunnerManager);
-
-      // Commit transaction
-      await queryRunner.commitTransaction();
-
-      // Return user id
-      return savedBlog.id;
-    } catch (e) {
-      // since we have errors - rollback the changes
-      console.error(e);
-      await queryRunner.rollbackTransaction();
-      return null;
-    } finally {
-      // release a queryRunner which was manually instantiated
-      await queryRunner.release();
-    }
+    // Return user id
+    return savedBlog.id;
   }
 }
