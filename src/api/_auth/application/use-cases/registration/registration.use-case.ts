@@ -77,6 +77,10 @@ export class RegistrationUseCase extends TransactionBaseUseCase<
     return savedUser.id;
   }
 
+  public async execute(command: RegistrationCommand) {
+    return super.execute(command);
+  }
+
   private async sendRegistrationMail(
     login: string,
     email: string,

@@ -41,4 +41,8 @@ export class PasswordUpdateUseCase extends TransactionBaseUseCase<
     await this.usersRepository.queryRunnerSave(user, manager);
     return this.usersRepository.deletePasswordRecoveryRecord(user.id);
   }
+
+  public async execute(command: PasswordUpdateCommand) {
+    return super.execute(command);
+  }
 }

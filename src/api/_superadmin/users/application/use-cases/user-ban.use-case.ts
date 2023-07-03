@@ -52,4 +52,8 @@ export class UserBanUseCase extends TransactionBaseUseCase<
       return true;
     }
   }
+
+  public async execute(command: SAUserBanCommand) {
+    return super.execute(command);
+  }
 }

@@ -54,4 +54,8 @@ export class BlogCreateUseCase extends TransactionBaseUseCase<
     // Return user id
     return savedBlog.id;
   }
+
+  public async execute(command: BlogCreateCommand) {
+    return super.execute(command);
+  }
 }

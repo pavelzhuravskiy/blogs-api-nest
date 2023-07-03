@@ -41,4 +41,8 @@ export class RegistrationConfirmationUseCase extends TransactionBaseUseCase<
     await this.usersRepository.queryRunnerSave(user, manager);
     return this.usersRepository.deleteEmailConfirmationRecord(user.id);
   }
+
+  public async execute(command: RegistrationConfirmationCommand) {
+    return super.execute(command);
+  }
 }
