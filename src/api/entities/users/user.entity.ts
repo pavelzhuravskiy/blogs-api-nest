@@ -54,16 +54,16 @@ export class User {
   userPasswordRecovery: UserPasswordRecovery;
 
   @OneToMany(() => Device, (device) => device.user)
-  device: Device;
+  device: Device[];
 
   @OneToMany(() => Blog, (blog) => blog.user)
-  blog: Blog;
+  blog: Blog[];
 
   @OneToMany(() => Comment, (comment) => comment.user)
-  comment: Comment;
+  comment: Comment[];
 
   @OneToMany(() => CommentLike, (commentLike) => commentLike.user)
-  commentLike: CommentLike;
+  commentLike: CommentLike[];
 
   static checkSortingField(value: any) {
     const u = new User();

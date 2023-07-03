@@ -41,13 +41,13 @@ export class Blog {
   user: User;
 
   @OneToMany(() => Post, (post) => post.blog)
-  post: Post;
+  post: Post[];
 
   @OneToMany(
     () => UserBanByBlogger,
     (userBanByBlogger) => userBanByBlogger.blog,
   )
-  userBanByBlogger: UserBanByBlogger;
+  userBanByBlogger: UserBanByBlogger[];
 
   static checkSortingField(value: any) {
     const b = new Blog();

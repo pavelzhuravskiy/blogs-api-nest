@@ -35,7 +35,7 @@ export class Comment {
   post: Post;
 
   @OneToMany(() => CommentLike, (commentLike) => commentLike.comment)
-  commentLike: CommentLike;
+  commentLike: CommentLike[];
 
   static checkSortingField(value: any) {
     const c = new Comment();

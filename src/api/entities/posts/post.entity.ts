@@ -35,10 +35,10 @@ export class Post {
   blog: Blog;
 
   @OneToMany(() => Comment, (comment) => comment.post)
-  comment: Comment;
+  comment: Comment[];
 
   @OneToMany(() => PostLike, (postLike) => postLike.post)
-  postLike: PostLike;
+  postLike: PostLike[];
 
   static checkSortingField(value: any) {
     const p = new Post();
