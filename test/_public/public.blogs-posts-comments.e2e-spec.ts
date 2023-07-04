@@ -319,12 +319,12 @@ describe('Public blogs, posts, comments testing', () => {
     // Not found errors [404]
     it(`should return 404 when trying to update nonexistent comment`, async () => {
       return agent
-        .put(publicCommentsURI + commentId)
+        .put(publicCommentsURI + invalidURI)
         .send({
           content: commentContent,
         })
         .auth(aTokenUser02, { type: 'bearer' })
-        .expect(403);
+        .expect(404);
     });
 
     // Success

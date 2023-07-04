@@ -48,7 +48,6 @@ describe('Users filtering, sorting, pagination', () => {
     const users = await agent
       .get(saUsersURI)
       .auth(basicAuthLogin, basicAuthPassword)
-      .auth(basicAuthLogin, basicAuthPassword)
       .expect(200);
     expect(users.body.items).toHaveLength(10);
   }, 30000);

@@ -4,6 +4,7 @@ export const postNotFound = 'Post not found';
 export const commentNotFound = 'Comment not found';
 export const userNotFound = 'User not found';
 export const deviceNotFound = 'Device not found';
+export const questionNotFound = 'Question not found';
 
 // Fields
 export const blogIDField = 'blogId';
@@ -14,6 +15,7 @@ export const deviceIDField = 'deviceId';
 export const confirmCodeField = 'code';
 export const recoveryCodeField = 'recoveryCode';
 export const emailField = 'email';
+export const questionField = 'question';
 
 // Unique user
 export const loginNotUnique = 'Login already exists';
@@ -31,9 +33,3 @@ export const blogIsBound = 'Blog is already bound';
 
 // Ban user
 export const userIsBanned = 'User is banned';
-export const userIsAlreadyBanned = 'User is already banned';
-export const userIsAlreadyUnbanned = 'User is already unbanned';
-
-// Ban blog
-export const blogIsAlreadyBanned = 'Blog is already banned';
-export const blogIsAlreadyUnbanned = 'Blog is already unbanned';
