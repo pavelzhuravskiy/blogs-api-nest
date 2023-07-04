@@ -26,6 +26,7 @@ import { User } from '../entities/users/user.entity';
 import { UsersModule } from './users.module';
 import { MailAdapter } from '../infrastructure/mail/mail-adapter';
 import { DevicesModule } from './devices.module';
+import { UsersService } from '../_superadmin/users/application/users.service';
 
 const services = [JwtService];
 
@@ -67,6 +68,7 @@ const strategies = [
   ],
   controllers: [PublicAuthController],
   providers: [
+    UsersService,
     ...services,
     ...useCases,
     ...repositories,

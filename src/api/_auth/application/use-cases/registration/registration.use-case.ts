@@ -1,16 +1,13 @@
 import { CommandHandler } from '@nestjs/cqrs';
 import { UserInputDto } from '../../../../dto/users/input/user-input.dto';
-import bcrypt from 'bcrypt';
 import { UsersRepository } from '../../../../infrastructure/repositories/users/users.repository';
 import { MailAdapter } from '../../../../infrastructure/mail/mail-adapter';
-import { User } from '../../../../entities/users/user.entity';
-import { UserBanBySA } from '../../../../entities/users/user-ban-by-sa.entity';
 import { DataSource, EntityManager } from 'typeorm';
 import { UserEmailConfirmation } from '../../../../entities/users/user-email-confirmation.entity';
 import { randomUUID } from 'crypto';
 import { add } from 'date-fns';
 import { TransactionBaseUseCase } from '../../../../_common/application/use-cases/transaction-base.use-case';
-import { UserBanByBlogger } from '../../../../entities/users/user-ban-by-blogger.entity';
+import { UsersService } from '../../../../_superadmin/users/application/users.service';
 
 export class RegistrationCommand {
   constructor(public userInputDto: UserInputDto) {}
@@ -23,6 +20,7 @@ export class RegistrationUseCase extends TransactionBaseUseCase<
 > {
   constructor(
     protected readonly dataSource: DataSource,
+    protected readonly usersService: UsersService,
     protected readonly usersRepository: UsersRepository,
     protected readonly mailAdapter: MailAdapter,
   ) {
@@ -33,28 +31,12 @@ export class RegistrationUseCase extends TransactionBaseUseCase<
     command: RegistrationCommand,
     manager: EntityManager,
   ): Promise<number | null> {
-    // Create user
-    const user = new User();
-    user.login = command.userInputDto.login;
-    user.passwordHash = await bcrypt.hash(
-      command.userInputDto.password,
-      Number(process.env.HASH_ROUNDS),
-    );
-    user.email = command.userInputDto.email;
+    const { user, userBanBySA, userBanByBlogger } =
+      await this.usersService.createUser(command);
     user.isConfirmed = false;
+
     const savedUser = await this.usersRepository.queryRunnerSave(user, manager);
-
-    // Create user ban record
-    const userBanBySA = new UserBanBySA();
-    userBanBySA.user = user;
-    userBanBySA.isBanned = false;
     await this.usersRepository.queryRunnerSave(userBanBySA, manager);
-
-    // Create user ban by blogger record
-    const userBanByBlogger = new UserBanByBlogger();
-    userBanByBlogger.user = user;
-    userBanByBlogger.isBanned = false;
-
     await this.usersRepository.queryRunnerSave(userBanByBlogger, manager);
 
     // Create user email confirmation record
@@ -63,7 +45,6 @@ export class RegistrationUseCase extends TransactionBaseUseCase<
     userEmailConfirmation.user = user;
     userEmailConfirmation.confirmationCode = confirmationCode;
     userEmailConfirmation.expirationDate = add(new Date(), { hours: 1 });
-
     await this.usersRepository.queryRunnerSave(userEmailConfirmation, manager);
 
     await this.sendRegistrationMail(

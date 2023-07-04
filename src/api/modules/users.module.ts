@@ -16,6 +16,7 @@ import { UserEmailConfirmation } from '../entities/users/user-email-confirmation
 import { UserPasswordRecovery } from '../entities/users/user-password-recovery.entity';
 import { DevicesModule } from './devices.module';
 import { UserBanByBlogger } from '../entities/users/user-ban-by-blogger.entity';
+import { UsersService } from '../_superadmin/users/application/users.service';
 
 const useCases = [UserCreateUseCase, UserDeleteUseCase, UserBanUseCase];
 
@@ -33,6 +34,7 @@ const repositories = [UsersRepository, UsersQueryRepository, DevicesRepository];
   imports: [TypeOrmModule.forFeature([...entities]), DevicesModule, CqrsModule],
   controllers: [SuperAdminUsersController],
   providers: [
+    UsersService,
     ...useCases,
     ...repositories,
     IsLoginExistConstraint,
