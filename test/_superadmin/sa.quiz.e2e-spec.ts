@@ -14,6 +14,7 @@ import {
   answer03,
   questionBody,
   questionUpdatedBody,
+  saQuestionsPublishURI,
   saQuestionsURI,
 } from '../utils/constants/quiz.constants';
 import { longString508 } from '../utils/constants/common.constants';
@@ -102,7 +103,7 @@ describe('Super admin quiz questions testing', () => {
   });
   describe('Update question', () => {
     // Auth errors [401]
-    it(`should return 401 when trying to update blog with incorrect access token`, async () => {
+    it(`should return 401 when trying to update question with incorrect credentials`, async () => {
       return agent
         .put(saQuestionsURI + questionId)
         .auth(basicAuthLogin, randomUUID())
@@ -141,6 +142,58 @@ describe('Super admin quiz questions testing', () => {
         .auth(basicAuthLogin, basicAuthPassword)
         .expect(200);
       expect(check.body.items[0]).toEqual(questionUpdatedObject);
+    });
+    it(`should update published status`, async () => {
+      await agent
+        .put(saQuestionsURI + questionId + saQuestionsPublishURI)
+        .auth(basicAuthLogin, basicAuthPassword)
+        .send({
+          published: true,
+        })
+        .expect(204);
+
+      const check = await agent
+        .get(saQuestionsURI)
+        .auth(basicAuthLogin, basicAuthPassword)
+        .expect(200);
+      expect(check.body.items[0].published).toBeTruthy();
+    });
+  });
+  describe('Delete question', () => {
+    // Auth errors [401]
+    it(`should return 401 when trying to delete question with incorrect credentials`, async () => {
+      return agent
+        .delete(saQuestionsURI + questionId)
+        .auth(basicAuthLogin, randomUUID())
+        .expect(401);
+    });
+
+    // Not found errors [404]
+    it(`should return 404 when trying to delete nonexistent question`, async () => {
+      await agent
+        .delete(saQuestionsURI + randomUUID())
+        .auth(basicAuthLogin, basicAuthPassword)
+        .expect(404);
+    });
+
+    // Success
+    it(`should delete question by ID`, async () => {
+      await agent
+        .delete(saQuestionsURI + questionId)
+        .auth(basicAuthLogin, basicAuthPassword)
+        .expect(204);
+
+      const response = await agent
+        .get(saQuestionsURI)
+        .auth(basicAuthLogin, basicAuthPassword)
+        .expect(200);
+      expect(response.body).toEqual({
+        pagesCount: 0,
+        page: 1,
+        pageSize: 10,
+        totalCount: 0,
+        items: [],
+      });
     });
   });
 

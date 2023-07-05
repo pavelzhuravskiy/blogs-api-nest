@@ -7,8 +7,15 @@ import { Question } from '../entities/quiz/question.entity';
 import { QuestionsRepository } from '../infrastructure/repositories/quiz/questions.repository';
 import { QuestionsQueryRepository } from '../infrastructure/repositories/quiz/questions.query.repository';
 import { QuestionUpdateUseCase } from '../_superadmin/quiz/application/use-cases/question-update.use-case';
+import { QuestionPublishUseCase } from '../_superadmin/quiz/application/use-cases/question-publish.use-case';
+import { QuestionDeleteUseCase } from '../_superadmin/quiz/application/use-cases/question-delete.use-case';
 
-const useCases = [QuestionCreateUseCase, QuestionUpdateUseCase];
+const useCases = [
+  QuestionCreateUseCase,
+  QuestionUpdateUseCase,
+  QuestionPublishUseCase,
+  QuestionDeleteUseCase,
+];
 
 const entities = [Question];
 

@@ -11,14 +11,6 @@ export class QuestionsRepository {
     @InjectDataSource() private dataSource: DataSource,
   ) {}
 
-  /*// ***** TypeORM query runner transaction SAVE *****
-  async queryRunnerSave(
-    entity: Blog | BlogBan,
-    queryRunnerManager: EntityManager,
-  ): Promise<Blog | BlogBan> {
-    return queryRunnerManager.save(entity);
-  }*/
-
   // ***** TypeORM data source manager SAVE *****
   async dataSourceSave(entity: Question): Promise<Question> {
     return this.dataSource.manager.save(entity);
@@ -37,40 +29,14 @@ export class QuestionsRepository {
     }
   }
 
-  /*async findBlogWithOwner(blogId: string): Promise<Blog | null> {
-    try {
-      return await this.blogsRepository
-        .createQueryBuilder('b')
-        .where(`b.id = :blogId`, { blogId: blogId })
-        .leftJoinAndSelect('b.user', 'u')
-        .getOne();
-    } catch (e) {
-      console.log(e);
-      return null;
-    }
-  }*/
-
-  /*async findBlogForBlogBan(blogId: string): Promise<Blog | null> {
-    try {
-      return await this.blogsRepository
-        .createQueryBuilder('b')
-        .where(`b.id = :blogId`, { blogId: blogId })
-        .leftJoinAndSelect('b.blogBan', 'bb')
-        .getOne();
-    } catch (e) {
-      console.log(e);
-      return null;
-    }
-  }*/
-
-  /*// ***** Delete operations *****
-  async deleteBlog(blogId: number): Promise<boolean> {
-    const result = await this.blogsRepository
-      .createQueryBuilder('b')
+  // ***** Delete operations *****
+  async deleteQuestion(questionId: number): Promise<boolean> {
+    const result = await this.questionsRepository
+      .createQueryBuilder('q')
       .delete()
-      .from(Blog)
-      .where('id = :blogId', { blogId: blogId })
+      .from(Question)
+      .where('id = :questionId', { questionId: questionId })
       .execute();
     return result.affected === 1;
-  }*/
+  }
 }

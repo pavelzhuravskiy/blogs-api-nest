@@ -1,5 +1,6 @@
 // Quiz URI
 export const saQuestionsURI = '/sa/quiz/questions/';
+export const saQuestionsPublishURI = '/publish/';
 
 // Question updating strings
 export const questionBody = 'This is a test question body';

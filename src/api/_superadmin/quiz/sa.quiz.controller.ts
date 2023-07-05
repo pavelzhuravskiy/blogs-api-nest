@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   Param,
@@ -22,6 +23,9 @@ import {
   questionField,
   questionNotFound,
 } from '../../../exceptions/exception.constants';
+import { QuestionPublishInputDto } from '../../dto/quiz/input/question-publish.Input.dto';
+import { QuestionPublishCommand } from './application/use-cases/question-publish.use-case';
+import { QuestionDeleteCommand } from './application/use-cases/question-delete.use-case';
 
 @Controller('sa/quiz/questions')
 export class SuperAdminQuizController {
@@ -55,6 +59,47 @@ export class SuperAdminQuizController {
   ) {
     const result = await this.commandBus.execute(
       new QuestionUpdateCommand(questionInputDto, questionId),
+    );
+
+    if (!result) {
+      return exceptionHandler(
+        ResultCode.NotFound,
+        questionNotFound,
+        questionField,
+      );
+    }
+
+    return result;
+  }
+
+  @UseGuards(BasicAuthGuard)
+  @Put(':id/publish')
+  @HttpCode(204)
+  async publishQuestion(
+    @Body() questionPublishInputDto: QuestionPublishInputDto,
+    @Param('id') questionId,
+  ) {
+    const result = await this.commandBus.execute(
+      new QuestionPublishCommand(questionPublishInputDto, questionId),
+    );
+
+    if (!result) {
+      return exceptionHandler(
+        ResultCode.NotFound,
+        questionNotFound,
+        questionField,
+      );
+    }
+
+    return result;
+  }
+
+  @UseGuards(BasicAuthGuard)
+  @Delete(':id')
+  @HttpCode(204)
+  async deleteQuestion(@Param('id') questionId) {
+    const result = await this.commandBus.execute(
+      new QuestionDeleteCommand(questionId),
     );
 
     if (!result) {
