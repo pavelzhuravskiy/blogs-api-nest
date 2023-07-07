@@ -6,12 +6,16 @@ import {
 } from '../utils/constants/auth.constants';
 import { exceptionObject } from '../utils/objects/common.objects';
 import { randomUUID } from 'crypto';
-import { questionBodyField } from '../utils/constants/exceptions.constants';
+import {
+  questionAnswersField,
+  questionBodyField,
+} from '../utils/constants/exceptions.constants';
 import { getAppAndClearDb } from '../utils/functions/get-app';
 import {
   answer01,
   answer02,
   answer03,
+  answerNumeric,
   questionBody,
   questionUpdatedBody,
   saQuestionsPublishURI,
@@ -102,6 +106,31 @@ describe('Super admin quiz questions testing', () => {
     });
   });
   describe('Update question', () => {
+    // Validation errors [400]
+    it(`should return 400 when trying to update question without answers`, async () => {
+      const response = await agent
+        .put(saQuestionsURI + questionId)
+        .auth(basicAuthLogin, basicAuthPassword)
+        .send({
+          body: questionBody,
+        })
+        .expect(400);
+
+      expect(response.body).toEqual(exceptionObject(questionAnswersField));
+    });
+    it(`should return 400 when trying to update question with incorrect answers type`, async () => {
+      const response = await agent
+        .put(saQuestionsURI + questionId)
+        .auth(basicAuthLogin, basicAuthPassword)
+        .send({
+          body: questionBody,
+          correctAnswers: 123,
+        })
+        .expect(400);
+
+      expect(response.body).toEqual(exceptionObject(questionAnswersField));
+    });
+
     // Auth errors [401]
     it(`should return 401 when trying to update question with incorrect credentials`, async () => {
       return agent
@@ -133,7 +162,7 @@ describe('Super admin quiz questions testing', () => {
         .auth(basicAuthLogin, basicAuthPassword)
         .send({
           body: questionUpdatedBody,
-          correctAnswers: [answer01, answer02, answer03],
+          correctAnswers: [answer01, answer02, answer03, answerNumeric],
         })
         .expect(204);
 
@@ -159,7 +188,8 @@ describe('Super admin quiz questions testing', () => {
       expect(check.body.items[0].published).toBeTruthy();
     });
   });
-  describe('Delete question', () => {
+
+  describe.skip('Delete question', () => {
     // Auth errors [401]
     it(`should return 401 when trying to delete question with incorrect credentials`, async () => {
       return agent

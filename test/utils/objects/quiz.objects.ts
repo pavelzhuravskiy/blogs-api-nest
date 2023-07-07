@@ -1,4 +1,11 @@
-import { questionBody, questionUpdatedBody } from '../constants/quiz.constants';
+import {
+  answer01,
+  answer02,
+  answer03,
+  answerNumeric,
+  questionBody,
+  questionUpdatedBody,
+} from '../constants/quiz.constants';
 
 export const questionCreatedObject = {
   id: expect.any(String),
@@ -12,8 +19,8 @@ export const questionCreatedObject = {
 export const questionUpdatedObject = {
   id: expect.any(String),
   body: questionUpdatedBody,
-  correctAnswers: [],
+  correctAnswers: [answer01, answer02, answer03, answerNumeric.toString()],
   published: false,
   createdAt: expect.any(String),
-  updatedAt: null,
+  updatedAt: expect.any(String),
 };

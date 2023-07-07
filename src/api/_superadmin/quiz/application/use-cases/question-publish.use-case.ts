@@ -26,6 +26,7 @@ export class QuestionPublishUseCase
     }
 
     question.published = command.questionPublishInputDto.published;
+    question.updatedAt = new Date();
     return this.questionsRepository.dataSourceSave(question);
   }
 }

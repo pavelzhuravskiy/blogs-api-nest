@@ -13,6 +13,9 @@ export class Question {
   @Column({ type: 'varchar', width: 500 })
   body: string;
 
+  @Column({ name: 'correct_answers', type: 'jsonb', default: [] })
+  correctAnswers;
+
   @Column({ type: 'boolean', default: false })
   published: boolean;
 

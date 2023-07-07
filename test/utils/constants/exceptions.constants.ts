@@ -22,3 +22,4 @@ export const banReasonField = 'banReason';
 
 // Quiz exception fields strings
 export const questionBodyField = 'body';
+export const questionAnswersField = 'correctAnswers';

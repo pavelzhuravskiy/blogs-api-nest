@@ -20,7 +20,6 @@ export class QuestionsQueryRepository {
       .where(`q.id = :questionId`, {
         questionId: questionId,
       })
-      // .leftJoinAndSelect(ANSWERS)
       .getMany();
 
     const mappedQuestions = await this.questionsMapping(questions);
@@ -48,7 +47,6 @@ export class QuestionsQueryRepository {
           bodyTerm: `%${query.bodySearchTerm}%`,
         },
       )
-      // .leftJoinAndSelect(ANSWERS)
       .orderBy(`q.${query.sortBy}`, query.sortDirection)
       .skip((query.pageNumber - 1) * query.pageSize)
       .take(query.pageSize)
@@ -72,7 +70,6 @@ export class QuestionsQueryRepository {
           bodyTerm: `%${query.bodySearchTerm}%`,
         },
       )
-      // .leftJoinAndSelect(ANSWERS)
       .getCount();
 
     return Paginator.paginate({
@@ -90,7 +87,7 @@ export class QuestionsQueryRepository {
       return {
         id: q.id.toString(),
         body: q.body,
-        correctAnswers: [],
+        correctAnswers: q.correctAnswers,
         published: q.published,
         createdAt: q.createdAt,
         updatedAt: q.updatedAt,

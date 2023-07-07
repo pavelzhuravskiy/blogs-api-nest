@@ -8,6 +8,12 @@ export class QuestionInputDto {
 
   @IsArray()
   @ArrayNotEmpty()
-  @Transform(({ value }) => value.map((a) => a.toString().trim()))
+  @Transform(({ value }) => {
+    if (!Array.isArray(value)) {
+      return false;
+    } else {
+      return value.map((a) => a.toString().trim());
+    }
+  })
   correctAnswers: string[];
 }

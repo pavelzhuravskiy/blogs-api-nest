@@ -26,6 +26,8 @@ export class QuestionUpdateUseCase
     }
 
     question.body = command.questionInputDto.body;
+    question.correctAnswers = command.questionInputDto.correctAnswers;
+    question.updatedAt = new Date();
     return this.questionsRepository.dataSourceSave(question);
   }
 }
