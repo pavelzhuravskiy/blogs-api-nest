@@ -1,12 +1,12 @@
 import { QueryDto } from '../../query.dto';
 import { IsOptional } from 'class-validator';
 import { Transform } from 'class-transformer';
-import { Question } from '../../../entities/quiz/question.entity';
+import { QuizQuestion } from '../../../entities/quiz/question.entity';
 import { PublishedStatus } from '../../../../enums/published-status.enum';
 
 export class QuestionQueryDto extends QueryDto {
   @Transform(({ value }) => {
-    if (Question.checkSortingField(value)) {
+    if (QuizQuestion.checkSortingField(value)) {
       return value;
     } else {
       return 'createdAt';

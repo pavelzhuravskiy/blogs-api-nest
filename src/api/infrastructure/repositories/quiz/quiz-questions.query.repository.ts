@@ -2,15 +2,18 @@ import { Injectable } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 import { Paginator } from '../../../../helpers/paginator';
-import { Question } from '../../../entities/quiz/question.entity';
+import { QuizQuestion } from '../../../entities/quiz/question.entity';
 import { QuestionViewDto } from '../../../dto/quiz/view/question.view.dto';
 import { QuestionQueryDto } from '../../../dto/quiz/query/question.query.dto';
+import { QuizGame } from '../../../entities/quiz/quiz-game.entity';
 
 @Injectable()
-export class QuestionsQueryRepository {
+export class QuizQuestionsQueryRepository {
   constructor(
-    @InjectRepository(Question)
-    private readonly questionsRepository: Repository<Question>,
+    @InjectRepository(QuizQuestion)
+    private readonly questionsRepository: Repository<QuizQuestion>,
+    @InjectRepository(QuizGame)
+    private readonly quizGamesRepository: Repository<QuizGame>,
     @InjectDataSource() private dataSource: DataSource,
   ) {}
 
@@ -81,7 +84,7 @@ export class QuestionsQueryRepository {
   }
 
   private async questionsMapping(
-    array: Question[],
+    array: QuizQuestion[],
   ): Promise<QuestionViewDto[]> {
     return array.map((q) => {
       return {

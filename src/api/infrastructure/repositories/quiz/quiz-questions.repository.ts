@@ -1,23 +1,23 @@
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
-import { Question } from '../../../entities/quiz/question.entity';
+import { QuizQuestion } from '../../../entities/quiz/question.entity';
 
 @Injectable()
-export class QuestionsRepository {
+export class QuizQuestionsRepository {
   constructor(
-    @InjectRepository(Question)
-    private readonly questionsRepository: Repository<Question>,
+    @InjectRepository(QuizQuestion)
+    private readonly questionsRepository: Repository<QuizQuestion>,
     @InjectDataSource() private dataSource: DataSource,
   ) {}
 
   // ***** TypeORM data source manager SAVE *****
-  async dataSourceSave(entity: Question): Promise<Question> {
+  async dataSourceSave(entity: QuizQuestion): Promise<QuizQuestion> {
     return this.dataSource.manager.save(entity);
   }
 
   // ***** Find question operations *****
-  async findQuestion(questionId: string): Promise<Question | null> {
+  async findQuestion(questionId: string): Promise<QuizQuestion | null> {
     try {
       return await this.questionsRepository
         .createQueryBuilder('q')
@@ -34,7 +34,7 @@ export class QuestionsRepository {
     const result = await this.questionsRepository
       .createQueryBuilder('q')
       .delete()
-      .from(Question)
+      .from(QuizQuestion)
       .where('id = :questionId', { questionId: questionId })
       .execute();
     return result.affected === 1;

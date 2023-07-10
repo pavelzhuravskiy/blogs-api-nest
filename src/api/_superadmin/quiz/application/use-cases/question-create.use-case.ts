@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { QuestionInputDto } from '../../../../dto/quiz/input/question.Input.dto';
-import { QuestionsRepository } from '../../../../infrastructure/repositories/quiz/questions.repository';
-import { Question } from '../../../../entities/quiz/question.entity';
+import { QuizQuestionsRepository } from '../../../../infrastructure/repositories/quiz/quiz-questions.repository';
+import { QuizQuestion } from '../../../../entities/quiz/question.entity';
 
 export class QuestionCreateCommand {
   constructor(public questionInputDto: QuestionInputDto) {}
@@ -11,10 +11,10 @@ export class QuestionCreateCommand {
 export class QuestionCreateUseCase
   implements ICommandHandler<QuestionCreateCommand>
 {
-  constructor(private readonly questionsRepository: QuestionsRepository) {}
+  constructor(private readonly questionsRepository: QuizQuestionsRepository) {}
 
   async execute(command: QuestionCreateCommand): Promise<number> {
-    const question = new Question();
+    const question = new QuizQuestion();
     question.body = command.questionInputDto.body;
     question.published = false;
     question.createdAt = new Date();

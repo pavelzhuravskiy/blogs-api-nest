@@ -14,7 +14,7 @@ import { CommandBus } from '@nestjs/cqrs';
 import { QuestionInputDto } from '../../dto/quiz/input/question.Input.dto';
 import { BasicAuthGuard } from '../../_auth/guards/basic-auth.guard';
 import { QuestionCreateCommand } from './application/use-cases/question-create.use-case';
-import { QuestionsQueryRepository } from '../../infrastructure/repositories/quiz/questions.query.repository';
+import { QuizQuestionsQueryRepository } from '../../infrastructure/repositories/quiz/quiz-questions.query.repository';
 import { QuestionQueryDto } from '../../dto/quiz/query/question.query.dto';
 import { ResultCode } from '../../../enums/result-code.enum';
 import { exceptionHandler } from '../../../exceptions/exception.handler';
@@ -31,7 +31,7 @@ import { QuestionDeleteCommand } from './application/use-cases/question-delete.u
 export class SuperAdminQuizController {
   constructor(
     private commandBus: CommandBus,
-    private readonly questionsQueryRepository: QuestionsQueryRepository,
+    private readonly questionsQueryRepository: QuizQuestionsQueryRepository,
   ) {}
 
   @UseGuards(BasicAuthGuard)

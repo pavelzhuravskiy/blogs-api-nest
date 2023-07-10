@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { QuestionsRepository } from '../../../../infrastructure/repositories/quiz/questions.repository';
-import { Question } from '../../../../entities/quiz/question.entity';
+import { QuizQuestionsRepository } from '../../../../infrastructure/repositories/quiz/quiz-questions.repository';
+import { QuizQuestion } from '../../../../entities/quiz/question.entity';
 import { QuestionPublishInputDto } from '../../../../dto/quiz/input/question-publish.Input.dto';
 
 export class QuestionPublishCommand {
@@ -14,9 +14,9 @@ export class QuestionPublishCommand {
 export class QuestionPublishUseCase
   implements ICommandHandler<QuestionPublishCommand>
 {
-  constructor(private readonly questionsRepository: QuestionsRepository) {}
+  constructor(private readonly questionsRepository: QuizQuestionsRepository) {}
 
-  async execute(command: QuestionPublishCommand): Promise<Question | null> {
+  async execute(command: QuestionPublishCommand): Promise<QuizQuestion | null> {
     const question = await this.questionsRepository.findQuestion(
       command.questionId,
     );

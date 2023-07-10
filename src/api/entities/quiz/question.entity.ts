@@ -2,11 +2,14 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinTable,
+  ManyToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { QuizGame } from './quiz-game.entity';
 
-@Entity('questions')
-export class Question {
+@Entity('quiz_questions')
+export class QuizQuestion {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -29,8 +32,12 @@ export class Question {
   })
   updatedAt: Date;
 
+  @ManyToMany(() => QuizGame, (game) => game.questions)
+  @JoinTable()
+  games: QuizGame[];
+
   static checkSortingField(value: any) {
-    const q = new Question();
+    const q = new QuizQuestion();
     q.id = 1;
     q.body = '';
     q.published = false;
