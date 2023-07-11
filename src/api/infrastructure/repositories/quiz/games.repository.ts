@@ -52,4 +52,27 @@ export class GamesRepository {
       return null;
     }
   }
+
+  async findGameOfCurrentUser(userId: number): Promise<Game | null> {
+    const game = await this.gamesRepository
+      .createQueryBuilder('game')
+      .leftJoinAndSelect('game.players', 'p')
+      .leftJoinAndSelect('p.user', 'u')
+      .leftJoinAndSelect('p.answers', 'a')
+      .leftJoinAndSelect('game.questions', 'q')
+      .orderBy('p.player_id')
+      .getOne();
+
+    if (!game) {
+      return null;
+    }
+
+    const currentUserInGame = game.players.find((p) => p.user.id === userId);
+
+    if (!currentUserInGame) {
+      return null;
+    }
+
+    return game;
+  }
 }

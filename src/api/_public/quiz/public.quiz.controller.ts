@@ -11,6 +11,7 @@ import {
   gameNotFound,
 } from '../../../exceptions/exception.constants';
 import { GameFindQuery } from './application/use-cases/game-find.use-case';
+import { AnswerSendCommand } from './application/use-cases/answer-send.use-case';
 
 @Controller('pair-game-quiz')
 export class PublicQuizController {
@@ -60,5 +61,17 @@ export class PublicQuizController {
     }
 
     return result.response;
+  }
+
+  @UseGuards(JwtBearerGuard)
+  @Post('pairs/my-current/answers')
+  async sendAnswer(@UserIdFromGuard() userId) {
+    const result = await this.commandBus.execute(new AnswerSendCommand(userId));
+
+    if (result.code !== ResultCode.Success) {
+      return exceptionHandler(result.code, result.message, result.field);
+    }
+
+    return result;
   }
 }

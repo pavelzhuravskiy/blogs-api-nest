@@ -32,6 +32,7 @@ export class QuestionsRepository {
   async findRandomQuestions(): Promise<Question[] | null> {
     return await this.questionsRepository
       .createQueryBuilder('q')
+      .where('q.published = true')
       .orderBy('RANDOM()')
       .take(5)
       .getMany();

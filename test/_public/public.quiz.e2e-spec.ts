@@ -17,10 +17,12 @@ import {
 } from '../utils/constants/auth.constants';
 import { getAppAndClearDb } from '../utils/functions/get-app';
 import {
+  publicAnswersURI,
   publicCurrentGameURI,
   publicGameConnectionURI,
   publicGameURI,
   questionBody,
+  saQuestionsPublishURI,
   saQuestionsURI,
 } from '../utils/constants/quiz.constants';
 import { randomUUID } from 'crypto';
@@ -149,9 +151,10 @@ describe('Public quiz testing', () => {
     });
 
     // Success
-    it(`should create 10 questions`, async () => {
+    it(`should create and publish 10 questions`, async () => {
+      let questionId;
       for (let i = 1; i < 11; i++) {
-        await agent
+        const response = await agent
           .post(saQuestionsURI)
           .auth(basicAuthLogin, basicAuthPassword)
           .send({
@@ -159,6 +162,16 @@ describe('Public quiz testing', () => {
             correctAnswers: [i + i],
           })
           .expect(201);
+
+        questionId = response.body.id;
+
+        await agent
+          .put(saQuestionsURI + questionId + saQuestionsPublishURI)
+          .auth(basicAuthLogin, basicAuthPassword)
+          .send({
+            published: true,
+          })
+          .expect(204);
       }
     }, 30000);
     it(`should connect user 02 and start the game`, async () => {
@@ -257,6 +270,34 @@ describe('Public quiz testing', () => {
         .expect(200);
       expect(response.body).toEqual(startedGameObject);
       return response;
+    });
+  });
+  describe('Answers operations', () => {
+    // Authentication errors [401]
+    it(`should return 401 when trying to send answer with incorrect token`, async () => {
+      return agent
+        .post(publicAnswersURI)
+        .auth(randomUUID(), { type: 'bearer' })
+        .expect(401);
+    });
+
+    // Forbidden errors [403]
+    it(`should return 403 when user 03 trying to send answer in the game he is not participating`, async () => {
+      return agent
+        .post(publicAnswersURI)
+        .auth(aTokenUser03, { type: 'bearer' })
+        .expect(403);
+    });
+
+    // Success
+    it(`should ...`, async () => {
+      const test = await agent
+        .post(publicAnswersURI)
+        .auth(aTokenUser01, { type: 'bearer' });
+
+      // .expect(200);
+      // console.log(test.body);
+      return test;
     });
   });
 

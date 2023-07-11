@@ -15,7 +15,6 @@ import { UserBanByBlogger } from './user-ban-by-blogger.entity';
 import { Blog } from '../blogs/blog.entity';
 import { CommentLike } from '../comments/comment-like.entity';
 import { Player } from '../quiz/player.entity';
-import { Answer } from '../quiz/answer.entity';
 
 @Entity('users')
 export class User {
@@ -69,9 +68,6 @@ export class User {
 
   @OneToOne(() => Player, (player) => player.user)
   player: Player;
-
-  @OneToMany(() => Answer, (answer) => answer.user)
-  answers: Answer[];
 
   static checkSortingField(value: any) {
     const u = new User();

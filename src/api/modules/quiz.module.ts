@@ -20,6 +20,7 @@ import { UsersRepository } from '../infrastructure/repositories/users/users.repo
 import { UsersModule } from './users.module';
 import { PublicQuizController } from '../_public/quiz/public.quiz.controller';
 import { GameFindUseCase } from '../_public/quiz/application/use-cases/game-find.use-case';
+import { AnswerSendUseCase } from '../_public/quiz/application/use-cases/answer-send.use-case';
 
 const useCases = [
   QuestionCreateUseCase,
@@ -28,6 +29,7 @@ const useCases = [
   QuestionDeleteUseCase,
   UserConnectUseCase,
   GameFindUseCase,
+  AnswerSendUseCase,
 ];
 
 const entities = [Question, Answer, Game, Player];

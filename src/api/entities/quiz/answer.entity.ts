@@ -6,7 +6,6 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { User } from '../users/user.entity';
 import { Player } from './player.entity';
 import { AnswerStatus } from '../../../enums/answer-status.enum';
 
@@ -26,16 +25,4 @@ export class Answer {
   })
   @JoinColumn()
   player: Player;
-
-  /*@ManyToOne(() => QuizQuestion, (question) => question.answer, {
-    onDelete: 'CASCADE',
-  })
-  @JoinColumn()
-  question: QuizQuestion;*/
-
-  @ManyToOne(() => User, (user) => user.answers, {
-    onDelete: 'CASCADE',
-  })
-  @JoinColumn()
-  user: User;
 }
