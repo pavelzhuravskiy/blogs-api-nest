@@ -1,7 +1,7 @@
-import { Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { exceptionHandler } from '../../../exceptions/exception.handler';
 import { ResultCode } from '../../../enums/result-code.enum';
-import { CommandBus } from '@nestjs/cqrs';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { UserIdFromGuard } from '../../_auth/decorators/user-id-from-guard.decorator';
 import { JwtBearerGuard } from '../../_auth/guards/jwt-bearer.guard';
 import { UserConnectCommand } from './application/use-cases/user-connect.use-case';
@@ -10,11 +10,13 @@ import {
   gameField,
   gameNotFound,
 } from '../../../exceptions/exception.constants';
+import { GameFindQuery } from './application/use-cases/game-find.use-case';
 
 @Controller('pair-game-quiz')
 export class PublicQuizController {
   constructor(
     private commandBus: CommandBus,
+    private queryBus: QueryBus,
     private readonly gamesQueryRepository: GamesQueryRepository,
   ) {}
 
@@ -29,12 +31,12 @@ export class PublicQuizController {
       return exceptionHandler(result.code, result.message, result.field);
     }
 
-    return this.gamesQueryRepository.findCreatedGame(result.response);
+    return this.gamesQueryRepository.findGameById(result.response);
   }
 
   @UseGuards(JwtBearerGuard)
   @Get('pairs/my-current')
-  async getCurrentGame(@UserIdFromGuard() userId) {
+  async findCurrentGame(@UserIdFromGuard() userId) {
     const result = await this.gamesQueryRepository.findGameOfCurrentUser(
       userId,
     );
@@ -44,5 +46,19 @@ export class PublicQuizController {
     }
 
     return result;
+  }
+
+  @UseGuards(JwtBearerGuard)
+  @Get('pairs/:id')
+  async findGame(@Param('id') gameId, @UserIdFromGuard() userId) {
+    const result = await this.queryBus.execute(
+      new GameFindQuery(gameId, userId),
+    );
+
+    if (result.code !== ResultCode.Success) {
+      return exceptionHandler(result.code, result.message, result.field);
+    }
+
+    return result.response;
   }
 }

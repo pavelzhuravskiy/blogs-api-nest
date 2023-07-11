@@ -5,6 +5,7 @@ export const saQuestionsPublishURI = '/publish/';
 // Quiz public URI
 export const publicGameConnectionURI = '/pair-game-quiz/pairs/connection/';
 export const publicCurrentGameURI = '/pair-game-quiz/pairs/my-current/';
+export const publicGameURI = '/pair-game-quiz/pairs/';
 
 // Question updating strings
 export const questionBody = 'This is a test question body';

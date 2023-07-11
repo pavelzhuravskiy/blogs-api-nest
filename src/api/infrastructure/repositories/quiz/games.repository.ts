@@ -21,6 +21,22 @@ export class GamesRepository {
   }
 
   // ***** Find game operations *****
+  async findGameById(gameId: string): Promise<Game | null> {
+    try {
+      return await this.gamesRepository
+        .createQueryBuilder('game')
+        .where(`game.id = :gameId`, {
+          gameId: gameId,
+        })
+        .leftJoinAndSelect('game.players', 'p')
+        .leftJoinAndSelect('p.user', 'u')
+        .getOne();
+    } catch (e) {
+      console.log(e);
+      return null;
+    }
+  }
+
   async findGameWithPendingStatus(): Promise<Game | null> {
     try {
       return await this.gamesRepository

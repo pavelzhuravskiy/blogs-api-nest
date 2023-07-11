@@ -19,6 +19,7 @@ import { getAppAndClearDb } from '../utils/functions/get-app';
 import {
   publicCurrentGameURI,
   publicGameConnectionURI,
+  publicGameURI,
   questionBody,
   saQuestionsURI,
 } from '../utils/constants/quiz.constants';
@@ -116,22 +117,13 @@ describe('Public quiz testing', () => {
       return response;
     });
   });
-
-  describe('Game operations', () => {
+  describe('Game create and connect operations', () => {
     // Authentication errors [401]
-    it(`should return 401 when trying to get the game with incorrect token`, async () => {
+    it(`should return 401 when trying to create game with incorrect token`, async () => {
       return agent
-        .get(publicCurrentGameURI)
+        .post(publicGameConnectionURI)
         .auth(randomUUID(), { type: 'bearer' })
         .expect(401);
-    });
-
-    // Not found errors [404]
-    it(`should return 404 when user 01 is trying to get the game he is not participating`, async () => {
-      return agent
-        .get(publicCurrentGameURI)
-        .auth(aTokenUser01, { type: 'bearer' })
-        .expect(404);
     });
 
     // Success
@@ -145,14 +137,6 @@ describe('Public quiz testing', () => {
 
       gameId = response.body.id;
 
-      return response;
-    });
-    it(`should return created game for user 01`, async () => {
-      const response = await agent
-        .get(publicCurrentGameURI)
-        .auth(aTokenUser01, { type: 'bearer' })
-        .expect(200);
-      expect(response.body).toEqual(createdGameObject);
       return response;
     });
 
@@ -177,15 +161,37 @@ describe('Public quiz testing', () => {
           .expect(201);
       }
     }, 30000);
-    it(`should connect user 02`, async () => {
+    it(`should connect user 02 and start the game`, async () => {
       const response = await agent
         .post(publicGameConnectionURI)
         .auth(aTokenUser02, { type: 'bearer' })
         .expect(201);
       expect(response.body).toEqual(startedGameObject);
+
+      gameId = response.body.id;
+
       return response;
     });
-    it(`should return started game for user 01`, async () => {
+  });
+  describe('Get current game operations', () => {
+    // Authentication errors [401]
+    it(`should return 401 when trying to get current game with incorrect token`, async () => {
+      return agent
+        .get(publicCurrentGameURI)
+        .auth(randomUUID(), { type: 'bearer' })
+        .expect(401);
+    });
+
+    // Not found errors [404]
+    it(`should return 404 when user 03 is trying to get the game he is not participating`, async () => {
+      return agent
+        .get(publicCurrentGameURI)
+        .auth(aTokenUser03, { type: 'bearer' })
+        .expect(404);
+    });
+
+    // Success
+    it(`should return started current game for user 01`, async () => {
       const response = await agent
         .get(publicCurrentGameURI)
         .auth(aTokenUser01, { type: 'bearer' })
@@ -193,7 +199,7 @@ describe('Public quiz testing', () => {
       expect(response.body).toEqual(startedGameObject);
       return response;
     });
-    it(`should return started game for user 02`, async () => {
+    it(`should return started current game for user 02`, async () => {
       const response = await agent
         .get(publicCurrentGameURI)
         .auth(aTokenUser02, { type: 'bearer' })
@@ -208,6 +214,49 @@ describe('Public quiz testing', () => {
         .get(publicCurrentGameURI)
         .auth(aTokenUser03, { type: 'bearer' })
         .expect(404);
+    });
+  });
+  describe('Get game by ID operations', () => {
+    // Authentication errors [401]
+    it(`should return 401 when trying to get the game by ID with incorrect token`, async () => {
+      return agent
+        .get(publicGameURI + gameId)
+        .auth(randomUUID(), { type: 'bearer' })
+        .expect(401);
+    });
+
+    // Forbidden errors [403]
+    it(`should return 403 when user 03 is trying to get the game by ID he is not participating`, async () => {
+      return agent
+        .get(publicGameURI + gameId)
+        .auth(aTokenUser03, { type: 'bearer' })
+        .expect(403);
+    });
+
+    // Not found errors [404]
+    it(`should return 404 when user 03 is trying to get the nonexistent game`, async () => {
+      return agent
+        .get(publicGameURI + randomUUID())
+        .auth(aTokenUser03, { type: 'bearer' })
+        .expect(404);
+    });
+
+    // Success
+    it(`should return started game by id for user 01`, async () => {
+      const response = await agent
+        .get(publicGameURI + gameId)
+        .auth(aTokenUser01, { type: 'bearer' })
+        .expect(200);
+      expect(response.body).toEqual(startedGameObject);
+      return response;
+    });
+    it(`should return started game by id for user 02`, async () => {
+      const response = await agent
+        .get(publicGameURI + gameId)
+        .auth(aTokenUser02, { type: 'bearer' })
+        .expect(200);
+      expect(response.body).toEqual(startedGameObject);
+      return response;
     });
   });
 

@@ -12,7 +12,7 @@ export class GamesQueryRepository {
     @InjectDataSource() private dataSource: DataSource,
   ) {}
 
-  async findCreatedGame(gameId: number): Promise<GameViewDto> {
+  async findGameById(gameId: number | string): Promise<GameViewDto> {
     const games = await this.gamesRepository
       .createQueryBuilder('game')
       .where(`game.id = :gameId`, {
