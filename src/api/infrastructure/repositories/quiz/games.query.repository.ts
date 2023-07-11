@@ -12,7 +12,7 @@ export class GamesQueryRepository {
     @InjectDataSource() private dataSource: DataSource,
   ) {}
 
-  async findGame(gameId: number): Promise<any> {
+  async findCreatedGame(gameId: number): Promise<GameViewDto> {
     const games = await this.gamesRepository
       .createQueryBuilder('game')
       .where(`game.id = :gameId`, {
@@ -30,11 +30,40 @@ export class GamesQueryRepository {
     return mappedQuizGames[0];
   }
 
+  async findGameOfCurrentUser(userId: number): Promise<GameViewDto> {
+    const games = await this.gamesRepository
+      .createQueryBuilder('game')
+      .leftJoinAndSelect('game.players', 'p')
+      .leftJoinAndSelect('p.user', 'u')
+      .leftJoinAndSelect('p.answers', 'a')
+      .leftJoinAndSelect('game.questions', 'q')
+      .orderBy('p.player_id')
+      .getMany();
+
+    if (games.length === 0) {
+      return null;
+    }
+
+    const currentUserInGame = games[0].players.find(
+      (p) => p.user.id === userId,
+    );
+
+    if (!currentUserInGame) {
+      return null;
+    }
+
+    const playersCount = games[0].players.length;
+    const mappedQuizGames = await this.gamesMapping(games, playersCount);
+    return mappedQuizGames[0];
+  }
+
   private async gamesMapping(
     array: Game[],
     playersCount: number,
   ): Promise<GameViewDto[]> {
     let secondPlayerProgress = null;
+    let questions = null;
+
     return array.map((g) => {
       if (playersCount === 2) {
         secondPlayerProgress = {
@@ -45,7 +74,14 @@ export class GamesQueryRepository {
           },
           score: g.players[1].score,
         };
+        questions = g.questions.map((q) => {
+          return {
+            id: q.id.toString(),
+            body: q.body,
+          };
+        });
       }
+
       return {
         id: g.id.toString(),
         firstPlayerProgress: {
@@ -57,12 +93,7 @@ export class GamesQueryRepository {
           score: g.players[0].score,
         },
         secondPlayerProgress: secondPlayerProgress,
-        questions: g.questions.map((q) => {
-          return {
-            id: q.id.toString(),
-            body: q.body,
-          };
-        }),
+        questions: questions,
         status: g.status,
         pairCreatedDate: g.pairCreatedDate,
         startGameDate: g.startGameDate,

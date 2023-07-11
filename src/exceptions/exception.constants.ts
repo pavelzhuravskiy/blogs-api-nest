@@ -5,6 +5,7 @@ export const commentNotFound = 'Comment not found';
 export const userNotFound = 'User not found';
 export const deviceNotFound = 'Device not found';
 export const questionNotFound = 'Question not found';
+export const gameNotFound = 'Game not found';
 
 // Fields
 export const blogIDField = 'blogId';
@@ -16,6 +17,7 @@ export const confirmCodeField = 'code';
 export const recoveryCodeField = 'recoveryCode';
 export const emailField = 'email';
 export const questionField = 'question';
+export const gameField = 'game';
 
 // Unique user
 export const loginNotUnique = 'Login already exists';

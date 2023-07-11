@@ -13,7 +13,7 @@ export class GameViewDto {
     player: PlayerViewDto;
     score: number;
   } | null;
-  questions: QuestionViewDto[] | [];
+  questions: QuestionViewDto[] | null;
   status: GameStatus;
   pairCreatedDate: Date;
   startGameDate: Date | null;

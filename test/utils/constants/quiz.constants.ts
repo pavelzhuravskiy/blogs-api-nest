@@ -3,7 +3,8 @@ export const saQuestionsURI = '/sa/quiz/questions/';
 export const saQuestionsPublishURI = '/publish/';
 
 // Quiz public URI
-export const publicQuizGameConnectionURI = '/pair-game-quiz/pairs/connection/';
+export const publicGameConnectionURI = '/pair-game-quiz/pairs/connection/';
+export const publicCurrentGameURI = '/pair-game-quiz/pairs/my-current/';
 
 // Question updating strings
 export const questionBody = 'This is a test question body';

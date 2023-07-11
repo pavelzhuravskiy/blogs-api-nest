@@ -1,12 +1,13 @@
 import { SuperAgentTest } from 'supertest';
 import { INestApplication } from '@nestjs/common';
-import { publicBlogsURI } from '../utils/constants/blogs.constants';
 import {
   saUsersURI,
   user01Email,
   user01Login,
   user02Email,
   user02Login,
+  user03Email,
+  user03Login,
   userPassword,
 } from '../utils/constants/users.constants';
 import {
@@ -14,13 +15,18 @@ import {
   basicAuthPassword,
   publicLoginUri,
 } from '../utils/constants/auth.constants';
-import { blog01Object } from '../utils/objects/blogs.objects';
 import { getAppAndClearDb } from '../utils/functions/get-app';
 import {
-  publicQuizGameConnectionURI,
+  publicCurrentGameURI,
+  publicGameConnectionURI,
   questionBody,
   saQuestionsURI,
 } from '../utils/constants/quiz.constants';
+import { randomUUID } from 'crypto';
+import {
+  createdGameObject,
+  startedGameObject,
+} from '../utils/objects/quiz.objects';
 
 describe('Public quiz testing', () => {
   let app: INestApplication;
@@ -36,9 +42,10 @@ describe('Public quiz testing', () => {
 
   let aTokenUser01;
   let aTokenUser02;
+  let aTokenUser03;
 
   describe('Users creation and authentication', () => {
-    it(`should create two users`, async () => {
+    it(`should create three users`, async () => {
       await agent
         .post(saUsersURI)
         .auth(basicAuthLogin, basicAuthPassword)
@@ -49,13 +56,23 @@ describe('Public quiz testing', () => {
         })
         .expect(201);
 
-      return agent
+      await agent
         .post(saUsersURI)
         .auth(basicAuthLogin, basicAuthPassword)
         .send({
           login: user02Login,
           password: userPassword,
           email: user02Email,
+        })
+        .expect(201);
+
+      return agent
+        .post(saUsersURI)
+        .auth(basicAuthLogin, basicAuthPassword)
+        .send({
+          login: user03Login,
+          password: userPassword,
+          email: user03Email,
         })
         .expect(201);
     });
@@ -67,7 +84,10 @@ describe('Public quiz testing', () => {
           password: userPassword,
         })
         .expect(200);
+
       aTokenUser01 = response.body.accessToken;
+
+      return response;
     });
     it(`should log in user 02`, async () => {
       const response = await agent
@@ -77,29 +97,69 @@ describe('Public quiz testing', () => {
           password: userPassword,
         })
         .expect(200);
+
       aTokenUser02 = response.body.accessToken;
+
+      return response;
+    });
+    it(`should log in user 03`, async () => {
+      const response = await agent
+        .post(publicLoginUri)
+        .send({
+          loginOrEmail: user03Login,
+          password: userPassword,
+        })
+        .expect(200);
+
+      aTokenUser03 = response.body.accessToken;
+
+      return response;
     });
   });
 
-  describe('Create game', () => {
+  describe('Game operations', () => {
+    // Authentication errors [401]
+    it(`should return 401 when trying to get the game with incorrect token`, async () => {
+      return agent
+        .get(publicCurrentGameURI)
+        .auth(randomUUID(), { type: 'bearer' })
+        .expect(401);
+    });
+
+    // Not found errors [404]
+    it(`should return 404 when user 01 is trying to get the game he is not participating`, async () => {
+      return agent
+        .get(publicCurrentGameURI)
+        .auth(aTokenUser01, { type: 'bearer' })
+        .expect(404);
+    });
+
     // Success
     it(`should create new game with pending user 02`, async () => {
       const response = await agent
-        .post(publicQuizGameConnectionURI)
+        .post(publicGameConnectionURI)
         .auth(aTokenUser01, { type: 'bearer' })
         .expect(201);
 
-      console.log(response.body);
+      expect(response.body).toEqual(createdGameObject);
 
       gameId = response.body.id;
 
+      return response;
+    });
+    it(`should return created game for user 01`, async () => {
+      const response = await agent
+        .get(publicCurrentGameURI)
+        .auth(aTokenUser01, { type: 'bearer' })
+        .expect(200);
+      expect(response.body).toEqual(createdGameObject);
       return response;
     });
 
     // Forbidden errors [403]
     it(`should return 403 when user 01 is already participating in active pair`, async () => {
       return agent
-        .post(publicQuizGameConnectionURI)
+        .post(publicGameConnectionURI)
         .auth(aTokenUser01, { type: 'bearer' })
         .expect(403);
     });
@@ -119,30 +179,35 @@ describe('Public quiz testing', () => {
     }, 30000);
     it(`should connect user 02`, async () => {
       const response = await agent
-        .post(publicQuizGameConnectionURI)
+        .post(publicGameConnectionURI)
         .auth(aTokenUser02, { type: 'bearer' })
         .expect(201);
-
-      console.log(response.body);
+      expect(response.body).toEqual(startedGameObject);
+      return response;
+    });
+    it(`should return started game for user 01`, async () => {
+      const response = await agent
+        .get(publicCurrentGameURI)
+        .auth(aTokenUser01, { type: 'bearer' })
+        .expect(200);
+      expect(response.body).toEqual(startedGameObject);
+      return response;
+    });
+    it(`should return started game for user 02`, async () => {
+      const response = await agent
+        .get(publicCurrentGameURI)
+        .auth(aTokenUser02, { type: 'bearer' })
+        .expect(200);
+      expect(response.body).toEqual(startedGameObject);
       return response;
     });
 
-    // Success
-    it.skip(`should return created game`, async () => {
-      const response = await agent.get(publicQuizGameConnectionURI).expect(200);
-      /*expect(blogs.body).toEqual({
-        pagesCount: 1,
-        page: 1,
-        pageSize: 10,
-        totalCount: 1,
-        items: [blog01Object],
-      });*/
-    });
-    it.skip(`should return created blog by ID`, async () => {
-      const blog = await agent.get(publicBlogsURI + gameId).expect(200);
-      expect(blog.body).toEqual(blog01Object);
-
-      gameId = blog.body.id;
+    // Not found errors [404]
+    it(`should return 404 when user 03 is trying to get the started game he is not participating`, async () => {
+      return agent
+        .get(publicCurrentGameURI)
+        .auth(aTokenUser03, { type: 'bearer' })
+        .expect(404);
     });
   });
 
