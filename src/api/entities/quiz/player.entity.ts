@@ -11,10 +11,16 @@ import { User } from '../users/user.entity';
 import { Game } from './game.entity';
 import { Answer } from './answer.entity';
 
-@Entity('players')
+@Entity('quiz_players')
 export class Player {
   @PrimaryGeneratedColumn()
   id: number;
+
+  @Column({
+    name: 'player_id',
+    type: 'int',
+  })
+  playerId: number;
 
   @Column({
     name: 'score',

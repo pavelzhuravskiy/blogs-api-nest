@@ -22,9 +22,8 @@ export class GamesQueryRepository {
       .leftJoinAndSelect('p.user', 'u')
       .leftJoinAndSelect('p.answers', 'a')
       .leftJoinAndSelect('game.questions', 'q')
+      .orderBy('p.player_id')
       .getMany();
-
-    // console.log(games);
 
     const playersCount = games[0].players.length;
     const mappedQuizGames = await this.gamesMapping(games, playersCount);

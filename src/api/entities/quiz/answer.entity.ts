@@ -10,7 +10,7 @@ import { User } from '../users/user.entity';
 import { Player } from './player.entity';
 import { AnswerStatus } from '../../../enums/answer-status.enum';
 
-@Entity('answers')
+@Entity('quiz_answers')
 export class Answer {
   @PrimaryGeneratedColumn()
   id: number;

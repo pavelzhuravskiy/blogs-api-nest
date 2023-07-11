@@ -53,7 +53,12 @@ export class UserConnectUseCase extends TransactionBaseUseCase<
 
     let currentGame = await this.gamesRepository.findGameWithPendingStatus();
 
+    const player = new Player();
+    player.user = user;
+    player.score = 0;
+
     if (!currentGame) {
+      player.playerId = 1;
       currentGame = new Game();
       currentGame.status = GameStatus.PendingSecondPlayer;
       currentGame.pairCreatedDate = new Date();
@@ -65,6 +70,7 @@ export class UserConnectUseCase extends TransactionBaseUseCase<
           code: ResultCode.Forbidden,
         };
       }
+      player.playerId = 2;
       currentGame.status = GameStatus.Active;
       currentGame.startGameDate = new Date();
       currentGame.questions =
@@ -73,10 +79,7 @@ export class UserConnectUseCase extends TransactionBaseUseCase<
       await this.gamesRepository.queryRunnerSave(currentGame, manager);
     }
 
-    const player = new Player();
-    player.user = user;
     player.game = currentGame;
-    player.score = 0;
     await this.playersRepository.queryRunnerSave(player, manager);
 
     return {
