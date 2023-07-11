@@ -14,14 +14,10 @@ import {
   basicAuthPassword,
   publicLoginUri,
 } from '../utils/constants/auth.constants';
-import { randomUUID } from 'crypto';
 import { blog01Object } from '../utils/objects/blogs.objects';
 import { getAppAndClearDb } from '../utils/functions/get-app';
 import {
-  answer01,
-  answer02,
-  answer03,
-  publicQuizPairsConnectionURI,
+  publicQuizGameConnectionURI,
   questionBody,
   saQuestionsURI,
 } from '../utils/constants/quiz.constants';
@@ -36,7 +32,7 @@ describe('Public quiz testing', () => {
     agent = data.agent;
   });
 
-  let pairId;
+  let gameId;
 
   let aTokenUser01;
   let aTokenUser02;
@@ -85,44 +81,55 @@ describe('Public quiz testing', () => {
     });
   });
 
-  describe('Create question', () => {
-    it(`should create question`, async () => {
-      return agent
-        .post(saQuestionsURI)
-        .auth(basicAuthLogin, basicAuthPassword)
-        .send({
-          body: questionBody,
-          correctAnswers: [answer01, answer02, answer03],
-        })
-        .expect(201);
-    });
-  });
-
-  describe('Create pair', () => {
-    it(`should create new pair with pending user 02`, async () => {
+  describe('Create game', () => {
+    // Success
+    it(`should create new game with pending user 02`, async () => {
       const response = await agent
-        .post(publicQuizPairsConnectionURI)
-        .auth(aTokenUser01, { type: 'bearer' });
-      // .expect(201);
+        .post(publicQuizGameConnectionURI)
+        .auth(aTokenUser01, { type: 'bearer' })
+        .expect(201);
 
       console.log(response.body);
-      // console.log(response.body);
 
-      pairId = response.body.id;
+      gameId = response.body.id;
 
       return response;
     });
 
     // Forbidden errors [403]
-    it.skip(`should return 404 when trying to get nonexistent blog`, async () => {
-      return agent.get(publicBlogsURI + randomUUID()).expect(404);
+    it(`should return 403 when user 01 is already participating in active pair`, async () => {
+      return agent
+        .post(publicQuizGameConnectionURI)
+        .auth(aTokenUser01, { type: 'bearer' })
+        .expect(403);
     });
 
     // Success
-    it.skip(`should return created pair`, async () => {
+    it(`should create 10 questions`, async () => {
+      for (let i = 1; i < 11; i++) {
+        await agent
+          .post(saQuestionsURI)
+          .auth(basicAuthLogin, basicAuthPassword)
+          .send({
+            body: `${questionBody} ${i} + ${i}`,
+            correctAnswers: [i + i],
+          })
+          .expect(201);
+      }
+    }, 30000);
+    it(`should connect user 02`, async () => {
       const response = await agent
-        .get(publicQuizPairsConnectionURI)
-        .expect(200);
+        .post(publicQuizGameConnectionURI)
+        .auth(aTokenUser02, { type: 'bearer' })
+        .expect(201);
+
+      console.log(response.body);
+      return response;
+    });
+
+    // Success
+    it.skip(`should return created game`, async () => {
+      const response = await agent.get(publicQuizGameConnectionURI).expect(200);
       /*expect(blogs.body).toEqual({
         pagesCount: 1,
         page: 1,
@@ -132,10 +139,10 @@ describe('Public quiz testing', () => {
       });*/
     });
     it.skip(`should return created blog by ID`, async () => {
-      const blog = await agent.get(publicBlogsURI + pairId).expect(200);
+      const blog = await agent.get(publicBlogsURI + gameId).expect(200);
       expect(blog.body).toEqual(blog01Object);
 
-      pairId = blog.body.id;
+      gameId = blog.body.id;
     });
   });
 

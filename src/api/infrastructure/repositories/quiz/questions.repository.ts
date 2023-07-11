@@ -1,23 +1,23 @@
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
-import { QuizQuestion } from '../../../entities/quiz/question.entity';
+import { Question } from '../../../entities/quiz/question.entity';
 
 @Injectable()
-export class QuizQuestionsRepository {
+export class QuestionsRepository {
   constructor(
-    @InjectRepository(QuizQuestion)
-    private readonly questionsRepository: Repository<QuizQuestion>,
+    @InjectRepository(Question)
+    private readonly questionsRepository: Repository<Question>,
     @InjectDataSource() private dataSource: DataSource,
   ) {}
 
   // ***** TypeORM data source manager SAVE *****
-  async dataSourceSave(entity: QuizQuestion): Promise<QuizQuestion> {
+  async dataSourceSave(entity: Question): Promise<Question> {
     return this.dataSource.manager.save(entity);
   }
 
   // ***** Find question operations *****
-  async findQuestion(questionId: string): Promise<QuizQuestion | null> {
+  async findQuestion(questionId: string): Promise<Question | null> {
     try {
       return await this.questionsRepository
         .createQueryBuilder('q')
@@ -29,12 +29,20 @@ export class QuizQuestionsRepository {
     }
   }
 
+  async findRandomQuestions(): Promise<Question[] | null> {
+    return await this.questionsRepository
+      .createQueryBuilder('q')
+      .orderBy('RANDOM()')
+      .take(5)
+      .getMany();
+  }
+
   // ***** Delete operations *****
   async deleteQuestion(questionId: number): Promise<boolean> {
     const result = await this.questionsRepository
       .createQueryBuilder('q')
       .delete()
-      .from(QuizQuestion)
+      .from(Question)
       .where('id = :questionId', { questionId: questionId })
       .execute();
     return result.affected === 1;

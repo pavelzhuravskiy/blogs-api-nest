@@ -6,10 +6,10 @@ import {
   ManyToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { QuizGame } from './quiz-game.entity';
+import { Game } from './game.entity';
 
-@Entity('quiz_questions')
-export class QuizQuestion {
+@Entity('questions')
+export class Question {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -32,12 +32,12 @@ export class QuizQuestion {
   })
   updatedAt: Date;
 
-  @ManyToMany(() => QuizGame, (game) => game.questions)
+  @ManyToMany(() => Game, (game) => game.questions)
   @JoinTable()
-  games: QuizGame[];
+  games: Game[];
 
   static checkSortingField(value: any) {
-    const q = new QuizQuestion();
+    const q = new Question();
     q.id = 1;
     q.body = '';
     q.published = false;

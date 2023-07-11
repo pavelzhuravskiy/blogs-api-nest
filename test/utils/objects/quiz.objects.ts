@@ -10,7 +10,7 @@ import {
 export const questionCreatedObject = {
   id: expect.any(String),
   body: questionBody,
-  correctAnswers: [],
+  correctAnswers: [answer01, answer02, answer03],
   published: false,
   createdAt: expect.any(String),
   updatedAt: null,

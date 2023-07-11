@@ -1,21 +1,21 @@
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { DataSource, EntityManager, Repository } from 'typeorm';
-import { QuizPlayerProgress } from '../../../entities/quiz/progress.entity';
+import { Player } from '../../../entities/quiz/player.entity';
 
 @Injectable()
-export class QuizPlayerProgressesRepository {
+export class PlayersRepository {
   constructor(
-    @InjectRepository(QuizPlayerProgress)
-    private readonly questionsRepository: Repository<QuizPlayerProgress>,
+    @InjectRepository(Player)
+    private readonly questionsRepository: Repository<Player>,
     @InjectDataSource() private dataSource: DataSource,
   ) {}
 
   // ***** TypeORM query runner transaction SAVE *****
   async queryRunnerSave(
-    entity: QuizPlayerProgress,
+    entity: Player,
     queryRunnerManager: EntityManager,
-  ): Promise<QuizPlayerProgress> {
+  ): Promise<Player> {
     return queryRunnerManager.save(entity);
   }
 }

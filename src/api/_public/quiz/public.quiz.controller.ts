@@ -5,13 +5,13 @@ import { CommandBus } from '@nestjs/cqrs';
 import { UserIdFromGuard } from '../../_auth/decorators/user-id-from-guard.decorator';
 import { JwtBearerGuard } from '../../_auth/guards/jwt-bearer.guard';
 import { UserConnectCommand } from './application/use-cases/user-connect.use-case';
-import { QuizGamesQueryRepository } from '../../infrastructure/repositories/quiz/quiz-games.query.repository';
+import { GamesQueryRepository } from '../../infrastructure/repositories/quiz/games.query.repository';
 
 @Controller('pair-game-quiz')
 export class PublicQuizController {
   constructor(
     private commandBus: CommandBus,
-    private readonly quizGamesQueryRepository: QuizGamesQueryRepository,
+    private readonly gamesQueryRepository: GamesQueryRepository,
   ) {}
 
   @UseGuards(JwtBearerGuard)
@@ -25,6 +25,6 @@ export class PublicQuizController {
       return exceptionHandler(result.code, result.message, result.field);
     }
 
-    return this.quizGamesQueryRepository.findGame(result.response);
+    return this.gamesQueryRepository.findGame(result.response);
   }
 }

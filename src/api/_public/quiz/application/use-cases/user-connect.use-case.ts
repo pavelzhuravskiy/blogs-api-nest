@@ -3,17 +3,18 @@ import { UsersRepository } from '../../../../infrastructure/repositories/users/u
 import { DataSource, EntityManager } from 'typeorm';
 import { TransactionBaseUseCase } from '../../../../_common/application/use-cases/transaction-base.use-case';
 import { InjectDataSource } from '@nestjs/typeorm';
-import { QuizGame } from '../../../../entities/quiz/quiz-game.entity';
+import { Game } from '../../../../entities/quiz/game.entity';
 import { GameStatus } from '../../../../../enums/game-status.enum';
-import { QuizPlayerProgress } from '../../../../entities/quiz/progress.entity';
-import { QuizGamesRepository } from '../../../../infrastructure/repositories/quiz/quiz-games.repository';
-import { QuizPlayerProgressesRepository } from '../../../../infrastructure/repositories/quiz/quiz-player-progresses.repository';
+import { Player } from '../../../../entities/quiz/player.entity';
+import { GamesRepository } from '../../../../infrastructure/repositories/quiz/games.repository';
+import { PlayersRepository } from '../../../../infrastructure/repositories/quiz/players.repository';
 import { ExceptionResultType } from '../../../../../exceptions/types/exception-result.type';
 import { ResultCode } from '../../../../../enums/result-code.enum';
 import {
   userIDField,
   userNotFound,
 } from '../../../../../exceptions/exception.constants';
+import { QuestionsRepository } from '../../../../infrastructure/repositories/quiz/questions.repository';
 
 export class UserConnectCommand {
   constructor(public userId: number) {}
@@ -27,8 +28,9 @@ export class UserConnectUseCase extends TransactionBaseUseCase<
   constructor(
     @InjectDataSource()
     protected readonly dataSource: DataSource,
-    protected readonly quizGamesRepository: QuizGamesRepository,
-    protected readonly quizPlayerProgressesRepository: QuizPlayerProgressesRepository,
+    protected readonly gamesRepository: GamesRepository,
+    protected readonly playersRepository: PlayersRepository,
+    protected readonly questionsRepository: QuestionsRepository,
     protected readonly usersRepository: UsersRepository,
   ) {
     super(dataSource);
@@ -38,8 +40,6 @@ export class UserConnectUseCase extends TransactionBaseUseCase<
     command: UserConnectCommand,
     manager: EntityManager,
   ): Promise<ExceptionResultType<boolean>> {
-    // TODO Implement current game search
-
     const user = await this.usersRepository.findUserById(command.userId);
 
     if (!user) {
@@ -51,32 +51,38 @@ export class UserConnectUseCase extends TransactionBaseUseCase<
       };
     }
 
-    /*if () {
-      return {
-        data: false,
-        code: ResultCode.Forbidden,
-        message: ,
-      };
-    }*/
+    let currentGame = await this.gamesRepository.findGameWithPendingStatus();
 
-    const game = new QuizGame();
-    game.status = GameStatus.PendingSecondPlayer;
-    game.pairCreatedDate = new Date();
-    await this.quizGamesRepository.queryRunnerSave(game, manager);
+    if (!currentGame) {
+      currentGame = new Game();
+      currentGame.status = GameStatus.PendingSecondPlayer;
+      currentGame.pairCreatedDate = new Date();
+      await this.gamesRepository.queryRunnerSave(currentGame, manager);
+    } else {
+      if (currentGame.players[0].user.id === command.userId) {
+        return {
+          data: false,
+          code: ResultCode.Forbidden,
+        };
+      }
+      currentGame.status = GameStatus.Active;
+      currentGame.startGameDate = new Date();
+      currentGame.questions =
+        await this.questionsRepository.findRandomQuestions();
 
-    const playerProgress = new QuizPlayerProgress();
-    playerProgress.user = user;
-    playerProgress.game = game;
-    playerProgress.score = 0;
-    await this.quizPlayerProgressesRepository.queryRunnerSave(
-      playerProgress,
-      manager,
-    );
+      await this.gamesRepository.queryRunnerSave(currentGame, manager);
+    }
+
+    const player = new Player();
+    player.user = user;
+    player.game = currentGame;
+    player.score = 0;
+    await this.playersRepository.queryRunnerSave(player, manager);
 
     return {
       data: true,
       code: ResultCode.Success,
-      response: game.id,
+      response: currentGame.id,
     };
   }
 

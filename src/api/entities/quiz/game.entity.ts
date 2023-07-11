@@ -6,12 +6,12 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { QuizPlayerProgress } from './progress.entity';
-import { QuizQuestion } from './question.entity';
+import { Player } from './player.entity';
+import { Question } from './question.entity';
 import { GameStatus } from '../../../enums/game-status.enum';
 
-@Entity('quiz_games')
-export class QuizGame {
+@Entity('games')
+export class Game {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -38,9 +38,10 @@ export class QuizGame {
   })
   finishGameDate: Date;
 
-  @OneToMany(() => QuizPlayerProgress, (progress) => progress.game)
-  progresses: QuizPlayerProgress[];
+  @OneToMany(() => Player, (player) => player.game)
+  players: Player[];
 
-  @ManyToMany(() => QuizQuestion, (question) => question.games)
-  questions: QuizQuestion[];
+  // todo fix to one to many
+  @ManyToMany(() => Question, (question) => question.games)
+  questions: Question[];
 }

@@ -7,11 +7,11 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { User } from '../users/user.entity';
-import { QuizPlayerProgress } from './progress.entity';
+import { Player } from './player.entity';
 import { AnswerStatus } from '../../../enums/answer-status.enum';
 
-@Entity('quiz_answers')
-export class QuizAnswer {
+@Entity('answers')
+export class Answer {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -21,11 +21,11 @@ export class QuizAnswer {
   @CreateDateColumn({ name: 'added_at', type: 'timestamp with time zone' })
   addedAt: Date;
 
-  @ManyToOne(() => QuizPlayerProgress, (progress) => progress.answers, {
+  @ManyToOne(() => Player, (player) => player.answers, {
     onDelete: 'CASCADE',
   })
   @JoinColumn()
-  progress: QuizPlayerProgress;
+  player: Player;
 
   /*@ManyToOne(() => QuizQuestion, (question) => question.answer, {
     onDelete: 'CASCADE',

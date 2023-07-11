@@ -8,11 +8,11 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { User } from '../users/user.entity';
-import { QuizGame } from './quiz-game.entity';
-import { QuizAnswer } from './answer.entity';
+import { Game } from './game.entity';
+import { Answer } from './answer.entity';
 
-@Entity('quiz_player_progresses')
-export class QuizPlayerProgress {
+@Entity('players')
+export class Player {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -22,16 +22,16 @@ export class QuizPlayerProgress {
   })
   score: number;
 
-  @ManyToOne(() => QuizGame, (game) => game.progresses, {
+  @ManyToOne(() => Game, (game) => game.players, {
     onDelete: 'CASCADE',
   })
   @JoinColumn()
-  game: QuizGame;
+  game: Game;
 
-  @OneToMany(() => QuizAnswer, (answer) => answer.progress)
-  answers: QuizAnswer[];
+  @OneToMany(() => Answer, (answer) => answer.player)
+  answers: Answer[];
 
-  @OneToOne(() => User, (user) => user.progress, {
+  @OneToOne(() => User, (user) => user.player, {
     onDelete: 'CASCADE',
   })
   @JoinColumn()

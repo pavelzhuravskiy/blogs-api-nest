@@ -14,8 +14,8 @@ import { Comment } from '../comments/comment.entity';
 import { UserBanByBlogger } from './user-ban-by-blogger.entity';
 import { Blog } from '../blogs/blog.entity';
 import { CommentLike } from '../comments/comment-like.entity';
-import { QuizPlayerProgress } from '../quiz/progress.entity';
-import { QuizAnswer } from '../quiz/answer.entity';
+import { Player } from '../quiz/player.entity';
+import { Answer } from '../quiz/answer.entity';
 
 @Entity('users')
 export class User {
@@ -67,11 +67,11 @@ export class User {
   @OneToMany(() => CommentLike, (commentLike) => commentLike.user)
   commentLike: CommentLike[];
 
-  @OneToOne(() => QuizPlayerProgress, (progress) => progress.user)
-  progress: QuizPlayerProgress;
+  @OneToOne(() => Player, (player) => player.user)
+  player: Player;
 
-  @OneToMany(() => QuizAnswer, (answer) => answer.user)
-  answers: QuizAnswer[];
+  @OneToMany(() => Answer, (answer) => answer.user)
+  answers: Answer[];
 
   static checkSortingField(value: any) {
     const u = new User();

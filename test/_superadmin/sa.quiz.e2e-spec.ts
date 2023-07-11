@@ -189,7 +189,7 @@ describe('Super admin quiz questions testing', () => {
     });
   });
 
-  describe.skip('Delete question', () => {
+  describe('Delete question', () => {
     // Auth errors [401]
     it(`should return 401 when trying to delete question with incorrect credentials`, async () => {
       return agent
