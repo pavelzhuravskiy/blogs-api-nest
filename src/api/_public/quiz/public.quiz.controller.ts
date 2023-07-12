@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { exceptionHandler } from '../../../exceptions/exception.handler';
 import { ResultCode } from '../../../enums/result-code.enum';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
@@ -12,6 +12,7 @@ import {
 } from '../../../exceptions/exception.constants';
 import { GameFindQuery } from './application/use-cases/game-find.use-case';
 import { AnswerSendCommand } from './application/use-cases/answer-send.use-case';
+import { AnswerInputDto } from '../../dto/quiz/input/answer-input.dto';
 
 @Controller('pair-game-quiz')
 export class PublicQuizController {
@@ -65,8 +66,13 @@ export class PublicQuizController {
 
   @UseGuards(JwtBearerGuard)
   @Post('pairs/my-current/answers')
-  async sendAnswer(@UserIdFromGuard() userId) {
-    const result = await this.commandBus.execute(new AnswerSendCommand(userId));
+  async sendAnswer(
+    @Body() answerInputDto: AnswerInputDto,
+    @UserIdFromGuard() userId,
+  ) {
+    const result = await this.commandBus.execute(
+      new AnswerSendCommand(answerInputDto, userId),
+    );
 
     if (result.code !== ResultCode.Success) {
       return exceptionHandler(result.code, result.message, result.field);

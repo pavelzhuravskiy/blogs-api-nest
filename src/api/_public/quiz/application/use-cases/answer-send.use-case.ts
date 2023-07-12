@@ -7,9 +7,10 @@ import {
 import { ExceptionResultType } from '../../../../../exceptions/types/exception-result.type';
 import { UsersRepository } from '../../../../infrastructure/repositories/users/users.repository';
 import { GamesRepository } from '../../../../infrastructure/repositories/quiz/games.repository';
+import { AnswerInputDto } from '../../../../dto/quiz/input/answer-input.dto';
 
 export class AnswerSendCommand {
-  constructor(public userId: number) {}
+  constructor(public answerInputDto: AnswerInputDto, public userId: number) {}
 }
 
 @CommandHandler(AnswerSendCommand)

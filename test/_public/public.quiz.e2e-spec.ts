@@ -17,6 +17,7 @@ import {
 } from '../utils/constants/auth.constants';
 import { getAppAndClearDb } from '../utils/functions/get-app';
 import {
+  correctAnswer01,
   publicAnswersURI,
   publicCurrentGameURI,
   publicGameConnectionURI,
@@ -273,11 +274,31 @@ describe('Public quiz testing', () => {
     });
   });
   describe('Answers operations', () => {
+    // Bad request errors [400]
+    it(`should return 400 when trying to send answer without answer`, async () => {
+      return agent
+        .post(publicAnswersURI)
+        .auth(randomUUID(), { type: 'bearer' })
+        .expect(401);
+    });
+    it(`should return 400 when trying to send answer with incorrect answer type`, async () => {
+      return agent
+        .post(publicAnswersURI)
+        .auth(randomUUID(), { type: 'bearer' })
+        .send({
+          answer: 123,
+        })
+        .expect(401);
+    });
+
     // Authentication errors [401]
     it(`should return 401 when trying to send answer with incorrect token`, async () => {
       return agent
         .post(publicAnswersURI)
         .auth(randomUUID(), { type: 'bearer' })
+        .send({
+          answer: correctAnswer01,
+        })
         .expect(401);
     });
 
@@ -286,6 +307,9 @@ describe('Public quiz testing', () => {
       return agent
         .post(publicAnswersURI)
         .auth(aTokenUser03, { type: 'bearer' })
+        .send({
+          answer: correctAnswer01,
+        })
         .expect(403);
     });
 

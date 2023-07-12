@@ -10,10 +10,20 @@ export const publicAnswersURI = '/pair-game-quiz/pairs/my-current/answers/';
 
 // Question updating strings
 export const questionBody = 'This is a test question body';
-export const answer01 = 'answer01';
-export const answer02 = 'answer02';
-export const answer03 = 'answer03';
-export const answerNumeric = 4;
+export const questionCorrectAnswer01 = 'answer01';
+export const questionCorrectAnswer02 = 'answer02';
+export const questionCorrectAnswer03 = 'answer03';
+export const questionCorrectAnswerNumeric = 4;
+
+// Answer strings
+export const correctAnswer01 = 'answer01';
+export const incorrectAnswer01 = 'incorrect01';
+export const correctAnswer02 = 'answer02';
+export const incorrectAnswer02 = 'incorrect02';
+export const correctAnswer03 = 'answer03';
+export const incorrectAnswer03 = 'incorrect03';
+export const correctAnswer04 = 'answer04';
+export const incorrectAnswer04 = 'incorrect04';
 
 // Blog updating strings
 export const questionUpdatedBody = 'This is a new question body';

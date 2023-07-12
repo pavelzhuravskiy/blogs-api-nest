@@ -12,10 +12,10 @@ import {
 } from '../utils/constants/exceptions.constants';
 import { getAppAndClearDb } from '../utils/functions/get-app';
 import {
-  answer01,
-  answer02,
-  answer03,
-  answerNumeric,
+  questionCorrectAnswer01,
+  questionCorrectAnswer02,
+  questionCorrectAnswer03,
+  questionCorrectAnswerNumeric,
   questionBody,
   questionUpdatedBody,
   saQuestionsPublishURI,
@@ -46,7 +46,11 @@ describe('Super admin quiz questions testing', () => {
         .post(saQuestionsURI)
         .auth(basicAuthLogin, basicAuthPassword)
         .send({
-          correctAnswers: [answer01, answer02, answer03],
+          correctAnswers: [
+            questionCorrectAnswer01,
+            questionCorrectAnswer02,
+            questionCorrectAnswer03,
+          ],
         })
         .expect(400);
 
@@ -58,7 +62,11 @@ describe('Super admin quiz questions testing', () => {
         .auth(basicAuthLogin, basicAuthPassword)
         .send({
           body: 123,
-          correctAnswers: [answer01, answer02, answer03],
+          correctAnswers: [
+            questionCorrectAnswer01,
+            questionCorrectAnswer02,
+            questionCorrectAnswer03,
+          ],
         })
         .expect(400);
 
@@ -70,7 +78,11 @@ describe('Super admin quiz questions testing', () => {
         .auth(basicAuthLogin, basicAuthPassword)
         .send({
           body: longString508,
-          correctAnswers: [answer01, answer02, answer03],
+          correctAnswers: [
+            questionCorrectAnswer01,
+            questionCorrectAnswer02,
+            questionCorrectAnswer03,
+          ],
         })
         .expect(400);
 
@@ -84,7 +96,11 @@ describe('Super admin quiz questions testing', () => {
         .auth(basicAuthLogin, randomUUID())
         .send({
           body: questionBody,
-          correctAnswers: [answer01, answer02, answer03],
+          correctAnswers: [
+            questionCorrectAnswer01,
+            questionCorrectAnswer02,
+            questionCorrectAnswer03,
+          ],
         })
         .expect(401);
     });
@@ -96,7 +112,11 @@ describe('Super admin quiz questions testing', () => {
         .auth(basicAuthLogin, basicAuthPassword)
         .send({
           body: questionBody,
-          correctAnswers: [answer01, answer02, answer03],
+          correctAnswers: [
+            questionCorrectAnswer01,
+            questionCorrectAnswer02,
+            questionCorrectAnswer03,
+          ],
         })
         .expect(201);
 
@@ -138,7 +158,11 @@ describe('Super admin quiz questions testing', () => {
         .auth(basicAuthLogin, randomUUID())
         .send({
           body: questionUpdatedBody,
-          correctAnswers: [answer01, answer02, answer03],
+          correctAnswers: [
+            questionCorrectAnswer01,
+            questionCorrectAnswer02,
+            questionCorrectAnswer03,
+          ],
         })
         .expect(401);
     });
@@ -150,7 +174,11 @@ describe('Super admin quiz questions testing', () => {
         .auth(basicAuthLogin, basicAuthPassword)
         .send({
           body: questionUpdatedBody,
-          correctAnswers: [answer01, answer02, answer03],
+          correctAnswers: [
+            questionCorrectAnswer01,
+            questionCorrectAnswer02,
+            questionCorrectAnswer03,
+          ],
         })
         .expect(404);
     });
@@ -162,7 +190,12 @@ describe('Super admin quiz questions testing', () => {
         .auth(basicAuthLogin, basicAuthPassword)
         .send({
           body: questionUpdatedBody,
-          correctAnswers: [answer01, answer02, answer03, answerNumeric],
+          correctAnswers: [
+            questionCorrectAnswer01,
+            questionCorrectAnswer02,
+            questionCorrectAnswer03,
+            questionCorrectAnswerNumeric,
+          ],
         })
         .expect(204);
 

@@ -1,8 +1,8 @@
 import {
-  answer01,
-  answer02,
-  answer03,
-  answerNumeric,
+  questionCorrectAnswer01,
+  questionCorrectAnswer02,
+  questionCorrectAnswer03,
+  questionCorrectAnswerNumeric,
   questionBody,
   questionUpdatedBody,
 } from '../constants/quiz.constants';
@@ -12,7 +12,11 @@ import { user01Login, user02Login } from '../constants/users.constants';
 export const questionCreatedObject = {
   id: expect.any(String),
   body: questionBody,
-  correctAnswers: [answer01, answer02, answer03],
+  correctAnswers: [
+    questionCorrectAnswer01,
+    questionCorrectAnswer02,
+    questionCorrectAnswer03,
+  ],
   published: false,
   createdAt: expect.any(String),
   updatedAt: null,
@@ -21,7 +25,12 @@ export const questionCreatedObject = {
 export const questionUpdatedObject = {
   id: expect.any(String),
   body: questionUpdatedBody,
-  correctAnswers: [answer01, answer02, answer03, answerNumeric.toString()],
+  correctAnswers: [
+    questionCorrectAnswer01,
+    questionCorrectAnswer02,
+    questionCorrectAnswer03,
+    questionCorrectAnswerNumeric.toString(),
+  ],
   published: false,
   createdAt: expect.any(String),
   updatedAt: expect.any(String),

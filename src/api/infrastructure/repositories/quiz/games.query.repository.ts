@@ -3,6 +3,7 @@ import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 import { Game } from '../../../entities/quiz/game.entity';
 import { GameViewDto } from '../../../dto/quiz/view/game.view.dto';
+import { GameStatus } from '../../../../enums/game-status.enum';
 
 @Injectable()
 export class GamesQueryRepository {
@@ -33,6 +34,10 @@ export class GamesQueryRepository {
   async findGameOfCurrentUser(userId: number): Promise<GameViewDto> {
     const games = await this.gamesRepository
       .createQueryBuilder('game')
+      .where(`game.status = :pending or game.status = :active`, {
+        pending: GameStatus.PendingSecondPlayer,
+        active: GameStatus.Active,
+      })
       .leftJoinAndSelect('game.players', 'p')
       .leftJoinAndSelect('p.user', 'u')
       .leftJoinAndSelect('p.answers', 'a')

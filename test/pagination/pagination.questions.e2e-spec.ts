@@ -6,9 +6,9 @@ import {
 } from '../utils/constants/auth.constants';
 import { getAppAndClearDb } from '../utils/functions/get-app';
 import {
-  answer01,
-  answer02,
-  answer03,
+  questionCorrectAnswer01,
+  questionCorrectAnswer02,
+  questionCorrectAnswer03,
   questionBody,
   saQuestionsURI,
 } from '../utils/constants/quiz.constants';
@@ -31,7 +31,11 @@ describe('Questions filtering, sorting, pagination', () => {
         .auth(basicAuthLogin, basicAuthPassword)
         .send({
           body: `${questionBody}0${i}`,
-          correctAnswers: [answer01, answer02, answer03],
+          correctAnswers: [
+            questionCorrectAnswer01,
+            questionCorrectAnswer02,
+            questionCorrectAnswer03,
+          ],
         })
         .expect(201);
     }
@@ -41,7 +45,11 @@ describe('Questions filtering, sorting, pagination', () => {
         .auth(basicAuthLogin, basicAuthPassword)
         .send({
           body: `${questionBody}1${i}`,
-          correctAnswers: [answer01, answer02, answer03],
+          correctAnswers: [
+            questionCorrectAnswer01,
+            questionCorrectAnswer02,
+            questionCorrectAnswer03,
+          ],
         })
         .expect(201);
     }
