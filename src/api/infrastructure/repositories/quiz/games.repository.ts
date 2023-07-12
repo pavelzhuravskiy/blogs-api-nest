@@ -63,6 +63,7 @@ export class GamesRepository {
       .leftJoinAndSelect('a.question', 'aq')
       .orderBy('p.player_id')
       .addOrderBy('gq.created_at', 'DESC')
+      .addOrderBy('a.added_at')
       .getOne();
 
     if (!game) {

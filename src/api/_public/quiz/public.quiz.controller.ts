@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  Param,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { exceptionHandler } from '../../../exceptions/exception.handler';
 import { ResultCode } from '../../../enums/result-code.enum';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
@@ -66,6 +74,7 @@ export class PublicQuizController {
 
   @UseGuards(JwtBearerGuard)
   @Post('pairs/my-current/answers')
+  @HttpCode(200)
   async sendAnswer(
     @Body() answerInputDto: AnswerInputDto,
     @UserIdFromGuard() userId,

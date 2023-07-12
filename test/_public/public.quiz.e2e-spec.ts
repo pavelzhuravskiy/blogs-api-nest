@@ -32,6 +32,8 @@ import {
   startedGameObject,
 } from '../utils/objects/quiz.objects';
 import { answersFinder } from '../utils/functions/answers-finder';
+import { AnswerStatus } from '../../src/enums/answer-status.enum';
+import { GameStatus } from '../../src/enums/game-status.enum';
 
 describe('Public quiz testing', () => {
   let app: INestApplication;
@@ -49,11 +51,19 @@ describe('Public quiz testing', () => {
   let aTokenUser02;
   let aTokenUser03;
 
+  let gameQuestion01Id;
+  let gameQuestion02Id;
+  let gameQuestion03Id;
+  let gameQuestion04Id;
+  let gameQuestion05Id;
+
   let answers01;
   let answers02;
   let answers03;
   let answers04;
   let answers05;
+
+  let gameObject;
 
   describe('Users creation and authentication', () => {
     it(`should create three users`, async () => {
@@ -243,11 +253,11 @@ describe('Public quiz testing', () => {
         .expect(200);
 
       // Get game question IDs
-      const gameQuestion01Id = game.body.questions[0].id;
-      const gameQuestion02Id = game.body.questions[1].id;
-      const gameQuestion03Id = game.body.questions[2].id;
-      const gameQuestion04Id = game.body.questions[3].id;
-      const gameQuestion05Id = game.body.questions[4].id;
+      gameQuestion01Id = game.body.questions[0].id;
+      gameQuestion02Id = game.body.questions[1].id;
+      gameQuestion03Id = game.body.questions[2].id;
+      gameQuestion04Id = game.body.questions[3].id;
+      gameQuestion05Id = game.body.questions[4].id;
 
       // Get questions by admin to get answers
       const adminQuestions = await agent
@@ -270,26 +280,92 @@ describe('Public quiz testing', () => {
       expect(answers05.length).toBeGreaterThan(0);
     });
     it(`should answer [question 01] by user 01 (CORRECT) and user 02 (INCORRECT)`, async () => {
-      const test = await agent
+      await agent
         .post(publicAnswersURI)
         .auth(aTokenUser01, { type: 'bearer' })
         .send({
           answer: answers01[0],
-        });
-      // .expect(200);
-      return test;
+        })
+        .expect(200);
 
-      /*const test2 = await agent
+      return agent
+        .post(publicAnswersURI)
+        .auth(aTokenUser02, { type: 'bearer' })
+        .send({
+          answer: randomUUID(),
+        })
+        .expect(200);
+    });
+    it(`should answer [question 02] by user 01 (INCORRECT) and user 02 (CORRECT)`, async () => {
+      await agent
         .post(publicAnswersURI)
         .auth(aTokenUser01, { type: 'bearer' })
         .send({
-          answer: answers01[0],
-        });
-      // .expect(200);
-      return test2;*/
+          answer: randomUUID(),
+        })
+        .expect(200);
+
+      return agent
+        .post(publicAnswersURI)
+        .auth(aTokenUser02, { type: 'bearer' })
+        .send({
+          answer: answers02[0],
+        })
+        .expect(200);
+    });
+    it(`should answer [question 03] by user 01 (CORRECT) and user 02 (INCORRECT)`, async () => {
+      await agent
+        .post(publicAnswersURI)
+        .auth(aTokenUser01, { type: 'bearer' })
+        .send({
+          answer: answers03[0],
+        })
+        .expect(200);
+
+      return agent
+        .post(publicAnswersURI)
+        .auth(aTokenUser02, { type: 'bearer' })
+        .send({
+          answer: randomUUID(),
+        })
+        .expect(200);
+    });
+    it(`should answer [question 04] by user 01 (INCORRECT) and user 02 (CORRECT)`, async () => {
+      await agent
+        .post(publicAnswersURI)
+        .auth(aTokenUser01, { type: 'bearer' })
+        .send({
+          answer: randomUUID(),
+        })
+        .expect(200);
+
+      return agent
+        .post(publicAnswersURI)
+        .auth(aTokenUser02, { type: 'bearer' })
+        .send({
+          answer: answers04[0],
+        })
+        .expect(200);
+    });
+    it(`should answer [question 05] by user 01 (CORRECT) and user 02 (INCORRECT)`, async () => {
+      await agent
+        .post(publicAnswersURI)
+        .auth(aTokenUser01, { type: 'bearer' })
+        .send({
+          answer: answers05[0],
+        })
+        .expect(200);
+
+      return agent
+        .post(publicAnswersURI)
+        .auth(aTokenUser02, { type: 'bearer' })
+        .send({
+          answer: randomUUID(),
+        })
+        .expect(200);
     });
   });
-  describe.skip('Get current game operations', () => {
+  describe('Get current game operations', () => {
     // Authentication errors [401]
     it(`should return 401 when trying to get current game with incorrect token`, async () => {
       return agent
@@ -312,7 +388,106 @@ describe('Public quiz testing', () => {
         .get(publicCurrentGameURI)
         .auth(aTokenUser01, { type: 'bearer' })
         .expect(200);
-      expect(response.body).toEqual(startedGameObject);
+
+      gameObject = {
+        id: expect.any(String),
+        firstPlayerProgress: {
+          answers: [
+            {
+              addedAt: expect.any(String),
+              answerStatus: AnswerStatus.Correct,
+              questionId: gameQuestion01Id,
+            },
+            {
+              addedAt: expect.any(String),
+              answerStatus: AnswerStatus.Incorrect,
+              questionId: gameQuestion02Id,
+            },
+            {
+              addedAt: expect.any(String),
+              answerStatus: AnswerStatus.Correct,
+              questionId: gameQuestion03Id,
+            },
+            {
+              addedAt: expect.any(String),
+              answerStatus: AnswerStatus.Incorrect,
+              questionId: gameQuestion04Id,
+            },
+            {
+              addedAt: expect.any(String),
+              answerStatus: AnswerStatus.Correct,
+              questionId: gameQuestion05Id,
+            },
+          ],
+          player: {
+            id: expect.any(String),
+            login: user01Login,
+          },
+          score: 0,
+        },
+        secondPlayerProgress: {
+          answers: [
+            {
+              addedAt: expect.any(String),
+              answerStatus: AnswerStatus.Incorrect,
+              questionId: gameQuestion01Id,
+            },
+            {
+              addedAt: expect.any(String),
+              answerStatus: AnswerStatus.Correct,
+              questionId: gameQuestion02Id,
+            },
+            {
+              addedAt: expect.any(String),
+              answerStatus: AnswerStatus.Incorrect,
+              questionId: gameQuestion03Id,
+            },
+            {
+              addedAt: expect.any(String),
+              answerStatus: AnswerStatus.Correct,
+              questionId: gameQuestion04Id,
+            },
+            {
+              addedAt: expect.any(String),
+              answerStatus: AnswerStatus.Incorrect,
+              questionId: gameQuestion05Id,
+            },
+          ],
+          player: {
+            id: expect.any(String),
+            login: user02Login,
+          },
+          score: 0,
+        },
+        questions: [
+          {
+            id: gameQuestion01Id,
+            body: expect.any(String),
+          },
+          {
+            id: gameQuestion02Id,
+            body: expect.any(String),
+          },
+          {
+            id: gameQuestion03Id,
+            body: expect.any(String),
+          },
+          {
+            id: gameQuestion04Id,
+            body: expect.any(String),
+          },
+          {
+            id: gameQuestion05Id,
+            body: expect.any(String),
+          },
+        ],
+        status: GameStatus.Active,
+        pairCreatedDate: expect.any(String),
+        startGameDate: expect.any(String),
+        finishGameDate: null,
+      };
+
+      expect(response.body).toEqual(gameObject);
       return response;
     });
     it(`should return started current game for user 02`, async () => {
@@ -320,7 +495,7 @@ describe('Public quiz testing', () => {
         .get(publicCurrentGameURI)
         .auth(aTokenUser02, { type: 'bearer' })
         .expect(200);
-      expect(response.body).toEqual(startedGameObject);
+      expect(response.body).toEqual(gameObject);
       return response;
     });
 
@@ -332,7 +507,7 @@ describe('Public quiz testing', () => {
         .expect(404);
     });
   });
-  describe.skip('Get game by ID operations', () => {
+  describe('Get game by ID operations', () => {
     // Authentication errors [401]
     it(`should return 401 when trying to get the game by ID with incorrect token`, async () => {
       return agent
@@ -363,7 +538,7 @@ describe('Public quiz testing', () => {
         .get(publicGameURI + gameId)
         .auth(aTokenUser01, { type: 'bearer' })
         .expect(200);
-      expect(response.body).toEqual(startedGameObject);
+      expect(response.body).toEqual(gameObject);
       return response;
     });
     it(`should return started game by id for user 02`, async () => {
@@ -371,7 +546,7 @@ describe('Public quiz testing', () => {
         .get(publicGameURI + gameId)
         .auth(aTokenUser02, { type: 'bearer' })
         .expect(200);
-      expect(response.body).toEqual(startedGameObject);
+      expect(response.body).toEqual(gameObject);
       return response;
     });
   });

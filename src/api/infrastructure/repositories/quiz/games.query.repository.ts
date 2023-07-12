@@ -20,10 +20,13 @@ export class GamesQueryRepository {
         gameId: gameId,
       })
       .leftJoinAndSelect('game.players', 'p')
+      .leftJoinAndSelect('game.questions', 'gq')
       .leftJoinAndSelect('p.user', 'u')
       .leftJoinAndSelect('p.answers', 'a')
-      .leftJoinAndSelect('game.questions', 'q')
+      .leftJoinAndSelect('a.question', 'aq')
       .orderBy('p.player_id')
+      .addOrderBy('gq.created_at', 'DESC')
+      .addOrderBy('a.added_at')
       .getMany();
 
     const playersCount = games[0].players.length;
@@ -45,9 +48,8 @@ export class GamesQueryRepository {
       .leftJoinAndSelect('a.question', 'aq')
       .orderBy('p.player_id')
       .addOrderBy('gq.created_at', 'DESC')
+      .addOrderBy('a.added_at')
       .getMany();
-
-    // console.log(games);
 
     if (games.length === 0) {
       return null;
