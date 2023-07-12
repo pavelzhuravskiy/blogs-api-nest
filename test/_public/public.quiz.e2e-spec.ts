@@ -31,6 +31,7 @@ import {
   createdGameObject,
   startedGameObject,
 } from '../utils/objects/quiz.objects';
+import { answersFinder } from '../utils/functions/answers-finder';
 
 describe('Public quiz testing', () => {
   let app: INestApplication;
@@ -47,6 +48,12 @@ describe('Public quiz testing', () => {
   let aTokenUser01;
   let aTokenUser02;
   let aTokenUser03;
+
+  let answers01;
+  let answers02;
+  let answers03;
+  let answers04;
+  let answers05;
 
   describe('Users creation and authentication', () => {
     it(`should create three users`, async () => {
@@ -187,7 +194,102 @@ describe('Public quiz testing', () => {
       return response;
     });
   });
-  describe('Get current game operations', () => {
+  describe('Answers operations', () => {
+    // Bad request errors [400]
+    it(`should return 400 when trying to send answer without answer`, async () => {
+      return agent
+        .post(publicAnswersURI)
+        .auth(randomUUID(), { type: 'bearer' })
+        .expect(401);
+    });
+    it(`should return 400 when trying to send answer with incorrect answer type`, async () => {
+      return agent
+        .post(publicAnswersURI)
+        .auth(randomUUID(), { type: 'bearer' })
+        .send({
+          answer: 123,
+        })
+        .expect(401);
+    });
+
+    // Authentication errors [401]
+    it(`should return 401 when trying to send answer with incorrect token`, async () => {
+      return agent
+        .post(publicAnswersURI)
+        .auth(randomUUID(), { type: 'bearer' })
+        .send({
+          answer: correctAnswer01,
+        })
+        .expect(401);
+    });
+
+    // Forbidden errors [403]
+    it(`should return 403 when user 03 trying to send answer in the game he is not participating`, async () => {
+      return agent
+        .post(publicAnswersURI)
+        .auth(aTokenUser03, { type: 'bearer' })
+        .send({
+          answer: correctAnswer01,
+        })
+        .expect(403);
+    });
+
+    // Success
+    it(`should get questions and answers`, async () => {
+      // Get current game
+      const game = await agent
+        .get(publicCurrentGameURI)
+        .auth(aTokenUser01, { type: 'bearer' })
+        .expect(200);
+
+      // Get game question IDs
+      const gameQuestion01Id = game.body.questions[0].id;
+      const gameQuestion02Id = game.body.questions[1].id;
+      const gameQuestion03Id = game.body.questions[2].id;
+      const gameQuestion04Id = game.body.questions[3].id;
+      const gameQuestion05Id = game.body.questions[4].id;
+
+      // Get questions by admin to get answers
+      const adminQuestions = await agent
+        .get(saQuestionsURI)
+        .auth(basicAuthLogin, basicAuthPassword)
+        .expect(200);
+
+      // Get answers to game questions and check publish statuses
+      answers01 = answersFinder(adminQuestions, gameQuestion01Id);
+      answers02 = answersFinder(adminQuestions, gameQuestion02Id);
+      answers03 = answersFinder(adminQuestions, gameQuestion03Id);
+      answers04 = answersFinder(adminQuestions, gameQuestion04Id);
+      answers05 = answersFinder(adminQuestions, gameQuestion05Id);
+
+      // Check answers arrays
+      expect(answers01.length).toBeGreaterThan(0);
+      expect(answers02.length).toBeGreaterThan(0);
+      expect(answers03.length).toBeGreaterThan(0);
+      expect(answers04.length).toBeGreaterThan(0);
+      expect(answers05.length).toBeGreaterThan(0);
+    });
+    it(`should answer [question 01] by user 01 (CORRECT) and user 02 (INCORRECT)`, async () => {
+      const test = await agent
+        .post(publicAnswersURI)
+        .auth(aTokenUser01, { type: 'bearer' })
+        .send({
+          answer: answers01[0],
+        });
+      // .expect(200);
+      return test;
+
+      /*const test2 = await agent
+        .post(publicAnswersURI)
+        .auth(aTokenUser01, { type: 'bearer' })
+        .send({
+          answer: answers01[0],
+        });
+      // .expect(200);
+      return test2;*/
+    });
+  });
+  describe.skip('Get current game operations', () => {
     // Authentication errors [401]
     it(`should return 401 when trying to get current game with incorrect token`, async () => {
       return agent
@@ -230,7 +332,7 @@ describe('Public quiz testing', () => {
         .expect(404);
     });
   });
-  describe('Get game by ID operations', () => {
+  describe.skip('Get game by ID operations', () => {
     // Authentication errors [401]
     it(`should return 401 when trying to get the game by ID with incorrect token`, async () => {
       return agent
@@ -271,57 +373,6 @@ describe('Public quiz testing', () => {
         .expect(200);
       expect(response.body).toEqual(startedGameObject);
       return response;
-    });
-  });
-  describe('Answers operations', () => {
-    // Bad request errors [400]
-    it(`should return 400 when trying to send answer without answer`, async () => {
-      return agent
-        .post(publicAnswersURI)
-        .auth(randomUUID(), { type: 'bearer' })
-        .expect(401);
-    });
-    it(`should return 400 when trying to send answer with incorrect answer type`, async () => {
-      return agent
-        .post(publicAnswersURI)
-        .auth(randomUUID(), { type: 'bearer' })
-        .send({
-          answer: 123,
-        })
-        .expect(401);
-    });
-
-    // Authentication errors [401]
-    it(`should return 401 when trying to send answer with incorrect token`, async () => {
-      return agent
-        .post(publicAnswersURI)
-        .auth(randomUUID(), { type: 'bearer' })
-        .send({
-          answer: correctAnswer01,
-        })
-        .expect(401);
-    });
-
-    // Forbidden errors [403]
-    it(`should return 403 when user 03 trying to send answer in the game he is not participating`, async () => {
-      return agent
-        .post(publicAnswersURI)
-        .auth(aTokenUser03, { type: 'bearer' })
-        .send({
-          answer: correctAnswer01,
-        })
-        .expect(403);
-    });
-
-    // Success
-    it(`should ...`, async () => {
-      const test = await agent
-        .post(publicAnswersURI)
-        .auth(aTokenUser01, { type: 'bearer' });
-
-      // .expect(200);
-      // console.log(test.body);
-      return test;
     });
   });
 

@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { Player } from './player.entity';
 import { AnswerStatus } from '../../../enums/answer-status.enum';
+import { Question } from './question.entity';
 
 @Entity('quiz_answers')
 export class Answer {
@@ -25,4 +26,10 @@ export class Answer {
   })
   @JoinColumn()
   player: Player;
+
+  @ManyToOne(() => Question, (question) => question.answers, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn()
+  question: Question;
 }

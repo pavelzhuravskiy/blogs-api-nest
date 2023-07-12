@@ -4,9 +4,11 @@ import {
   Entity,
   JoinTable,
   ManyToMany,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Game } from './game.entity';
+import { Answer } from './answer.entity';
 
 @Entity('quiz_questions')
 export class Question {
@@ -31,6 +33,9 @@ export class Question {
     nullable: true,
   })
   updatedAt: Date;
+
+  @OneToMany(() => Answer, (answer) => answer.question)
+  answers: Answer[];
 
   @ManyToMany(() => Game, (game) => game.questions)
   @JoinTable()

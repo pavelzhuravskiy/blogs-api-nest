@@ -21,6 +21,7 @@ import { UsersModule } from './users.module';
 import { PublicQuizController } from '../_public/quiz/public.quiz.controller';
 import { GameFindUseCase } from '../_public/quiz/application/use-cases/game-find.use-case';
 import { AnswerSendUseCase } from '../_public/quiz/application/use-cases/answer-send.use-case';
+import { AnswersRepository } from '../infrastructure/repositories/quiz/answers.repository';
 
 const useCases = [
   QuestionCreateUseCase,
@@ -41,6 +42,7 @@ const repositories = [
   GamesQueryRepository,
   PlayersRepository,
   UsersRepository,
+  AnswersRepository,
 ];
 
 @Module({

@@ -41,7 +41,6 @@ export class Game {
   @OneToMany(() => Player, (player) => player.game)
   players: Player[];
 
-  // todo fix to one to many
   @ManyToMany(() => Question, (question) => question.games)
   questions: Question[];
 }

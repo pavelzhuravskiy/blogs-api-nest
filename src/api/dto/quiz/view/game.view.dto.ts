@@ -1,10 +1,11 @@
 import { GameStatus } from '../../../../enums/game-status.enum';
 import { Answer } from '../../../entities/quiz/answer.entity';
+import { AnswerStatus } from '../../../../enums/answer-status.enum';
 
 export class GameViewDto {
   id: string;
   firstPlayerProgress: {
-    answers: Answer[] | [];
+    answers: AnswerViewDto[] | [];
     player: PlayerViewDto;
     score: number;
   };
@@ -28,4 +29,10 @@ class PlayerViewDto {
 class QuestionViewDto {
   id: string;
   body: string;
+}
+
+class AnswerViewDto {
+  questionId: string;
+  answerStatus: AnswerStatus;
+  addedAt: Date;
 }

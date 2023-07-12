@@ -57,10 +57,12 @@ export class GamesRepository {
     const game = await this.gamesRepository
       .createQueryBuilder('game')
       .leftJoinAndSelect('game.players', 'p')
+      .leftJoinAndSelect('game.questions', 'gq')
       .leftJoinAndSelect('p.user', 'u')
       .leftJoinAndSelect('p.answers', 'a')
-      .leftJoinAndSelect('game.questions', 'q')
+      .leftJoinAndSelect('a.question', 'aq')
       .orderBy('p.player_id')
+      .addOrderBy('gq.created_at', 'DESC')
       .getOne();
 
     if (!game) {

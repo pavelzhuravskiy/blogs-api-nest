@@ -39,11 +39,15 @@ export class GamesQueryRepository {
         active: GameStatus.Active,
       })
       .leftJoinAndSelect('game.players', 'p')
+      .leftJoinAndSelect('game.questions', 'gq')
       .leftJoinAndSelect('p.user', 'u')
       .leftJoinAndSelect('p.answers', 'a')
-      .leftJoinAndSelect('game.questions', 'q')
+      .leftJoinAndSelect('a.question', 'aq')
       .orderBy('p.player_id')
+      .addOrderBy('gq.created_at', 'DESC')
       .getMany();
+
+    // console.log(games);
 
     if (games.length === 0) {
       return null;
@@ -72,7 +76,13 @@ export class GamesQueryRepository {
     return array.map((g) => {
       if (playersCount === 2) {
         secondPlayerProgress = {
-          answers: g.players[1].answers,
+          answers: g.players[1].answers.map((a) => {
+            return {
+              questionId: a.question.id.toString(),
+              answerStatus: a.answerStatus,
+              addedAt: a.addedAt,
+            };
+          }),
           player: {
             id: g.players[1].user.id.toString(),
             login: g.players[1].user.login,
@@ -90,7 +100,13 @@ export class GamesQueryRepository {
       return {
         id: g.id.toString(),
         firstPlayerProgress: {
-          answers: g.players[0].answers,
+          answers: g.players[0].answers.map((a) => {
+            return {
+              questionId: a.question.id.toString(),
+              answerStatus: a.answerStatus,
+              addedAt: a.addedAt,
+            };
+          }),
           player: {
             id: g.players[0].user.id.toString(),
             login: g.players[0].user.login,
