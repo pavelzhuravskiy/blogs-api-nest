@@ -347,7 +347,10 @@ describe('Public quiz testing', () => {
         })
         .expect(200);
     });
-    it(`should answer [question 05] by user 01 (CORRECT) and user 02 (INCORRECT)`, async () => {
+  });
+  describe('Get current game and finish operations', () => {
+    // Success
+    it(`should answer [question 05] by user 01 (CORRECT)`, async () => {
       await agent
         .post(publicAnswersURI)
         .auth(aTokenUser01, { type: 'bearer' })
@@ -355,17 +358,19 @@ describe('Public quiz testing', () => {
           answer: answers05[0],
         })
         .expect(200);
+    });
 
+    // Forbidden errors [403]
+    it(`should return 403 when user 01 trying to send answer after all questions answered`, async () => {
       return agent
         .post(publicAnswersURI)
-        .auth(aTokenUser02, { type: 'bearer' })
+        .auth(aTokenUser01, { type: 'bearer' })
         .send({
-          answer: randomUUID(),
+          answer: correctAnswer01,
         })
-        .expect(200);
+        .expect(403);
     });
-  });
-  describe('Get current game operations', () => {
+
     // Authentication errors [401]
     it(`should return 401 when trying to get current game with incorrect token`, async () => {
       return agent
@@ -447,11 +452,6 @@ describe('Public quiz testing', () => {
               answerStatus: AnswerStatus.Correct,
               questionId: gameQuestion04Id,
             },
-            {
-              addedAt: expect.any(String),
-              answerStatus: AnswerStatus.Incorrect,
-              questionId: gameQuestion05Id,
-            },
           ],
           player: {
             id: expect.any(String),
@@ -506,6 +506,32 @@ describe('Public quiz testing', () => {
         .auth(aTokenUser03, { type: 'bearer' })
         .expect(404);
     });
+
+    // Success
+    it(`should answer [question 05] by user 02 (INCORRECT) and finish game`, async () => {
+      await agent
+        .post(publicAnswersURI)
+        .auth(aTokenUser02, { type: 'bearer' })
+        .send({
+          answer: randomUUID(),
+        })
+        .expect(200);
+    });
+
+    // Not found errors [404]
+    it(`should return 404 when user 01 is trying to get finished game`, async () => {
+      return agent
+        .get(publicCurrentGameURI)
+        .auth(aTokenUser01, { type: 'bearer' })
+        .expect(404);
+    });
+    // Not found errors [404]
+    it(`should return 404 when user 02 is trying to get finished game`, async () => {
+      return agent
+        .get(publicCurrentGameURI)
+        .auth(aTokenUser02, { type: 'bearer' })
+        .expect(404);
+    });
   });
   describe('Get game by ID operations', () => {
     // Authentication errors [401]
@@ -533,15 +559,24 @@ describe('Public quiz testing', () => {
     });
 
     // Success
-    it(`should return started game by id for user 01`, async () => {
+    it(`should return finished game by id for user 01`, async () => {
       const response = await agent
         .get(publicGameURI + gameId)
         .auth(aTokenUser01, { type: 'bearer' })
         .expect(200);
+
+      gameObject.secondPlayerProgress.answers[4] = {
+        addedAt: expect.any(String),
+        answerStatus: AnswerStatus.Incorrect,
+        questionId: gameQuestion05Id,
+      };
+      gameObject.status = GameStatus.Finished;
+      gameObject.finishGameDate = response.body.finishGameDate;
+
       expect(response.body).toEqual(gameObject);
       return response;
     });
-    it(`should return started game by id for user 02`, async () => {
+    it(`should return finished game by id for user 02`, async () => {
       const response = await agent
         .get(publicGameURI + gameId)
         .auth(aTokenUser02, { type: 'bearer' })

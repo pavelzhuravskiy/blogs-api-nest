@@ -15,6 +15,7 @@ import { AnswerInputDto } from '../../../../dto/quiz/input/answer-input.dto';
 import { AnswersRepository } from '../../../../infrastructure/repositories/quiz/answers.repository';
 import { Answer } from '../../../../entities/quiz/answer.entity';
 import { AnswerStatus } from '../../../../../enums/answer-status.enum';
+import { GameStatus } from '../../../../../enums/game-status.enum';
 
 export class AnswerSendCommand {
   constructor(public answerInputDto: AnswerInputDto, public userId: number) {}
@@ -68,6 +69,14 @@ export class AnswerSendUseCase extends TransactionBaseUseCase<
     }
 
     const questionIndex = currentPlayer.answers.length;
+
+    if (questionIndex >= 5) {
+      return {
+        data: false,
+        code: ResultCode.Forbidden,
+      };
+    }
+
     const currentQuestion = currentGame.questions[questionIndex];
 
     let answerStatus = AnswerStatus.Incorrect;
@@ -76,7 +85,7 @@ export class AnswerSendUseCase extends TransactionBaseUseCase<
     );
     if (answerCheck) {
       answerStatus = AnswerStatus.Correct;
-      currentPlayer.score = currentPlayer.score + 1;
+      currentPlayer.score += 1;
       await this.playersRepository.queryRunnerSave(currentPlayer, manager);
     }
 
@@ -86,6 +95,18 @@ export class AnswerSendUseCase extends TransactionBaseUseCase<
     answer.answerStatus = answerStatus;
     answer.addedAt = new Date();
     await this.answersRepository.queryRunnerSave(answer, manager);
+
+    const fPlayerAnswersCount = currentGame.players[0].answers.length;
+    const sPlayerAnswersCount = currentGame.players[1].answers.length;
+
+    if (
+      (fPlayerAnswersCount === 5 && sPlayerAnswersCount === 4) ||
+      (fPlayerAnswersCount === 4 && sPlayerAnswersCount === 5)
+    ) {
+      currentGame.status = GameStatus.Finished;
+      currentGame.finishGameDate = new Date();
+      await this.gamesRepository.queryRunnerSave(currentGame, manager);
+    }
 
     return {
       data: true,

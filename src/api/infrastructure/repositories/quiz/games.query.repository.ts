@@ -30,8 +30,8 @@ export class GamesQueryRepository {
       .getMany();
 
     const playersCount = games[0].players.length;
-    const mappedQuizGames = await this.gamesMapping(games, playersCount);
-    return mappedQuizGames[0];
+    const mappedGames = await this.gamesMapping(games, playersCount);
+    return mappedGames[0];
   }
 
   async findGameOfCurrentUser(userId: number): Promise<GameViewDto> {
@@ -64,8 +64,8 @@ export class GamesQueryRepository {
     }
 
     const playersCount = games[0].players.length;
-    const mappedQuizGames = await this.gamesMapping(games, playersCount);
-    return mappedQuizGames[0];
+    const mappedGames = await this.gamesMapping(games, playersCount);
+    return mappedGames[0];
   }
 
   private async gamesMapping(
