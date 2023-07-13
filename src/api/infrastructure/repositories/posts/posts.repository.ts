@@ -13,11 +13,6 @@ export class PostsRepository {
     @InjectDataSource() private dataSource: DataSource,
   ) {}
 
-  // ***** TypeORM data source manager SAVE *****
-  async dataSourceSave(entity: Post | PostLike): Promise<Post | PostLike> {
-    return this.dataSource.manager.save(entity);
-  }
-
   // ***** Find post operations *****
   async findPost(postId: string): Promise<Post | null> {
     try {

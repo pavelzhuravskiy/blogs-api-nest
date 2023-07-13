@@ -8,6 +8,7 @@ import { ExceptionResultType } from '../../../../exceptions/types/exception-resu
 import { BloggerUserBanInputDto } from '../../../dto/users/input/blogger/blogger.user-ban.input.dto';
 import { UsersRepository } from '../../../infrastructure/repositories/users/users.repository';
 import { BlogsRepository } from '../../../infrastructure/repositories/blogs/blogs.repository';
+import { DataSourceRepository } from '../../../infrastructure/repositories/common/data-source.repository';
 
 export class BloggerUserBanCommand {
   constructor(
@@ -24,6 +25,7 @@ export class BloggerUserBanUseCase
   constructor(
     private readonly usersRepository: UsersRepository,
     private readonly blogsRepository: BlogsRepository,
+    private readonly dataSourceRepository: DataSourceRepository,
   ) {}
 
   async execute(
@@ -60,17 +62,13 @@ export class BloggerUserBanUseCase
       userToBanOrUnban.userBanByBlogger.banReason =
         command.bloggerUserBanInputDto.banReason;
       userToBanOrUnban.userBanByBlogger.banDate = new Date();
-      await this.usersRepository.dataSourceSave(
-        userToBanOrUnban.userBanByBlogger,
-      );
     } else {
       userToBanOrUnban.userBanByBlogger.isBanned = false;
       userToBanOrUnban.userBanByBlogger.banReason = null;
       userToBanOrUnban.userBanByBlogger.banDate = null;
-      await this.usersRepository.dataSourceSave(
-        userToBanOrUnban.userBanByBlogger,
-      );
     }
+
+    await this.dataSourceRepository.save(userToBanOrUnban.userBanByBlogger);
 
     return {
       data: true,

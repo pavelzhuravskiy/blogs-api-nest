@@ -13,6 +13,7 @@ import { PostsRepository } from '../../../../infrastructure/repositories/posts/p
 import { UsersRepository } from '../../../../infrastructure/repositories/users/users.repository';
 import { CommentsRepository } from '../../../../infrastructure/repositories/comments/comments.repository';
 import { Comment } from '../../../../entities/comments/comment.entity';
+import { DataSourceRepository } from '../../../../infrastructure/repositories/common/data-source.repository';
 
 export class CommentCreateCommand {
   constructor(
@@ -27,6 +28,7 @@ export class CommentCreateUseCase
   implements ICommandHandler<CommentCreateCommand>
 {
   constructor(
+    private readonly dataSourceRepository: DataSourceRepository,
     private readonly commentsRepository: CommentsRepository,
     private readonly postsRepository: PostsRepository,
     private readonly usersRepository: UsersRepository,
@@ -72,7 +74,7 @@ export class CommentCreateUseCase
     comment.user = user;
     comment.content = command.commentInputDto.content;
     comment.createdAt = new Date();
-    await this.commentsRepository.dataSourceSave(comment);
+    await this.dataSourceRepository.save(comment);
 
     return {
       data: true,

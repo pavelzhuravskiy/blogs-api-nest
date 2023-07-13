@@ -4,6 +4,7 @@ import { UsersRepository } from '../../../../infrastructure/repositories/users/u
 import { MailAdapter } from '../../../../infrastructure/mail/mail-adapter';
 import { randomUUID } from 'crypto';
 import { add } from 'date-fns';
+import { DataSourceRepository } from '../../../../infrastructure/repositories/common/data-source.repository';
 
 export class RegistrationEmailResendCommand {
   constructor(public emailInputDto: EmailInputDto) {}
@@ -15,6 +16,7 @@ export class RegistrationEmailResendUseCase
 {
   constructor(
     private readonly usersRepository: UsersRepository,
+    private readonly dataSourceRepository: DataSourceRepository,
     private readonly mailAdapter: MailAdapter,
   ) {}
 
@@ -32,7 +34,7 @@ export class RegistrationEmailResendUseCase
     const newConfirmationCode = randomUUID();
     user.userEmailConfirmation.confirmationCode = newConfirmationCode;
     user.userEmailConfirmation.expirationDate = add(new Date(), { hours: 1 });
-    await this.usersRepository.dataSourceSave(user.userEmailConfirmation);
+    await this.dataSourceRepository.save(user.userEmailConfirmation);
 
     await this.resendRegistrationMail(
       user.login,

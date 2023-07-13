@@ -7,6 +7,7 @@ import {
   blogNotFound,
 } from '../../../../exceptions/exception.constants';
 import { BlogsRepository } from '../../../infrastructure/repositories/blogs/blogs.repository';
+import { DataSourceRepository } from '../../../infrastructure/repositories/common/data-source.repository';
 
 export class BlogUpdateCommand {
   constructor(
@@ -18,7 +19,10 @@ export class BlogUpdateCommand {
 
 @CommandHandler(BlogUpdateCommand)
 export class BlogUpdateUseCase implements ICommandHandler<BlogUpdateCommand> {
-  constructor(private readonly blogsRepository: BlogsRepository) {}
+  constructor(
+    private readonly dataSourceRepository: DataSourceRepository,
+    private readonly blogsRepository: BlogsRepository,
+  ) {}
 
   async execute(
     command: BlogUpdateCommand,
@@ -44,7 +48,7 @@ export class BlogUpdateUseCase implements ICommandHandler<BlogUpdateCommand> {
     blog.name = command.blogInputDto.name;
     blog.description = command.blogInputDto.description;
     blog.websiteUrl = command.blogInputDto.websiteUrl;
-    await this.blogsRepository.dataSourceSave(blog);
+    await this.dataSourceRepository.save(blog);
 
     return {
       data: true,

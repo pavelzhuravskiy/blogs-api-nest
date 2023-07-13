@@ -5,6 +5,7 @@ import { UsersRepository } from '../../../../infrastructure/repositories/users/u
 import { MailAdapter } from '../../../../infrastructure/mail/mail-adapter';
 import { add } from 'date-fns';
 import { UserPasswordRecovery } from '../../../../entities/users/user-password-recovery.entity';
+import { DataSourceRepository } from '../../../../infrastructure/repositories/common/data-source.repository';
 
 export class PasswordRecoveryCommand {
   constructor(public emailInputDto: EmailInputDto) {}
@@ -16,6 +17,7 @@ export class PasswordRecoveryUseCase
 {
   constructor(
     private readonly usersRepository: UsersRepository,
+    private readonly dataSourceRepository: DataSourceRepository,
     private readonly mailAdapter: MailAdapter,
   ) {}
 
@@ -35,7 +37,7 @@ export class PasswordRecoveryUseCase
     userPasswordRecovery.recoveryCode = recoveryCode;
     userPasswordRecovery.expirationDate = add(new Date(), { hours: 1 });
 
-    await this.usersRepository.dataSourceSave(userPasswordRecovery);
+    await this.dataSourceRepository.save(userPasswordRecovery);
     await this.sendPasswordRecoveryMail(user.login, user.email, recoveryCode);
     return true;
   }

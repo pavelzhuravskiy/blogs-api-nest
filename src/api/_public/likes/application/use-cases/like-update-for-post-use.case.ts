@@ -9,6 +9,7 @@ import {
 } from '../../../../../exceptions/exception.constants';
 import { UsersRepository } from '../../../../infrastructure/repositories/users/users.repository';
 import { PostLike } from '../../../../entities/posts/post-like.entity';
+import { DataSourceRepository } from '../../../../infrastructure/repositories/common/data-source.repository';
 
 export class LikeUpdateForPostCommand {
   constructor(
@@ -25,6 +26,7 @@ export class LikeUpdateForPostUseCase
   constructor(
     private readonly postsRepository: PostsRepository,
     private readonly usersRepository: UsersRepository,
+    private readonly dataSourceRepository: DataSourceRepository,
   ) {}
 
   async execute(
@@ -63,7 +65,7 @@ export class LikeUpdateForPostUseCase
     likeRecord.likeStatus = command.likeStatusInputDto.likeStatus;
     likeRecord.addedAt = new Date();
 
-    await this.postsRepository.dataSourceSave(likeRecord);
+    await this.dataSourceRepository.save(likeRecord);
 
     return {
       data: true,

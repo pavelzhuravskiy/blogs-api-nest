@@ -10,6 +10,7 @@ import {
 import { PostInputDto } from '../../../dto/posts/input/post.input.dto';
 import { PostsRepository } from '../../../infrastructure/repositories/posts/posts.repository';
 import { BlogsRepository } from '../../../infrastructure/repositories/blogs/blogs.repository';
+import { DataSourceRepository } from '../../../infrastructure/repositories/common/data-source.repository';
 
 export class PostUpdateCommand {
   constructor(
@@ -25,6 +26,7 @@ export class PostUpdateUseCase implements ICommandHandler<PostUpdateCommand> {
   constructor(
     private readonly blogsRepository: BlogsRepository,
     private readonly postsRepository: PostsRepository,
+    private readonly dataSourceRepository: DataSourceRepository,
   ) {}
 
   async execute(
@@ -63,7 +65,7 @@ export class PostUpdateUseCase implements ICommandHandler<PostUpdateCommand> {
     post.shortDescription = command.postInputDto.shortDescription;
     post.content = command.postInputDto.content;
 
-    await this.postsRepository.dataSourceSave(post);
+    await this.dataSourceRepository.save(post);
 
     return {
       data: true,

@@ -1,10 +1,10 @@
 import { CommandHandler } from '@nestjs/cqrs';
 import { UserInputDto } from '../../../../dto/users/input/user-input.dto';
-import { UsersRepository } from '../../../../infrastructure/repositories/users/users.repository';
 import { DataSource, EntityManager } from 'typeorm';
 import { TransactionBaseUseCase } from '../../../../_common/application/use-cases/transaction-base.use-case';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { UsersService } from '../users.service';
+import { TransactionsRepository } from '../../../../infrastructure/repositories/common/transactions.repository';
 
 export class UserCreateCommand {
   constructor(public userInputDto: UserInputDto) {}
@@ -18,8 +18,8 @@ export class UserCreateUseCase extends TransactionBaseUseCase<
   constructor(
     @InjectDataSource()
     protected readonly dataSource: DataSource,
-    protected readonly usersRepository: UsersRepository,
     protected readonly usersService: UsersService,
+    protected readonly transactionsRepository: TransactionsRepository,
   ) {
     super(dataSource);
   }
@@ -30,11 +30,12 @@ export class UserCreateUseCase extends TransactionBaseUseCase<
   ): Promise<number> {
     const { user, userBanBySA, userBanByBlogger } =
       await this.usersService.createUser(command);
+
     user.isConfirmed = true;
 
-    const savedUser = await this.usersRepository.queryRunnerSave(user, manager);
-    await this.usersRepository.queryRunnerSave(userBanBySA, manager);
-    await this.usersRepository.queryRunnerSave(userBanByBlogger, manager);
+    const savedUser = await this.transactionsRepository.save(user, manager);
+    await this.transactionsRepository.save(userBanBySA, manager);
+    await this.transactionsRepository.save(userBanByBlogger, manager);
 
     return savedUser.id;
   }

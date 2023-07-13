@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { QuestionInputDto } from '../../../../dto/quiz/input/question.Input.dto';
-import { QuestionsRepository } from '../../../../infrastructure/repositories/quiz/questions.repository';
 import { Question } from '../../../../entities/quiz/question.entity';
+import { DataSourceRepository } from '../../../../infrastructure/repositories/common/data-source.repository';
 
 export class QuestionCreateCommand {
   constructor(public questionInputDto: QuestionInputDto) {}
@@ -11,7 +11,7 @@ export class QuestionCreateCommand {
 export class QuestionCreateUseCase
   implements ICommandHandler<QuestionCreateCommand>
 {
-  constructor(private readonly questionsRepository: QuestionsRepository) {}
+  constructor(private readonly dataSourceRepository: DataSourceRepository) {}
 
   async execute(command: QuestionCreateCommand): Promise<number> {
     const question = new Question();
@@ -20,9 +20,7 @@ export class QuestionCreateUseCase
     question.published = false;
     question.createdAt = new Date();
 
-    const savedQuestion = await this.questionsRepository.dataSourceSave(
-      question,
-    );
+    const savedQuestion = await this.dataSourceRepository.save(question);
     return savedQuestion.id;
   }
 }

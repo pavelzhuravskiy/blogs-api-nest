@@ -10,12 +10,6 @@ export class QuestionsRepository {
     private readonly questionsRepository: Repository<Question>,
     @InjectDataSource() private dataSource: DataSource,
   ) {}
-
-  // ***** TypeORM data source manager SAVE *****
-  async dataSourceSave(entity: Question): Promise<Question> {
-    return this.dataSource.manager.save(entity);
-  }
-
   // ***** Find question operations *****
   async findQuestion(questionId: string): Promise<Question | null> {
     try {

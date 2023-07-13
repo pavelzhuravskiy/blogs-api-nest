@@ -24,6 +24,7 @@ import { TransactionsRepository } from '../infrastructure/repositories/common/tr
 import { UsersTransactionsRepository } from '../infrastructure/repositories/users/users.transactions.repository';
 import { GamesTransactionsRepository } from '../infrastructure/repositories/quiz/games.transactions.repository';
 import { QuestionsTransactionsRepository } from '../infrastructure/repositories/quiz/questions.transactions.repository';
+import { DataSourceRepository } from '../infrastructure/repositories/common/data-source.repository';
 
 const useCases = [
   QuestionCreateUseCase,
@@ -47,6 +48,7 @@ const repositories = [
   UsersTransactionsRepository,
   UsersRepository,
   TransactionsRepository,
+  DataSourceRepository,
 ];
 
 @Module({

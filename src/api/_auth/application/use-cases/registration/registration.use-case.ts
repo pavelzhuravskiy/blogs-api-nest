@@ -1,6 +1,5 @@
 import { CommandHandler } from '@nestjs/cqrs';
 import { UserInputDto } from '../../../../dto/users/input/user-input.dto';
-import { UsersRepository } from '../../../../infrastructure/repositories/users/users.repository';
 import { MailAdapter } from '../../../../infrastructure/mail/mail-adapter';
 import { DataSource, EntityManager } from 'typeorm';
 import { UserEmailConfirmation } from '../../../../entities/users/user-email-confirmation.entity';
@@ -8,6 +7,8 @@ import { randomUUID } from 'crypto';
 import { add } from 'date-fns';
 import { TransactionBaseUseCase } from '../../../../_common/application/use-cases/transaction-base.use-case';
 import { UsersService } from '../../../../_superadmin/users/application/users.service';
+import { TransactionsRepository } from '../../../../infrastructure/repositories/common/transactions.repository';
+import { UsersTransactionsRepository } from '../../../../infrastructure/repositories/users/users.transactions.repository';
 
 export class RegistrationCommand {
   constructor(public userInputDto: UserInputDto) {}
@@ -21,8 +22,9 @@ export class RegistrationUseCase extends TransactionBaseUseCase<
   constructor(
     protected readonly dataSource: DataSource,
     protected readonly usersService: UsersService,
-    protected readonly usersRepository: UsersRepository,
     protected readonly mailAdapter: MailAdapter,
+    protected readonly transactionsRepository: TransactionsRepository,
+    protected readonly usersTransactionsRepository: UsersTransactionsRepository,
   ) {
     super(dataSource);
   }
@@ -35,9 +37,9 @@ export class RegistrationUseCase extends TransactionBaseUseCase<
       await this.usersService.createUser(command);
     user.isConfirmed = false;
 
-    const savedUser = await this.usersRepository.queryRunnerSave(user, manager);
-    await this.usersRepository.queryRunnerSave(userBanBySA, manager);
-    await this.usersRepository.queryRunnerSave(userBanByBlogger, manager);
+    const savedUser = await this.transactionsRepository.save(user, manager);
+    await this.transactionsRepository.save(userBanBySA, manager);
+    await this.transactionsRepository.save(userBanByBlogger, manager);
 
     // Create user email confirmation record
     const confirmationCode = randomUUID();
@@ -45,13 +47,14 @@ export class RegistrationUseCase extends TransactionBaseUseCase<
     userEmailConfirmation.user = user;
     userEmailConfirmation.confirmationCode = confirmationCode;
     userEmailConfirmation.expirationDate = add(new Date(), { hours: 1 });
-    await this.usersRepository.queryRunnerSave(userEmailConfirmation, manager);
+    await this.transactionsRepository.save(userEmailConfirmation, manager);
 
     await this.sendRegistrationMail(
       user.login,
       user.email,
       confirmationCode,
       user.id,
+      manager,
     );
 
     // Return user id
@@ -67,6 +70,7 @@ export class RegistrationUseCase extends TransactionBaseUseCase<
     email: string,
     confirmationCode: string,
     userId: number,
+    manager: EntityManager,
   ): Promise<any> {
     try {
       await this.mailAdapter.sendRegistrationMail(
@@ -76,7 +80,7 @@ export class RegistrationUseCase extends TransactionBaseUseCase<
       );
     } catch (e) {
       console.error(e);
-      await this.usersRepository.deleteUser(userId);
+      await this.usersTransactionsRepository.deleteUser(userId, manager);
       return null;
     }
   }

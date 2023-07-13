@@ -11,6 +11,7 @@ import {
 } from '../../../../../exceptions/exception.constants';
 import { ExceptionResultType } from '../../../../../exceptions/types/exception-result.type';
 import { CommentLike } from '../../../../entities/comments/comment-like.entity';
+import { DataSourceRepository } from '../../../../infrastructure/repositories/common/data-source.repository';
 
 export class LikeUpdateForCommentCommand {
   constructor(
@@ -25,6 +26,7 @@ export class LikeUpdateForCommentUseCase
   implements ICommandHandler<LikeUpdateForCommentCommand>
 {
   constructor(
+    private readonly dataSourceRepository: DataSourceRepository,
     private readonly commentsRepository: CommentsRepository,
     private readonly usersRepository: UsersRepository,
   ) {}
@@ -74,7 +76,7 @@ export class LikeUpdateForCommentUseCase
     likeRecord.user = user;
     likeRecord.likeStatus = command.likeStatusInputDto.likeStatus;
 
-    await this.commentsRepository.dataSourceSave(likeRecord);
+    await this.dataSourceRepository.save(likeRecord);
 
     return {
       data: true,

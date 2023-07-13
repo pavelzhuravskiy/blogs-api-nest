@@ -1,9 +1,10 @@
 import { CommandHandler } from '@nestjs/cqrs';
 import { SAUserBanInputDto } from '../../../../dto/users/input/superadmin/sa.user-ban.input.dto';
-import { UsersRepository } from '../../../../infrastructure/repositories/users/users.repository';
-import { DevicesRepository } from '../../../../infrastructure/repositories/devices/devices.repository';
 import { DataSource, EntityManager } from 'typeorm';
 import { TransactionBaseUseCase } from '../../../../_common/application/use-cases/transaction-base.use-case';
+import { UsersTransactionsRepository } from '../../../../infrastructure/repositories/users/users.transactions.repository';
+import { TransactionsRepository } from '../../../../infrastructure/repositories/common/transactions.repository';
+import { DevicesTransactionsRepository } from '../../../../infrastructure/repositories/devices/devices.transactions.repository';
 
 export class SAUserBanCommand {
   constructor(
@@ -19,8 +20,9 @@ export class UserBanUseCase extends TransactionBaseUseCase<
 > {
   constructor(
     protected readonly dataSource: DataSource,
-    protected readonly usersRepository: UsersRepository,
-    protected readonly devicesRepository: DevicesRepository,
+    protected readonly transactionsRepository: TransactionsRepository,
+    protected readonly usersTransactionsRepository: UsersTransactionsRepository,
+    protected readonly devicesTransactionsRepository: DevicesTransactionsRepository,
   ) {
     super(dataSource);
   }
@@ -29,7 +31,10 @@ export class UserBanUseCase extends TransactionBaseUseCase<
     command: SAUserBanCommand,
     manager: EntityManager,
   ): Promise<boolean | null> {
-    const user = await this.usersRepository.findUserForBanBySA(command.userId);
+    const user = await this.usersTransactionsRepository.findUserForBanBySA(
+      command.userId,
+      manager,
+    );
 
     if (!user) {
       return null;
@@ -40,15 +45,18 @@ export class UserBanUseCase extends TransactionBaseUseCase<
       user.userBanBySA.isBanned = true;
       user.userBanBySA.banReason = command.saUserBanInputDto.banReason;
       user.userBanBySA.banDate = new Date();
-      await this.usersRepository.queryRunnerSave(user.userBanBySA, manager);
+      await this.transactionsRepository.save(user.userBanBySA, manager);
 
       // Delete user's devices
-      return this.devicesRepository.deleteBannedUserDevices(user.id);
+      return this.devicesTransactionsRepository.deleteBannedUserDevices(
+        user.id,
+        manager,
+      );
     } else {
       user.userBanBySA.isBanned = false;
       user.userBanBySA.banReason = null;
       user.userBanBySA.banDate = null;
-      await this.usersRepository.dataSourceSave(user.userBanBySA);
+      await this.transactionsRepository.save(user.userBanBySA, manager);
       return true;
     }
   }

@@ -6,9 +6,9 @@ import {
   blogNotFound,
 } from '../../../../exceptions/exception.constants';
 import { PostInputDto } from '../../../dto/posts/input/post.input.dto';
-import { PostsRepository } from '../../../infrastructure/repositories/posts/posts.repository';
 import { BlogsRepository } from '../../../infrastructure/repositories/blogs/blogs.repository';
 import { Post } from '../../../entities/posts/post.entity';
+import { DataSourceRepository } from '../../../infrastructure/repositories/common/data-source.repository';
 
 export class PostCreateCommand {
   constructor(
@@ -21,8 +21,8 @@ export class PostCreateCommand {
 @CommandHandler(PostCreateCommand)
 export class PostCreateUseCase implements ICommandHandler<PostCreateCommand> {
   constructor(
-    private readonly postsRepository: PostsRepository,
     private readonly blogsRepository: BlogsRepository,
+    private readonly dataSourceRepository: DataSourceRepository,
   ) {}
 
   async execute(
@@ -52,7 +52,7 @@ export class PostCreateUseCase implements ICommandHandler<PostCreateCommand> {
     post.shortDescription = command.postInputDto.shortDescription;
     post.content = command.postInputDto.content;
     post.createdAt = new Date();
-    const savedPost = await this.postsRepository.dataSourceSave(post);
+    const savedPost = await this.dataSourceRepository.save(post);
 
     return {
       data: true,

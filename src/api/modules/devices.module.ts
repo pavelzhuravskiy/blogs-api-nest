@@ -8,10 +8,15 @@ import { DevicesRepository } from '../infrastructure/repositories/devices/device
 import { DevicesQueryRepository } from '../infrastructure/repositories/devices/devices.query.repository';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Device } from '../entities/devices/device.entity';
+import { DataSourceRepository } from '../infrastructure/repositories/common/data-source.repository';
 
 const useCases = [DeviceDeleteForTerminateUseCase, DevicesDeleteOldUseCase];
 const entities = [Device];
-const repositories = [DevicesRepository, DevicesQueryRepository];
+const repositories = [
+  DevicesRepository,
+  DevicesQueryRepository,
+  DataSourceRepository,
+];
 
 @Module({
   imports: [TypeOrmModule.forFeature([...entities]), CqrsModule],

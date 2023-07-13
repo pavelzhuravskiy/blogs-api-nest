@@ -7,6 +7,7 @@ import {
 } from '../../../../../exceptions/exception.constants';
 import { CommentInputDto } from '../../../../dto/comments/input/comment.input.dto';
 import { CommentsRepository } from '../../../../infrastructure/repositories/comments/comments.repository';
+import { DataSourceRepository } from '../../../../infrastructure/repositories/common/data-source.repository';
 
 export class CommentUpdateCommand {
   constructor(
@@ -20,7 +21,10 @@ export class CommentUpdateCommand {
 export class CommentUpdateUseCase
   implements ICommandHandler<CommentUpdateCommand>
 {
-  constructor(private readonly commentsRepository: CommentsRepository) {}
+  constructor(
+    private readonly dataSourceRepository: DataSourceRepository,
+    private readonly commentsRepository: CommentsRepository,
+  ) {}
 
   async execute(
     command: CommentUpdateCommand,
@@ -46,7 +50,7 @@ export class CommentUpdateUseCase
     }
 
     comment.content = command.commentInputDto.content;
-    await this.commentsRepository.dataSourceSave(comment);
+    await this.dataSourceRepository.save(comment);
 
     return {
       data: true,

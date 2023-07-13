@@ -14,14 +14,7 @@ export class CommentsRepository {
     @InjectDataSource() private dataSource: DataSource,
   ) {}
 
-  // ***** TypeORM data source manager SAVE *****
-  async dataSourceSave(
-    entity: Comment | CommentLike,
-  ): Promise<Comment | CommentLike> {
-    return this.dataSource.manager.save(entity);
-  }
-
-  // ***** Find comment operations *****
+  // ***** Find comment *****
   async findComment(commentId: string): Promise<Comment | null> {
     try {
       return await this.commentsRepository
@@ -37,7 +30,7 @@ export class CommentsRepository {
     }
   }
 
-  // ***** Delete comment operations *****
+  // ***** Delete comment *****
   async deleteComment(commentId: number): Promise<boolean> {
     const result = await this.commentsRepository
       .createQueryBuilder('c')
@@ -48,7 +41,7 @@ export class CommentsRepository {
     return result.affected === 1;
   }
 
-  // ***** Likes for comment operations *****
+  // ***** Likes for comments *****
   async findUserCommentLikeRecord(
     commentId: number,
     userId: number,

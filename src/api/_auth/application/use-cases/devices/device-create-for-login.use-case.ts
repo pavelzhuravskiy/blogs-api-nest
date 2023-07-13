@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { JwtService } from '@nestjs/jwt';
-import { DevicesRepository } from '../../../../infrastructure/repositories/devices/devices.repository';
 import { Device } from '../../../../entities/devices/device.entity';
+import { DataSourceRepository } from '../../../../infrastructure/repositories/common/data-source.repository';
 
 export class DeviceCreateForLoginCommand {
   constructor(
@@ -16,7 +16,8 @@ export class DeviceCreateForLoginUseCase
   implements ICommandHandler<DeviceCreateForLoginCommand>
 {
   constructor(
-    private readonly devicesRepository: DevicesRepository,
+    private readonly dataSourceRepository: DataSourceRepository,
+
     private readonly jwtService: JwtService,
   ) {}
 
@@ -31,6 +32,7 @@ export class DeviceCreateForLoginUseCase
     device.expirationDate = decodedToken.exp;
     device.user = decodedToken.sub;
 
-    return this.devicesRepository.dataSourceSave(device);
+    await this.dataSourceRepository.save(device);
+    return device;
   }
 }

@@ -2,9 +2,10 @@ import { User } from '../../../entities/users/user.entity';
 import bcrypt from 'bcrypt';
 import { UserBanBySA } from '../../../entities/users/user-ban-by-sa.entity';
 import { UserBanByBlogger } from '../../../entities/users/user-ban-by-blogger.entity';
+import { UserCreateCommand } from './use-cases/user-create.use-case';
 
 export class UsersService {
-  async createUser(command: any) {
+  async createUser(command: UserCreateCommand) {
     // Create user
     const user = new User();
     user.login = command.userInputDto.login;

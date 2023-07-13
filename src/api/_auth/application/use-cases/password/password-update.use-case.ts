@@ -1,9 +1,10 @@
 import { CommandHandler } from '@nestjs/cqrs';
 import { NewPasswordInputDto } from '../../../dto/new-password.input.dto';
 import bcrypt from 'bcrypt';
-import { UsersRepository } from '../../../../infrastructure/repositories/users/users.repository';
 import { DataSource, EntityManager } from 'typeorm';
 import { TransactionBaseUseCase } from '../../../../_common/application/use-cases/transaction-base.use-case';
+import { UsersTransactionsRepository } from '../../../../infrastructure/repositories/users/users.transactions.repository';
+import { TransactionsRepository } from '../../../../infrastructure/repositories/common/transactions.repository';
 
 export class PasswordUpdateCommand {
   constructor(public newPasswordDto: NewPasswordInputDto) {}
@@ -16,7 +17,8 @@ export class PasswordUpdateUseCase extends TransactionBaseUseCase<
 > {
   constructor(
     protected readonly dataSource: DataSource,
-    protected readonly usersRepository: UsersRepository,
+    protected readonly transactionsRepository: TransactionsRepository,
+    protected readonly usersTransactionsRepository: UsersTransactionsRepository,
   ) {
     super(dataSource);
   }
@@ -25,9 +27,11 @@ export class PasswordUpdateUseCase extends TransactionBaseUseCase<
     command: PasswordUpdateCommand,
     manager: EntityManager,
   ): Promise<boolean | null> {
-    const user = await this.usersRepository.findUserForPasswordUpdate(
-      command.newPasswordDto.recoveryCode,
-    );
+    const user =
+      await this.usersTransactionsRepository.findUserForPasswordUpdate(
+        command.newPasswordDto.recoveryCode,
+        manager,
+      );
 
     if (!user || user.userPasswordRecovery.expirationDate < new Date()) {
       return null;
@@ -38,8 +42,11 @@ export class PasswordUpdateUseCase extends TransactionBaseUseCase<
       command.newPasswordDto.newPassword,
       Number(process.env.HASH_ROUNDS),
     );
-    await this.usersRepository.queryRunnerSave(user, manager);
-    return this.usersRepository.deletePasswordRecoveryRecord(user.id);
+    await this.transactionsRepository.save(user, manager);
+    return this.usersTransactionsRepository.deletePasswordRecoveryRecord(
+      user.id,
+      manager,
+    );
   }
 
   public async execute(command: PasswordUpdateCommand) {

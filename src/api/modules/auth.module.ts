@@ -27,6 +27,9 @@ import { UsersModule } from './users.module';
 import { MailAdapter } from '../infrastructure/mail/mail-adapter';
 import { DevicesModule } from './devices.module';
 import { UsersService } from '../_superadmin/users/application/users.service';
+import { TransactionsRepository } from '../infrastructure/repositories/common/transactions.repository';
+import { UsersTransactionsRepository } from '../infrastructure/repositories/users/users.transactions.repository';
+import { DataSourceRepository } from '../infrastructure/repositories/common/data-source.repository';
 
 const services = [JwtService];
 
@@ -45,7 +48,13 @@ const useCases = [
   TokensCreateUseCase,
 ];
 
-const repositories = [UsersRepository, DevicesRepository];
+const repositories = [
+  UsersRepository,
+  DevicesRepository,
+  TransactionsRepository,
+  UsersTransactionsRepository,
+  DataSourceRepository,
+];
 const typeORMRepositories = [Repository<User>];
 
 const strategies = [

@@ -9,7 +9,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersRepository } from '../infrastructure/repositories/users/users.repository';
 import { IsEmailExistConstraint } from '../../exceptions/decorators/unique-email.decorator';
 import { UsersQueryRepository } from '../infrastructure/repositories/users/users.query.repository';
-import { DevicesRepository } from '../infrastructure/repositories/devices/devices.repository';
 import { User } from '../entities/users/user.entity';
 import { UserBanBySA } from '../entities/users/user-ban-by-sa.entity';
 import { UserEmailConfirmation } from '../entities/users/user-email-confirmation.entity';
@@ -18,6 +17,8 @@ import { DevicesModule } from './devices.module';
 import { UserBanByBlogger } from '../entities/users/user-ban-by-blogger.entity';
 import { UsersService } from '../_superadmin/users/application/users.service';
 import { UsersTransactionsRepository } from '../infrastructure/repositories/users/users.transactions.repository';
+import { TransactionsRepository } from '../infrastructure/repositories/common/transactions.repository';
+import { DevicesTransactionsRepository } from '../infrastructure/repositories/devices/devices.transactions.repository';
 
 const useCases = [UserCreateUseCase, UserDeleteUseCase, UserBanUseCase];
 
@@ -33,7 +34,8 @@ const repositories = [
   UsersRepository,
   UsersQueryRepository,
   UsersTransactionsRepository,
-  DevicesRepository,
+  DevicesTransactionsRepository,
+  TransactionsRepository,
 ];
 
 @Module({
