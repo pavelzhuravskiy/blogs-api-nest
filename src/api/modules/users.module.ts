@@ -17,6 +17,7 @@ import { UserPasswordRecovery } from '../entities/users/user-password-recovery.e
 import { DevicesModule } from './devices.module';
 import { UserBanByBlogger } from '../entities/users/user-ban-by-blogger.entity';
 import { UsersService } from '../_superadmin/users/application/users.service';
+import { UsersTransactionsRepository } from '../infrastructure/repositories/users/users.transactions.repository';
 
 const useCases = [UserCreateUseCase, UserDeleteUseCase, UserBanUseCase];
 
@@ -28,7 +29,12 @@ const entities = [
   UserBanByBlogger,
 ];
 
-const repositories = [UsersRepository, UsersQueryRepository, DevicesRepository];
+const repositories = [
+  UsersRepository,
+  UsersQueryRepository,
+  UsersTransactionsRepository,
+  DevicesRepository,
+];
 
 @Module({
   imports: [TypeOrmModule.forFeature([...entities]), DevicesModule, CqrsModule],

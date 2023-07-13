@@ -235,13 +235,15 @@ describe('Public quiz testing', () => {
 
     // Forbidden errors [403]
     it(`should return 403 when user 03 trying to send answer in the game he is not participating`, async () => {
-      return agent
+      const test = await agent
         .post(publicAnswersURI)
         .auth(aTokenUser03, { type: 'bearer' })
         .send({
           answer: correctAnswer01,
         })
         .expect(403);
+      // console.log(test.body);
+      return test;
     });
 
     // Success

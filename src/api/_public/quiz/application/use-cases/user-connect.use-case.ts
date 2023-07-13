@@ -1,20 +1,20 @@
 import { CommandHandler } from '@nestjs/cqrs';
-import { UsersRepository } from '../../../../infrastructure/repositories/users/users.repository';
 import { DataSource, EntityManager } from 'typeorm';
 import { TransactionBaseUseCase } from '../../../../_common/application/use-cases/transaction-base.use-case';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { Game } from '../../../../entities/quiz/game.entity';
 import { GameStatus } from '../../../../../enums/game-status.enum';
 import { Player } from '../../../../entities/quiz/player.entity';
-import { GamesRepository } from '../../../../infrastructure/repositories/quiz/games.repository';
-import { PlayersRepository } from '../../../../infrastructure/repositories/quiz/players.repository';
 import { ExceptionResultType } from '../../../../../exceptions/types/exception-result.type';
 import { ResultCode } from '../../../../../enums/result-code.enum';
 import {
   userIDField,
   userNotFound,
 } from '../../../../../exceptions/exception.constants';
-import { QuestionsRepository } from '../../../../infrastructure/repositories/quiz/questions.repository';
+import { UsersTransactionsRepository } from '../../../../infrastructure/repositories/users/users.transactions.repository';
+import { GamesTransactionsRepository } from '../../../../infrastructure/repositories/quiz/games.transactions.repository';
+import { TransactionsRepository } from '../../../../infrastructure/repositories/common/transactions.repository';
+import { QuestionsTransactionsRepository } from '../../../../infrastructure/repositories/quiz/questions.transactions.repository';
 
 export class UserConnectCommand {
   constructor(public userId: number) {}
@@ -28,10 +28,10 @@ export class UserConnectUseCase extends TransactionBaseUseCase<
   constructor(
     @InjectDataSource()
     protected readonly dataSource: DataSource,
-    protected readonly gamesRepository: GamesRepository,
-    protected readonly playersRepository: PlayersRepository,
-    protected readonly questionsRepository: QuestionsRepository,
-    protected readonly usersRepository: UsersRepository,
+    private readonly transactionsRepository: TransactionsRepository,
+    private readonly usersTransactionsRepository: UsersTransactionsRepository,
+    private readonly gamesTransactionsRepository: GamesTransactionsRepository,
+    private readonly questionsTransactionsRepository: QuestionsTransactionsRepository,
   ) {
     super(dataSource);
   }
@@ -40,7 +40,10 @@ export class UserConnectUseCase extends TransactionBaseUseCase<
     command: UserConnectCommand,
     manager: EntityManager,
   ): Promise<ExceptionResultType<boolean>> {
-    const user = await this.usersRepository.findUserById(command.userId);
+    const user = await this.usersTransactionsRepository.findUserById(
+      command.userId,
+      manager,
+    );
 
     if (!user) {
       return {
@@ -51,7 +54,8 @@ export class UserConnectUseCase extends TransactionBaseUseCase<
       };
     }
 
-    let currentGame = await this.gamesRepository.findGameWithPendingStatus();
+    let currentGame =
+      await this.gamesTransactionsRepository.findGameWithPendingStatus(manager);
 
     const player = new Player();
     player.user = user;
@@ -62,7 +66,6 @@ export class UserConnectUseCase extends TransactionBaseUseCase<
       currentGame = new Game();
       currentGame.status = GameStatus.PendingSecondPlayer;
       currentGame.pairCreatedDate = new Date();
-      await this.gamesRepository.queryRunnerSave(currentGame, manager);
     } else {
       if (currentGame.players[0].user.id === command.userId) {
         return {
@@ -74,13 +77,13 @@ export class UserConnectUseCase extends TransactionBaseUseCase<
       currentGame.status = GameStatus.Active;
       currentGame.startGameDate = new Date();
       currentGame.questions =
-        await this.questionsRepository.findRandomQuestions();
-
-      await this.gamesRepository.queryRunnerSave(currentGame, manager);
+        await this.questionsTransactionsRepository.findRandomQuestions(manager);
     }
 
+    await this.transactionsRepository.save(currentGame, manager);
+
     player.game = currentGame;
-    await this.playersRepository.queryRunnerSave(player, manager);
+    await this.transactionsRepository.save(player, manager);
 
     return {
       data: true,

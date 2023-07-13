@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
-import { DataSource, EntityManager, Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { Game } from '../../../entities/quiz/game.entity';
-import { GameStatus } from '../../../../enums/game-status.enum';
 
 @Injectable()
 export class GamesRepository {
@@ -12,15 +11,6 @@ export class GamesRepository {
     @InjectDataSource() private dataSource: DataSource,
   ) {}
 
-  // ***** TypeORM query runner transaction SAVE *****
-  async queryRunnerSave(
-    entity: Game,
-    queryRunnerManager: EntityManager,
-  ): Promise<Game> {
-    return queryRunnerManager.save(entity);
-  }
-
-  // ***** Find game operations *****
   async findGameById(gameId: string): Promise<Game | null> {
     try {
       return await this.gamesRepository
@@ -35,47 +25,5 @@ export class GamesRepository {
       console.log(e);
       return null;
     }
-  }
-
-  async findGameWithPendingStatus(): Promise<Game | null> {
-    try {
-      return await this.gamesRepository
-        .createQueryBuilder('game')
-        .where(`game.status = :gameStatus`, {
-          gameStatus: GameStatus.PendingSecondPlayer,
-        })
-        .leftJoinAndSelect('game.players', 'p')
-        .leftJoinAndSelect('p.user', 'u')
-        .getOne();
-    } catch (e) {
-      console.log(e);
-      return null;
-    }
-  }
-
-  async findGameOfCurrentUser(userId: number): Promise<Game | null> {
-    const game = await this.gamesRepository
-      .createQueryBuilder('game')
-      .leftJoinAndSelect('game.players', 'p')
-      .leftJoinAndSelect('game.questions', 'gq')
-      .leftJoinAndSelect('p.user', 'u')
-      .leftJoinAndSelect('p.answers', 'a')
-      .leftJoinAndSelect('a.question', 'aq')
-      .orderBy('p.player_id')
-      .addOrderBy('gq.created_at', 'DESC')
-      .addOrderBy('a.added_at')
-      .getOne();
-
-    if (!game) {
-      return null;
-    }
-
-    const currentUserInGame = game.players.find((p) => p.user.id === userId);
-
-    if (!currentUserInGame) {
-      return null;
-    }
-
-    return game;
   }
 }

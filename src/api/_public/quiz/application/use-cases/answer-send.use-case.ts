@@ -1,10 +1,7 @@
 import { CommandHandler } from '@nestjs/cqrs';
-import { UsersRepository } from '../../../../infrastructure/repositories/users/users.repository';
 import { DataSource, EntityManager } from 'typeorm';
 import { TransactionBaseUseCase } from '../../../../_common/application/use-cases/transaction-base.use-case';
 import { InjectDataSource } from '@nestjs/typeorm';
-import { GamesRepository } from '../../../../infrastructure/repositories/quiz/games.repository';
-import { PlayersRepository } from '../../../../infrastructure/repositories/quiz/players.repository';
 import { ExceptionResultType } from '../../../../../exceptions/types/exception-result.type';
 import { ResultCode } from '../../../../../enums/result-code.enum';
 import {
@@ -12,10 +9,12 @@ import {
   userNotFound,
 } from '../../../../../exceptions/exception.constants';
 import { AnswerInputDto } from '../../../../dto/quiz/input/answer-input.dto';
-import { AnswersRepository } from '../../../../infrastructure/repositories/quiz/answers.repository';
 import { Answer } from '../../../../entities/quiz/answer.entity';
 import { AnswerStatus } from '../../../../../enums/answer-status.enum';
 import { GameStatus } from '../../../../../enums/game-status.enum';
+import { TransactionsRepository } from '../../../../infrastructure/repositories/common/transactions.repository';
+import { UsersTransactionsRepository } from '../../../../infrastructure/repositories/users/users.transactions.repository';
+import { GamesTransactionsRepository } from '../../../../infrastructure/repositories/quiz/games.transactions.repository';
 
 export class AnswerSendCommand {
   constructor(public answerInputDto: AnswerInputDto, public userId: number) {}
@@ -29,10 +28,9 @@ export class AnswerSendUseCase extends TransactionBaseUseCase<
   constructor(
     @InjectDataSource()
     protected readonly dataSource: DataSource,
-    private readonly usersRepository: UsersRepository,
-    private readonly gamesRepository: GamesRepository,
-    private readonly answersRepository: AnswersRepository,
-    private readonly playersRepository: PlayersRepository,
+    private readonly transactionsRepository: TransactionsRepository,
+    private readonly usersTransactionsRepository: UsersTransactionsRepository,
+    private readonly gamesTransactionsRepository: GamesTransactionsRepository,
   ) {
     super(dataSource);
   }
@@ -41,7 +39,10 @@ export class AnswerSendUseCase extends TransactionBaseUseCase<
     command: AnswerSendCommand,
     manager: EntityManager,
   ): Promise<ExceptionResultType<boolean>> {
-    const user = await this.usersRepository.findUserById(command.userId);
+    const user = await this.usersTransactionsRepository.findUserById(
+      command.userId,
+      manager,
+    );
 
     if (!user) {
       return {
@@ -52,9 +53,11 @@ export class AnswerSendUseCase extends TransactionBaseUseCase<
       };
     }
 
-    const currentGame = await this.gamesRepository.findGameOfCurrentUser(
-      command.userId,
-    );
+    const currentGame =
+      await this.gamesTransactionsRepository.findGameOfCurrentUser(
+        command.userId,
+        manager,
+      );
 
     if (!currentGame) {
       return {
@@ -86,7 +89,7 @@ export class AnswerSendUseCase extends TransactionBaseUseCase<
     if (answerCheck) {
       answerStatus = AnswerStatus.Correct;
       currentPlayer.score += 1;
-      await this.playersRepository.queryRunnerSave(currentPlayer, manager);
+      await this.transactionsRepository.save(currentPlayer, manager);
     }
 
     const answer = new Answer();
@@ -94,7 +97,7 @@ export class AnswerSendUseCase extends TransactionBaseUseCase<
     answer.question = currentQuestion;
     answer.answerStatus = answerStatus;
     answer.addedAt = new Date();
-    await this.answersRepository.queryRunnerSave(answer, manager);
+    await this.transactionsRepository.save(answer, manager);
 
     const fPlayerAnswersCount = currentGame.players[0].answers.length;
     const sPlayerAnswersCount = currentGame.players[1].answers.length;
@@ -105,7 +108,7 @@ export class AnswerSendUseCase extends TransactionBaseUseCase<
     ) {
       currentGame.status = GameStatus.Finished;
       currentGame.finishGameDate = new Date();
-      await this.gamesRepository.queryRunnerSave(currentGame, manager);
+      await this.transactionsRepository.save(currentGame, manager);
     }
 
     return {
