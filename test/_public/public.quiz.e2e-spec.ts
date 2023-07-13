@@ -423,7 +423,7 @@ describe('Public quiz testing', () => {
             id: expect.any(String),
             login: user01Login,
           },
-          score: 0,
+          score: 3,
         },
         secondPlayerProgress: {
           answers: [
@@ -457,7 +457,7 @@ describe('Public quiz testing', () => {
             id: expect.any(String),
             login: user02Login,
           },
-          score: 0,
+          score: 2,
         },
         questions: [
           {

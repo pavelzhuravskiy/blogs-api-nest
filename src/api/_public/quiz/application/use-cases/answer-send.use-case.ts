@@ -76,6 +76,8 @@ export class AnswerSendUseCase extends TransactionBaseUseCase<
     );
     if (answerCheck) {
       answerStatus = AnswerStatus.Correct;
+      currentPlayer.score = currentPlayer.score + 1;
+      await this.playersRepository.queryRunnerSave(currentPlayer, manager);
     }
 
     const answer = new Answer();
