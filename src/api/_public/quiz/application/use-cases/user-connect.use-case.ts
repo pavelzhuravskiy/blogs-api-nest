@@ -55,6 +55,7 @@ export class UserConnectUseCase extends TransactionBaseUseCase<
     }
 
     let game = await this.gamesTransactionsRepository.findGameForConnection(
+      command.userId,
       manager,
     );
 
@@ -69,9 +70,9 @@ export class UserConnectUseCase extends TransactionBaseUseCase<
       game.pairCreatedDate = new Date();
     } else {
       if (
-        game.status !== GameStatus.PendingSecondPlayer ||
         (game.status === GameStatus.PendingSecondPlayer &&
-          game.players[0].user.id === command.userId)
+          game.players[0].user.id === command.userId) ||
+        game.status === GameStatus.Active
       ) {
         return {
           data: false,
