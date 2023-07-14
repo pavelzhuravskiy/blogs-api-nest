@@ -59,7 +59,7 @@ export class AnswerSendUseCase extends TransactionBaseUseCase<
         manager,
       );
 
-    if (!currentGame) {
+    if (!currentGame || currentGame.status !== GameStatus.Active) {
       return {
         data: false,
         code: ResultCode.Forbidden,

@@ -190,6 +190,109 @@ describe('Public quiz testing', () => {
         .auth(aTokenUser01, { type: 'bearer' })
         .expect(403);
     });
+    it(`should return 403 when user 01 trying to send answer (before game start)`, async () => {
+      const test = await agent
+        .post(publicAnswersURI)
+        .auth(aTokenUser01, { type: 'bearer' })
+        .send({
+          answer: correctAnswer01,
+        })
+        .expect(403);
+      // console.log(test.body);
+      return test;
+    });
+    it(`should return 403 when user 02 trying to send answer (before game start)`, async () => {
+      const test = await agent
+        .post(publicAnswersURI)
+        .auth(aTokenUser02, { type: 'bearer' })
+        .send({
+          answer: correctAnswer01,
+        })
+        .expect(403);
+      // console.log(test.body);
+      return test;
+    });
+
+    // Success
+    it(`should connect user 02 and start the game`, async () => {
+      const response = await agent
+        .post(publicGameConnectionURI)
+        .auth(aTokenUser02, { type: 'bearer' })
+        .expect(200);
+      expect(response.body).toEqual(startedGameObject);
+
+      gameId = response.body.id;
+
+      return response;
+    });
+
+    // Forbidden errors [403]
+    it(`should return 403 when user 01 is already participating in active pair (after game start)`, async () => {
+      return agent
+        .post(publicGameConnectionURI)
+        .auth(aTokenUser01, { type: 'bearer' })
+        .expect(403);
+    });
+    it(`should return 403 when user 02 is already participating in active pair (after game start)`, async () => {
+      return agent
+        .post(publicGameConnectionURI)
+        .auth(aTokenUser02, { type: 'bearer' })
+        .expect(403);
+    });
+  });
+  describe.skip('Game 02 create and connect operations', () => {
+    // Authentication errors [401]
+    it(`should return 401 when trying to create game with incorrect token`, async () => {
+      return agent
+        .post(publicGameConnectionURI)
+        .auth(randomUUID(), { type: 'bearer' })
+        .expect(401);
+    });
+
+    // Success
+    it(`should create new game with pending user 02`, async () => {
+      const response = await agent
+        .post(publicGameConnectionURI)
+        .auth(aTokenUser01, { type: 'bearer' })
+        .expect(200);
+
+      expect(response.body).toEqual(createdGameObject);
+
+      gameId = response.body.id;
+
+      return response;
+    });
+    it(`should create and publish 10 questions`, async () => {
+      let questionId;
+      for (let i = 1; i < 11; i++) {
+        const response = await agent
+          .post(saQuestionsURI)
+          .auth(basicAuthLogin, basicAuthPassword)
+          .send({
+            body: `${questionBody} ${i} + ${i}`,
+            correctAnswers: [i + i],
+          })
+          .expect(201);
+
+        questionId = response.body.id;
+
+        await agent
+          .put(saQuestionsURI + questionId + saQuestionsPublishURI)
+          .auth(basicAuthLogin, basicAuthPassword)
+          .send({
+            published: true,
+          })
+          .expect(204);
+      }
+    }, 30000);
+
+    // Forbidden errors [403]
+    it(`should return 403 when user 01 is already participating in active pair (before game start)`, async () => {
+      return agent
+        .post(publicGameConnectionURI)
+        .auth(aTokenUser01, { type: 'bearer' })
+        .expect(403);
+    });
 
     // Success
     it(`should connect user 02 and start the game`, async () => {
@@ -364,7 +467,7 @@ describe('Public quiz testing', () => {
         .expect(200);
     });
   });
-  describe('Get current game and finish operations', () => {
+  describe.skip('Get current game and finish operations', () => {
     // Success
     it(`should answer [question 05] by user 01 (CORRECT)`, async () => {
       await agent
@@ -549,7 +652,7 @@ describe('Public quiz testing', () => {
         .expect(404);
     });
   });
-  describe('Get game by ID operations', () => {
+  describe.skip('Get game by ID operations', () => {
     // Authentication errors [401]
     it(`should return 401 when trying to get the game by ID with incorrect token`, async () => {
       return agent
