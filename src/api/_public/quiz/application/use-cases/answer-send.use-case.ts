@@ -66,13 +66,15 @@ export class AnswerSendUseCase extends TransactionBaseUseCase<
       };
     }
 
-    let currentPlayer = currentGame.players[0];
-    if (command.userId === currentGame.players[1].user.id) {
-      currentPlayer = currentGame.players[1];
+    const playerOne = currentGame.players[0];
+    const playerTwo = currentGame.players[1];
+
+    let currentPlayer = playerOne;
+    if (playerTwo && command.userId === playerTwo.user.id) {
+      currentPlayer = playerTwo;
     }
 
     const questionIndex = currentPlayer.answers.length;
-
     if (questionIndex >= 5) {
       return {
         data: false,
@@ -81,7 +83,6 @@ export class AnswerSendUseCase extends TransactionBaseUseCase<
     }
 
     const currentQuestion = currentGame.questions[questionIndex];
-
     let answerStatus = AnswerStatus.Incorrect;
     const answerCheck = currentQuestion.correctAnswers.includes(
       command.answerInputDto.answer,
@@ -99,13 +100,24 @@ export class AnswerSendUseCase extends TransactionBaseUseCase<
     answer.addedAt = new Date();
     await this.transactionsRepository.save(answer, manager);
 
-    const fPlayerAnswersCount = currentGame.players[0].answers.length;
-    const sPlayerAnswersCount = currentGame.players[1].answers.length;
+    const playerOneAnswersCount = playerOne.answers.length;
+    const playerTwoAnswersCount = playerTwo.answers.length;
 
     if (
-      (fPlayerAnswersCount === 5 && sPlayerAnswersCount === 4) ||
-      (fPlayerAnswersCount === 4 && sPlayerAnswersCount === 5)
+      (playerOneAnswersCount === 5 && playerTwoAnswersCount === 4) ||
+      (playerOneAnswersCount === 4 && playerTwoAnswersCount === 5)
     ) {
+      let fastPlayer = playerOne;
+      if (playerTwoAnswersCount === 5) {
+        fastPlayer = playerTwo;
+      }
+
+      if (fastPlayer.score !== 0) {
+        fastPlayer.score += 1;
+      }
+
+      await this.transactionsRepository.save(fastPlayer, manager);
+
       currentGame.status = GameStatus.Finished;
       currentGame.finishGameDate = new Date();
       await this.transactionsRepository.save(currentGame, manager);

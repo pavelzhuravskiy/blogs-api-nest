@@ -32,6 +32,7 @@ export class PublicQuizController {
 
   @UseGuards(JwtBearerGuard)
   @Post('pairs/connection')
+  @HttpCode(200)
   async connectUser(@UserIdFromGuard() userId) {
     const result = await this.commandBus.execute(
       new UserConnectCommand(userId),

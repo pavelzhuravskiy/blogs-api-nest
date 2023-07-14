@@ -54,41 +54,46 @@ export class UserConnectUseCase extends TransactionBaseUseCase<
       };
     }
 
-    let currentGame =
-      await this.gamesTransactionsRepository.findGameWithPendingStatus(manager);
+    let game = await this.gamesTransactionsRepository.findGameForConnection(
+      manager,
+    );
 
     const player = new Player();
     player.user = user;
     player.score = 0;
 
-    if (!currentGame) {
+    if (!game) {
       player.playerId = 1;
-      currentGame = new Game();
-      currentGame.status = GameStatus.PendingSecondPlayer;
-      currentGame.pairCreatedDate = new Date();
+      game = new Game();
+      game.status = GameStatus.PendingSecondPlayer;
+      game.pairCreatedDate = new Date();
     } else {
-      if (currentGame.players[0].user.id === command.userId) {
+      if (
+        game.status !== GameStatus.PendingSecondPlayer ||
+        (game.status === GameStatus.PendingSecondPlayer &&
+          game.players[0].user.id === command.userId)
+      ) {
         return {
           data: false,
           code: ResultCode.Forbidden,
         };
       }
       player.playerId = 2;
-      currentGame.status = GameStatus.Active;
-      currentGame.startGameDate = new Date();
-      currentGame.questions =
+      game.status = GameStatus.Active;
+      game.startGameDate = new Date();
+      game.questions =
         await this.questionsTransactionsRepository.findRandomQuestions(manager);
     }
 
-    await this.transactionsRepository.save(currentGame, manager);
+    await this.transactionsRepository.save(game, manager);
 
-    player.game = currentGame;
+    player.game = game;
     await this.transactionsRepository.save(player, manager);
 
     return {
       data: true,
       code: ResultCode.Success,
-      response: currentGame.id,
+      response: game.id,
     };
   }
 

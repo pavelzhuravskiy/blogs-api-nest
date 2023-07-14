@@ -66,8 +66,8 @@ export class User {
   @OneToMany(() => CommentLike, (commentLike) => commentLike.user)
   commentLike: CommentLike[];
 
-  @OneToOne(() => Player, (player) => player.user)
-  player: Player;
+  @OneToMany(() => Player, (player) => player.user)
+  player: Player[];
 
   static checkSortingField(value: any) {
     const u = new User();

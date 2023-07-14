@@ -137,7 +137,7 @@ describe('Public quiz testing', () => {
       return response;
     });
   });
-  describe('Game create and connect operations', () => {
+  describe('Game 01 create and connect operations', () => {
     // Authentication errors [401]
     it(`should return 401 when trying to create game with incorrect token`, async () => {
       return agent
@@ -151,7 +151,7 @@ describe('Public quiz testing', () => {
       const response = await agent
         .post(publicGameConnectionURI)
         .auth(aTokenUser01, { type: 'bearer' })
-        .expect(201);
+        .expect(200);
 
       expect(response.body).toEqual(createdGameObject);
 
@@ -159,16 +159,6 @@ describe('Public quiz testing', () => {
 
       return response;
     });
-
-    // Forbidden errors [403]
-    it(`should return 403 when user 01 is already participating in active pair`, async () => {
-      return agent
-        .post(publicGameConnectionURI)
-        .auth(aTokenUser01, { type: 'bearer' })
-        .expect(403);
-    });
-
-    // Success
     it(`should create and publish 10 questions`, async () => {
       let questionId;
       for (let i = 1; i < 11; i++) {
@@ -192,16 +182,40 @@ describe('Public quiz testing', () => {
           .expect(204);
       }
     }, 30000);
+
+    // Forbidden errors [403]
+    it(`should return 403 when user 01 is already participating in active pair (before game start)`, async () => {
+      return agent
+        .post(publicGameConnectionURI)
+        .auth(aTokenUser01, { type: 'bearer' })
+        .expect(403);
+    });
+
+    // Success
     it(`should connect user 02 and start the game`, async () => {
       const response = await agent
         .post(publicGameConnectionURI)
         .auth(aTokenUser02, { type: 'bearer' })
-        .expect(201);
+        .expect(200);
       expect(response.body).toEqual(startedGameObject);
 
       gameId = response.body.id;
 
       return response;
+    });
+
+    // Forbidden errors [403]
+    it(`should return 403 when user 01 is already participating in active pair (after game start)`, async () => {
+      return agent
+        .post(publicGameConnectionURI)
+        .auth(aTokenUser01, { type: 'bearer' })
+        .expect(403);
+    });
+    it(`should return 403 when user 02 is already participating in active pair (after game start)`, async () => {
+      return agent
+        .post(publicGameConnectionURI)
+        .auth(aTokenUser02, { type: 'bearer' })
+        .expect(403);
     });
   });
   describe('Answers operations', () => {
@@ -567,6 +581,7 @@ describe('Public quiz testing', () => {
         .auth(aTokenUser01, { type: 'bearer' })
         .expect(200);
 
+      gameObject.firstPlayerProgress.score = 4;
       gameObject.secondPlayerProgress.answers[4] = {
         addedAt: expect.any(String),
         answerStatus: AnswerStatus.Incorrect,

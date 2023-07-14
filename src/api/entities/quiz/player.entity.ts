@@ -4,7 +4,6 @@ import {
   JoinColumn,
   ManyToOne,
   OneToMany,
-  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { User } from '../users/user.entity';
@@ -37,7 +36,7 @@ export class Player {
   @OneToMany(() => Answer, (answer) => answer.player)
   answers: Answer[];
 
-  @OneToOne(() => User, (user) => user.player, {
+  @ManyToOne(() => User, (user) => user.player, {
     onDelete: 'CASCADE',
   })
   @JoinColumn()

@@ -1,19 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { EntityManager } from 'typeorm';
 import { Game } from '../../../entities/quiz/game.entity';
-import { GameStatus } from '../../../../enums/game-status.enum';
 
 @Injectable()
 export class GamesTransactionsRepository {
-  async findGameWithPendingStatus(
-    manager: EntityManager,
-  ): Promise<Game | null> {
+  async findGameForConnection(manager: EntityManager): Promise<Game | null> {
     try {
       return await manager
         .createQueryBuilder(Game, 'game')
-        .where(`game.status = :gameStatus`, {
-          gameStatus: GameStatus.PendingSecondPlayer,
-        })
         .leftJoinAndSelect('game.players', 'p')
         .leftJoinAndSelect('p.user', 'u')
         .getOne();
@@ -29,7 +23,7 @@ export class GamesTransactionsRepository {
   ): Promise<Game | null> {
     const game = await manager
       .createQueryBuilder(Game, 'game')
-      // .setLock('pessimistic_write')
+      .setLock('pessimistic_write', undefined, ['game'])
       .leftJoinAndSelect('game.players', 'p')
       .leftJoinAndSelect('game.questions', 'gq')
       .leftJoinAndSelect('p.user', 'u')
