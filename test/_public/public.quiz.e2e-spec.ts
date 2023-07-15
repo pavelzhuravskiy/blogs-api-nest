@@ -312,7 +312,7 @@ describe('Public quiz testing', () => {
       expect(answers05.length).toBeGreaterThan(0);
     });
     it(`should answer [question 01] by user 01 (CORRECT) and user 02 (INCORRECT)`, async () => {
-      await agent
+      const response01 = await agent
         .post(publicAnswersURI)
         .auth(aTokenUser01, { type: 'bearer' })
         .send({
@@ -320,16 +320,28 @@ describe('Public quiz testing', () => {
         })
         .expect(200);
 
-      return agent
+      expect(response01.body).toEqual({
+        questionId: gameQuestion01Id,
+        answerStatus: AnswerStatus.Correct,
+        addedAt: expect.any(String),
+      });
+
+      const response02 = await agent
         .post(publicAnswersURI)
         .auth(aTokenUser02, { type: 'bearer' })
         .send({
           answer: randomUUID(),
         })
         .expect(200);
+
+      expect(response02.body).toEqual({
+        questionId: gameQuestion01Id,
+        answerStatus: AnswerStatus.Incorrect,
+        addedAt: expect.any(String),
+      });
     });
     it(`should answer [question 02] by user 01 (INCORRECT) and user 02 (CORRECT)`, async () => {
-      await agent
+      const response01 = await agent
         .post(publicAnswersURI)
         .auth(aTokenUser01, { type: 'bearer' })
         .send({
@@ -337,16 +349,28 @@ describe('Public quiz testing', () => {
         })
         .expect(200);
 
-      return agent
+      expect(response01.body).toEqual({
+        questionId: gameQuestion02Id,
+        answerStatus: AnswerStatus.Incorrect,
+        addedAt: expect.any(String),
+      });
+
+      const response02 = await agent
         .post(publicAnswersURI)
         .auth(aTokenUser02, { type: 'bearer' })
         .send({
           answer: answers02[0],
         })
         .expect(200);
+
+      expect(response02.body).toEqual({
+        questionId: gameQuestion02Id,
+        answerStatus: AnswerStatus.Correct,
+        addedAt: expect.any(String),
+      });
     });
     it(`should answer [question 03] by user 01 (CORRECT) and user 02 (INCORRECT)`, async () => {
-      await agent
+      const response01 = await agent
         .post(publicAnswersURI)
         .auth(aTokenUser01, { type: 'bearer' })
         .send({
@@ -354,16 +378,28 @@ describe('Public quiz testing', () => {
         })
         .expect(200);
 
-      return agent
+      expect(response01.body).toEqual({
+        questionId: gameQuestion03Id,
+        answerStatus: AnswerStatus.Correct,
+        addedAt: expect.any(String),
+      });
+
+      const response02 = await agent
         .post(publicAnswersURI)
         .auth(aTokenUser02, { type: 'bearer' })
         .send({
           answer: randomUUID(),
         })
         .expect(200);
+
+      expect(response02.body).toEqual({
+        questionId: gameQuestion03Id,
+        answerStatus: AnswerStatus.Incorrect,
+        addedAt: expect.any(String),
+      });
     });
     it(`should answer [question 04] by user 01 (INCORRECT) and user 02 (CORRECT)`, async () => {
-      await agent
+      const response01 = await agent
         .post(publicAnswersURI)
         .auth(aTokenUser01, { type: 'bearer' })
         .send({
@@ -371,25 +407,43 @@ describe('Public quiz testing', () => {
         })
         .expect(200);
 
-      return agent
+      expect(response01.body).toEqual({
+        questionId: gameQuestion04Id,
+        answerStatus: AnswerStatus.Incorrect,
+        addedAt: expect.any(String),
+      });
+
+      const response02 = await agent
         .post(publicAnswersURI)
         .auth(aTokenUser02, { type: 'bearer' })
         .send({
           answer: answers04[0],
         })
         .expect(200);
+
+      expect(response02.body).toEqual({
+        questionId: gameQuestion04Id,
+        answerStatus: AnswerStatus.Correct,
+        addedAt: expect.any(String),
+      });
     });
   });
   describe('Get game and finish operations', () => {
     // Success
     it(`should answer [question 05] by user 01 (CORRECT)`, async () => {
-      await agent
+      const response = await agent
         .post(publicAnswersURI)
         .auth(aTokenUser01, { type: 'bearer' })
         .send({
           answer: answers05[0],
         })
         .expect(200);
+
+      expect(response.body).toEqual({
+        questionId: gameQuestion05Id,
+        answerStatus: AnswerStatus.Correct,
+        addedAt: expect.any(String),
+      });
     });
 
     // Forbidden errors [403]
@@ -541,13 +595,19 @@ describe('Public quiz testing', () => {
 
     // Success
     it(`should answer [question 05] by user 02 (INCORRECT) and finish game`, async () => {
-      await agent
+      const response = await agent
         .post(publicAnswersURI)
         .auth(aTokenUser02, { type: 'bearer' })
         .send({
           answer: randomUUID(),
         })
         .expect(200);
+
+      expect(response.body).toEqual({
+        questionId: gameQuestion05Id,
+        answerStatus: AnswerStatus.Incorrect,
+        addedAt: expect.any(String),
+      });
     });
 
     // Not found errors [404]

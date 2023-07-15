@@ -31,7 +31,7 @@ class QuestionViewDto {
   body: string;
 }
 
-class AnswerViewDto {
+export class AnswerViewDto {
   questionId: string;
   answerStatus: AnswerStatus;
   addedAt: Date;

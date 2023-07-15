@@ -80,14 +80,14 @@ export class PublicQuizController {
     @Body() answerInputDto: AnswerInputDto,
     @UserIdFromGuard() userId,
   ) {
-    const result = await this.commandBus.execute(
+    const gameId = await this.commandBus.execute(
       new AnswerSendCommand(answerInputDto, userId),
     );
 
-    if (result.code !== ResultCode.Success) {
-      return exceptionHandler(result.code, result.message, result.field);
+    if (gameId.code !== ResultCode.Success) {
+      return exceptionHandler(gameId.code, gameId.message, gameId.field);
     }
 
-    return result;
+    return this.gamesQueryRepository.findAnswerInGame(gameId.response, userId);
   }
 }

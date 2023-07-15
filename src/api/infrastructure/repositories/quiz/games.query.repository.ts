@@ -2,8 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 import { Game } from '../../../entities/quiz/game.entity';
-import { GameViewDto } from '../../../dto/quiz/view/game.view.dto';
+import {
+  AnswerViewDto,
+  GameViewDto,
+} from '../../../dto/quiz/view/game.view.dto';
 import { GameStatus } from '../../../../enums/game-status.enum';
+import { Answer } from '../../../entities/quiz/answer.entity';
 
 @Injectable()
 export class GamesQueryRepository {
@@ -32,6 +36,31 @@ export class GamesQueryRepository {
     const playersCount = games[0].players.length;
     const mappedGames = await this.gamesMapping(games, playersCount);
     return mappedGames[0];
+  }
+
+  async findAnswerInGame(
+    gameId: number,
+    userId: number,
+  ): Promise<AnswerViewDto> {
+    const games = await this.gamesRepository
+      .createQueryBuilder('game')
+      .where(`game.id = :gameId`, {
+        gameId: gameId,
+      })
+      .andWhere(`u.id = :userId`, {
+        userId: userId,
+      })
+      .leftJoinAndSelect('game.players', 'p')
+      .leftJoinAndSelect('p.user', 'u')
+      .leftJoinAndSelect('p.answers', 'a')
+      .leftJoinAndSelect('a.question', 'aq')
+      .orderBy('p.player_id')
+      .addOrderBy('a.added_at')
+      .getMany();
+
+    const answers = games[0].players[0].answers;
+    const mappedAnswers = await this.answersMapping(answers);
+    return mappedAnswers[mappedAnswers.length - 1];
   }
 
   async findGameOfCurrentUser(userId: number): Promise<GameViewDto> {
@@ -121,6 +150,16 @@ export class GamesQueryRepository {
         pairCreatedDate: g.pairCreatedDate,
         startGameDate: g.startGameDate,
         finishGameDate: g.finishGameDate,
+      };
+    });
+  }
+
+  private async answersMapping(array: Answer[]): Promise<AnswerViewDto[]> {
+    return array.map((a) => {
+      return {
+        questionId: a.question.id.toString(),
+        answerStatus: a.answerStatus,
+        addedAt: a.addedAt,
       };
     });
   }
