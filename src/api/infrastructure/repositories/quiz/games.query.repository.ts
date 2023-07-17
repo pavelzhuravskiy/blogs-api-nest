@@ -80,19 +80,21 @@ export class GamesQueryRepository {
       .addOrderBy('a.added_at')
       .getMany();
 
-    if (games.length === 0) {
+    const gameOfCurrentUser = games.find((g) => {
+      if (g.players.length === 1) {
+        return g.players[0].user.id === userId;
+      } else {
+        return (
+          g.players[0].user.id === userId || g.players[1].user.id === userId
+        );
+      }
+    });
+
+    if (!gameOfCurrentUser) {
       return null;
     }
 
-    const currentUserInGame = games[0].players.find(
-      (p) => p.user.id === userId,
-    );
-
-    if (!currentUserInGame) {
-      return null;
-    }
-
-    const playersCount = games[0].players.length;
+    const playersCount = gameOfCurrentUser.players.length;
     const mappedGames = await this.gamesMapping(games, playersCount);
     return mappedGames[0];
   }

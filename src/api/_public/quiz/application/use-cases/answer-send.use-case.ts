@@ -54,12 +54,12 @@ export class AnswerSendUseCase extends TransactionBaseUseCase<
     }
 
     const currentGame =
-      await this.gamesTransactionsRepository.findGameOfCurrentUser(
+      await this.gamesTransactionsRepository.findGameForAnswer(
         command.userId,
         manager,
       );
 
-    if (!currentGame || currentGame.status !== GameStatus.Active) {
+    if (!currentGame) {
       return {
         data: false,
         code: ResultCode.Forbidden,

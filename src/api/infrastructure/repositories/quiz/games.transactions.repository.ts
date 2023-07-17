@@ -28,13 +28,16 @@ export class GamesTransactionsRepository {
     }
   }
 
-  async findGameOfCurrentUser(
+  async findGameForAnswer(
     userId: number,
     manager: EntityManager,
   ): Promise<Game | null> {
-    const game = await manager
+    const games = await manager
       .createQueryBuilder(Game, 'game')
-      .setLock('pessimistic_write', undefined, ['game'])
+      // .setLock('pessimistic_write', undefined, ['game'])
+      .where('game.status = :active', {
+        active: GameStatus.Active,
+      })
       .leftJoinAndSelect('game.players', 'p')
       .leftJoinAndSelect('game.questions', 'gq')
       .leftJoinAndSelect('p.user', 'u')
@@ -43,18 +46,10 @@ export class GamesTransactionsRepository {
       .orderBy('p.player_id')
       .addOrderBy('gq.created_at', 'DESC')
       .addOrderBy('a.added_at')
-      .getOne();
+      .getMany();
 
-    if (!game) {
-      return null;
-    }
-
-    const currentUserInGame = game.players.find((p) => p.user.id === userId);
-
-    if (!currentUserInGame) {
-      return null;
-    }
-
-    return game;
+    return games.find(
+      (g) => g.players[0].user.id === userId || g.players[1].user.id === userId,
+    );
   }
 }
