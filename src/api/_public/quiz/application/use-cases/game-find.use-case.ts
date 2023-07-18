@@ -1,6 +1,5 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { UsersRepository } from '../../../../infrastructure/repositories/users/users.repository';
-import { GamesRepository } from '../../../../infrastructure/repositories/quiz/games.repository';
 import { ExceptionResultType } from '../../../../../exceptions/types/exception-result.type';
 import { ResultCode } from '../../../../../enums/result-code.enum';
 import { GamesQueryRepository } from '../../../../infrastructure/repositories/quiz/games.query.repository';
@@ -19,7 +18,6 @@ export class GameFindQuery {
 export class GameFindUseCase implements IQueryHandler<GameFindQuery> {
   constructor(
     private readonly usersRepository: UsersRepository,
-    private readonly gamesRepository: GamesRepository,
     private readonly gamesQueryRepository: GamesQueryRepository,
   ) {}
 

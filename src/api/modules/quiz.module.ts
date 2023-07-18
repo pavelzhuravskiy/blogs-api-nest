@@ -12,7 +12,6 @@ import { QuestionDeleteUseCase } from '../_superadmin/quiz/application/use-cases
 import { Answer } from '../entities/quiz/answer.entity';
 import { Player } from '../entities/quiz/player.entity';
 import { Game } from '../entities/quiz/game.entity';
-import { GamesRepository } from '../infrastructure/repositories/quiz/games.repository';
 import { GamesQueryRepository } from '../infrastructure/repositories/quiz/games.query.repository';
 import { UserConnectUseCase } from '../_public/quiz/application/use-cases/user-connect.use-case';
 import { UsersRepository } from '../infrastructure/repositories/users/users.repository';
@@ -42,7 +41,6 @@ const repositories = [
   QuestionsRepository,
   QuestionsQueryRepository,
   QuestionsTransactionsRepository,
-  GamesRepository,
   GamesQueryRepository,
   GamesTransactionsRepository,
   UsersTransactionsRepository,
