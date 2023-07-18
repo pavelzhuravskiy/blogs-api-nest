@@ -13,7 +13,7 @@ export class UsersGetBannedQuery {
   constructor(
     public bloggerUserBanQueryDto: BloggerUserBanQueryDto,
     public blogId: string,
-    public userId: number,
+    public userId: string,
   ) {}
 }
 

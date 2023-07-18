@@ -12,11 +12,7 @@ import {
   publicBlogsURI,
 } from '../utils/constants/blogs.constants';
 import {
-  invalidURI,
-  longString1013,
-  longString109,
   longString17,
-  longString39,
   longString508,
 } from '../utils/constants/common.constants';
 import { exceptionObject } from '../utils/objects/common.objects';
@@ -58,6 +54,11 @@ import {
 } from '../utils/constants/posts.constants';
 import { postObject, updatedPostObject } from '../utils/objects/posts.objects';
 import { getAppAndClearDb } from '../utils/functions/get-app';
+import {
+  longString1013,
+  longString109,
+  longString39,
+} from '../utils/constants/common.constants';
 
 describe('Blogger blogs and posts testing', () => {
   let app: INestApplication;
@@ -361,7 +362,7 @@ describe('Blogger blogs and posts testing', () => {
     // Not found errors [404]
     it(`should return 404 when trying to update nonexistent blog`, async () => {
       await agent
-        .put(bloggerBlogsURI + invalidURI)
+        .put(bloggerBlogsURI + randomUUID())
         .auth(aTokenUser01, { type: 'bearer' })
         .send({
           name: blogUpdatedName,
@@ -407,7 +408,7 @@ describe('Blogger blogs and posts testing', () => {
     // Not found errors [404]
     it(`should return 404 when trying to delete nonexistent blog`, async () => {
       await agent
-        .delete(bloggerBlogsURI + invalidURI)
+        .delete(bloggerBlogsURI + randomUUID())
         .auth(aTokenUser01, { type: 'bearer' })
         .expect(404);
     });
@@ -576,7 +577,7 @@ describe('Blogger blogs and posts testing', () => {
     // Not found errors [404]
     it(`should return 404 when trying to create post of nonexistent blog`, async () => {
       await agent
-        .post(bloggerBlogsURI + invalidURI + publicPostsURI)
+        .post(bloggerBlogsURI + randomUUID() + publicPostsURI)
         .auth(aTokenUser01, { type: 'bearer' })
         .send({
           title: postTitle,
@@ -641,7 +642,7 @@ describe('Blogger blogs and posts testing', () => {
     // Not found errors [404]
     it(`should return 404 when trying to update post of nonexistent blog`, async () => {
       return agent
-        .put(bloggerBlogsURI + invalidURI + publicPostsURI + postId)
+        .put(bloggerBlogsURI + randomUUID() + publicPostsURI + postId)
         .auth(aTokenUser01, { type: 'bearer' })
         .send({
           title: postUpdatedTitle,
@@ -652,7 +653,7 @@ describe('Blogger blogs and posts testing', () => {
     });
     it(`should return 404 when trying to update nonexistent post`, async () => {
       return agent
-        .put(bloggerBlogsURI + blog01Id + publicPostsURI + invalidURI)
+        .put(bloggerBlogsURI + blog01Id + publicPostsURI + randomUUID())
         .auth(aTokenUser01, { type: 'bearer' })
         .send({
           title: postUpdatedTitle,
@@ -698,13 +699,13 @@ describe('Blogger blogs and posts testing', () => {
     // Not found errors [404]
     it(`should return 404 when trying to delete post of nonexistent blog`, async () => {
       return agent
-        .delete(bloggerBlogsURI + invalidURI + publicPostsURI + postId)
+        .delete(bloggerBlogsURI + randomUUID() + publicPostsURI + postId)
         .auth(aTokenUser01, { type: 'bearer' })
         .expect(404);
     });
     it(`should return 404 when trying to delete nonexistent post`, async () => {
       return agent
-        .delete(bloggerBlogsURI + blog01Id + publicPostsURI + invalidURI)
+        .delete(bloggerBlogsURI + blog01Id + publicPostsURI + randomUUID())
         .auth(aTokenUser01, { type: 'bearer' })
         .expect(404);
     });

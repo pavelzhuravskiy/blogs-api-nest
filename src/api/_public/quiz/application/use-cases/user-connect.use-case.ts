@@ -17,7 +17,7 @@ import { TransactionsRepository } from '../../../../infrastructure/repositories/
 import { QuestionsTransactionsRepository } from '../../../../infrastructure/repositories/quiz/questions.transactions.repository';
 
 export class UserConnectCommand {
-  constructor(public userId: number) {}
+  constructor(public userId: string) {}
 }
 
 @CommandHandler(UserConnectCommand)

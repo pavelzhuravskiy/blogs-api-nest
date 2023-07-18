@@ -270,6 +270,10 @@ export class PostsQueryRepository {
         .offset((query.pageNumber - 1) * query.pageSize)
         .getRawMany();
 
+      if (posts.length === 0) {
+        return null;
+      }
+
       const totalCount = await this.postsRepository
         .createQueryBuilder('p')
         .leftJoinAndSelect('p.blog', 'b')

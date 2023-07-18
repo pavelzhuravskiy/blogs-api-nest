@@ -24,7 +24,7 @@ export class QuestionsRepository {
   }
 
   // ***** Delete operations *****
-  async deleteQuestion(questionId: number): Promise<boolean> {
+  async deleteQuestion(questionId: string): Promise<boolean> {
     const result = await this.questionsRepository
       .createQueryBuilder('q')
       .delete()

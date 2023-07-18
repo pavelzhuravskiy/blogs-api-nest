@@ -13,7 +13,7 @@ export class QuestionCreateUseCase
 {
   constructor(private readonly dataSourceRepository: DataSourceRepository) {}
 
-  async execute(command: QuestionCreateCommand): Promise<number> {
+  async execute(command: QuestionCreateCommand): Promise<string> {
     const question = new Question();
     question.body = command.questionInputDto.body;
     question.correctAnswers = command.questionInputDto.correctAnswers;

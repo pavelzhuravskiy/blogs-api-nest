@@ -12,8 +12,8 @@ import { Question } from './question.entity';
 
 @Entity('quiz_answers')
 export class Answer {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column({ name: 'answer_status', type: 'varchar' })
   answerStatus: AnswerStatus;

@@ -17,7 +17,7 @@ export class RegistrationCommand {
 @CommandHandler(RegistrationCommand)
 export class RegistrationUseCase extends TransactionBaseUseCase<
   RegistrationCommand,
-  number
+  string
 > {
   constructor(
     protected readonly dataSource: DataSource,
@@ -32,7 +32,7 @@ export class RegistrationUseCase extends TransactionBaseUseCase<
   async doLogic(
     command: RegistrationCommand,
     manager: EntityManager,
-  ): Promise<number | null> {
+  ): Promise<string | null> {
     const { user, userBanBySA, userBanByBlogger } =
       await this.usersService.createUser(command);
     user.isConfirmed = false;
@@ -69,7 +69,7 @@ export class RegistrationUseCase extends TransactionBaseUseCase<
     login: string,
     email: string,
     confirmationCode: string,
-    userId: number,
+    userId: string,
     manager: EntityManager,
   ): Promise<any> {
     try {

@@ -9,8 +9,8 @@ import { User } from '../users/user.entity';
 
 @Entity('devices')
 export class Device {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column({ name: 'device_id', type: 'uuid' })
   deviceId: string;

@@ -10,11 +10,12 @@ import {
 import { Blog } from '../blogs/blog.entity';
 import { Comment } from '../comments/comment.entity';
 import { PostLike } from './post-like.entity';
+import { randomUUID } from 'crypto';
 
 @Entity('posts')
 export class Post {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column({ type: 'varchar', width: 30 })
   title: string;
@@ -42,7 +43,7 @@ export class Post {
 
   static checkSortingField(value: any) {
     const p = new Post();
-    p.id = 1;
+    p.id = randomUUID();
     p.title = '';
     p.shortDescription = '';
     p.content = '';

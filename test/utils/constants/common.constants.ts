@@ -1,6 +1,3 @@
-// URI
-export const invalidURI = '-100';
-
 // Long strings
 export const longString17 = 'Lorem ipsum dolor';
 export const longString39 = 'Lorem ipsum dolor sit amet, consectetur';

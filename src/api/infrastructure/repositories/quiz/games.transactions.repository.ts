@@ -6,7 +6,7 @@ import { GameStatus } from '../../../../enums/game-status.enum';
 @Injectable()
 export class GamesTransactionsRepository {
   async findGameForConnection(
-    userId: number,
+    userId: string,
     manager: EntityManager,
   ): Promise<Game | null> {
     return manager
@@ -26,7 +26,7 @@ export class GamesTransactionsRepository {
   }
 
   async findGameForAnswer(
-    userId: number,
+    userId: string,
     manager: EntityManager,
   ): Promise<Game | null> {
     return manager

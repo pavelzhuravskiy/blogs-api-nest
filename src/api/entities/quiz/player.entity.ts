@@ -13,8 +13,8 @@ import { Answer } from './answer.entity';
 
 @Entity('quiz_players')
 export class Player {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column({
     name: 'score',

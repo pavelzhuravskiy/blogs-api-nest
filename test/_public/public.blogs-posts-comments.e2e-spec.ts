@@ -36,7 +36,7 @@ import {
 } from '../utils/constants/comments.constants';
 import { exceptionObject } from '../utils/objects/common.objects';
 import { contentField } from '../utils/constants/exceptions.constants';
-import { invalidURI, longString508 } from '../utils/constants/common.constants';
+import { longString508 } from '../utils/constants/common.constants';
 import {
   commentObject,
   updatedCommentObject,
@@ -244,7 +244,7 @@ describe('Public blogs, posts, comments testing', () => {
     // Not found errors [404]
     it(`should return 404 when trying to create comment for nonexistent post`, async () => {
       return agent
-        .post(publicPostsURI + invalidURI + publicCommentsURI)
+        .post(publicPostsURI + randomUUID() + publicCommentsURI)
         .send({
           content: commentContent,
         })
@@ -319,7 +319,7 @@ describe('Public blogs, posts, comments testing', () => {
     // Not found errors [404]
     it(`should return 404 when trying to update nonexistent comment`, async () => {
       return agent
-        .put(publicCommentsURI + invalidURI)
+        .put(publicCommentsURI + randomUUID())
         .send({
           content: commentContent,
         })
@@ -361,7 +361,7 @@ describe('Public blogs, posts, comments testing', () => {
     // Not found errors [404]
     it(`should return 404 when trying to delete nonexistent comment`, async () => {
       return agent
-        .delete(publicCommentsURI + invalidURI)
+        .delete(publicCommentsURI + randomUUID())
         .auth(aTokenUser01, { type: 'bearer' })
         .expect(404);
     });

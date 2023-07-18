@@ -12,11 +12,12 @@ import { BlogBan } from './blog-ban.entity';
 import { Post } from '../posts/post.entity';
 import { UserBanByBlogger } from '../users/user-ban-by-blogger.entity';
 import { User } from '../users/user.entity';
+import { randomUUID } from 'crypto';
 
 @Entity('blogs')
 export class Blog {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column({ type: 'varchar', width: 15 })
   name: string;
@@ -51,7 +52,7 @@ export class Blog {
 
   static checkSortingField(value: any) {
     const b = new Blog();
-    b.id = 1;
+    b.id = randomUUID();
     b.name = '';
     b.description = '';
     b.websiteUrl = '';

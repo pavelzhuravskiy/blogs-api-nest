@@ -14,7 +14,7 @@ export class BloggerUserBanCommand {
   constructor(
     public bloggerUserBanInputDto: BloggerUserBanInputDto,
     public userToBanOrUnbanId: string,
-    public currentUserId: number,
+    public currentUserId: string,
   ) {}
 }
 

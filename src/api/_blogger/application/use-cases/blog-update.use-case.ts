@@ -13,7 +13,7 @@ export class BlogUpdateCommand {
   constructor(
     public blogInputDto: BlogInputDto,
     public blogId: string,
-    public userId: number,
+    public userId: string,
   ) {}
 }
 

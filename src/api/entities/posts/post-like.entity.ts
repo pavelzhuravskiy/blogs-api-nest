@@ -10,8 +10,8 @@ import { Post } from './post.entity';
 
 @Entity('post_likes')
 export class PostLike {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column({ name: 'like_status', type: 'varchar' })
   likeStatus: string;

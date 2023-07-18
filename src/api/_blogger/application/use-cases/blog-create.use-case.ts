@@ -8,13 +8,13 @@ import { UsersTransactionsRepository } from '../../../infrastructure/repositorie
 import { TransactionsRepository } from '../../../infrastructure/repositories/common/transactions.repository';
 
 export class BlogCreateCommand {
-  constructor(public blogInputDto: BlogInputDto, public userId: number) {}
+  constructor(public blogInputDto: BlogInputDto, public userId: string) {}
 }
 
 @CommandHandler(BlogCreateCommand)
 export class BlogCreateUseCase extends TransactionBaseUseCase<
   BlogCreateCommand,
-  number | null
+  string | null
 > {
   constructor(
     protected readonly dataSource: DataSource,
@@ -27,7 +27,7 @@ export class BlogCreateUseCase extends TransactionBaseUseCase<
   async doLogic(
     command: BlogCreateCommand,
     manager: EntityManager,
-  ): Promise<number | null> {
+  ): Promise<string | null> {
     const user = await this.usersTransactionsRepository.findUserById(
       command.userId,
       manager,

@@ -14,7 +14,7 @@ export class PostDeleteCommand {
   constructor(
     public blogId: string,
     public postId: string,
-    public userId: number,
+    public userId: string,
   ) {}
 }
 

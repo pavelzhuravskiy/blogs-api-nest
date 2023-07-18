@@ -15,11 +15,12 @@ import { UserBanByBlogger } from './user-ban-by-blogger.entity';
 import { Blog } from '../blogs/blog.entity';
 import { CommentLike } from '../comments/comment-like.entity';
 import { Player } from '../quiz/player.entity';
+import { randomUUID } from 'crypto';
 
 @Entity('users')
 export class User {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column({ type: 'varchar', width: 10, unique: true })
   login: string;
@@ -71,7 +72,7 @@ export class User {
 
   static checkSortingField(value: any) {
     const u = new User();
-    u.id = 1;
+    u.id = randomUUID();
     u.login = '';
     u.email = '';
     u.createdAt = new Date();

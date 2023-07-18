@@ -9,8 +9,8 @@ import { User } from './user.entity';
 
 @Entity('user_bans_by_sa')
 export class UserBanBySA {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column({ name: 'is_banned', type: 'bool' })
   isBanned: boolean;

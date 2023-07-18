@@ -10,8 +10,8 @@ import { User } from '../users/user.entity';
 
 @Entity('comment_likes')
 export class CommentLike {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column({ name: 'like_status', type: 'varchar' })
   likeStatus: string;

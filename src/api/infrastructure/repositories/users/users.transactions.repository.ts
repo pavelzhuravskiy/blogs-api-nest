@@ -8,7 +8,7 @@ import { UserPasswordRecovery } from '../../../entities/users/user-password-reco
 export class UsersTransactionsRepository {
   // ***** Find user *****
   async findUserById(
-    userId: number,
+    userId: string,
     manager: EntityManager,
   ): Promise<User | null> {
     try {
@@ -42,7 +42,7 @@ export class UsersTransactionsRepository {
   }
 
   async deleteEmailConfirmationRecord(
-    userId: number,
+    userId: string,
     manager: EntityManager,
   ): Promise<boolean> {
     const result = await manager
@@ -74,7 +74,7 @@ export class UsersTransactionsRepository {
   }
 
   async deletePasswordRecoveryRecord(
-    userId: number,
+    userId: string,
     manager: EntityManager,
   ): Promise<boolean> {
     const result = await manager
@@ -104,7 +104,7 @@ export class UsersTransactionsRepository {
   }
 
   // ***** Delete user *****
-  async deleteUser(userId: number, manager: EntityManager): Promise<boolean> {
+  async deleteUser(userId: string, manager: EntityManager): Promise<boolean> {
     const result = await manager
       .createQueryBuilder(User, 'u')
       .delete()

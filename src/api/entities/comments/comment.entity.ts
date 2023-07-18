@@ -10,11 +10,12 @@ import {
 import { User } from '../users/user.entity';
 import { Post } from '../posts/post.entity';
 import { CommentLike } from './comment-like.entity';
+import { randomUUID } from 'crypto';
 
 @Entity('comments')
 export class Comment {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column({ type: 'varchar', width: 300 })
   content: string;
@@ -39,7 +40,7 @@ export class Comment {
 
   static checkSortingField(value: any) {
     const c = new Comment();
-    c.id = 1;
+    c.id = randomUUID();
     c.content = '';
     c.createdAt = new Date();
     return c.hasOwnProperty(value);

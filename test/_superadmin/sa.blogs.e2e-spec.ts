@@ -24,7 +24,6 @@ import {
   saBlogsURI,
 } from '../utils/constants/blogs.constants';
 import { exceptionObject } from '../utils/objects/common.objects';
-import { invalidURI } from '../utils/constants/common.constants';
 import {
   blogIDField,
   userIDField,
@@ -131,7 +130,7 @@ describe('Super admin blogs testing', () => {
     // Validation errors [400]
     it(`should return 400 when trying to bind nonexistent blog`, async () => {
       const response = await agent
-        .put(saBlogsURI + invalidURI + blogBindURI + user01Id)
+        .put(saBlogsURI + randomUUID() + blogBindURI + user01Id)
         .auth(basicAuthLogin, basicAuthPassword)
         .expect(400);
 
@@ -139,7 +138,7 @@ describe('Super admin blogs testing', () => {
     });
     it(`should return 400 when trying to bind blog to nonexistent user`, async () => {
       const response = await agent
-        .put(saBlogsURI + blogId + blogBindURI + invalidURI)
+        .put(saBlogsURI + blogId + blogBindURI + randomUUID())
         .auth(basicAuthLogin, basicAuthPassword)
         .expect(400);
 

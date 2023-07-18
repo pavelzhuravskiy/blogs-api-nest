@@ -9,8 +9,8 @@ import { User } from './user.entity';
 
 @Entity('user_password_recoveries')
 export class UserPasswordRecovery {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column({ name: 'recovery_code', type: 'uuid' })
   recoveryCode: string;

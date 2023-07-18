@@ -92,7 +92,7 @@ export class UsersQueryRepository {
 
   async findUsersBannedByBlogger(
     query: BloggerUserBanQueryDto,
-    blogId: number,
+    blogId: string,
   ): Promise<Paginator<UsersBannedByBloggerViewDto[]>> {
     const users = await this.usersRepository
       .createQueryBuilder('u')

@@ -8,7 +8,7 @@ import {
 import { CommentsRepository } from '../../../../infrastructure/repositories/comments/comments.repository';
 
 export class CommentDeleteCommand {
-  constructor(public commentId: string, public userId: number) {}
+  constructor(public commentId: string, public userId: string) {}
 }
 
 @CommandHandler(CommentDeleteCommand)

@@ -17,7 +17,7 @@ export class PostUpdateCommand {
     public postInputDto: PostInputDto,
     public blogId: string,
     public postId: string,
-    public userId: number,
+    public userId: string,
   ) {}
 }
 

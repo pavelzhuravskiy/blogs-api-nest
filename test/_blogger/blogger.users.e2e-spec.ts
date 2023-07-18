@@ -7,7 +7,7 @@ import {
   blogURI,
   blogWebsite,
 } from '../utils/constants/blogs.constants';
-import { invalidURI, longString17 } from '../utils/constants/common.constants';
+import { longString17 } from '../utils/constants/common.constants';
 import { exceptionObject } from '../utils/objects/common.objects';
 import {
   banReasonField,
@@ -185,7 +185,7 @@ describe('Blogger users ban testing', () => {
     });
     it(`should return 400 when trying to ban user with incorrect userId`, async () => {
       const response = await agent
-        .put(bloggerUsersURI + invalidURI + banURI)
+        .put(bloggerUsersURI + randomUUID() + banURI)
         .auth(aTokenUser01, { type: 'bearer' })
         .send({
           isBanned: true,

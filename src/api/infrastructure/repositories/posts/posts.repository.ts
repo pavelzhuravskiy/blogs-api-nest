@@ -29,7 +29,7 @@ export class PostsRepository {
   }
 
   // ***** Delete post operations *****
-  async deletePost(postId: number): Promise<boolean> {
+  async deletePost(postId: string): Promise<boolean> {
     const result = await this.postsRepository
       .createQueryBuilder('p')
       .delete()
@@ -41,8 +41,8 @@ export class PostsRepository {
 
   // ***** Likes for post operations *****
   async findUserPostLikeRecord(
-    postId: number,
-    userId: number,
+    postId: string,
+    userId: string,
   ): Promise<PostLike | null> {
     return this.postLikesRepository
       .createQueryBuilder('pl')

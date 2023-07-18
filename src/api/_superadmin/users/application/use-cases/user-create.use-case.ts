@@ -13,7 +13,7 @@ export class UserCreateCommand {
 @CommandHandler(UserCreateCommand)
 export class UserCreateUseCase extends TransactionBaseUseCase<
   UserCreateCommand,
-  number
+  string
 > {
   constructor(
     @InjectDataSource()
@@ -27,7 +27,7 @@ export class UserCreateUseCase extends TransactionBaseUseCase<
   async doLogic(
     command: UserCreateCommand,
     manager: EntityManager,
-  ): Promise<number> {
+  ): Promise<string> {
     const { user, userBanBySA, userBanByBlogger } =
       await this.usersService.createUser(command);
 

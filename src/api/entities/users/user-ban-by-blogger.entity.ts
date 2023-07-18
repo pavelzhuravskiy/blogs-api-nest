@@ -11,8 +11,8 @@ import { Blog } from '../blogs/blog.entity';
 
 @Entity('user_bans_by_blogger')
 export class UserBanByBlogger {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column({ name: 'is_banned', type: 'bool' })
   isBanned: boolean;

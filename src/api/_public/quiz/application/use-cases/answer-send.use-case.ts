@@ -17,7 +17,7 @@ import { Answer } from '../../../../entities/quiz/answer.entity';
 import { GameStatus } from '../../../../../enums/game-status.enum';
 
 export class AnswerSendCommand {
-  constructor(public answerInputDto: AnswerInputDto, public userId: number) {}
+  constructor(public answerInputDto: AnswerInputDto, public userId: string) {}
 }
 
 @CommandHandler(AnswerSendCommand)

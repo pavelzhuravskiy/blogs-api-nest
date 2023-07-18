@@ -13,8 +13,8 @@ import { GameStatus } from '../../../enums/game-status.enum';
 
 @Entity('quiz_games')
 export class Game {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column({ type: 'varchar' })
   status: GameStatus;

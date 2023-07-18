@@ -9,11 +9,12 @@ import {
 } from 'typeorm';
 import { Game } from './game.entity';
 import { Answer } from './answer.entity';
+import { randomUUID } from 'crypto';
 
 @Entity('quiz_questions')
 export class Question {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column({ type: 'varchar', width: 500 })
   body: string;
@@ -43,7 +44,7 @@ export class Question {
 
   static checkSortingField(value: any) {
     const q = new Question();
-    q.id = 1;
+    q.id = randomUUID();
     q.body = '';
     q.published = false;
     q.createdAt = new Date();

@@ -14,7 +14,7 @@ export class PostCreateCommand {
   constructor(
     public postInputDto: PostInputDto,
     public blogId: string,
-    public userId: number,
+    public userId: string,
   ) {}
 }
 

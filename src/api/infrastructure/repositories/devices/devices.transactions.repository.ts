@@ -5,7 +5,7 @@ import { Device } from '../../../entities/devices/device.entity';
 @Injectable()
 export class DevicesTransactionsRepository {
   async deleteBannedUserDevices(
-    userId: number,
+    userId: string,
     manager: EntityManager,
   ): Promise<boolean> {
     const result = await manager

@@ -50,7 +50,7 @@ export class BlogsRepository {
   }
 
   // ***** Delete operations *****
-  async deleteBlog(blogId: number): Promise<boolean> {
+  async deleteBlog(blogId: string): Promise<boolean> {
     const result = await this.blogsRepository
       .createQueryBuilder('b')
       .delete()

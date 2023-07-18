@@ -19,7 +19,6 @@ import {
 } from '../utils/constants/auth.constants';
 import { randomUUID } from 'crypto';
 import { deviceObject, userProfileObject } from '../utils/objects/auth.objects';
-import { invalidURI } from '../utils/constants/common.constants';
 import { sleep } from '../utils/functions/sleep';
 import { getAppAndClearDb } from '../utils/functions/get-app';
 
@@ -225,7 +224,7 @@ describe('Public login, logout, devices testing', () => {
     // Not found errors [404]
     it(`should return 404 when trying to delete nonexistent device`, async () => {
       await agent
-        .delete(publicDevicesURI + invalidURI)
+        .delete(publicDevicesURI + randomUUID())
         .set('Cookie', rTokenUser01)
         .expect(404);
     });

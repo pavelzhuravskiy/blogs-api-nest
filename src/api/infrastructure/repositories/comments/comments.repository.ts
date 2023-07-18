@@ -31,7 +31,7 @@ export class CommentsRepository {
   }
 
   // ***** Delete comment *****
-  async deleteComment(commentId: number): Promise<boolean> {
+  async deleteComment(commentId: string): Promise<boolean> {
     const result = await this.commentsRepository
       .createQueryBuilder('c')
       .delete()
@@ -43,8 +43,8 @@ export class CommentsRepository {
 
   // ***** Likes for comments *****
   async findUserCommentLikeRecord(
-    commentId: number,
-    userId: number,
+    commentId: string,
+    userId: string,
   ): Promise<CommentLike | null> {
     return this.commentLikesRepository
       .createQueryBuilder('cl')

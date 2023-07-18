@@ -8,7 +8,7 @@ import { ExceptionResultType } from '../../../../../exceptions/types/exception-r
 import { DevicesRepository } from '../../../../infrastructure/repositories/devices/devices.repository';
 
 export class DeviceDeleteForTerminateCommand {
-  constructor(public deviceId: string, public userId: number) {}
+  constructor(public deviceId: string, public userId: string) {}
 }
 
 @CommandHandler(DeviceDeleteForTerminateCommand)

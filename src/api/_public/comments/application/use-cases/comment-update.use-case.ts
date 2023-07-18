@@ -13,7 +13,7 @@ export class CommentUpdateCommand {
   constructor(
     public commentInputDto: CommentInputDto,
     public commentId: string,
-    public userId: number,
+    public userId: string,
   ) {}
 }
 

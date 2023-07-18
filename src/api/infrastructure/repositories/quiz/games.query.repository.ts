@@ -81,8 +81,8 @@ export class GamesQueryRepository {
   }
 
   async findAnswerInGame(
-    gameId: number,
-    userId: number,
+    gameId: string,
+    userId: string,
   ): Promise<AnswerViewDto> {
     const games = await this.gamesRepository
       .createQueryBuilder('game')
