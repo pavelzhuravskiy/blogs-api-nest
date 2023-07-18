@@ -240,12 +240,10 @@ describe('Public quiz testing', () => {
         .expect(403);
     });
     it(`should return 403 when user 03 is trying to get the game by ID he is not participating`, async () => {
-      const test = await agent
+      return agent
         .get(publicGameURI + game01Id)
         .auth(aTokenUser03, { type: 'bearer' })
         .expect(403);
-      console.log(test.body, 'HERE IS AN ERROR');
-      return test;
     });
 
     // Success
