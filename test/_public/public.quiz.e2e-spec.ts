@@ -239,6 +239,14 @@ describe('Public quiz testing', () => {
         })
         .expect(403);
     });
+    it(`should return 403 when user 03 is trying to get the game by ID he is not participating`, async () => {
+      const test = await agent
+        .get(publicGameURI + game01Id)
+        .auth(aTokenUser03, { type: 'bearer' })
+        .expect(403);
+      console.log(test.body, 'HERE IS AN ERROR');
+      return test;
+    });
 
     // Success
     it(`should connect user 02 and start the game`, async () => {
@@ -662,14 +670,6 @@ describe('Public quiz testing', () => {
         .get(publicGameURI + game01Id)
         .auth(randomUUID(), { type: 'bearer' })
         .expect(401);
-    });
-
-    // Forbidden errors [403]
-    it(`should return 403 when user 03 is trying to get the game by ID he is not participating`, async () => {
-      return agent
-        .get(publicGameURI + game01Id)
-        .auth(aTokenUser03, { type: 'bearer' })
-        .expect(403);
     });
 
     // Not found errors [404]

@@ -46,13 +46,21 @@ export class GameFindUseCase implements IQueryHandler<GameFindQuery> {
       };
     }
 
-    // console.log(query.userId.toString(), 'QUERY');
-    // console.log(currentGame.firstPlayerProgress.player.id, 'FP');
-    // console.log(currentGame.secondPlayerProgress.player.id, 'SP');
+    const playerOneProgress = currentGame.firstPlayerProgress;
+    const playerTwoProgress = currentGame.secondPlayerProgress;
+
+    if (playerOneProgress && !playerTwoProgress) {
+      if (playerOneProgress.player.id !== query.userId.toString()) {
+        return {
+          data: false,
+          code: ResultCode.Forbidden,
+        };
+      }
+    }
 
     if (
-      currentGame.firstPlayerProgress.player.id !== query.userId.toString() &&
-      currentGame.secondPlayerProgress.player.id !== query.userId.toString()
+      playerOneProgress.player.id !== query.userId.toString() &&
+      playerTwoProgress.player.id !== query.userId.toString()
     ) {
       return {
         data: false,
