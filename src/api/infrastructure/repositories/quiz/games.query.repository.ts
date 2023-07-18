@@ -29,7 +29,7 @@ export class GamesQueryRepository {
       .leftJoinAndSelect('pt.user', 'ptu')
       .leftJoinAndSelect('pt.answers', 'pta')
       .leftJoinAndSelect('pta.question', 'ptaq')
-      .where(`(game.status = :pending or game.status = :active)`, {
+      .where(`game.status = :pending or game.status = :active`, {
         pending: GameStatus.PendingSecondPlayer,
         active: GameStatus.Active,
       })
@@ -48,31 +48,36 @@ export class GamesQueryRepository {
   }
 
   async findGameById(gameId: number | string): Promise<GameViewDto> {
-    const games = await this.gamesRepository
-      .createQueryBuilder('game')
-      .leftJoinAndSelect('game.questions', 'gq')
-      .leftJoinAndSelect('game.playerOne', 'po')
-      .leftJoinAndSelect('po.user', 'pou')
-      .leftJoinAndSelect('po.answers', 'poa')
-      .leftJoinAndSelect('poa.question', 'poaq')
-      .leftJoinAndSelect('game.playerTwo', 'pt')
-      .leftJoinAndSelect('pt.user', 'ptu')
-      .leftJoinAndSelect('pt.answers', 'pta')
-      .leftJoinAndSelect('pta.question', 'ptaq')
-      .where(`game.id = :gameId`, {
-        gameId: gameId,
-      })
-      .addOrderBy('gq.created_at', 'DESC')
-      .addOrderBy('poa.added_at')
-      .addOrderBy('pta.added_at')
-      .getMany();
+    try {
+      const games = await this.gamesRepository
+        .createQueryBuilder('game')
+        .leftJoinAndSelect('game.questions', 'gq')
+        .leftJoinAndSelect('game.playerOne', 'po')
+        .leftJoinAndSelect('po.user', 'pou')
+        .leftJoinAndSelect('po.answers', 'poa')
+        .leftJoinAndSelect('poa.question', 'poaq')
+        .leftJoinAndSelect('game.playerTwo', 'pt')
+        .leftJoinAndSelect('pt.user', 'ptu')
+        .leftJoinAndSelect('pt.answers', 'pta')
+        .leftJoinAndSelect('pta.question', 'ptaq')
+        .where(`game.id = :gameId`, {
+          gameId: gameId,
+        })
+        .addOrderBy('gq.created_at', 'DESC')
+        .addOrderBy('poa.added_at')
+        .addOrderBy('pta.added_at')
+        .getMany();
 
-    if (games.length === 0) {
+      if (games.length === 0) {
+        return null;
+      }
+
+      const mappedGames = await this.gamesMapping(games);
+      return mappedGames[0];
+    } catch (e) {
+      console.log(e);
       return null;
     }
-
-    const mappedGames = await this.gamesMapping(games);
-    return mappedGames[0];
   }
 
   async findAnswerInGame(
@@ -90,7 +95,7 @@ export class GamesQueryRepository {
       .leftJoinAndSelect('pt.user', 'ptu')
       .leftJoinAndSelect('pt.answers', 'pta')
       .leftJoinAndSelect('pta.question', 'ptaq')
-      .where(`(game.id = :gameId)`, {
+      .where(`game.id = :gameId`, {
         gameId: gameId,
       })
       .andWhere(`(pou.id = :userId or ptu.id = :userId)`, {

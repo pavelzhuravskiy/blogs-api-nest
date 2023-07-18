@@ -15,11 +15,11 @@ export class GamesTransactionsRepository {
       .leftJoinAndSelect('game.playerTwo', 'pt')
       .leftJoinAndSelect('po.user', 'pou')
       .leftJoinAndSelect('pt.user', 'ptu')
-      .where(`game.status = :pending OR game.status = :active`, {
+      .where(`game.status = :pending or game.status = :active`, {
         pending: GameStatus.PendingSecondPlayer,
         active: GameStatus.Active,
       })
-      .andWhere(`pou.id = :userId or ptu.id = :userId`, {
+      .andWhere(`(pou.id = :userId or ptu.id = :userId)`, {
         userId: userId,
       })
       .getOne();
@@ -44,7 +44,7 @@ export class GamesTransactionsRepository {
       .where('game.status = :active', {
         active: GameStatus.Active,
       })
-      .andWhere('pou.id = :userId or ptu.id = :userId', { userId: userId })
+      .andWhere('(pou.id = :userId or ptu.id = :userId)', { userId: userId })
       .addOrderBy('gq.created_at', 'DESC')
       .addOrderBy('poa.added_at')
       .addOrderBy('pta.added_at')
