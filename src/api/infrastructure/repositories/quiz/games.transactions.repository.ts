@@ -9,32 +9,29 @@ export class GamesTransactionsRepository {
     userId: number,
     manager: EntityManager,
   ): Promise<Game | null> {
-    try {
-      return await manager
-        .createQueryBuilder(Game, 'game')
-        .where(`game.status = :pending OR game.status = :active`, {
-          pending: GameStatus.PendingSecondPlayer,
-          active: GameStatus.Active,
-        })
-        .andWhere(`u.id = :userId`, {
-          userId: userId,
-        })
-        .leftJoinAndSelect('game.players', 'p')
-        .leftJoinAndSelect('p.user', 'u')
-        .getOne();
-    } catch (e) {
-      console.log(e);
-      return null;
-    }
+    return manager
+      .createQueryBuilder(Game, 'game')
+      .where(`game.status = :pending OR game.status = :active`, {
+        pending: GameStatus.PendingSecondPlayer,
+        active: GameStatus.Active,
+      })
+      .andWhere(`pou.id = :userId or ptu.id = :userId`, {
+        userId: userId,
+      })
+      .leftJoinAndSelect('game.playerOne', 'po')
+      .leftJoinAndSelect('game.playerTwo', 'pt')
+      .leftJoinAndSelect('po.user', 'pou')
+      .leftJoinAndSelect('pt.user', 'ptu')
+      .getOne();
   }
 
   async findGameForAnswer(
     userId: number,
     manager: EntityManager,
-  ): Promise<Game | null> {
+  ): Promise</*Game | null*/ any> {
     const games = await manager
       .createQueryBuilder(Game, 'game')
-      // .setLock('pessimistic_write', undefined, ['game'])
+      .setLock('pessimistic_write', undefined, ['game'])
       .where('game.status = :active', {
         active: GameStatus.Active,
       })
@@ -48,8 +45,6 @@ export class GamesTransactionsRepository {
       .addOrderBy('a.added_at')
       .getMany();
 
-    return games.find(
-      (g) => g.players[0].user.id === userId || g.players[1].user.id === userId,
-    );
+    return games;
   }
 }

@@ -64,14 +64,14 @@ export class UserConnectUseCase extends TransactionBaseUseCase<
     player.score = 0;
 
     if (!game) {
-      player.playerId = 1;
       game = new Game();
+      game.playerOne = player;
       game.status = GameStatus.PendingSecondPlayer;
       game.pairCreatedDate = new Date();
     } else {
       if (
         (game.status === GameStatus.PendingSecondPlayer &&
-          game.players[0].user.id === command.userId) ||
+          game.playerOne.user.id === command.userId) ||
         game.status === GameStatus.Active
       ) {
         return {
@@ -79,17 +79,15 @@ export class UserConnectUseCase extends TransactionBaseUseCase<
           code: ResultCode.Forbidden,
         };
       }
-      player.playerId = 2;
+      game.playerTwo = player;
       game.status = GameStatus.Active;
       game.startGameDate = new Date();
       game.questions =
         await this.questionsTransactionsRepository.findRandomQuestions(manager);
     }
 
-    await this.transactionsRepository.save(game, manager);
-
-    player.game = game;
     await this.transactionsRepository.save(player, manager);
+    await this.transactionsRepository.save(game, manager);
 
     return {
       data: true,

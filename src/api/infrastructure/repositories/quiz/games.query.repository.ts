@@ -17,31 +17,39 @@ export class GamesQueryRepository {
     @InjectDataSource() private dataSource: DataSource,
   ) {}
 
-  async findGameById(gameId: number | string): Promise<GameViewDto> {
-    const games = await this.gamesRepository
+  async findGameById(gameId: number | string): Promise</*GameViewDto*/ any> {
+    const game = await this.gamesRepository
       .createQueryBuilder('game')
       .where(`game.id = :gameId`, {
         gameId: gameId,
       })
-      .leftJoinAndSelect('game.players', 'p')
       .leftJoinAndSelect('game.questions', 'gq')
-      .leftJoinAndSelect('p.user', 'u')
-      .leftJoinAndSelect('p.answers', 'a')
-      .leftJoinAndSelect('a.question', 'aq')
-      .orderBy('p.player_id')
+      .leftJoinAndSelect('game.playerOne', 'po')
+      .leftJoinAndSelect('po.user', 'pou')
+      .leftJoinAndSelect('po.answers', 'poa')
+      .leftJoinAndSelect('poa.question', 'poaq')
+      .leftJoinAndSelect('game.playerTwo', 'pt')
+      .leftJoinAndSelect('pt.user', 'ptu')
+      .leftJoinAndSelect('pt.answers', 'pta')
+      .leftJoinAndSelect('pta.question', 'ptaq')
       .addOrderBy('gq.created_at', 'DESC')
-      .addOrderBy('a.added_at')
+      // .addOrderBy('poa.added_at')
+      // .addOrderBy('pta.added_at')
       .getMany();
 
-    const playersCount = games[0].players.length;
-    const mappedGames = await this.gamesMapping(games, playersCount);
-    return mappedGames[0];
+    let playersCount = 1;
+    if (game[0].playerTwo) {
+      playersCount = 2;
+    }
+
+    const mappedGame = await this.gamesMapping(game, playersCount);
+    return mappedGame[0];
   }
 
   async findAnswerInGame(
     gameId: number,
     userId: number,
-  ): Promise<AnswerViewDto> {
+  ): Promise</*AnswerViewDto*/ any> {
     const games = await this.gamesRepository
       .createQueryBuilder('game')
       .where(`game.id = :gameId`, {
@@ -58,12 +66,14 @@ export class GamesQueryRepository {
       .addOrderBy('a.added_at')
       .getMany();
 
-    const answers = games[0].players[0].answers;
-    const mappedAnswers = await this.answersMapping(answers);
-    return mappedAnswers[mappedAnswers.length - 1];
+    return games[0];
+
+    // const answers = games[0].players[0].answers;
+    // const mappedAnswers = await this.answersMapping(answers);
+    // return mappedAnswers[mappedAnswers.length - 1];
   }
 
-  async findGameOfCurrentUser(userId: number): Promise<GameViewDto> {
+  async findGameOfCurrentUser(userId: number): Promise</*GameViewDto*/ any> {
     const games = await this.gamesRepository
       .createQueryBuilder('game')
       .where(`game.status = :pending or game.status = :active`, {
@@ -78,38 +88,28 @@ export class GamesQueryRepository {
       .orderBy('p.player_id')
       .addOrderBy('gq.created_at', 'DESC')
       .addOrderBy('a.added_at')
-      .getMany();
+      .getOne();
 
-    const gameOfCurrentUser = games.find((g) => {
-      if (g.players.length === 1) {
-        return g.players[0].user.id === userId;
-      } else {
-        return (
-          g.players[0].user.id === userId || g.players[1].user.id === userId
-        );
-      }
-    });
+    // if (!gameOfCurrentUser) {
+    //   return null;
+    // }
 
-    if (!gameOfCurrentUser) {
-      return null;
-    }
-
-    const playersCount = gameOfCurrentUser.players.length;
-    const mappedGames = await this.gamesMapping(games, playersCount);
-    return mappedGames[0];
+    // const playersCount = gameOfCurrentUser.players.length;
+    // const mappedGames = await this.gamesMapping(games, playersCount);
+    // return mappedGames[0];
   }
 
   private async gamesMapping(
-    array: Game[],
+    games: Game[],
     playersCount: number,
   ): Promise<GameViewDto[]> {
     let secondPlayerProgress = null;
     let questions = null;
 
-    return array.map((g) => {
+    return games.map((g) => {
       if (playersCount === 2) {
         secondPlayerProgress = {
-          answers: g.players[1].answers.map((a) => {
+          answers: g.playerTwo.answers.map((a) => {
             return {
               questionId: a.question.id.toString(),
               answerStatus: a.answerStatus,
@@ -117,10 +117,10 @@ export class GamesQueryRepository {
             };
           }),
           player: {
-            id: g.players[1].user.id.toString(),
-            login: g.players[1].user.login,
+            id: g.playerTwo.user.id.toString(),
+            login: g.playerTwo.user.login,
           },
-          score: g.players[1].score,
+          score: g.playerTwo.score,
         };
         questions = g.questions.map((q) => {
           return {
@@ -133,7 +133,7 @@ export class GamesQueryRepository {
       return {
         id: g.id.toString(),
         firstPlayerProgress: {
-          answers: g.players[0].answers.map((a) => {
+          answers: g.playerOne.answers.map((a) => {
             return {
               questionId: a.question.id.toString(),
               answerStatus: a.answerStatus,
@@ -141,10 +141,10 @@ export class GamesQueryRepository {
             };
           }),
           player: {
-            id: g.players[0].user.id.toString(),
-            login: g.players[0].user.login,
+            id: g.playerOne.user.id.toString(),
+            login: g.playerOne.user.login,
           },
-          score: g.players[0].score,
+          score: g.playerOne.score,
         },
         secondPlayerProgress: secondPlayerProgress,
         questions: questions,

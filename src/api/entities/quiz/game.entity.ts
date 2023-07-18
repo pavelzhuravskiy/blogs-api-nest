@@ -2,8 +2,9 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   ManyToMany,
-  OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Player } from './player.entity';
@@ -38,8 +39,18 @@ export class Game {
   })
   finishGameDate: Date;
 
-  @OneToMany(() => Player, (player) => player.game)
-  players: Player[];
+  @OneToOne(() => Player, (player) => player.game, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn()
+  playerOne: Player;
+
+  @OneToOne(() => Player, (player) => player.game, {
+    nullable: true,
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn()
+  playerTwo: Player;
 
   @ManyToMany(() => Question, (question) => question.games)
   questions: Question[];
