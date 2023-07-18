@@ -2,7 +2,7 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { DevicesRepository } from '../../../../infrastructure/repositories/devices/devices.repository';
 
 export class DevicesDeleteOldCommand {
-  constructor(public deviceId: string, public userId: number) {}
+  constructor(public deviceId: string, public userId: string) {}
 }
 
 @CommandHandler(DevicesDeleteOldCommand)

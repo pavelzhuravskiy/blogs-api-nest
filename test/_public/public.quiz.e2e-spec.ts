@@ -36,6 +36,7 @@ import {
 import { answersFinder } from '../utils/functions/answers-finder';
 import { AnswerStatus } from '../../src/enums/answer-status.enum';
 import { GameStatus } from '../../src/enums/game-status.enum';
+import { invalidURI } from '../utils/constants/common.constants';
 
 describe('Public quiz testing', () => {
   let app: INestApplication;
@@ -662,6 +663,14 @@ describe('Public quiz testing', () => {
     });
   });
   describe('01 Get game by ID operations', () => {
+    // Authentication errors [400]
+    it(`should return 400 when trying to get the game by ID with incorrect URI`, async () => {
+      return agent
+        .get(publicGameURI + invalidURI)
+        .auth(aTokenUser01, { type: 'bearer' })
+        .expect(400);
+    });
+
     // Authentication errors [401]
     it(`should return 401 when trying to get the game by ID with incorrect token`, async () => {
       return agent

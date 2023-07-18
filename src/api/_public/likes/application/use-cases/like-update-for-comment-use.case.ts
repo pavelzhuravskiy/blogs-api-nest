@@ -17,7 +17,7 @@ export class LikeUpdateForCommentCommand {
   constructor(
     public likeStatusInputDto: LikeStatusInputDto,
     public commentId: string,
-    public userId: number,
+    public userId: string,
   ) {}
 }
 

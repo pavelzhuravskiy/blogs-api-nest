@@ -16,7 +16,7 @@ export class PostsQueryRepository {
     @InjectDataSource() private dataSource: DataSource,
   ) {}
 
-  async findPost(postId: string, userId: number): Promise<PostViewDto | null> {
+  async findPost(postId: string, userId: string): Promise<PostViewDto | null> {
     try {
       const posts = await this.postsRepository
         .createQueryBuilder('p')
@@ -98,7 +98,7 @@ export class PostsQueryRepository {
 
   async findPosts(
     query: PostQueryDto,
-    userId: number,
+    userId: string,
   ): Promise<Paginator<PostViewDto[]>> {
     const posts = await this.postsRepository
       .createQueryBuilder('p')
@@ -194,7 +194,7 @@ export class PostsQueryRepository {
   async findPostsForBlog(
     query: PostQueryDto,
     blogId: string,
-    userId: number,
+    userId: string,
   ): Promise<Paginator<PostViewDto[]>> {
     try {
       const posts = await this.postsRepository

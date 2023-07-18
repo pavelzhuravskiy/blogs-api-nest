@@ -5,13 +5,16 @@ import { ResultCode } from '../../../../../enums/result-code.enum';
 import { GamesQueryRepository } from '../../../../infrastructure/repositories/quiz/games.query.repository';
 import {
   gameField,
+  gameIDField,
   gameNotFound,
   userIDField,
   userNotFound,
+  uuidMessage,
 } from '../../../../../exceptions/exception.constants';
+import { isUUID } from 'class-validator';
 
 export class GameFindQuery {
-  constructor(public gameId: string, public userId: number) {}
+  constructor(public gameId: string, public userId: string) {}
 }
 
 @QueryHandler(GameFindQuery)
@@ -30,6 +33,15 @@ export class GameFindUseCase implements IQueryHandler<GameFindQuery> {
         code: ResultCode.NotFound,
         field: userIDField,
         message: userNotFound,
+      };
+    }
+
+    if (!isUUID(query.gameId)) {
+      return {
+        data: false,
+        code: ResultCode.BadRequest,
+        field: gameIDField,
+        message: uuidMessage,
       };
     }
 

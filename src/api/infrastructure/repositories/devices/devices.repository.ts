@@ -35,7 +35,7 @@ export class DevicesRepository {
     return result.affected === 1;
   }
 
-  async deleteOldDevices(deviceId: string, userId: number): Promise<boolean> {
+  async deleteOldDevices(deviceId: string, userId: string): Promise<boolean> {
     const result = await this.devicesRepository
       .createQueryBuilder('d')
       .delete()

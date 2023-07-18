@@ -17,7 +17,7 @@ export class GamesQueryRepository {
     @InjectDataSource() private dataSource: DataSource,
   ) {}
 
-  async findCurrentGame(userId: number): Promise<GameViewDto> {
+  async findCurrentGame(userId: string): Promise<GameViewDto> {
     const games = await this.gamesRepository
       .createQueryBuilder('game')
       .leftJoinAndSelect('game.questions', 'gq')
@@ -47,7 +47,7 @@ export class GamesQueryRepository {
     return mappedGames[0];
   }
 
-  async findGameById(gameId: number | string): Promise<GameViewDto> {
+  async findGameById(gameId: string): Promise<GameViewDto> {
     try {
       const games = await this.gamesRepository
         .createQueryBuilder('game')

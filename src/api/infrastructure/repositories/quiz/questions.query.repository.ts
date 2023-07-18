@@ -14,7 +14,7 @@ export class QuestionsQueryRepository {
     @InjectDataSource() private dataSource: DataSource,
   ) {}
 
-  async findQuestion(questionId: number): Promise<QuestionViewDto> {
+  async findQuestion(questionId: string): Promise<QuestionViewDto> {
     const questions = await this.questionsRepository
       .createQueryBuilder('q')
       .where(`q.id = :questionId`, {

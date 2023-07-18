@@ -12,7 +12,7 @@ export class DevicesQueryRepository {
     @InjectDataSource() private dataSource: DataSource,
   ) {}
 
-  async findDevices(userId: number): Promise<DeviceViewDto[]> {
+  async findDevices(userId: string): Promise<DeviceViewDto[]> {
     const devices = await this.devicesRepository
       .createQueryBuilder('d')
       .where(`d.userId = :userId`, {

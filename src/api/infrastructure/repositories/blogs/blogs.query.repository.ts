@@ -15,7 +15,7 @@ export class BlogsQueryRepository {
     @InjectDataSource() private dataSource: DataSource,
   ) {}
 
-  async findBlog(blogId: number | string): Promise<BlogViewDto> {
+  async findBlog(blogId: string): Promise<BlogViewDto> {
     try {
       const blogs = await this.blogsRepository
         .createQueryBuilder('b')
@@ -68,7 +68,7 @@ export class BlogsQueryRepository {
 
   async findBlogsOfCurrentBlogger(
     query: BlogQueryDto,
-    userId: number,
+    userId: string,
   ): Promise<Paginator<BlogViewDto[]>> {
     const blogs = await this.blogsRepository
       .createQueryBuilder('b')

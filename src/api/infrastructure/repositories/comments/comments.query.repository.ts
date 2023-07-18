@@ -18,8 +18,8 @@ export class CommentsQueryRepository {
   ) {}
 
   async findComment(
-    commentId: number,
-    userId: number,
+    commentId: string,
+    userId: string,
   ): Promise<CommentViewDto | null> {
     try {
       const comments = await this.commentsRepository
@@ -76,7 +76,7 @@ export class CommentsQueryRepository {
   async findComments(
     query: CommentQueryDto,
     postId: string,
-    userId: number,
+    userId: string,
   ): Promise<Paginator<CommentViewDto[]>> {
     try {
       const comments = await this.commentsRepository
@@ -151,7 +151,7 @@ export class CommentsQueryRepository {
 
   async findCommentsOfBloggerPosts(
     query: CommentQueryDto,
-    userId: number,
+    userId: string,
   ): Promise<Paginator<CommentViewDto[]>> {
     try {
       const comments = await this.commentsRepository

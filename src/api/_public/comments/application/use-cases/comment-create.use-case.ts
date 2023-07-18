@@ -19,7 +19,7 @@ export class CommentCreateCommand {
   constructor(
     public commentInputDto: CommentInputDto,
     public postId: string,
-    public userId: number,
+    public userId: string,
   ) {}
 }
 

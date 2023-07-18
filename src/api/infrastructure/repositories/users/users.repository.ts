@@ -32,7 +32,7 @@ export class UsersRepository {
   }
 
   // ***** Find user operations *****
-  async findUserById(userId: number): Promise<User | null> {
+  async findUserById(userId: string): Promise<User | null> {
     try {
       return await this.usersRepository
         .createQueryBuilder('u')
@@ -73,7 +73,7 @@ export class UsersRepository {
       .getOne();
   }
 
-  async findUserForBanByBlogger(userId: string | number): Promise<User | null> {
+  async findUserForBanByBlogger(userId: string): Promise<User | null> {
     try {
       return await this.usersRepository
         .createQueryBuilder('u')
@@ -87,7 +87,7 @@ export class UsersRepository {
   }
 
   // ***** Delete user *****
-  async deleteUser(userId: number): Promise<boolean> {
+  async deleteUser(userId: string): Promise<boolean> {
     const result = await this.usersRepository
       .createQueryBuilder('u')
       .delete()

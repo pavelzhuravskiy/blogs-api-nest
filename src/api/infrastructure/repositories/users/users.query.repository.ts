@@ -15,7 +15,7 @@ export class UsersQueryRepository {
     @InjectDataSource() private dataSource: DataSource,
   ) {}
 
-  async findUserById(userId: number): Promise<SuperAdminUserViewDto> {
+  async findUserById(userId: string): Promise<SuperAdminUserViewDto> {
     const users = await this.usersRepository
       .createQueryBuilder('u')
       .leftJoinAndSelect('u.userBanBySA', 'ubsa')

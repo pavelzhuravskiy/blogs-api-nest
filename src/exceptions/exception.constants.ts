@@ -10,6 +10,7 @@ export const gameNotFound = 'Game not found';
 // Fields
 export const blogIDField = 'blogId';
 export const postIDField = 'postId';
+export const gameIDField = 'gameId';
 export const commentIDField = 'commentId';
 export const userIDField = 'userId';
 export const deviceIDField = 'deviceId';
@@ -35,3 +36,6 @@ export const blogIsBound = 'Blog is already bound';
 
 // Ban user
 export const userIsBanned = 'User is banned';
+
+// UUID
+export const uuidMessage = 'ID must be UUID';
