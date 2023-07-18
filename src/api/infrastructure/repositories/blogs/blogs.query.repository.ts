@@ -19,11 +19,11 @@ export class BlogsQueryRepository {
     try {
       const blogs = await this.blogsRepository
         .createQueryBuilder('b')
+        .leftJoinAndSelect('b.blogBan', 'bb')
         .where(`b.id = :blogId`, {
           blogId: blogId,
         })
         .andWhere(`bb.isBanned = false`)
-        .leftJoinAndSelect('b.blogBan', 'bb')
         .getMany();
 
       const mappedBlogs = await this.blogsMapping(blogs);

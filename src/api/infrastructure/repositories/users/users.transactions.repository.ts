@@ -30,10 +30,10 @@ export class UsersTransactionsRepository {
     try {
       return await manager
         .createQueryBuilder(User, 'u')
+        .leftJoinAndSelect('u.userEmailConfirmation', 'uec')
         .where(`uec.confirmationCode = :confirmationCode`, {
           confirmationCode: confirmationCode,
         })
-        .leftJoinAndSelect('u.userEmailConfirmation', 'uec')
         .getOne();
     } catch (e) {
       console.error(e);
@@ -62,10 +62,10 @@ export class UsersTransactionsRepository {
     try {
       return await manager
         .createQueryBuilder(User, 'u')
+        .leftJoinAndSelect('u.userPasswordRecovery', 'upr')
         .where(`upr.recoveryCode = :recoveryCode`, {
           recoveryCode: recoveryCode,
         })
-        .leftJoinAndSelect('u.userPasswordRecovery', 'upr')
         .getOne();
     } catch (e) {
       console.error(e);
@@ -94,8 +94,8 @@ export class UsersTransactionsRepository {
     try {
       return await manager
         .createQueryBuilder(User, 'u')
-        .where(`u.id = :userId`, { userId: userId })
         .leftJoinAndSelect('u.userBanBySA', 'ubsa')
+        .where(`u.id = :userId`, { userId: userId })
         .getOne();
     } catch (e) {
       console.log(e);

@@ -11,6 +11,10 @@ export class GamesTransactionsRepository {
   ): Promise<Game | null> {
     return manager
       .createQueryBuilder(Game, 'game')
+      .leftJoinAndSelect('game.playerOne', 'po')
+      .leftJoinAndSelect('game.playerTwo', 'pt')
+      .leftJoinAndSelect('po.user', 'pou')
+      .leftJoinAndSelect('pt.user', 'ptu')
       .where(`game.status = :pending OR game.status = :active`, {
         pending: GameStatus.PendingSecondPlayer,
         active: GameStatus.Active,
@@ -18,33 +22,32 @@ export class GamesTransactionsRepository {
       .andWhere(`pou.id = :userId or ptu.id = :userId`, {
         userId: userId,
       })
-      .leftJoinAndSelect('game.playerOne', 'po')
-      .leftJoinAndSelect('game.playerTwo', 'pt')
-      .leftJoinAndSelect('po.user', 'pou')
-      .leftJoinAndSelect('pt.user', 'ptu')
       .getOne();
   }
 
   async findGameForAnswer(
     userId: number,
     manager: EntityManager,
-  ): Promise</*Game | null*/ any> {
-    const games = await manager
+  ): Promise<Game | null> {
+    return manager
       .createQueryBuilder(Game, 'game')
       .setLock('pessimistic_write', undefined, ['game'])
+      .leftJoinAndSelect('game.questions', 'gq')
+      .leftJoinAndSelect('game.playerOne', 'po')
+      .leftJoinAndSelect('po.user', 'pou')
+      .leftJoinAndSelect('po.answers', 'poa')
+      .leftJoinAndSelect('poa.question', 'poaq')
+      .leftJoinAndSelect('game.playerTwo', 'pt')
+      .leftJoinAndSelect('pt.user', 'ptu')
+      .leftJoinAndSelect('pt.answers', 'pta')
+      .leftJoinAndSelect('pta.question', 'ptaq')
       .where('game.status = :active', {
         active: GameStatus.Active,
       })
-      .leftJoinAndSelect('game.players', 'p')
-      .leftJoinAndSelect('game.questions', 'gq')
-      .leftJoinAndSelect('p.user', 'u')
-      .leftJoinAndSelect('p.answers', 'a')
-      .leftJoinAndSelect('a.question', 'aq')
-      .orderBy('p.player_id')
+      .andWhere('pou.id = :userId or ptu.id = :userId', { userId: userId })
       .addOrderBy('gq.created_at', 'DESC')
-      .addOrderBy('a.added_at')
-      .getMany();
-
-    return games;
+      .addOrderBy('poa.added_at')
+      .addOrderBy('pta.added_at')
+      .getOne();
   }
 }

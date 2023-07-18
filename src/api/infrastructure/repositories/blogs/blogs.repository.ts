@@ -27,8 +27,8 @@ export class BlogsRepository {
     try {
       return await this.blogsRepository
         .createQueryBuilder('b')
-        .where(`b.id = :blogId`, { blogId: blogId })
         .leftJoinAndSelect('b.user', 'u')
+        .where(`b.id = :blogId`, { blogId: blogId })
         .getOne();
     } catch (e) {
       console.log(e);
@@ -40,8 +40,8 @@ export class BlogsRepository {
     try {
       return await this.blogsRepository
         .createQueryBuilder('b')
-        .where(`b.id = :blogId`, { blogId: blogId })
         .leftJoinAndSelect('b.blogBan', 'bb')
+        .where(`b.id = :blogId`, { blogId: blogId })
         .getOne();
     } catch (e) {
       console.log(e);

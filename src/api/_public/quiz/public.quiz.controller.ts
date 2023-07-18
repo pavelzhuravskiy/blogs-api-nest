@@ -48,9 +48,7 @@ export class PublicQuizController {
   @UseGuards(JwtBearerGuard)
   @Get('pairs/my-current')
   async findCurrentGame(@UserIdFromGuard() userId) {
-    const result = await this.gamesQueryRepository.findGameOfCurrentUser(
-      userId,
-    );
+    const result = await this.gamesQueryRepository.findCurrentGame(userId);
 
     if (!result) {
       return exceptionHandler(ResultCode.NotFound, gameNotFound, gameField);

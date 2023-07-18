@@ -15,8 +15,8 @@ export class DevicesRepository {
     try {
       return await this.devicesRepository
         .createQueryBuilder('d')
-        .where(`d.deviceId = :deviceId`, { deviceId: deviceId })
         .leftJoinAndSelect('d.user', 'u')
+        .where(`d.deviceId = :deviceId`, { deviceId: deviceId })
         .getOne();
     } catch (e) {
       console.log(e);

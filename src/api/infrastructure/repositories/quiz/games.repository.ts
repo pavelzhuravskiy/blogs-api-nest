@@ -15,11 +15,11 @@ export class GamesRepository {
     try {
       return await this.gamesRepository
         .createQueryBuilder('game')
+        .leftJoinAndSelect('game.players', 'p')
+        .leftJoinAndSelect('p.user', 'u')
         .where(`game.id = :gameId`, {
           gameId: gameId,
         })
-        .leftJoinAndSelect('game.players', 'p')
-        .leftJoinAndSelect('p.user', 'u')
         .getOne();
     } catch (e) {
       console.log(e);

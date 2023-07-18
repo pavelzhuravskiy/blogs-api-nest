@@ -18,10 +18,10 @@ export class UsersQueryRepository {
   async findUserById(userId: number): Promise<SuperAdminUserViewDto> {
     const users = await this.usersRepository
       .createQueryBuilder('u')
+      .leftJoinAndSelect('u.userBanBySA', 'ubsa')
       .where(`u.id = :userId`, {
         userId: userId,
       })
-      .leftJoinAndSelect('u.userBanBySA', 'ubsa')
       .getMany();
 
     const mappedUsers = await this.usersMapping(users);
@@ -33,6 +33,7 @@ export class UsersQueryRepository {
   ): Promise<Paginator<SuperAdminUserViewDto[]>> {
     const users = await this.usersRepository
       .createQueryBuilder('u')
+      .leftJoinAndSelect('u.userBanBySA', 'ubsa')
       .where(
         `${
           query.banStatus === true || query.banStatus === false
@@ -52,7 +53,6 @@ export class UsersQueryRepository {
           emailTerm: `%${query.searchEmailTerm}%`,
         },
       )
-      .leftJoinAndSelect('u.userBanBySA', 'ubsa')
       .orderBy(`u.${query.sortBy}`, query.sortDirection)
       .skip((query.pageNumber - 1) * query.pageSize)
       .take(query.pageSize)
@@ -60,6 +60,7 @@ export class UsersQueryRepository {
 
     const totalCount = await this.usersRepository
       .createQueryBuilder('u')
+      .leftJoinAndSelect('u.userBanBySA', 'ubsa')
       .where(
         `${
           query.banStatus === true || query.banStatus === false
@@ -79,7 +80,6 @@ export class UsersQueryRepository {
           emailTerm: `%${query.searchEmailTerm}%`,
         },
       )
-      .leftJoinAndSelect('u.userBanBySA', 'ubsa')
       .getCount();
 
     return Paginator.paginate({
@@ -96,6 +96,8 @@ export class UsersQueryRepository {
   ): Promise<Paginator<UsersBannedByBloggerViewDto[]>> {
     const users = await this.usersRepository
       .createQueryBuilder('u')
+      .leftJoinAndSelect('u.userBanByBlogger', 'ubb')
+      .leftJoinAndSelect('ubb.blog', 'b')
       .where(`${query.searchLoginTerm ? 'u.login ilike :loginTerm' : ''}`, {
         loginTerm: `%${query.searchLoginTerm}%`,
       })
@@ -103,8 +105,6 @@ export class UsersQueryRepository {
       .andWhere(`b.id = :blogId`, {
         blogId: blogId,
       })
-      .leftJoinAndSelect('u.userBanByBlogger', 'ubb')
-      .leftJoinAndSelect('ubb.blog', 'b')
       .orderBy(`u.${query.sortBy}`, query.sortDirection)
       .skip((query.pageNumber - 1) * query.pageSize)
       .take(query.pageSize)
@@ -112,6 +112,8 @@ export class UsersQueryRepository {
 
     const totalCount = await this.usersRepository
       .createQueryBuilder('u')
+      .leftJoinAndSelect('u.userBanByBlogger', 'ubb')
+      .leftJoinAndSelect('ubb.blog', 'b')
       .where(`${query.searchLoginTerm ? 'u.login ilike :loginTerm' : ''}`, {
         loginTerm: `%${query.searchLoginTerm}%`,
       })
@@ -119,8 +121,6 @@ export class UsersQueryRepository {
       .andWhere(`b.id = :blogId`, {
         blogId: blogId,
       })
-      .leftJoinAndSelect('u.userBanByBlogger', 'ubb')
-      .leftJoinAndSelect('ubb.blog', 'b')
       .getCount();
 
     return Paginator.paginate({

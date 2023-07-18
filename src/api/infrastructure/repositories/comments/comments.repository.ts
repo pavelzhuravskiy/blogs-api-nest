@@ -19,10 +19,10 @@ export class CommentsRepository {
     try {
       return await this.commentsRepository
         .createQueryBuilder('c')
+        .leftJoinAndSelect('c.user', 'u')
         .where(`c.id = :commentId`, {
           commentId: commentId,
         })
-        .leftJoinAndSelect('c.user', 'u')
         .getOne();
     } catch (e) {
       console.log(e);
@@ -48,14 +48,14 @@ export class CommentsRepository {
   ): Promise<CommentLike | null> {
     return this.commentLikesRepository
       .createQueryBuilder('cl')
+      .leftJoinAndSelect('cl.comment', 'c')
+      .leftJoinAndSelect('cl.user', 'u')
       .where(`c.id = :commentId`, {
         commentId: commentId,
       })
       .andWhere(`u.id = :userId`, {
         userId: userId,
       })
-      .leftJoinAndSelect('cl.comment', 'c')
-      .leftJoinAndSelect('cl.user', 'u')
       .getOne();
   }
 }

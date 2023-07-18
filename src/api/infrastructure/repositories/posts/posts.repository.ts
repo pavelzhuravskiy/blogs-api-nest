@@ -46,14 +46,14 @@ export class PostsRepository {
   ): Promise<PostLike | null> {
     return this.postLikesRepository
       .createQueryBuilder('pl')
+      .leftJoinAndSelect('pl.post', 'p')
+      .leftJoinAndSelect('pl.user', 'u')
       .where(`p.id = :postId`, {
         postId: postId,
       })
       .andWhere(`u.id = :userId`, {
         userId: userId,
       })
-      .leftJoinAndSelect('pl.post', 'p')
-      .leftJoinAndSelect('pl.user', 'u')
       .getOne();
   }
 }

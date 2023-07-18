@@ -77,15 +77,15 @@ export class PostsQueryRepository {
 
           'newest_likes',
         )
+        .leftJoinAndSelect('p.blog', 'b')
+        .leftJoinAndSelect('b.blogBan', 'bb')
+        .leftJoinAndSelect('b.user', 'u')
+        .leftJoinAndSelect('u.userBanBySA', 'ubsa')
         .where(`p.id = :postId`, {
           postId: postId,
         })
         .andWhere(`bb.isBanned = false`)
         .andWhere(`ubsa.isBanned = false`)
-        .leftJoinAndSelect('p.blog', 'b')
-        .leftJoinAndSelect('b.blogBan', 'bb')
-        .leftJoinAndSelect('b.user', 'u')
-        .leftJoinAndSelect('u.userBanBySA', 'ubsa')
         .getRawMany();
 
       const mappedPosts = await this.postsMapping(posts);
@@ -159,12 +159,12 @@ export class PostsQueryRepository {
 
         'newest_likes',
       )
-      .where(`bb.isBanned = false`)
-      .andWhere(`ubsa.isBanned = false`)
       .leftJoinAndSelect('p.blog', 'b')
       .leftJoinAndSelect('b.blogBan', 'bb')
       .leftJoinAndSelect('b.user', 'u')
       .leftJoinAndSelect('u.userBanBySA', 'ubsa')
+      .where(`bb.isBanned = false`)
+      .andWhere(`ubsa.isBanned = false`)
       .orderBy(
         `${query.sortBy === 'blogName' ? 'b.name' : `p.${query.sortBy}`}`,
         query.sortDirection,
@@ -175,12 +175,12 @@ export class PostsQueryRepository {
 
     const totalCount = await this.postsRepository
       .createQueryBuilder('p')
-      .where(`bb.isBanned = false`)
-      .andWhere(`ubsa.isBanned = false`)
       .leftJoinAndSelect('p.blog', 'b')
       .leftJoinAndSelect('b.blogBan', 'bb')
       .leftJoinAndSelect('b.user', 'u')
       .leftJoinAndSelect('u.userBanBySA', 'ubsa')
+      .where(`bb.isBanned = false`)
+      .andWhere(`ubsa.isBanned = false`)
       .getCount();
 
     return Paginator.paginate({
@@ -256,15 +256,15 @@ export class PostsQueryRepository {
 
           'newest_likes',
         )
+        .leftJoinAndSelect('p.blog', 'b')
+        .leftJoinAndSelect('b.blogBan', 'bb')
+        .leftJoinAndSelect('b.user', 'u')
+        .leftJoinAndSelect('u.userBanBySA', 'ubsa')
         .where(`b.id = :blogId`, {
           blogId: blogId,
         })
         .andWhere(`bb.isBanned = false`)
         .andWhere(`ubsa.isBanned = false`)
-        .leftJoinAndSelect('p.blog', 'b')
-        .leftJoinAndSelect('b.blogBan', 'bb')
-        .leftJoinAndSelect('b.user', 'u')
-        .leftJoinAndSelect('u.userBanBySA', 'ubsa')
         .orderBy(`p.${query.sortBy}`, query.sortDirection)
         .limit(query.pageSize)
         .offset((query.pageNumber - 1) * query.pageSize)
@@ -272,15 +272,15 @@ export class PostsQueryRepository {
 
       const totalCount = await this.postsRepository
         .createQueryBuilder('p')
+        .leftJoinAndSelect('p.blog', 'b')
+        .leftJoinAndSelect('b.blogBan', 'bb')
+        .leftJoinAndSelect('b.user', 'u')
+        .leftJoinAndSelect('u.userBanBySA', 'ubsa')
         .where(`b.id = :blogId`, {
           blogId: blogId,
         })
         .andWhere(`bb.isBanned = false`)
         .andWhere(`ubsa.isBanned = false`)
-        .leftJoinAndSelect('p.blog', 'b')
-        .leftJoinAndSelect('b.blogBan', 'bb')
-        .leftJoinAndSelect('b.user', 'u')
-        .leftJoinAndSelect('u.userBanBySA', 'ubsa')
         .getCount();
 
       return Paginator.paginate({

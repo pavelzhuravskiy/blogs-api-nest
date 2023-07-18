@@ -215,24 +215,22 @@ describe('Public quiz testing', () => {
     }, 30000);
 
     // Forbidden errors [403]
-    it.skip(`should return 403 when user 01 is already participating in active pair (before game start)`, async () => {
+    it(`should return 403 when user 01 is already participating in active pair (before game start)`, async () => {
       return agent
         .post(publicGameConnectionURI)
         .auth(aTokenUser01, { type: 'bearer' })
         .expect(403);
     });
-    it.skip(`should return 403 when user 01 trying to send answer (before game start)`, async () => {
-      const test = await agent
+    it(`should return 403 when user 01 trying to send answer (before game start)`, async () => {
+      return agent
         .post(publicAnswersURI)
         .auth(aTokenUser01, { type: 'bearer' })
         .send({
           answer: correctAnswer01,
         })
         .expect(403);
-      console.log(test.body);
-      return test;
     });
-    it.skip(`should return 403 when user 02 trying to send answer (before game start)`, async () => {
+    it(`should return 403 when user 02 trying to send answer (before game start)`, async () => {
       return agent
         .post(publicAnswersURI)
         .auth(aTokenUser02, { type: 'bearer' })
@@ -256,20 +254,20 @@ describe('Public quiz testing', () => {
     });
 
     // Forbidden errors [403]
-    it.skip(`should return 403 when user 01 is already participating in active pair (after game start)`, async () => {
+    it(`should return 403 when user 01 is already participating in active pair (after game start)`, async () => {
       return agent
         .post(publicGameConnectionURI)
         .auth(aTokenUser01, { type: 'bearer' })
         .expect(403);
     });
-    it.skip(`should return 403 when user 02 is already participating in active pair (after game start)`, async () => {
+    it(`should return 403 when user 02 is already participating in active pair (after game start)`, async () => {
       return agent
         .post(publicGameConnectionURI)
         .auth(aTokenUser02, { type: 'bearer' })
         .expect(403);
     });
   });
-  describe.skip('01 Answers operations', () => {
+  describe('01 Answers operations', () => {
     // Bad request errors [400]
     it(`should return 400 when trying to send answer without answer`, async () => {
       return agent
@@ -315,9 +313,7 @@ describe('Public quiz testing', () => {
       const game = await agent
         .get(publicCurrentGameURI)
         .auth(aTokenUser01, { type: 'bearer' })
-        .expect(400);
-
-      console.log(game.body);
+        .expect(200);
 
       // Get game question IDs
       gameQuestion01Id = game.body.questions[0].id;
@@ -463,7 +459,7 @@ describe('Public quiz testing', () => {
       });
     });
   });
-  describe.skip('01 Get game and finish operations', () => {
+  describe('01 Get game and finish operations', () => {
     // Success
     it(`should answer [question 05] by user 01 (CORRECT)`, async () => {
       const response = await agent
@@ -652,7 +648,6 @@ describe('Public quiz testing', () => {
         .auth(aTokenUser01, { type: 'bearer' })
         .expect(404);
     });
-    // Not found errors [404]
     it(`should return 404 when user 02 is trying to get finished game`, async () => {
       return agent
         .get(publicCurrentGameURI)
@@ -660,7 +655,7 @@ describe('Public quiz testing', () => {
         .expect(404);
     });
   });
-  describe.skip('01 Get game by ID operations', () => {
+  describe('01 Get game by ID operations', () => {
     // Authentication errors [401]
     it(`should return 401 when trying to get the game by ID with incorrect token`, async () => {
       return agent

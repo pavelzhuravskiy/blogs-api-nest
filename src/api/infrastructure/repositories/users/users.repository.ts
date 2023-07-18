@@ -47,10 +47,10 @@ export class UsersRepository {
   async findUserForEmailResend(email: string): Promise<User | null> {
     return this.usersRepository
       .createQueryBuilder('u')
+      .leftJoinAndSelect('u.userEmailConfirmation', 'uec')
       .where(`u.email = :email`, {
         email: email,
       })
-      .leftJoinAndSelect('u.userEmailConfirmation', 'uec')
       .getOne();
   }
 
@@ -66,10 +66,10 @@ export class UsersRepository {
   async findUserForLoginValidation(loginOrEmail: string): Promise<User | null> {
     return this.usersRepository
       .createQueryBuilder('u')
+      .leftJoinAndSelect('u.userBanBySA', 'ubsa')
       .where(`u.login = :loginOrEmail OR u.email = :loginOrEmail`, {
         loginOrEmail: loginOrEmail,
       })
-      .leftJoinAndSelect('u.userBanBySA', 'ubsa')
       .getOne();
   }
 
@@ -77,8 +77,8 @@ export class UsersRepository {
     try {
       return await this.usersRepository
         .createQueryBuilder('u')
-        .where(`u.id = :userId`, { userId: userId })
         .leftJoinAndSelect('u.userBanByBlogger', 'ubb')
+        .where(`u.id = :userId`, { userId: userId })
         .getOne();
     } catch (e) {
       console.log(e);

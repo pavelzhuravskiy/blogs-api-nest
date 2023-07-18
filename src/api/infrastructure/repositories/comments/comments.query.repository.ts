@@ -57,12 +57,12 @@ export class CommentsQueryRepository {
               .andWhere('cl.userId = :userId', { userId: userId }),
           'like_status',
         )
+        .leftJoinAndSelect('c.user', 'u')
+        .leftJoinAndSelect('u.userBanBySA', 'ubsa')
         .where(`c.id = :commentId`, {
           commentId: commentId,
         })
         .andWhere(`ubsa.isBanned = false`)
-        .leftJoinAndSelect('c.user', 'u')
-        .leftJoinAndSelect('u.userBanBySA', 'ubsa')
         .getRawMany();
 
       const mappedComments = await this.commentsMapping(comments);
@@ -114,13 +114,13 @@ export class CommentsQueryRepository {
               .andWhere('cl.userId = :userId', { userId: userId }),
           'like_status',
         )
+        .leftJoinAndSelect('c.post', 'p')
+        .leftJoinAndSelect('c.user', 'u')
+        .leftJoinAndSelect('u.userBanBySA', 'ubsa')
         .where(`p.id = :postId`, {
           postId: postId,
         })
         .andWhere(`ubsa.isBanned = false`)
-        .leftJoinAndSelect('c.post', 'p')
-        .leftJoinAndSelect('c.user', 'u')
-        .leftJoinAndSelect('u.userBanBySA', 'ubsa')
         .orderBy(`c.${query.sortBy}`, query.sortDirection)
         .limit(query.pageSize)
         .offset((query.pageNumber - 1) * query.pageSize)
@@ -128,13 +128,13 @@ export class CommentsQueryRepository {
 
       const totalCount = await this.commentsRepository
         .createQueryBuilder('c')
+        .leftJoinAndSelect('c.post', 'p')
+        .leftJoinAndSelect('c.user', 'u')
+        .leftJoinAndSelect('u.userBanBySA', 'ubsa')
         .where(`p.id = :postId`, {
           postId: postId,
         })
         .andWhere(`ubsa.isBanned = false`)
-        .leftJoinAndSelect('c.post', 'p')
-        .leftJoinAndSelect('c.user', 'u')
-        .leftJoinAndSelect('u.userBanBySA', 'ubsa')
         .getCount();
 
       return Paginator.paginate({
@@ -189,15 +189,15 @@ export class CommentsQueryRepository {
               .andWhere('cl.userId = :userId', { userId: userId }),
           'like_status',
         )
-        .where(`bu.id = :userId`, {
-          userId: userId,
-        })
-        .andWhere(`ubsa.isBanned = false`)
         .leftJoinAndSelect('c.post', 'p')
         .leftJoinAndSelect('c.user', 'u')
         .leftJoinAndSelect('p.blog', 'b')
         .leftJoinAndSelect('b.user', 'bu')
         .leftJoinAndSelect('bu.userBanBySA', 'ubsa')
+        .where(`bu.id = :userId`, {
+          userId: userId,
+        })
+        .andWhere(`ubsa.isBanned = false`)
         .orderBy(`c.${query.sortBy}`, query.sortDirection)
         .limit(query.pageSize)
         .offset((query.pageNumber - 1) * query.pageSize)
@@ -205,14 +205,14 @@ export class CommentsQueryRepository {
 
       const totalCount = await this.commentsRepository
         .createQueryBuilder('c')
-        .where(`u.id = :userId`, {
-          userId: userId,
-        })
-        .andWhere(`ubsa.isBanned = false`)
         .leftJoinAndSelect('c.post', 'p')
         .leftJoinAndSelect('p.blog', 'b')
         .leftJoinAndSelect('b.user', 'u')
         .leftJoinAndSelect('u.userBanBySA', 'ubsa')
+        .where(`u.id = :userId`, {
+          userId: userId,
+        })
+        .andWhere(`ubsa.isBanned = false`)
         .getCount();
 
       return Paginator.paginate({
