@@ -373,17 +373,7 @@ describe('Super admin blogs testing', () => {
       });
     });
     it(`should NOT return created posts for blog after blog ban`, async () => {
-      const posts = await agent
-        .get(publicBlogsURI + blogId + publicPostsURI)
-        .expect(200);
-
-      expect(posts.body).toEqual({
-        pagesCount: 0,
-        page: 1,
-        pageSize: 10,
-        totalCount: 0,
-        items: [],
-      });
+      return agent.get(publicBlogsURI + blogId + publicPostsURI).expect(404);
     });
     it(`should NOT return created post by ID after blog ban`, async () => {
       await agent.get(publicPostsURI + post01Id).expect(404);

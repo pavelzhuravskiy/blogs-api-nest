@@ -5,6 +5,7 @@ import {
   HttpCode,
   Param,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { exceptionHandler } from '../../../exceptions/exception.handler';
@@ -21,6 +22,7 @@ import {
 import { GameFindQuery } from './application/use-cases/game-find.use-case';
 import { AnswerSendCommand } from './application/use-cases/answer-send.use-case';
 import { AnswerInputDto } from '../../dto/quiz/input/answer-input.dto';
+import { GameQueryDto } from '../../dto/quiz/query/game.query.dto';
 
 @Controller('pair-game-quiz')
 export class PublicQuizController {
@@ -43,6 +45,13 @@ export class PublicQuizController {
     }
 
     return this.gamesQueryRepository.findGameById(result.response);
+  }
+
+  @UseGuards(JwtBearerGuard)
+  @Get('pairs/my')
+  async findMyGames(@Query() query: GameQueryDto, @UserIdFromGuard() userId) {
+    debugger;
+    return this.gamesQueryRepository.findMyGames(query, userId);
   }
 
   @UseGuards(JwtBearerGuard)

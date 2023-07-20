@@ -45,7 +45,7 @@ export class GamesTransactionsRepository {
         active: GameStatus.Active,
       })
       .andWhere('(pou.id = :userId or ptu.id = :userId)', { userId: userId })
-      .addOrderBy('gq.created_at', 'DESC')
+      .orderBy('gq.created_at', 'DESC')
       .addOrderBy('poa.added_at')
       .addOrderBy('pta.added_at')
       .getOne();

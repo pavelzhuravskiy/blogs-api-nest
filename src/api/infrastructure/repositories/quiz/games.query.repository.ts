@@ -8,6 +8,7 @@ import {
 } from '../../../dto/quiz/view/game.view.dto';
 import { GameStatus } from '../../../../enums/game-status.enum';
 import { Answer } from '../../../entities/quiz/answer.entity';
+import { GameQueryDto } from '../../../dto/quiz/query/game.query.dto';
 
 @Injectable()
 export class GamesQueryRepository {
@@ -16,6 +17,72 @@ export class GamesQueryRepository {
     private readonly gamesRepository: Repository<Game>,
     @InjectDataSource() private dataSource: DataSource,
   ) {}
+
+  async findMyGames(
+    query: GameQueryDto,
+    userId: string,
+  ): Promise</*Paginator<GameViewDto[]>*/ any> {
+    const games = await this.gamesRepository
+      .createQueryBuilder('game')
+      .addSelect(
+        (qb) =>
+          qb
+            .select(
+              `jsonb_agg(json_build_object('po_score', pos, 'po_user_id', pouid, 'po_user_login', poul)
+                       )`,
+            )
+            .from((qb) => {
+              return qb
+                .select(`pou.id`, 'pouid')
+                .addSelect(`pou.login`, 'poul')
+                .addSelect(`po.score`, 'pos')
+                .from(Game, 'g')
+                .leftJoin('g.playerOne', 'po')
+                .leftJoin('po.user', 'pou')
+                .where('pou.id = :userId', {
+                  userId: userId,
+                })
+                .andWhere('g.id = game.id');
+            }, 'agg'),
+
+        'p_one',
+      )
+      .leftJoin('game.playerOne', 'po')
+      .leftJoin('po.user', 'pou')
+      .where('pou.id = :userId', {
+        userId: userId,
+      })
+      .orderBy(`game.${query.sortBy}`, query.sortDirection)
+      .skip(0)
+      .take(10)
+      .getRawMany();
+
+    console.log(games);
+
+    // console.log(games);
+    return games;
+
+    // const totalCount = await this.gamesRepository
+    //   .createQueryBuilder('game')
+    //   .leftJoinAndSelect('game.questions', 'gq')
+    //   .leftJoinAndSelect('game.playerOne', 'po')
+    //   .leftJoinAndSelect('po.user', 'pou')
+    //   .leftJoinAndSelect('po.answers', 'poa')
+    //   .leftJoinAndSelect('poa.question', 'poaq')
+    //   .leftJoinAndSelect('game.playerTwo', 'pt')
+    //   .leftJoinAndSelect('pt.user', 'ptu')
+    //   .leftJoinAndSelect('pt.answers', 'pta')
+    //   .leftJoinAndSelect('pta.question', 'ptaq')
+    //   .where('(pou.id = :userId or ptu.id = :userId)', { userId: userId })
+    //   .getCount();
+    //
+    // return Paginator.paginate({
+    //   pageNumber: query.pageNumber,
+    //   pageSize: query.pageSize,
+    //   totalCount: totalCount,
+    //   items: await this.gamesMapping(games),
+    // });
+  }
 
   async findCurrentGame(userId: string): Promise<GameViewDto> {
     const games = await this.gamesRepository
@@ -34,9 +101,9 @@ export class GamesQueryRepository {
         active: GameStatus.Active,
       })
       .andWhere('(pou.id = :userId or ptu.id = :userId)', { userId: userId })
-      .addOrderBy('gq.created_at', 'DESC')
-      .addOrderBy('poa.added_at')
-      .addOrderBy('pta.added_at')
+      .orderBy('gq.createdAt', 'DESC')
+      .addOrderBy('poa.addedAt')
+      .addOrderBy('pta.addedAt')
       .getMany();
 
     if (games.length === 0) {
@@ -63,9 +130,9 @@ export class GamesQueryRepository {
         .where(`game.id = :gameId`, {
           gameId: gameId,
         })
-        .addOrderBy('gq.created_at', 'DESC')
-        .addOrderBy('poa.added_at')
-        .addOrderBy('pta.added_at')
+        .orderBy('gq.createdAt', 'DESC')
+        .addOrderBy('poa.addedAt')
+        .addOrderBy('pta.addedAt')
         .getMany();
 
       if (games.length === 0) {
@@ -101,9 +168,9 @@ export class GamesQueryRepository {
       .andWhere(`(pou.id = :userId or ptu.id = :userId)`, {
         userId: userId,
       })
-      .addOrderBy('gq.created_at', 'DESC')
-      .addOrderBy('poa.added_at')
-      .addOrderBy('pta.added_at')
+      .orderBy('gq.createdAt', 'DESC')
+      .addOrderBy('poa.addedAt')
+      .addOrderBy('pta.addedAt')
       .getMany();
 
     if (games.length === 0) {

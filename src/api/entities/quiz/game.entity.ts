@@ -10,6 +10,7 @@ import {
 import { Player } from './player.entity';
 import { Question } from './question.entity';
 import { GameStatus } from '../../../enums/game-status.enum';
+import { randomUUID } from 'crypto';
 
 @Entity('quiz_games')
 export class Game {
@@ -54,4 +55,14 @@ export class Game {
 
   @ManyToMany(() => Question, (question) => question.games)
   questions: Question[];
+
+  static checkSortingField(value: any) {
+    const g = new Game();
+    g.id = randomUUID();
+    g.status = GameStatus.Finished;
+    g.pairCreatedDate = new Date();
+    g.startGameDate = new Date();
+    g.finishGameDate = new Date();
+    return g.hasOwnProperty(value);
+  }
 }
