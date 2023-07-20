@@ -9,6 +9,7 @@ import {
 import { GameStatus } from '../../../../enums/game-status.enum';
 import { Answer } from '../../../entities/quiz/answer.entity';
 import { GameQueryDto } from '../../../dto/quiz/query/game.query.dto';
+import { Question } from '../../../entities/quiz/question.entity';
 
 @Injectable()
 export class GamesQueryRepository {
@@ -62,23 +63,86 @@ export class GamesQueryRepository {
                 .leftJoin('po.user', 'pou')
                 .leftJoin('po.answers', 'poa')
                 .leftJoin('poa.question', 'poaq')
-                .where('pou.id = :userId', {
-                  userId: userId,
-                })
-                .andWhere('g.id = game.id')
+                .where('g.id = game.id')
                 .limit(1);
-            }, 'agg'),
+            }, 'p_one_agg'),
 
         'p_one',
       )
+      .addSelect(
+        (qb) =>
+          qb
+            .select(
+              `jsonb_agg(json_build_object('pt_score', pts, 'pt_user_id', ptuid, 'pt_user_login', ptul, 'pt_answers', p_two_answers)
+                       )`,
+            )
+            .from((qb) => {
+              return qb
+                .select(`ptu.id`, 'ptuid')
+                .addSelect(`ptu.login`, 'ptul')
+                .addSelect(`pt.score`, 'pts')
+                .addSelect(
+                  (qb) =>
+                    qb
+                      .select(
+                        `jsonb_agg(json_build_object('q_id', aqid, 'a_status', aas, 'a_added_at', to_char(
+            aaa::timestamp at time zone 'UTC',
+            'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'))
+                         )`,
+                      )
+                      .from((qb) => {
+                        return qb
+                          .select(`a.questionId`, 'aqid')
+                          .addSelect(`a.playerId`, 'apid')
+                          .addSelect(`a.answerStatus`, 'aas')
+                          .addSelect(`a.addedAt`, 'aaa')
+                          .from(Answer, 'a')
+                          .where('a.playerId = pt.id');
+                      }, 'a_agg'),
+
+                  'p_two_answers',
+                )
+                .from(Game, 'g')
+                .leftJoin('g.playerTwo', 'pt')
+                .leftJoin('pt.user', 'ptu')
+                .leftJoin('pt.answers', 'pta')
+                .leftJoin('pta.question', 'ptaq')
+                .where('g.id = game.id')
+                .limit(1);
+            }, 'p_two_agg'),
+
+        'p_two',
+      )
+      .addSelect(
+        (qb) =>
+          qb
+            .select(
+              `jsonb_agg(json_build_object('q_id', qid, 'q_body', qbody)
+                       )`,
+            )
+            .from((qb) => {
+              return qb
+                .select(`q.id`, 'qid')
+                .addSelect(`q.body`, 'qbody')
+                .addSelect(`q.createdAt`, 'qca')
+                .from(Question, 'q')
+                .leftJoin('q.games', 'qg')
+                .where('qg.id = game.id')
+                .orderBy('qca', 'DESC');
+            }, 'q_agg'),
+
+        'questions',
+      )
       .leftJoin('game.playerOne', 'po')
       .leftJoin('po.user', 'pou')
-      .where('pou.id = :userId', {
+      .leftJoin('game.playerTwo', 'pt')
+      .leftJoin('pt.user', 'ptu')
+      .where('pou.id = :userId or ptu.id = :userId', {
         userId: userId,
       })
       .orderBy(`game.${query.sortBy}`, query.sortDirection)
-      .skip(0)
-      .take(10)
+      .limit(10)
+      .offset(0)
       .getRawMany();
 
     // console.log(games);

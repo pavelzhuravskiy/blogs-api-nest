@@ -1771,13 +1771,19 @@ describe('Public quiz testing', () => {
       debugger;
       const response = await agent
         .get(publicMyGames)
-        .auth(aTokenUser01, { type: 'bearer' })
-        // .query({ sortBy: 'status', sortDirection: 'desc' })
+        .auth(aTokenUser03, { type: 'bearer' })
+        .query({ sortBy: 'status', sortDirection: 'desc' })
         .expect(200);
 
       console.log(response.body);
-      // console.log(response.body[0].p_one.po_answers);
-      // console.log(response.body[0].p_one[0].po_answers);
+
+      console.log(response.body[1].p_one, 'FIRST');
+      console.log(response.body[1].p_two, 'SECOND');
+      // console.log(response.body[0].questions, 'FIRST');
+      // console.log(response.body[0].questions, 'FIRST');
+      // console.log(response.body[1].questions, 'QUESTIONS');
+      // console.log(response.body[1].p_one[0].po_answers, 'ANSWERS');
+      // console.log(response.body[2].questions, 'THIRD');
       // console.log(response.body[1].p_one[0].po_answers);
       // console.log(response.body[2].p_one[0].po_answers);
       // console.log(response.body[1].p_one, 'player_one');
