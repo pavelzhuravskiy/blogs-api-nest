@@ -28,7 +28,7 @@ export class GamesQueryRepository {
         (qb) =>
           qb
             .select(
-              `jsonb_agg(json_build_object('po_score', pos, 'po_user_id', pouid, 'po_user_login', poul)
+              `jsonb_agg(json_build_object('po_score', pos, 'po_user_id', pouid, 'po_user_login', poul, 'po_answers', p_one_answers)
                        )`,
             )
             .from((qb) => {
@@ -36,13 +36,37 @@ export class GamesQueryRepository {
                 .select(`pou.id`, 'pouid')
                 .addSelect(`pou.login`, 'poul')
                 .addSelect(`po.score`, 'pos')
+                .addSelect(
+                  (qb) =>
+                    qb
+                      .select(
+                        `jsonb_agg(json_build_object('q_id', aqid, 'a_status', aas, 'a_added_at', to_char(
+            aaa::timestamp at time zone 'UTC',
+            'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'))
+                         )`,
+                      )
+                      .from((qb) => {
+                        return qb
+                          .select(`a.questionId`, 'aqid')
+                          .addSelect(`a.playerId`, 'apid')
+                          .addSelect(`a.answerStatus`, 'aas')
+                          .addSelect(`a.addedAt`, 'aaa')
+                          .from(Answer, 'a')
+                          .where('a.playerId = po.id');
+                      }, 'a_agg'),
+
+                  'p_one_answers',
+                )
                 .from(Game, 'g')
                 .leftJoin('g.playerOne', 'po')
                 .leftJoin('po.user', 'pou')
+                .leftJoin('po.answers', 'poa')
+                .leftJoin('poa.question', 'poaq')
                 .where('pou.id = :userId', {
                   userId: userId,
                 })
-                .andWhere('g.id = game.id');
+                .andWhere('g.id = game.id')
+                .limit(1);
             }, 'agg'),
 
         'p_one',
@@ -57,7 +81,7 @@ export class GamesQueryRepository {
       .take(10)
       .getRawMany();
 
-    console.log(games);
+    // console.log(games);
 
     // console.log(games);
     return games;

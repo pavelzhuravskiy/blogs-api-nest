@@ -1775,10 +1775,14 @@ describe('Public quiz testing', () => {
         // .query({ sortBy: 'status', sortDirection: 'desc' })
         .expect(200);
 
-      // console.log(response.body.length, 'LENGTH');
-      console.log(response.body[0].p_one);
-      console.log(response.body[1].p_one);
-      console.log(response.body[2].p_one);
+      console.log(response.body);
+      // console.log(response.body[0].p_one.po_answers);
+      // console.log(response.body[0].p_one[0].po_answers);
+      // console.log(response.body[1].p_one[0].po_answers);
+      // console.log(response.body[2].p_one[0].po_answers);
+      // console.log(response.body[1].p_one, 'player_one');
+      // console.log(response.body[1].p_one[0].po_answers);
+      // console.log(response.body[2].p_one.po_answers);
       // console.log(response.body[1], 'all');
       // console.log(response.body[1].questions, 'questions');
       // console.log(response.body[1].playerOne.answers, 'playerOne.answers');
