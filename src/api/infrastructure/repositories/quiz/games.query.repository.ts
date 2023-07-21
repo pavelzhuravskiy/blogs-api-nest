@@ -10,6 +10,7 @@ import { GameStatus } from '../../../../enums/game-status.enum';
 import { Answer } from '../../../entities/quiz/answer.entity';
 import { GameQueryDto } from '../../../dto/quiz/query/game.query.dto';
 import { Question } from '../../../entities/quiz/question.entity';
+import { Paginator } from '../../../../helpers/paginator';
 
 @Injectable()
 export class GamesQueryRepository {
@@ -24,95 +25,120 @@ export class GamesQueryRepository {
     userId: string,
   ): Promise</*Paginator<GameViewDto[]>*/ any> {
     const games = await this.gamesRepository
+      // Creating game object
       .createQueryBuilder('game')
+
+      // Adding player 01
       .addSelect(
         (qb) =>
+          // Aggregating results
           qb
             .select(
               `jsonb_agg(json_build_object('po_score', pos, 'po_user_id', pouid, 'po_user_login', poul, 'po_answers', p_one_answers)
                        )`,
             )
             .from((qb) => {
-              return qb
-                .select(`pou.id`, 'pouid')
-                .addSelect(`pou.login`, 'poul')
-                .addSelect(`po.score`, 'pos')
-                .addSelect(
-                  (qb) =>
-                    qb
-                      .select(
-                        `jsonb_agg(json_build_object('q_id', aqid, 'a_status', aas, 'a_added_at', to_char(
-            aaa::timestamp at time zone 'UTC',
+              // Getting player 01 info
+              return (
+                qb
+                  .select(`pou.id`, 'pouid')
+                  .addSelect(`pou.login`, 'poul')
+                  .addSelect(`po.score`, 'pos')
+
+                  // Getting player 01 answers
+                  .addSelect(
+                    (qb) =>
+                      qb
+                        .select(
+                          `jsonb_agg(json_build_object('q_id', poaqid, 'a_status', poaas, 'a_added_at', to_char(
+            poaaa::timestamp at time zone 'UTC',
             'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'))
                          )`,
-                      )
-                      .from((qb) => {
-                        return qb
-                          .select(`a.questionId`, 'aqid')
-                          .addSelect(`a.playerId`, 'apid')
-                          .addSelect(`a.answerStatus`, 'aas')
-                          .addSelect(`a.addedAt`, 'aaa')
-                          .from(Answer, 'a')
-                          .where('a.playerId = po.id');
-                      }, 'a_agg'),
+                        )
+                        .from((qb) => {
+                          return qb
+                            .select(`a.questionId`, 'poaqid')
+                            .addSelect(`a.playerId`, 'poapid')
+                            .addSelect(`a.answerStatus`, 'poaas')
+                            .addSelect(`a.addedAt`, 'poaaa')
+                            .from(Answer, 'a')
+                            .where('a.playerId = po.id')
+                            .orderBy('poaaa');
+                        }, 'poa_agg'),
 
-                  'p_one_answers',
-                )
-                .from(Game, 'g')
-                .leftJoin('g.playerOne', 'po')
-                .leftJoin('po.user', 'pou')
-                .leftJoin('po.answers', 'poa')
-                .leftJoin('poa.question', 'poaq')
-                .where('g.id = game.id')
-                .limit(1);
+                    'p_one_answers',
+                  )
+                  .from(Game, 'g')
+
+                  // Joining player 01 info tables
+                  .leftJoin('g.playerOne', 'po')
+                  .leftJoin('po.user', 'pou')
+                  .leftJoin('po.answers', 'poa')
+                  .leftJoin('poa.question', 'poaq')
+                  .where('g.id = game.id')
+                  .limit(1)
+              );
             }, 'p_one_agg'),
 
         'p_one',
       )
+
+      // Adding player 02
       .addSelect(
         (qb) =>
+          // Aggregating results
           qb
             .select(
               `jsonb_agg(json_build_object('pt_score', pts, 'pt_user_id', ptuid, 'pt_user_login', ptul, 'pt_answers', p_two_answers)
                        )`,
             )
+            // Getting player 02 info
             .from((qb) => {
-              return qb
-                .select(`ptu.id`, 'ptuid')
-                .addSelect(`ptu.login`, 'ptul')
-                .addSelect(`pt.score`, 'pts')
-                .addSelect(
-                  (qb) =>
-                    qb
-                      .select(
-                        `jsonb_agg(json_build_object('q_id', aqid, 'a_status', aas, 'a_added_at', to_char(
-            aaa::timestamp at time zone 'UTC',
+              return (
+                qb
+                  .select(`ptu.id`, 'ptuid')
+                  .addSelect(`ptu.login`, 'ptul')
+                  .addSelect(`pt.score`, 'pts')
+
+                  // Getting player 02 answers
+                  .addSelect(
+                    (qb) =>
+                      qb
+                        .select(
+                          `jsonb_agg(json_build_object('q_id', ptaqid, 'a_status', ptaas, 'a_added_at', to_char(
+            ptaaa::timestamp at time zone 'UTC',
             'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'))
                          )`,
-                      )
-                      .from((qb) => {
-                        return qb
-                          .select(`a.questionId`, 'aqid')
-                          .addSelect(`a.playerId`, 'apid')
-                          .addSelect(`a.answerStatus`, 'aas')
-                          .addSelect(`a.addedAt`, 'aaa')
-                          .from(Answer, 'a')
-                          .where('a.playerId = pt.id');
-                      }, 'a_agg'),
+                        )
+                        .from((qb) => {
+                          return qb
+                            .select(`a.questionId`, 'ptaqid')
+                            .addSelect(`a.playerId`, 'ptapid')
+                            .addSelect(`a.answerStatus`, 'ptaas')
+                            .addSelect(`a.addedAt`, 'ptaaa')
+                            .from(Answer, 'a')
+                            .where('a.playerId = pt.id')
+                            .orderBy('ptaaa');
+                        }, 'pta_agg'),
 
-                  'p_two_answers',
-                )
-                .from(Game, 'g')
-                .leftJoin('g.playerTwo', 'pt')
-                .leftJoin('pt.user', 'ptu')
-                .leftJoin('pt.answers', 'pta')
-                .leftJoin('pta.question', 'ptaq')
-                .where('g.id = game.id')
-                .limit(1);
+                    'p_two_answers',
+                  )
+                  .from(Game, 'g')
+
+                  // Joining player 02 info tables
+                  .leftJoin('g.playerTwo', 'pt')
+                  .leftJoin('pt.user', 'ptu')
+                  .leftJoin('pt.answers', 'pta')
+                  .leftJoin('pta.question', 'ptaq')
+                  .where('g.id = game.id')
+                  .limit(1)
+              );
             }, 'p_two_agg'),
 
         'p_two',
       )
+
+      // Adding game questions
       .addSelect(
         (qb) =>
           qb
@@ -133,6 +159,8 @@ export class GamesQueryRepository {
 
         'questions',
       )
+
+      // Joining players
       .leftJoin('game.playerOne', 'po')
       .leftJoin('po.user', 'pou')
       .leftJoin('game.playerTwo', 'pt')
@@ -140,36 +168,41 @@ export class GamesQueryRepository {
       .where('pou.id = :userId or ptu.id = :userId', {
         userId: userId,
       })
+
+      // Sorting
       .orderBy(`game.${query.sortBy}`, query.sortDirection)
-      .limit(10)
-      .offset(0)
+      .addOrderBy(`game.pairCreatedDate`, 'DESC')
+
+      // Pagination
+      .limit(query.pageSize)
+      .offset((query.pageNumber - 1) * query.pageSize)
+
+      // Getting result
       .getRawMany();
 
-    // console.log(games);
+    // console.log(games[1].p_one[0].po_answers, 'F');
+    // console.log(games[1].p_two[0].pt_answers, 'S');
 
-    // console.log(games);
-    return games;
+    const totalCount = await this.gamesRepository
+      .createQueryBuilder('game')
+      .leftJoinAndSelect('game.questions', 'gq')
+      .leftJoinAndSelect('game.playerOne', 'po')
+      .leftJoinAndSelect('po.user', 'pou')
+      .leftJoinAndSelect('po.answers', 'poa')
+      .leftJoinAndSelect('poa.question', 'poaq')
+      .leftJoinAndSelect('game.playerTwo', 'pt')
+      .leftJoinAndSelect('pt.user', 'ptu')
+      .leftJoinAndSelect('pt.answers', 'pta')
+      .leftJoinAndSelect('pta.question', 'ptaq')
+      .where('(pou.id = :userId or ptu.id = :userId)', { userId: userId })
+      .getCount();
 
-    // const totalCount = await this.gamesRepository
-    //   .createQueryBuilder('game')
-    //   .leftJoinAndSelect('game.questions', 'gq')
-    //   .leftJoinAndSelect('game.playerOne', 'po')
-    //   .leftJoinAndSelect('po.user', 'pou')
-    //   .leftJoinAndSelect('po.answers', 'poa')
-    //   .leftJoinAndSelect('poa.question', 'poaq')
-    //   .leftJoinAndSelect('game.playerTwo', 'pt')
-    //   .leftJoinAndSelect('pt.user', 'ptu')
-    //   .leftJoinAndSelect('pt.answers', 'pta')
-    //   .leftJoinAndSelect('pta.question', 'ptaq')
-    //   .where('(pou.id = :userId or ptu.id = :userId)', { userId: userId })
-    //   .getCount();
-    //
-    // return Paginator.paginate({
-    //   pageNumber: query.pageNumber,
-    //   pageSize: query.pageSize,
-    //   totalCount: totalCount,
-    //   items: await this.gamesMapping(games),
-    // });
+    return Paginator.paginate({
+      pageNumber: query.pageNumber,
+      pageSize: query.pageSize,
+      totalCount: totalCount,
+      items: await this.gamesRawMapping(games),
+    });
   }
 
   async findCurrentGame(userId: string): Promise<GameViewDto> {
@@ -329,6 +362,74 @@ export class GamesQueryRepository {
         pairCreatedDate: g.pairCreatedDate,
         startGameDate: g.startGameDate,
         finishGameDate: g.finishGameDate,
+      };
+    });
+  }
+
+  private async gamesRawMapping(games: any[]): Promise<GameViewDto[]> {
+    let secondPlayerProgress = null;
+    let questions = null;
+    let playerOneAnswers = [];
+    let playerTwoAnswers = [];
+
+    return games.map((g) => {
+      let playersCount = 1;
+      if (g.p_two) {
+        playersCount = 2;
+      }
+
+      if (g.p_one[0].po_answers) {
+        playerOneAnswers = g.p_one[0].po_answers.map((a) => {
+          return {
+            questionId: a.q_id.toString(),
+            answerStatus: a.a_status,
+            addedAt: a.a_added_at,
+          };
+        });
+      }
+
+      if (playersCount === 2) {
+        if (g.p_two[0].pt_answers) {
+          playerTwoAnswers = g.p_two[0].pt_answers.map((a) => {
+            return {
+              questionId: a.q_id.toString(),
+              answerStatus: a.a_status,
+              addedAt: a.a_added_at,
+            };
+          });
+        }
+        secondPlayerProgress = {
+          answers: playerTwoAnswers,
+          player: {
+            id: g.p_two[0].pt_user_id.toString(),
+            login: g.p_two[0].pt_user_login,
+          },
+          score: g.p_two[0].pt_score,
+        };
+        questions = g.questions.map((q) => {
+          return {
+            id: q.q_id.toString(),
+            body: q.q_body,
+          };
+        });
+      }
+
+      return {
+        id: g.game_id.toString(),
+        firstPlayerProgress: {
+          answers: playerOneAnswers,
+          player: {
+            id: g.p_one[0].po_user_id.toString(),
+            login: g.p_one[0].po_user_login,
+          },
+          score: g.p_one[0].po_score,
+        },
+        secondPlayerProgress: secondPlayerProgress,
+        questions: questions,
+        status: g.game_status,
+        pairCreatedDate: g.game_pair_created_date,
+        startGameDate: g.game_start_game_date,
+        finishGameDate: g.game_finish_game_date,
       };
     });
   }

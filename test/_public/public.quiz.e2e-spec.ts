@@ -1771,43 +1771,10 @@ describe('Public quiz testing', () => {
       debugger;
       const response = await agent
         .get(publicMyGames)
-        .auth(aTokenUser03, { type: 'bearer' })
-        .query({ sortBy: 'status', sortDirection: 'desc' })
+        .auth(aTokenUser01, { type: 'bearer' })
         .expect(200);
 
-      console.log(response.body);
-
-      console.log(response.body[1].p_one, 'FIRST');
-      console.log(response.body[1].p_two, 'SECOND');
-      // console.log(response.body[0].questions, 'FIRST');
-      // console.log(response.body[0].questions, 'FIRST');
-      // console.log(response.body[1].questions, 'QUESTIONS');
-      // console.log(response.body[1].p_one[0].po_answers, 'ANSWERS');
-      // console.log(response.body[2].questions, 'THIRD');
-      // console.log(response.body[1].p_one[0].po_answers);
-      // console.log(response.body[2].p_one[0].po_answers);
-      // console.log(response.body[1].p_one, 'player_one');
-      // console.log(response.body[1].p_one[0].po_answers);
-      // console.log(response.body[2].p_one.po_answers);
-      // console.log(response.body[1], 'all');
-      // console.log(response.body[1].questions, 'questions');
-      // console.log(response.body[1].playerOne.answers, 'playerOne.answers');
-      // console.log(response.body[1].playerTwo.answers, 'playerTwo.answers');
-
-      // console.log(response.body.items[2].questions, 'Q');
-      // console.log(response.body.items[2].firstPlayerProgress.answers, 'FPA');
-      // console.log(response.body.items[2].secondPlayerProgress.answers, 'SPA');
-
-      // expect(response.body.items[0].body).toBe(`${questionBody}17`);
-      // expect(response.body.items[1].body).toBe(`${questionBody}16`);
-      // expect(response.body.items[2].body).toBe(`${questionBody}15`);
-      // expect(response.body.items[3].body).toBe(`${questionBody}14`);
-      // expect(response.body.items[4].body).toBe(`${questionBody}13`);
-      // expect(response.body.items[5].body).toBe(`${questionBody}05`);
-      // expect(response.body.items[6].body).toBe(`${questionBody}04`);
-      // expect(response.body.items[7].body).toBe(`${questionBody}03`);
-      // expect(response.body.items[8].body).toBe(`${questionBody}02`);
-      // expect(response.body.items[9].body).toBe(`${questionBody}01`);
+      expect(response.body.items).toHaveLength(3);
     });
   });
 
