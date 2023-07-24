@@ -11,12 +11,15 @@ import { Answer } from '../../../entities/quiz/answer.entity';
 import { GameQueryDto } from '../../../dto/quiz/query/game.query.dto';
 import { Question } from '../../../entities/quiz/question.entity';
 import { Paginator } from '../../../../helpers/paginator';
+import { Player } from '../../../entities/quiz/player.entity';
 
 @Injectable()
 export class GamesQueryRepository {
   constructor(
     @InjectRepository(Game)
     private readonly gamesRepository: Repository<Game>,
+    @InjectRepository(Player)
+    private readonly playersRepository: Repository<Player>,
     @InjectDataSource() private dataSource: DataSource,
   ) {}
 
@@ -180,9 +183,6 @@ export class GamesQueryRepository {
       // Getting result
       .getRawMany();
 
-    // console.log(games[1].p_one[0].po_answers, 'F');
-    // console.log(games[1].p_two[0].pt_answers, 'S');
-
     const totalCount = await this.gamesRepository
       .createQueryBuilder('game')
       .leftJoinAndSelect('game.questions', 'gq')
@@ -305,6 +305,87 @@ export class GamesQueryRepository {
 
     const mappedAnswers = await this.answersMapping(answers);
     return mappedAnswers[mappedAnswers.length - 1];
+  }
+
+  async getStatistics(userId: string): Promise</*Game | null*/ any> {
+    const x = await this.playersRepository
+      .createQueryBuilder('p')
+      .select('p.id', 'p_id')
+      .addSelect('p.user', 'u_id')
+      // Adding wins
+      .addSelect((qb) => {
+        return qb
+          .select('count(*)')
+          .from(Game, 'g')
+          .leftJoin('g.playerOne', 'po')
+          .leftJoin('g.playerTwo', 'pt')
+          .leftJoin('po.user', 'pou')
+          .leftJoin('pt.user', 'ptu')
+          .where(`g.status = :finished`, {
+            finished: GameStatus.Finished,
+          })
+          .andWhere(`(pou.id = :userId or ptu.id = :userId)`, {
+            userId: userId,
+          })
+          .andWhere(
+            `(pou.id = :userId and po.score > pt.score) or (ptu.id = :userId and pt.score > po.score)`,
+            {
+              userId: userId,
+            },
+          );
+      }, 'wins')
+      // Adding losses
+      .addSelect((qb) => {
+        return qb
+          .select('count(*)')
+          .from(Game, 'g')
+          .leftJoin('g.playerOne', 'po')
+          .leftJoin('g.playerTwo', 'pt')
+          .leftJoin('po.user', 'pou')
+          .leftJoin('pt.user', 'ptu')
+          .where(`g.status = :finished`, {
+            finished: GameStatus.Finished,
+          })
+          .andWhere(`(pou.id = :userId or ptu.id = :userId)`, {
+            userId: userId,
+          })
+          .andWhere(
+            `(pou.id = :userId and po.score < pt.score) or (ptu.id = :userId and pt.score < po.score)`,
+            {
+              userId: userId,
+            },
+          );
+      }, 'losses')
+      // Adding draws
+      .addSelect((qb) => {
+        return qb
+          .select('count(*)')
+          .from(Game, 'g')
+          .leftJoin('g.playerOne', 'po')
+          .leftJoin('g.playerTwo', 'pt')
+          .leftJoin('po.user', 'pou')
+          .leftJoin('pt.user', 'ptu')
+          .where(`g.status = :finished`, {
+            finished: GameStatus.Finished,
+          })
+          .andWhere(`(pou.id = :userId or ptu.id = :userId)`, {
+            userId: userId,
+          })
+          .andWhere(
+            `(pou.id = :userId and po.score = pt.score) or (ptu.id = :userId and pt.score = po.score)`,
+            {
+              userId: userId,
+            },
+          );
+      }, 'draws')
+      .leftJoin('p.user', 'u')
+      .where(`u.id = :userId`, {
+        userId: userId,
+      })
+      .limit(1)
+      .getRawMany();
+
+    console.log(x);
   }
 
   private async gamesMapping(games: Game[]): Promise<GameViewDto[]> {

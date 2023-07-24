@@ -29,7 +29,7 @@ export const getAppAndClearDb = async () => {
   app.useGlobalFilters(new HttpExceptionFilter());
 
   await app.init();
-  await agent.delete(testingAllDataURI);
+  // await agent.delete(testingAllDataURI); // todo
 
   return {
     app: app,

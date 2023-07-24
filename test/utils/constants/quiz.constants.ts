@@ -7,6 +7,7 @@ export const publicGameConnectionURI = '/pair-game-quiz/pairs/connection/';
 export const publicCurrentGameURI = '/pair-game-quiz/pairs/my-current/';
 export const publicGameURI = '/pair-game-quiz/pairs/';
 export const publicMyGames = '/pair-game-quiz/pairs/my';
+export const publicMyStats = '/pair-game-quiz/users/my-statistic';
 export const publicAnswersURI = '/pair-game-quiz/pairs/my-current/answers/';
 
 // Question updating strings

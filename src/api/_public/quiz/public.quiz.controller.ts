@@ -48,9 +48,14 @@ export class PublicQuizController {
   }
 
   @UseGuards(JwtBearerGuard)
+  @Get('users/my-statistic')
+  async getStatistics(@UserIdFromGuard() userId) {
+    return this.gamesQueryRepository.getStatistics(userId);
+  }
+
+  @UseGuards(JwtBearerGuard)
   @Get('pairs/my')
   async findMyGames(@Query() query: GameQueryDto, @UserIdFromGuard() userId) {
-    debugger;
     return this.gamesQueryRepository.findMyGames(query, userId);
   }
 
