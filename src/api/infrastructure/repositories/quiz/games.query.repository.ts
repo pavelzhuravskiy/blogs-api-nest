@@ -12,6 +12,7 @@ import { GameQueryDto } from '../../../dto/quiz/query/game.query.dto';
 import { Question } from '../../../entities/quiz/question.entity';
 import { Paginator } from '../../../../helpers/paginator';
 import { Player } from '../../../entities/quiz/player.entity';
+import { StatsViewDto } from '../../../dto/quiz/view/stats.view.dto';
 
 @Injectable()
 export class GamesQueryRepository {
@@ -26,7 +27,7 @@ export class GamesQueryRepository {
   async findMyGames(
     query: GameQueryDto,
     userId: string,
-  ): Promise</*Paginator<GameViewDto[]>*/ any> {
+  ): Promise<Paginator<GameViewDto[]>> {
     const games = await this.gamesRepository
       // Creating game object
       .createQueryBuilder('game')
@@ -307,11 +308,49 @@ export class GamesQueryRepository {
     return mappedAnswers[mappedAnswers.length - 1];
   }
 
-  async getStatistics(userId: string): Promise</*Game | null*/ any> {
-    const x = await this.playersRepository
+  async getStatistics(userId: string): Promise<StatsViewDto> {
+    const stats = await this.playersRepository
       .createQueryBuilder('p')
       .select('p.id', 'p_id')
       .addSelect('p.user', 'u_id')
+
+      // Adding total scores count
+      .addSelect((qb) => {
+        return qb
+          .select('sum(p.score)')
+          .from(Player, 'p')
+          .where(`(p.userId = :userId)`, {
+            userId: userId,
+          });
+      }, 'scores_sum')
+
+      // Adding average scores count
+      .addSelect((qb) => {
+        return (
+          qb
+            // .select(
+            //   'case when avg("p"."score") % 2 = 0 then cast(avg("p"."score") as integer) else round(avg("p"."score"), 2) end',
+            // )
+            .select('round(avg("p"."score"), 2)')
+            .from(Player, 'p')
+            .where(`(p.userId = :userId)`, {
+              userId: userId,
+            })
+        );
+      }, 'scores_avg')
+
+      // Adding total games count
+      .addSelect((qb) => {
+        return qb
+          .select('count(*)')
+          .from(Game, 'g')
+          .leftJoin('g.playerOne', 'po')
+          .leftJoin('g.playerTwo', 'pt')
+          .where(`(po.userId = :userId or pt.userId = :userId)`, {
+            userId: userId,
+          });
+      }, 'total_games')
+
       // Adding wins
       .addSelect((qb) => {
         return qb
@@ -319,21 +358,17 @@ export class GamesQueryRepository {
           .from(Game, 'g')
           .leftJoin('g.playerOne', 'po')
           .leftJoin('g.playerTwo', 'pt')
-          .leftJoin('po.user', 'pou')
-          .leftJoin('pt.user', 'ptu')
-          .where(`g.status = :finished`, {
-            finished: GameStatus.Finished,
-          })
-          .andWhere(`(pou.id = :userId or ptu.id = :userId)`, {
+          .where(`(po.userId = :userId or pt.userId = :userId)`, {
             userId: userId,
           })
           .andWhere(
-            `(pou.id = :userId and po.score > pt.score) or (ptu.id = :userId and pt.score > po.score)`,
+            `(po.userId = :userId and po.score > pt.score or pt.userId = :userId and pt.score > po.score)`,
             {
               userId: userId,
             },
           );
       }, 'wins')
+
       // Adding losses
       .addSelect((qb) => {
         return qb
@@ -341,21 +376,17 @@ export class GamesQueryRepository {
           .from(Game, 'g')
           .leftJoin('g.playerOne', 'po')
           .leftJoin('g.playerTwo', 'pt')
-          .leftJoin('po.user', 'pou')
-          .leftJoin('pt.user', 'ptu')
-          .where(`g.status = :finished`, {
-            finished: GameStatus.Finished,
-          })
-          .andWhere(`(pou.id = :userId or ptu.id = :userId)`, {
+          .where(`(po.userId = :userId or pt.userId = :userId)`, {
             userId: userId,
           })
           .andWhere(
-            `(pou.id = :userId and po.score < pt.score) or (ptu.id = :userId and pt.score < po.score)`,
+            `(po.userId = :userId and po.score < pt.score or pt.userId = :userId and pt.score < po.score)`,
             {
               userId: userId,
             },
           );
       }, 'losses')
+
       // Adding draws
       .addSelect((qb) => {
         return qb
@@ -363,16 +394,11 @@ export class GamesQueryRepository {
           .from(Game, 'g')
           .leftJoin('g.playerOne', 'po')
           .leftJoin('g.playerTwo', 'pt')
-          .leftJoin('po.user', 'pou')
-          .leftJoin('pt.user', 'ptu')
-          .where(`g.status = :finished`, {
-            finished: GameStatus.Finished,
-          })
-          .andWhere(`(pou.id = :userId or ptu.id = :userId)`, {
+          .where(`(po.userId = :userId or pt.userId = :userId)`, {
             userId: userId,
           })
           .andWhere(
-            `(pou.id = :userId and po.score = pt.score) or (ptu.id = :userId and pt.score = po.score)`,
+            `(po.userId = :userId and po.score = pt.score or pt.userId = :userId and pt.score = po.score)`,
             {
               userId: userId,
             },
@@ -385,7 +411,8 @@ export class GamesQueryRepository {
       .limit(1)
       .getRawMany();
 
-    console.log(x);
+    const mappedStats = await this.statsMapping(stats);
+    return mappedStats[0];
   }
 
   private async gamesMapping(games: Game[]): Promise<GameViewDto[]> {
@@ -521,6 +548,19 @@ export class GamesQueryRepository {
         questionId: a.question.id.toString(),
         answerStatus: a.answerStatus,
         addedAt: a.addedAt,
+      };
+    });
+  }
+
+  private async statsMapping(array: any[]): Promise<StatsViewDto[]> {
+    return array.map((a) => {
+      return {
+        sumScore: +a.scores_sum,
+        avgScores: +a.scores_avg,
+        gamesCount: +a.total_games,
+        winsCount: +a.wins,
+        lossesCount: +a.losses,
+        drawsCount: +a.draws,
       };
     });
   }

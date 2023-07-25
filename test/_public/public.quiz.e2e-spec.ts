@@ -54,7 +54,6 @@ describe('Public quiz testing', () => {
   let game02Id;
   let game03Id;
   let game04Id;
-  let game05Id;
 
   let aTokenUser01;
   let aTokenUser02;
@@ -76,7 +75,7 @@ describe('Public quiz testing', () => {
   let gameObject;
 
   describe('Users creation and authentication', () => {
-    it.skip(`should create four users`, async () => {
+    it(`should create four users`, async () => {
       await agent
         .post(saUsersURI)
         .auth(basicAuthLogin, basicAuthPassword)
@@ -171,7 +170,7 @@ describe('Public quiz testing', () => {
     });
   });
 
-  describe.skip('01 Game create and connect operations', () => {
+  describe('01 Game create and connect operations', () => {
     // Authentication errors [401]
     it(`should return 401 when trying to create game with incorrect token`, async () => {
       return agent
@@ -276,7 +275,7 @@ describe('Public quiz testing', () => {
         .expect(403);
     });
   });
-  describe.skip('01 Answers operations', () => {
+  describe('01 Answers operations', () => {
     // Bad request errors [400]
     it(`should return 400 when trying to send answer without answer`, async () => {
       return agent
@@ -468,7 +467,7 @@ describe('Public quiz testing', () => {
       });
     });
   });
-  describe.skip('01 Get game and finish operations', () => {
+  describe('01 Get game and finish operations', () => {
     // Success
     it(`should answer [question 05] by user 01 (CORRECT)`, async () => {
       const response = await agent
@@ -664,7 +663,7 @@ describe('Public quiz testing', () => {
         .expect(404);
     });
   });
-  describe.skip('01 Get game by ID operations', () => {
+  describe('01 Get game by ID operations', () => {
     // Authentication errors [400]
     it(`should return 400 when trying to get the game by ID with incorrect URI`, async () => {
       return agent
@@ -718,7 +717,7 @@ describe('Public quiz testing', () => {
     });
   });
 
-  describe.skip('02 Game create and connect operations', () => {
+  describe('02 Game create and connect operations', () => {
     // Success
     it(`should create new game with pending user 02`, async () => {
       const response = await agent
@@ -744,7 +743,7 @@ describe('Public quiz testing', () => {
       return response;
     });
   });
-  describe.skip('02 Answers operations', () => {
+  describe('02 Answers operations', () => {
     // Success
     it(`should get questions and answers`, async () => {
       // Get current game
@@ -897,7 +896,7 @@ describe('Public quiz testing', () => {
       });
     });
   });
-  describe.skip('02 Get game and finish operations', () => {
+  describe('02 Get game and finish operations', () => {
     // Success
     it(`should answer [question 05] by user 01 (CORRECT)`, async () => {
       const response = await agent
@@ -1040,7 +1039,7 @@ describe('Public quiz testing', () => {
       });
     });
   });
-  describe.skip('02 Get game by ID operations', () => {
+  describe('02 Get game by ID operations', () => {
     // Success
     it(`should return finished game by id for user 01`, async () => {
       const response = await agent
@@ -1070,7 +1069,7 @@ describe('Public quiz testing', () => {
     });
   });
 
-  describe.skip('03 Game create and connect operations', () => {
+  describe('03 Game create and connect operations', () => {
     // Success
     it(`should create new game with pending user 04`, async () => {
       const response = await agent
@@ -1100,7 +1099,7 @@ describe('Public quiz testing', () => {
       return response;
     });
   });
-  describe.skip('03 Answers operations', () => {
+  describe('03 Answers operations', () => {
     // Success
     it(`should get questions and answers`, async () => {
       // Get current game
@@ -1320,7 +1319,7 @@ describe('Public quiz testing', () => {
       });
     });
   });
-  describe.skip('03 Get game and finish operations', () => {
+  describe('03 Get game and finish operations', () => {
     // Success
     it(`should answer [question 05] by user 03 (INCORRECT)`, async () => {
       const response = await agent
@@ -1463,7 +1462,7 @@ describe('Public quiz testing', () => {
       });
     });
   });
-  describe.skip('04 Get game by ID operations', () => {
+  describe('04 Get game by ID operations', () => {
     // Success
     it(`should return finished game by id for user 03`, async () => {
       const response = await agent
@@ -1493,7 +1492,7 @@ describe('Public quiz testing', () => {
     });
   });
 
-  describe.skip('04 Game create and connect operations', () => {
+  describe('04 Game create and connect operations', () => {
     // Success
     it(`should create new game with pending user 04`, async () => {
       const response = await agent
@@ -1517,7 +1516,7 @@ describe('Public quiz testing', () => {
       return response;
     });
   });
-  describe.skip('04 Answers operations', () => {
+  describe('04 Answers operations', () => {
     // Success
     it(`should get questions and answers`, async () => {
       // Get current game
@@ -1676,7 +1675,7 @@ describe('Public quiz testing', () => {
     });
   });
 
-  describe.skip('05 Game create and connect operations', () => {
+  describe('05 Game create and connect operations', () => {
     // Success
     it(`should create new game with pending user 02`, async () => {
       const response = await agent
@@ -1686,8 +1685,6 @@ describe('Public quiz testing', () => {
 
       createdGameObject.firstPlayerProgress.player.login = user01Login;
       expect(response.body).toEqual(createdGameObject);
-
-      game05Id = response.body.id;
 
       return response;
     });
@@ -1703,13 +1700,13 @@ describe('Public quiz testing', () => {
       return response;
     });
   });
-  describe.skip('05 Answers operations', () => {
+  describe('05 Answers operations', () => {
     // Success
     it(`should get questions and answers`, async () => {
       // Get current game
       const game = await agent
         .get(publicCurrentGameURI)
-        .auth(aTokenUser03, { type: 'bearer' })
+        .auth(aTokenUser01, { type: 'bearer' })
         .expect(200);
 
       // Get game question IDs
@@ -1740,7 +1737,7 @@ describe('Public quiz testing', () => {
       expect(answers05.length).toBeGreaterThan(0);
     });
     it(`should answer [question 01] by user 01 (CORRECT) and user 02 (INCORRECT)`, async () => {
-      await agent
+      const response01 = await agent
         .post(publicAnswersURI)
         .auth(aTokenUser01, { type: 'bearer' })
         .send({
@@ -1748,26 +1745,29 @@ describe('Public quiz testing', () => {
         })
         .expect(200);
 
-      await agent
+      expect(response01.body).toEqual({
+        questionId: gameQuestion01Id,
+        answerStatus: AnswerStatus.Correct,
+        addedAt: expect.any(String),
+      });
+
+      const response02 = await agent
         .post(publicAnswersURI)
         .auth(aTokenUser02, { type: 'bearer' })
         .send({
           answer: randomUUID(),
         })
         .expect(200);
-    });
-    it(`should return started current game for user 01`, async () => {
-      const response = await agent
-        .get(publicCurrentGameURI)
-        .auth(aTokenUser01, { type: 'bearer' })
-        .expect(200);
 
-      expect(response.body.id).toBe(game05Id);
-      return response;
+      expect(response02.body).toEqual({
+        questionId: gameQuestion01Id,
+        answerStatus: AnswerStatus.Incorrect,
+        addedAt: expect.any(String),
+      });
     });
   });
 
-  describe.skip('Games sorting and pagination', () => {
+  describe('Games sorting and pagination', () => {
     it(`should sort games by pair created date (desc)`, async () => {
       const response = await agent
         .get(publicMyGames)
@@ -1779,14 +1779,57 @@ describe('Public quiz testing', () => {
   });
 
   describe('Games statistics', () => {
-    it(`should ...`, async () => {
+    it(`should return correct stats for user 01`, async () => {
       const response = await agent
         .get(publicMyStats)
         .auth(aTokenUser01, { type: 'bearer' })
         .expect(200);
 
-      // console.log(response.body);
-      // console.log(response.body[0].wins);
+      expect(response.body.sumScore).toBe(9);
+      expect(response.body.avgScores).toBe(3);
+      expect(response.body.gamesCount).toBe(3);
+      expect(response.body.winsCount).toBe(3);
+      expect(response.body.lossesCount).toBe(0);
+      expect(response.body.drawsCount).toBe(0);
+    });
+    it(`should return correct stats for user 02`, async () => {
+      const response = await agent
+        .get(publicMyStats)
+        .auth(aTokenUser02, { type: 'bearer' })
+        .expect(200);
+
+      expect(response.body.sumScore).toBe(4);
+      expect(response.body.avgScores).toBe(1.33);
+      expect(response.body.gamesCount).toBe(3);
+      expect(response.body.winsCount).toBe(0);
+      expect(response.body.lossesCount).toBe(3);
+      expect(response.body.drawsCount).toBe(0);
+    });
+    it(`should return correct stats for user 03`, async () => {
+      const response = await agent
+        .get(publicMyStats)
+        .auth(aTokenUser03, { type: 'bearer' })
+        .expect(200);
+
+      expect(response.body.sumScore).toBe(1);
+      expect(response.body.avgScores).toBe(0.5);
+      expect(response.body.gamesCount).toBe(2);
+      expect(response.body.winsCount).toBe(1);
+      expect(response.body.lossesCount).toBe(1);
+      expect(response.body.drawsCount).toBe(0);
+    });
+    it(`should return correct stats for user 04`, async () => {
+      const response = await agent
+        .get(publicMyStats)
+        .auth(aTokenUser04, { type: 'bearer' })
+        .expect(200);
+
+      expect(response.body.sumScore).toBe(1);
+      expect(response.body.avgScores).toBe(0.5);
+      expect(response.body.gamesCount).toBe(2);
+      expect(response.body.winsCount).toBe(1);
+      expect(response.body.lossesCount).toBe(1);
+      expect(response.body.drawsCount).toBe(0);
     });
   });
 
