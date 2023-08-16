@@ -13,6 +13,7 @@ import { Question } from '../../../entities/quiz/question.entity';
 import { Paginator } from '../../../../helpers/paginator';
 import { Player } from '../../../entities/quiz/player.entity';
 import { StatsViewDto } from '../../../dto/quiz/view/stats.view.dto';
+import { PlayerTopQueryDto } from '../../../dto/quiz/query/player-top.query.dto';
 
 @Injectable()
 export class GamesQueryRepository {
@@ -308,6 +309,183 @@ export class GamesQueryRepository {
     return mappedAnswers[mappedAnswers.length - 1];
   }
 
+  async getTop(query: PlayerTopQueryDto): Promise</*StatsViewDto*/ any> {
+    let sort: string | string[] | string[][];
+
+    if (typeof query.sort === 'string') {
+      sort = query.sort.split(' ');
+      sort[1] = sort[1].toUpperCase();
+    } else {
+      sort = query.sort.map((el) => {
+        el = el.split(' ');
+        el[1] = el[1].toUpperCase();
+        return el;
+      });
+    }
+
+    let multipleFields = false;
+    if (Array.isArray(sort[0])) {
+      multipleFields = true;
+    }
+
+    const top = await this.playersRepository
+      .createQueryBuilder('pl')
+      .select('pl.user', 'u_id')
+      .addSelect('u.login', 'u_login')
+
+      // Adding total scores count
+      .addSelect((qb) => {
+        return qb
+          .select('sum(p.score)')
+          .from(Player, 'p')
+          .where(`p.userId = pl.user`);
+      }, 'sumScore')
+
+      // Adding average scores count
+      .addSelect((qb) => {
+        return (
+          qb
+            .select(
+              'case when avg("p"."score") % 1 = 0 then cast(avg("p"."score") as integer) else round(avg("p"."score"), 2) end',
+            )
+            // .select('round(avg("p"."score"), 2)')
+            .from(Player, 'p')
+            .where(`p.userId = pl.user`)
+        );
+      }, 'avgScores')
+
+      // Adding total games count
+      .addSelect((qb) => {
+        return qb
+          .select('count(*)')
+          .from(Game, 'g')
+          .leftJoin('g.playerOne', 'po')
+          .leftJoin('g.playerTwo', 'pt')
+          .where(`po.userId = pl.user or pt.userId = pl.user`);
+      }, 'gamesCount')
+
+      // Adding wins
+      .addSelect((qb) => {
+        return qb
+          .select('count(*)')
+          .from(Game, 'g')
+          .leftJoin('g.playerOne', 'po')
+          .leftJoin('g.playerTwo', 'pt')
+          .where(`(po.userId = pl.user or pt.userId = pl.user)`)
+          .andWhere(
+            `(po.userId = pl.user and po.score > pt.score or pt.userId = pl.user and pt.score > po.score)`,
+          );
+      }, 'winsCount')
+
+      // Adding losses
+      .addSelect((qb) => {
+        return qb
+          .select('count(*)')
+          .from(Game, 'g')
+          .leftJoin('g.playerOne', 'po')
+          .leftJoin('g.playerTwo', 'pt')
+          .where(`(po.userId = pl.user or pt.userId = pl.user)`)
+          .andWhere(
+            `(po.userId = pl.user and po.score < pt.score or pt.userId = pl.user and pt.score < po.score)`,
+          );
+      }, 'lossesCount')
+
+      // Adding draws
+      .addSelect((qb) => {
+        return qb
+          .select('count(*)')
+          .from(Game, 'g')
+          .leftJoin('g.playerOne', 'po')
+          .leftJoin('g.playerTwo', 'pt')
+          .where(`(po.userId = pl.user or pt.userId = pl.user)`)
+          .andWhere(
+            `(po.userId = pl.user and po.score = pt.score or pt.userId = pl.user and pt.score = po.score)`,
+          );
+      }, 'drawsCount')
+
+      // Join user info
+      .leftJoin('pl.user', 'u')
+
+      // Group and sort
+      .groupBy('u_id, u_login')
+      .orderBy(
+        `${multipleFields ? `"${sort[0][0]}"` : `"${sort[0]}"`}`,
+        `${
+          (multipleFields && sort[0][1] === 'ASC') ||
+          (!multipleFields && sort[1] === 'ASC')
+            ? 'ASC'
+            : 'DESC'
+        }`,
+      )
+      .addOrderBy(
+        `${
+          multipleFields && sort.length === 2
+            ? `"${sort[1][0]}"`
+            : '"avgScores"'
+        }`,
+        `${
+          multipleFields && sort.length === 2 && sort[1][1] === 'ASC'
+            ? 'ASC'
+            : 'DESC'
+        }`,
+      )
+      .addOrderBy(
+        `${
+          multipleFields && sort.length === 3
+            ? `"${sort[2][0]}"`
+            : '"avgScores"'
+        }`,
+        `${
+          multipleFields && sort.length === 3 && sort[2][1] === 'ASC'
+            ? 'ASC'
+            : 'DESC'
+        }`,
+      )
+      .addOrderBy(
+        `${
+          multipleFields && sort.length === 4
+            ? `"${sort[3][0]}"`
+            : '"avgScores"'
+        }`,
+        `${
+          multipleFields && sort.length === 4 && sort[3][1] === 'ASC'
+            ? 'ASC'
+            : 'DESC'
+        }`,
+      )
+      .addOrderBy(
+        `${
+          multipleFields && sort.length === 5
+            ? `"${sort[4][0]}"`
+            : '"avgScores"'
+        }`,
+        `${
+          multipleFields && sort.length === 5 && sort[4][1] === 'ASC'
+            ? 'ASC'
+            : 'DESC'
+        }`,
+      )
+      .addOrderBy(
+        `${
+          multipleFields && sort.length === 6
+            ? `"${sort[5][0]}"`
+            : '"avgScores"'
+        }`,
+        `${
+          multipleFields && sort.length === 6 && sort[5][1] === 'ASC'
+            ? 'ASC'
+            : 'DESC'
+        }`,
+      )
+      .getRawMany();
+
+    console.log(top);
+    return top;
+
+    // const mappedStats = await this.statsMapping(stats);
+    // return mappedStats[0];
+  }
+
   async getStatistics(userId: string): Promise<StatsViewDto> {
     const stats = await this.playersRepository
       .createQueryBuilder('p')
@@ -328,10 +506,10 @@ export class GamesQueryRepository {
       .addSelect((qb) => {
         return (
           qb
-            // .select(
-            //   'case when avg("p"."score") % 2 = 0 then cast(avg("p"."score") as integer) else round(avg("p"."score"), 2) end',
-            // )
-            .select('round(avg("p"."score"), 2)')
+            .select(
+              'case when avg("p"."score") % 1 = 0 then cast(avg("p"."score") as integer) else round(avg("p"."score"), 2) end',
+            )
+            // .select('round(avg("p"."score"), 2)')
             .from(Player, 'p')
             .where(`(p.userId = :userId)`, {
               userId: userId,

@@ -23,6 +23,7 @@ import { GameFindQuery } from './application/use-cases/game-find.use-case';
 import { AnswerSendCommand } from './application/use-cases/answer-send.use-case';
 import { AnswerInputDto } from '../../dto/quiz/input/answer-input.dto';
 import { GameQueryDto } from '../../dto/quiz/query/game.query.dto';
+import { PlayerTopQueryDto } from '../../dto/quiz/query/player-top.query.dto';
 
 @Controller('pair-game-quiz')
 export class PublicQuizController {
@@ -45,6 +46,12 @@ export class PublicQuizController {
     }
 
     return this.gamesQueryRepository.findGameById(result.response);
+  }
+
+  @Get('users/top')
+  async getTop(@Query() query: PlayerTopQueryDto) {
+    // console.log('query', query);
+    return this.gamesQueryRepository.getTop(query);
   }
 
   @UseGuards(JwtBearerGuard)
