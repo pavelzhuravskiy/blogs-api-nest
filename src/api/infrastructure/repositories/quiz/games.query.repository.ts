@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, Repository, SelectQueryBuilder } from 'typeorm';
 import { Game } from '../../../entities/quiz/game.entity';
 import {
   AnswerViewDto,
@@ -310,25 +310,7 @@ export class GamesQueryRepository {
   }
 
   async getTop(query: PlayerTopQueryDto): Promise</*StatsViewDto*/ any> {
-    let sort: string | string[] | string[][];
-
-    if (typeof query.sort === 'string') {
-      sort = query.sort.split(' ');
-      sort[1] = sort[1].toUpperCase();
-    } else {
-      sort = query.sort.map((el) => {
-        el = el.split(' ');
-        el[1] = el[1].toUpperCase();
-        return el;
-      });
-    }
-
-    let multipleFields = false;
-    if (Array.isArray(sort[0])) {
-      multipleFields = true;
-    }
-
-    const top = await this.playersRepository
+    const top = this.playersRepository
       .createQueryBuilder('pl')
       .select('pl.user', 'u_id')
       .addSelect('u.login', 'u_login')
@@ -407,80 +389,10 @@ export class GamesQueryRepository {
       .leftJoin('pl.user', 'u')
 
       // Group and sort
-      .groupBy('u_id, u_login')
-      .orderBy(
-        `${multipleFields ? `"${sort[0][0]}"` : `"${sort[0]}"`}`,
-        `${
-          (multipleFields && sort[0][1] === 'ASC') ||
-          (!multipleFields && sort[1] === 'ASC')
-            ? 'ASC'
-            : 'DESC'
-        }`,
-      )
-      .addOrderBy(
-        `${
-          multipleFields && sort.length === 2
-            ? `"${sort[1][0]}"`
-            : '"avgScores"'
-        }`,
-        `${
-          multipleFields && sort.length === 2 && sort[1][1] === 'ASC'
-            ? 'ASC'
-            : 'DESC'
-        }`,
-      )
-      .addOrderBy(
-        `${
-          multipleFields && sort.length === 3
-            ? `"${sort[2][0]}"`
-            : '"avgScores"'
-        }`,
-        `${
-          multipleFields && sort.length === 3 && sort[2][1] === 'ASC'
-            ? 'ASC'
-            : 'DESC'
-        }`,
-      )
-      .addOrderBy(
-        `${
-          multipleFields && sort.length === 4
-            ? `"${sort[3][0]}"`
-            : '"avgScores"'
-        }`,
-        `${
-          multipleFields && sort.length === 4 && sort[3][1] === 'ASC'
-            ? 'ASC'
-            : 'DESC'
-        }`,
-      )
-      .addOrderBy(
-        `${
-          multipleFields && sort.length === 5
-            ? `"${sort[4][0]}"`
-            : '"avgScores"'
-        }`,
-        `${
-          multipleFields && sort.length === 5 && sort[4][1] === 'ASC'
-            ? 'ASC'
-            : 'DESC'
-        }`,
-      )
-      .addOrderBy(
-        `${
-          multipleFields && sort.length === 6
-            ? `"${sort[5][0]}"`
-            : '"avgScores"'
-        }`,
-        `${
-          multipleFields && sort.length === 6 && sort[5][1] === 'ASC'
-            ? 'ASC'
-            : 'DESC'
-        }`,
-      )
-      .getRawMany();
-
-    console.log(top);
-    return top;
+      .groupBy('u_id, u_login');
+    const addOrderByAndGet = await this.addOrderByAndGet(top, query);
+    // console.log(addOrderByAndGet);
+    return addOrderByAndGet;
 
     // const mappedStats = await this.statsMapping(stats);
     // return mappedStats[0];
@@ -591,6 +503,65 @@ export class GamesQueryRepository {
 
     const mappedStats = await this.statsMapping(stats);
     return mappedStats[0];
+  }
+
+  private async addOrderByAndGet(
+    builder: SelectQueryBuilder<Player>,
+    query: PlayerTopQueryDto,
+  ): Promise<any> {
+    if (query.sort.length === 1) {
+      return builder.orderBy(`"${query.sort[0][0]}"`).getQuery();
+    }
+
+    if (query.sort.length === 2) {
+      return builder
+        .orderBy(`"${query.sort[0][0]}"`, query.sort[0][1])
+        .addOrderBy(`"${query.sort[1][0]}"`, query.sort[1][1])
+        .getQuery();
+    }
+
+    if (query.sort.length === 3) {
+      return builder
+        .orderBy(`"${query.sort[0][0]}"`, query.sort[0][1])
+        .addOrderBy(`"${query.sort[1][0]}"`, query.sort[1][1])
+        .addOrderBy(`"${query.sort[2][0]}"`, query.sort[2][1])
+        .getQuery();
+    }
+
+    if (query.sort.length === 4) {
+      return builder
+        .orderBy(`"${query.sort[0][0]}"`, query.sort[0][1])
+        .addOrderBy(`"${query.sort[1][0]}"`, query.sort[1][1])
+        .addOrderBy(`"${query.sort[2][0]}"`, query.sort[2][1])
+        .addOrderBy(`"${query.sort[3][0]}"`, query.sort[3][1])
+        .getQuery();
+    }
+
+    if (query.sort.length === 5) {
+      return builder
+        .orderBy(`"${query.sort[0][0]}"`, query.sort[0][1])
+        .addOrderBy(`"${query.sort[1][0]}"`, query.sort[1][1])
+        .addOrderBy(`"${query.sort[2][0]}"`, query.sort[2][1])
+        .addOrderBy(`"${query.sort[3][0]}"`, query.sort[3][1])
+        .addOrderBy(`"${query.sort[4][0]}"`, query.sort[4][1])
+        .getQuery();
+    }
+
+    if (query.sort.length === 6) {
+      return builder
+        .orderBy(`"${query.sort[0][0]}"`, query.sort[0][1])
+        .addOrderBy(`"${query.sort[1][0]}"`, query.sort[1][1])
+        .addOrderBy(`"${query.sort[2][0]}"`, query.sort[2][1])
+        .addOrderBy(`"${query.sort[3][0]}"`, query.sort[3][1])
+        .addOrderBy(`"${query.sort[4][0]}"`, query.sort[4][1])
+        .addOrderBy(`"${query.sort[5][0]}"`, query.sort[5][1])
+        .getQuery();
+    }
+
+    return builder
+      .orderBy(`"avgScores"`, 'DESC')
+      .addOrderBy(`"sumScore"`, 'DESC')
+      .getQuery();
   }
 
   private async gamesMapping(games: Game[]): Promise<GameViewDto[]> {

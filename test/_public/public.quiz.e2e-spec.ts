@@ -1834,15 +1834,17 @@ describe('Public quiz testing', () => {
     });
   });
   describe('Games top', () => {
-    it(`should return string top`, async () => {
-      return agent.get(publicTop).query('sort=winsCount asc');
+    it(`should return top sorted by default parameters`, async () => {
+      return agent.get(publicTop);
     });
-
-    it(`should return array top`, async () => {
+    it(`should return top sorted by average score asc`, async () => {
+      return agent.get(publicTop).query('sort=avgScores asc');
+    });
+    it(`should return top sorted with multiple parameters`, async () => {
       return agent
         .get(publicTop)
         .query(
-          'sort=avgScores asc&sort=sumScore desc&sort=winsCount desc&sort=lossesCount asc',
+          'sort=avgScores asc&sort=sumScore desc&sort=winsCount asc&sort=lossesCount desc',
         );
     });
   });
