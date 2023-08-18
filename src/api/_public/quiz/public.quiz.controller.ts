@@ -50,7 +50,6 @@ export class PublicQuizController {
 
   @Get('users/top')
   async getTop(@Query() query: PlayerTopQueryDto) {
-    // console.log('query', query);
     return this.gamesQueryRepository.getTop(query);
   }
 

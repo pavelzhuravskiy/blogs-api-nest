@@ -14,6 +14,7 @@ import { Paginator } from '../../../../helpers/paginator';
 import { Player } from '../../../entities/quiz/player.entity';
 import { StatsViewDto } from '../../../dto/quiz/view/stats.view.dto';
 import { PlayerTopQueryDto } from '../../../dto/quiz/query/player-top.query.dto';
+import { TopViewDto } from '../../../dto/quiz/view/top.view.dto';
 
 @Injectable()
 export class GamesQueryRepository {
@@ -390,12 +391,20 @@ export class GamesQueryRepository {
 
       // Group and sort
       .groupBy('u_id, u_login');
-    const addOrderByAndGet = await this.addOrderByAndGet(top, query);
-    // console.log(addOrderByAndGet);
-    return addOrderByAndGet;
 
-    // const mappedStats = await this.statsMapping(stats);
-    // return mappedStats[0];
+    const topResult = await this.addOrderByAndGet(top, query);
+
+    const totalCount = await this.playersRepository
+      .createQueryBuilder('pl')
+      .select('count(distinct "userId")', 'pl_count')
+      .getRawOne();
+
+    return Paginator.paginate({
+      pageNumber: query.pageNumber,
+      pageSize: query.pageSize,
+      totalCount: Number(totalCount.pl_count),
+      items: await this.topMapping(topResult),
+    });
   }
 
   async getStatistics(userId: string): Promise<StatsViewDto> {
@@ -508,16 +517,22 @@ export class GamesQueryRepository {
   private async addOrderByAndGet(
     builder: SelectQueryBuilder<Player>,
     query: PlayerTopQueryDto,
-  ): Promise<any> {
+  ): Promise<any[]> {
     if (query.sort.length === 1) {
-      return builder.orderBy(`"${query.sort[0][0]}"`).getQuery();
+      return builder
+        .orderBy(`"${query.sort[0][0]}"`, query.sort[0][1])
+        .limit(query.pageSize)
+        .offset((query.pageNumber - 1) * query.pageSize)
+        .getRawMany();
     }
 
     if (query.sort.length === 2) {
       return builder
         .orderBy(`"${query.sort[0][0]}"`, query.sort[0][1])
         .addOrderBy(`"${query.sort[1][0]}"`, query.sort[1][1])
-        .getQuery();
+        .limit(query.pageSize)
+        .offset((query.pageNumber - 1) * query.pageSize)
+        .getRawMany();
     }
 
     if (query.sort.length === 3) {
@@ -525,7 +540,9 @@ export class GamesQueryRepository {
         .orderBy(`"${query.sort[0][0]}"`, query.sort[0][1])
         .addOrderBy(`"${query.sort[1][0]}"`, query.sort[1][1])
         .addOrderBy(`"${query.sort[2][0]}"`, query.sort[2][1])
-        .getQuery();
+        .limit(query.pageSize)
+        .offset((query.pageNumber - 1) * query.pageSize)
+        .getRawMany();
     }
 
     if (query.sort.length === 4) {
@@ -534,7 +551,9 @@ export class GamesQueryRepository {
         .addOrderBy(`"${query.sort[1][0]}"`, query.sort[1][1])
         .addOrderBy(`"${query.sort[2][0]}"`, query.sort[2][1])
         .addOrderBy(`"${query.sort[3][0]}"`, query.sort[3][1])
-        .getQuery();
+        .limit(query.pageSize)
+        .offset((query.pageNumber - 1) * query.pageSize)
+        .getRawMany();
     }
 
     if (query.sort.length === 5) {
@@ -544,7 +563,9 @@ export class GamesQueryRepository {
         .addOrderBy(`"${query.sort[2][0]}"`, query.sort[2][1])
         .addOrderBy(`"${query.sort[3][0]}"`, query.sort[3][1])
         .addOrderBy(`"${query.sort[4][0]}"`, query.sort[4][1])
-        .getQuery();
+        .limit(query.pageSize)
+        .offset((query.pageNumber - 1) * query.pageSize)
+        .getRawMany();
     }
 
     if (query.sort.length === 6) {
@@ -555,13 +576,17 @@ export class GamesQueryRepository {
         .addOrderBy(`"${query.sort[3][0]}"`, query.sort[3][1])
         .addOrderBy(`"${query.sort[4][0]}"`, query.sort[4][1])
         .addOrderBy(`"${query.sort[5][0]}"`, query.sort[5][1])
-        .getQuery();
+        .limit(query.pageSize)
+        .offset((query.pageNumber - 1) * query.pageSize)
+        .getRawMany();
     }
 
     return builder
       .orderBy(`"avgScores"`, 'DESC')
       .addOrderBy(`"sumScore"`, 'DESC')
-      .getQuery();
+      .limit(query.pageSize)
+      .offset((query.pageNumber - 1) * query.pageSize)
+      .getRawMany();
   }
 
   private async gamesMapping(games: Game[]): Promise<GameViewDto[]> {
@@ -710,6 +735,23 @@ export class GamesQueryRepository {
         winsCount: +a.wins,
         lossesCount: +a.losses,
         drawsCount: +a.draws,
+      };
+    });
+  }
+
+  private async topMapping(array: any[]): Promise<TopViewDto[]> {
+    return array.map((a) => {
+      return {
+        sumScore: +a.sumScore,
+        avgScores: +a.avgScores,
+        gamesCount: +a.gamesCount,
+        winsCount: +a.winsCount,
+        lossesCount: +a.lossesCount,
+        drawsCount: +a.drawsCount,
+        player: {
+          id: a.u_id,
+          login: a.u_login,
+        },
       };
     });
   }
