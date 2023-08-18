@@ -310,7 +310,7 @@ export class GamesQueryRepository {
     return mappedAnswers[mappedAnswers.length - 1];
   }
 
-  async getTop(query: PlayerTopQueryDto): Promise</*StatsViewDto*/ any> {
+  async getTop(query: PlayerTopQueryDto): Promise<Paginator<TopViewDto[]>> {
     const top = this.playersRepository
       .createQueryBuilder('pl')
       .select('pl.user', 'u_id')
