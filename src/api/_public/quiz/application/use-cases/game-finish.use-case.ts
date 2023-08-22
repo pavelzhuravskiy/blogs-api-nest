@@ -43,9 +43,9 @@ export class GameFinishUseCase extends TransactionBaseUseCase<
 
       await this.transactionsRepository.save(fastPlayer, manager);
 
-      game.finishingExpirationDate = null;
       game.status = GameStatus.Finished;
       game.finishGameDate = new Date();
+      game.finishingExpirationDate = null;
       await this.transactionsRepository.save(game, manager);
     }
   }

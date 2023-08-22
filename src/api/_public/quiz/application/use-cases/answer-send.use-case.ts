@@ -112,7 +112,7 @@ export class AnswerSendUseCase extends TransactionBaseUseCase<
         currentGame.playerTwo.id === currentPlayer.id)
     ) {
       currentGame.finishingExpirationDate = add(new Date(), {
-        seconds: 10,
+        seconds: 9,
       });
       await this.transactionsRepository.save(currentGame, manager);
     }
@@ -133,9 +133,9 @@ export class AnswerSendUseCase extends TransactionBaseUseCase<
 
       await this.transactionsRepository.save(fastPlayer, manager);
 
-      currentGame.finishingExpirationDate = null;
       currentGame.status = GameStatus.Finished;
       currentGame.finishGameDate = new Date();
+      currentGame.finishingExpirationDate = null;
       await this.transactionsRepository.save(currentGame, manager);
     }
 

@@ -26,7 +26,6 @@ import {
   publicGameURI,
   publicMyGames,
   publicMyStats,
-  publicTop,
   questionBody,
   saQuestionsPublishURI,
   saQuestionsURI,
@@ -1831,21 +1830,6 @@ describe('Public quiz testing', () => {
       expect(response.body.winsCount).toBe(1);
       expect(response.body.lossesCount).toBe(1);
       expect(response.body.drawsCount).toBe(0);
-    });
-  });
-  describe('Games top', () => {
-    it(`should return top sorted by default parameters`, async () => {
-      return agent.get(publicTop);
-    });
-    it(`should return top sorted by average score asc`, async () => {
-      return agent.get(publicTop).query('sort=avgScores asc');
-    });
-    it(`should return top sorted with multiple parameters`, async () => {
-      return agent
-        .get(publicTop)
-        .query(
-          'sort=avgScores asc&sort=sumScore desc&sort=winsCount asc&sort=lossesCount desc&pageSize=2',
-        );
     });
   });
 
