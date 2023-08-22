@@ -14,6 +14,7 @@ import * as process from 'process';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm/dist/interfaces/typeorm-options.interface';
 import { MailModule } from './api/infrastructure/mail/mail.module';
 import { QuizModule } from './api/modules/quiz.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 export const options: TypeOrmModuleOptions = {
   type: 'postgres',
@@ -31,6 +32,7 @@ export const options: TypeOrmModuleOptions = {
   imports: [
     configModule,
     TypeOrmModule.forRoot(options),
+    ScheduleModule.forRoot(),
     CqrsModule,
     AuthModule,
     DevicesModule,

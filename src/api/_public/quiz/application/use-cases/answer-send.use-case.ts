@@ -15,6 +15,7 @@ import {
 import { AnswerStatus } from '../../../../../enums/answer-status.enum';
 import { Answer } from '../../../../entities/quiz/answer.entity';
 import { GameStatus } from '../../../../../enums/game-status.enum';
+import { add } from 'date-fns';
 
 export class AnswerSendCommand {
   constructor(public answerInputDto: AnswerInputDto, public userId: string) {}
@@ -103,6 +104,20 @@ export class AnswerSendUseCase extends TransactionBaseUseCase<
     const playerOneAnswersCount = currentGame.playerOne.answers.length;
     const playerTwoAnswersCount = currentGame.playerTwo.answers.length;
 
+    // Set game status to 'Finishing' when one player answered all questions
+    if (
+      (playerOneAnswersCount === 4 &&
+        currentGame.playerOne.id === currentPlayer.id) ||
+      (playerTwoAnswersCount === 4 &&
+        currentGame.playerTwo.id === currentPlayer.id)
+    ) {
+      currentGame.finishingExpirationDate = add(new Date(), {
+        seconds: 10,
+      });
+      await this.transactionsRepository.save(currentGame, manager);
+    }
+
+    // Finish game when all questions are answered
     if (
       (playerOneAnswersCount === 5 && playerTwoAnswersCount === 4) ||
       (playerOneAnswersCount === 4 && playerTwoAnswersCount === 5)
@@ -118,6 +133,7 @@ export class AnswerSendUseCase extends TransactionBaseUseCase<
 
       await this.transactionsRepository.save(fastPlayer, manager);
 
+      currentGame.finishingExpirationDate = null;
       currentGame.status = GameStatus.Finished;
       currentGame.finishGameDate = new Date();
       await this.transactionsRepository.save(currentGame, manager);

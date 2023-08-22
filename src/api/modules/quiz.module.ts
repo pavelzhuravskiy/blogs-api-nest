@@ -24,6 +24,7 @@ import { UsersTransactionsRepository } from '../infrastructure/repositories/user
 import { GamesTransactionsRepository } from '../infrastructure/repositories/quiz/games.transactions.repository';
 import { QuestionsTransactionsRepository } from '../infrastructure/repositories/quiz/questions.transactions.repository';
 import { DataSourceRepository } from '../infrastructure/repositories/common/data-source.repository';
+import { GameFinishUseCase } from '../_public/quiz/application/use-cases/game-finish.use-case';
 
 const useCases = [
   QuestionCreateUseCase,
@@ -32,6 +33,7 @@ const useCases = [
   QuestionDeleteUseCase,
   UserConnectUseCase,
   GameFindUseCase,
+  GameFinishUseCase,
   AnswerSendUseCase,
 ];
 

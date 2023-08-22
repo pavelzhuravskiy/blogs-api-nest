@@ -40,6 +40,13 @@ export class Game {
   })
   finishGameDate: Date;
 
+  @Column({
+    name: 'finishing_expiration_date',
+    type: 'timestamp with time zone',
+    nullable: true,
+  })
+  finishingExpirationDate: Date;
+
   @OneToOne(() => Player, (player) => player.game, {
     onDelete: 'CASCADE',
   })
