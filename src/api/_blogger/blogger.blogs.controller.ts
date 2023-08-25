@@ -32,6 +32,7 @@ import { BlogQueryDto } from '../dto/blogs/query/blog.query.dto';
 import { PostsQueryRepository } from '../infrastructure/repositories/posts/posts.query.repository';
 import { CommentQueryDto } from '../dto/comments/query/comment.query.dto';
 import { CommentsQueryRepository } from '../infrastructure/repositories/comments/comments.query.repository';
+import { AddMainImageCommand } from './application/use-cases/blog-add-img-main.use-case';
 
 @Controller('blogger/blogs')
 export class BloggerBlogsController {
@@ -161,5 +162,19 @@ export class BloggerBlogsController {
       query,
       userId,
     );
+  }
+
+  @UseGuards(JwtBearerGuard)
+  @Post(':blogId/images/main')
+  async uploadMainImage(@Param('blogId') blogId, @UserIdFromGuard() userId) {
+    const result = await this.commandBus.execute(
+      new AddMainImageCommand(blogId, userId),
+    );
+
+    if (result.code !== ResultCode.Success) {
+      return exceptionHandler(result.code, result.message, result.field);
+    }
+
+    return result;
   }
 }
