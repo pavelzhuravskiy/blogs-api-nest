@@ -6,7 +6,6 @@ import {
   blogNotFound,
 } from '../../../exceptions/exception.constants';
 import { ResultCode } from '../../../enums/result-code.enum';
-import { CommandBus } from '@nestjs/cqrs';
 import { BlogsQueryRepository } from '../../infrastructure/repositories/blogs/blogs.query.repository';
 import { PostQueryDto } from '../../dto/posts/query/post.query.dto';
 import { UserIdFromHeaders } from '../../_auth/decorators/user-id-from-headers.decorator';
@@ -15,7 +14,6 @@ import { PostsQueryRepository } from '../../infrastructure/repositories/posts/po
 @Controller('blogs')
 export class PublicBlogsController {
   constructor(
-    private commandBus: CommandBus,
     private readonly blogsQueryRepository: BlogsQueryRepository,
     private readonly postsQueryRepository: PostsQueryRepository,
   ) {}
@@ -26,7 +24,7 @@ export class PublicBlogsController {
   }
 
   @Get(':id')
-  async findBlog(@Param('id') id) {
+  async findBlog(@Param('id') id: string) {
     const result = await this.blogsQueryRepository.findBlog(id);
 
     if (!result) {
@@ -39,8 +37,8 @@ export class PublicBlogsController {
   @Get(':id/posts')
   async findPostsForBlog(
     @Query() query: PostQueryDto,
-    @Param('id') blogId,
-    @UserIdFromHeaders() userId,
+    @Param('id') blogId: string,
+    @UserIdFromHeaders() userId: string,
   ) {
     const result = await this.postsQueryRepository.findPostsForBlog(
       query,

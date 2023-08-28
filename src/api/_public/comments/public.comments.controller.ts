@@ -33,7 +33,10 @@ export class PublicCommentsController {
   ) {}
 
   @Get(':id')
-  async findComment(@Param('id') commentId, @UserIdFromHeaders() userId) {
+  async findComment(
+    @Param('id') commentId: string,
+    @UserIdFromHeaders() userId: string,
+  ) {
     const result = await this.commentsQueryRepository.findComment(
       commentId,
       userId,
@@ -55,8 +58,8 @@ export class PublicCommentsController {
   @HttpCode(204)
   async updateComment(
     @Body() commentInputDto: CommentInputDto,
-    @Param('id') commentId,
-    @UserIdFromGuard() userId,
+    @Param('id') commentId: string,
+    @UserIdFromGuard() userId: string,
   ) {
     const result = await this.commandBus.execute(
       new CommentUpdateCommand(commentInputDto, commentId, userId),
@@ -72,7 +75,10 @@ export class PublicCommentsController {
   @UseGuards(JwtBearerGuard)
   @Delete(':id')
   @HttpCode(204)
-  async deleteComment(@Param('id') commentId, @UserIdFromGuard() userId) {
+  async deleteComment(
+    @Param('id') commentId: string,
+    @UserIdFromGuard() userId: string,
+  ) {
     const result = await this.commandBus.execute(
       new CommentDeleteCommand(commentId, userId),
     );
@@ -89,8 +95,8 @@ export class PublicCommentsController {
   @HttpCode(204)
   async updateLikeStatus(
     @Body() likeStatusInputDto: LikeStatusInputDto,
-    @Param('id') commentId,
-    @UserIdFromGuard() userId,
+    @Param('id') commentId: string,
+    @UserIdFromGuard() userId: string,
   ) {
     const result = await this.commandBus.execute(
       new LikeUpdateForCommentCommand(likeStatusInputDto, commentId, userId),

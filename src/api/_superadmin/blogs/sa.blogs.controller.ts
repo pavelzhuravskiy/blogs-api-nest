@@ -51,7 +51,7 @@ export class SuperAdminBlogsController {
   @HttpCode(204)
   async banBlog(
     @Body() saBlogBanInputDto: SABlogBanInputDto,
-    @Param('id') blogId,
+    @Param('id') blogId: string,
   ) {
     const result = await this.commandBus.execute(
       new SABlogBanCommand(saBlogBanInputDto, blogId),

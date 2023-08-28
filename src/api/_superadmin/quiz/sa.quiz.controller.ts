@@ -55,7 +55,7 @@ export class SuperAdminQuizController {
   @HttpCode(204)
   async updateQuestion(
     @Body() questionInputDto: QuestionInputDto,
-    @Param('id') questionId,
+    @Param('id') questionId: string,
   ) {
     const result = await this.commandBus.execute(
       new QuestionUpdateCommand(questionInputDto, questionId),
@@ -77,7 +77,7 @@ export class SuperAdminQuizController {
   @HttpCode(204)
   async publishQuestion(
     @Body() questionPublishInputDto: QuestionPublishInputDto,
-    @Param('id') questionId,
+    @Param('id') questionId: string,
   ) {
     const result = await this.commandBus.execute(
       new QuestionPublishCommand(questionPublishInputDto, questionId),
@@ -97,7 +97,7 @@ export class SuperAdminQuizController {
   @UseGuards(BasicAuthGuard)
   @Delete(':id')
   @HttpCode(204)
-  async deleteQuestion(@Param('id') questionId) {
+  async deleteQuestion(@Param('id') questionId: string) {
     const result = await this.commandBus.execute(
       new QuestionDeleteCommand(questionId),
     );

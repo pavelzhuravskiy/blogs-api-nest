@@ -36,7 +36,7 @@ export class PublicQuizController {
   @UseGuards(JwtBearerGuard)
   @Post('pairs/connection')
   @HttpCode(200)
-  async connectUser(@UserIdFromGuard() userId) {
+  async connectUser(@UserIdFromGuard() userId: string) {
     const result = await this.commandBus.execute(
       new UserConnectCommand(userId),
     );
@@ -55,19 +55,22 @@ export class PublicQuizController {
 
   @UseGuards(JwtBearerGuard)
   @Get('users/my-statistic')
-  async getStatistics(@UserIdFromGuard() userId) {
+  async getStatistics(@UserIdFromGuard() userId: string) {
     return this.gamesQueryRepository.getStatistics(userId);
   }
 
   @UseGuards(JwtBearerGuard)
   @Get('pairs/my')
-  async findMyGames(@Query() query: GameQueryDto, @UserIdFromGuard() userId) {
+  async findMyGames(
+    @Query() query: GameQueryDto,
+    @UserIdFromGuard() userId: string,
+  ) {
     return this.gamesQueryRepository.findMyGames(query, userId);
   }
 
   @UseGuards(JwtBearerGuard)
   @Get('pairs/my-current')
-  async findCurrentGame(@UserIdFromGuard() userId) {
+  async findCurrentGame(@UserIdFromGuard() userId: string) {
     const result = await this.gamesQueryRepository.findCurrentGame(userId);
 
     if (!result) {
@@ -79,7 +82,10 @@ export class PublicQuizController {
 
   @UseGuards(JwtBearerGuard)
   @Get('pairs/:id')
-  async findGame(@Param('id') gameId, @UserIdFromGuard() userId) {
+  async findGame(
+    @Param('id') gameId: string,
+    @UserIdFromGuard() userId: string,
+  ) {
     const result = await this.queryBus.execute(
       new GameFindQuery(gameId, userId),
     );
@@ -96,7 +102,7 @@ export class PublicQuizController {
   @HttpCode(200)
   async sendAnswer(
     @Body() answerInputDto: AnswerInputDto,
-    @UserIdFromGuard() userId,
+    @UserIdFromGuard() userId: string,
   ) {
     const gameId = await this.commandBus.execute(
       new AnswerSendCommand(answerInputDto, userId),

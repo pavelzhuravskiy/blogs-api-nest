@@ -51,7 +51,7 @@ export class SuperAdminUsersController {
   @UseGuards(BasicAuthGuard)
   @Delete(':id')
   @HttpCode(204)
-  async deleteUser(@Param('id') userId) {
+  async deleteUser(@Param('id') userId: string) {
     const result = await this.commandBus.execute(new UserDeleteCommand(userId));
 
     if (!result) {
@@ -66,7 +66,7 @@ export class SuperAdminUsersController {
   @HttpCode(204)
   async banUser(
     @Body() saUserBanInputDto: SAUserBanInputDto,
-    @Param('id') userId,
+    @Param('id') userId: string,
   ) {
     const result = await this.commandBus.execute(
       new SAUserBanCommand(saUserBanInputDto, userId),

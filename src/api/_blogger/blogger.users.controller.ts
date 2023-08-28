@@ -27,8 +27,8 @@ export class BloggerUsersController {
   @HttpCode(204)
   async banUser(
     @Body() bloggerUserBanInputDto: BloggerUserBanInputDto,
-    @Param('id') userToBanId,
-    @UserIdFromGuard() userId,
+    @Param('id') userToBanId: string,
+    @UserIdFromGuard() userId: string,
   ) {
     const result = await this.commandBus.execute(
       new BloggerUserBanCommand(bloggerUserBanInputDto, userToBanId, userId),
@@ -45,8 +45,8 @@ export class BloggerUsersController {
   @Get('blog/:id')
   async findUsers(
     @Query() query: BloggerUserBanQueryDto,
-    @Param('id') blogId,
-    @UserIdFromGuard() userId,
+    @Param('id') blogId: string,
+    @UserIdFromGuard() userId: string,
   ) {
     const result = await this.queryBus.execute(
       new UsersGetBannedQuery(query, blogId, userId),

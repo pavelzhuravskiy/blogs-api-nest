@@ -27,7 +27,7 @@ export class PublicDevicesController {
 
   @UseGuards(JwtRefreshGuard)
   @Get('devices')
-  async getDevices(@UserIdFromGuard() userId) {
+  async getDevices(@UserIdFromGuard() userId: string) {
     return this.devicesQueryRepository.findDevices(userId);
   }
 
@@ -35,8 +35,8 @@ export class PublicDevicesController {
   @Delete('devices')
   @HttpCode(204)
   async deleteOldDevices(
-    @RefreshToken() refreshToken,
-    @UserIdFromGuard() userId,
+    @RefreshToken() refreshToken: any,
+    @UserIdFromGuard() userId: string,
   ) {
     const decodedToken: any = this.jwtService.decode(refreshToken);
     const deviceId = decodedToken?.deviceId;
@@ -48,7 +48,10 @@ export class PublicDevicesController {
   @UseGuards(JwtRefreshGuard)
   @Delete('devices/:id')
   @HttpCode(204)
-  async terminateSession(@Param('id') deviceId, @UserIdFromGuard() userId) {
+  async terminateSession(
+    @Param('id') deviceId: string,
+    @UserIdFromGuard() userId: string,
+  ) {
     const result = await this.commandBus.execute(
       new DeviceDeleteForTerminateCommand(deviceId, userId),
     );

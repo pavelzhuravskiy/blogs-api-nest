@@ -16,4 +16,5 @@ export const blogUpdatedName = 'New name';
 export const blogUpdatedDescription = 'New description';
 export const blogUpdatedWebsite = 'https://someurl.com/new';
 
-// Blog bind strings
+// Blog images strings
+export const bloggerBlogMainImageURI = '/images/main/';

@@ -3,6 +3,7 @@ import { INestApplication } from '@nestjs/common';
 import {
   blog01Name,
   blogDescription,
+  bloggerBlogMainImageURI,
   bloggerBlogsURI,
   blogUpdatedDescription,
   blogUpdatedName,
@@ -26,6 +27,7 @@ import {
 } from '../utils/constants/auth.constants';
 import { randomUUID } from 'crypto';
 import { getAppAndClearDb } from '../utils/functions/get-app';
+import * as path from 'path';
 
 describe('Blogger blogs and posts images testing', () => {
   let app: INestApplication;
@@ -37,7 +39,7 @@ describe('Blogger blogs and posts images testing', () => {
     agent = data.agent;
   });
 
-  let blog01Id;
+  let blogId;
 
   let postId;
 
@@ -87,8 +89,26 @@ describe('Blogger blogs and posts images testing', () => {
       aTokenUser02 = response.body.accessToken;
     });
   });
-
   describe('Add main image for blog', () => {
+    it(`should create new blog`, async () => {
+      await agent
+        .post(bloggerBlogsURI)
+        .auth(aTokenUser01, { type: 'bearer' })
+        .send({
+          name: blog01Name,
+          description: blogDescription,
+          websiteUrl: blogWebsite,
+        })
+        .expect(201);
+
+      const blogs = await agent
+        .get(bloggerBlogsURI)
+        .auth(aTokenUser01, { type: 'bearer' })
+        .expect(200);
+
+      blogId = blogs.body.items[0].id;
+    });
+
     // Validation errors [400]
     it.skip(`should return 400 when trying to add main image with incorrect dimensions`, async () => {
       const response = await agent
@@ -131,7 +151,7 @@ describe('Blogger blogs and posts images testing', () => {
     // Forbidden errors [403]
     it.skip(`should return 403 when trying to add main image of another user's blog`, async () => {
       await agent
-        .put(bloggerBlogsURI + blog01Id)
+        .put(bloggerBlogsURI + blogId)
         .auth(aTokenUser02, { type: 'bearer' })
         .send({
           name: blogUpdatedName,
@@ -143,15 +163,13 @@ describe('Blogger blogs and posts images testing', () => {
 
     // Success
     it(`should add main image`, async () => {
-      return agent
-        .post(bloggerBlogsURI)
+      const filePath = path.join(__dirname, 'img', 'main_156x156_10kb.jpg');
+      const response = await agent
+        .post(bloggerBlogsURI + blogId + bloggerBlogMainImageURI)
         .auth(aTokenUser01, { type: 'bearer' })
-        .send({
-          name: blog01Name,
-          description: blogDescription,
-          websiteUrl: blogWebsite,
-        })
-        .expect(201);
+        .attach('file', filePath);
+
+      console.log(response.body);
     });
   });
 

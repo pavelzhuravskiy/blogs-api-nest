@@ -37,12 +37,18 @@ export class PublicPostsController {
   ) {}
 
   @Get()
-  async findPosts(@Query() query: PostQueryDto, @UserIdFromHeaders() userId) {
+  async findPosts(
+    @Query() query: PostQueryDto,
+    @UserIdFromHeaders() userId: string,
+  ) {
     return this.postsQueryRepository.findPosts(query, userId);
   }
 
   @Get(':id')
-  async findPost(@Param('id') postId, @UserIdFromHeaders() userId) {
+  async findPost(
+    @Param('id') postId: string,
+    @UserIdFromHeaders() userId: string,
+  ) {
     const result = await this.postsQueryRepository.findPost(postId, userId);
 
     if (!result) {
@@ -56,8 +62,8 @@ export class PublicPostsController {
   @Post(':id/comments')
   async createComment(
     @Body() commentInputDto: CommentInputDto,
-    @Param('id') postId,
-    @UserIdFromGuard() userId,
+    @Param('id') postId: string,
+    @UserIdFromGuard() userId: string,
   ) {
     const result = await this.commandBus.execute(
       new CommentCreateCommand(commentInputDto, postId, userId),
@@ -73,8 +79,8 @@ export class PublicPostsController {
   @Get(':id/comments')
   async findComments(
     @Query() query: CommentQueryDto,
-    @Param('id') postId,
-    @UserIdFromHeaders() userId,
+    @Param('id') postId: string,
+    @UserIdFromHeaders() userId: string,
   ) {
     const result = await this.commentsQueryRepository.findComments(
       query,
@@ -94,8 +100,8 @@ export class PublicPostsController {
   @HttpCode(204)
   async updateLikeStatus(
     @Body() likeStatusInputDto: LikeStatusInputDto,
-    @Param('id') postId,
-    @UserIdFromGuard() userId,
+    @Param('id') postId: string,
+    @UserIdFromGuard() userId: string,
   ) {
     const result = await this.commandBus.execute(
       new LikeUpdateForPostCommand(likeStatusInputDto, postId, userId),

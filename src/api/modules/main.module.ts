@@ -48,7 +48,8 @@ import { PostLike } from '../entities/posts/post-like.entity';
 import { TransactionsRepository } from '../infrastructure/repositories/common/transactions.repository';
 import { UsersTransactionsRepository } from '../infrastructure/repositories/users/users.transactions.repository';
 import { DataSourceRepository } from '../infrastructure/repositories/common/data-source.repository';
-import { AddMainImageUseCase } from '../_blogger/application/use-cases/blog-add-img-main.use-case';
+import { BlogAddMainImageUseCase } from '../_blogger/application/use-cases/blog-add-img-main.use-case';
+import { S3Adapter } from '../infrastructure/aws/s3-adapter';
 
 const entities = [Blog, BlogBan, Post, PostLike, Comment, CommentLike];
 
@@ -79,7 +80,7 @@ const useCases = [
   LikeUpdateForCommentUseCase,
   BloggerUserBanUseCase,
   UsersGetBannedUseCase,
-  AddMainImageUseCase,
+  BlogAddMainImageUseCase,
 ];
 
 const repositories = [
@@ -107,6 +108,7 @@ const queryRepositories = [
     ...repositories,
     ...queryRepositories,
     IsBlogExistConstraint,
+    S3Adapter,
   ],
 })
 export class MainModule implements NestModule {

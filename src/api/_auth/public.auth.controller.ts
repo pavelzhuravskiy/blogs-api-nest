@@ -132,10 +132,10 @@ export class PublicAuthController {
   @Post('login')
   @HttpCode(200)
   async login(
-    @UserIdFromGuard() userId,
-    @Ip() ip,
-    @Headers() headers,
-    @Response() res,
+    @UserIdFromGuard() userId: string,
+    @Ip() ip: string,
+    @Headers() headers: any,
+    @Response() res: any,
   ) {
     const userAgent = headers['user-agent'] || 'unknown';
     const tokens = await this.commandBus.execute(
@@ -158,11 +158,11 @@ export class PublicAuthController {
   @Post('refresh-token')
   @HttpCode(200)
   async refreshTokens(
-    @UserIdFromGuard() userId,
-    @Ip() ip,
-    @Headers() headers,
-    @RefreshToken() refreshToken,
-    @Response() res,
+    @UserIdFromGuard() userId: string,
+    @Ip() ip: string,
+    @Headers() headers: any,
+    @RefreshToken() refreshToken: any,
+    @Response() res: any,
   ) {
     const userAgent = headers['user-agent'] || 'unknown';
     const decodedToken: any = this.jwtService.decode(refreshToken);
@@ -189,7 +189,7 @@ export class PublicAuthController {
   @UseGuards(JwtRefreshGuard)
   @Post('logout')
   @HttpCode(204)
-  async logout(@RefreshToken() refreshToken) {
+  async logout(@RefreshToken() refreshToken: any) {
     const decodedToken: any = this.jwtService.decode(refreshToken);
     const deviceId = decodedToken.deviceId;
     return this.commandBus.execute(new DeviceDeleteForLogoutCommand(deviceId));
@@ -197,7 +197,7 @@ export class PublicAuthController {
 
   @UseGuards(JwtBearerGuard)
   @Get('me')
-  async getProfile(@UserIdFromGuard() userId) {
+  async getProfile(@UserIdFromGuard() userId: string) {
     const user = await this.usersRepository.findUserById(userId);
 
     if (!user) {

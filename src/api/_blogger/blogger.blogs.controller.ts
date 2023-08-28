@@ -8,7 +8,9 @@ import {
   Post,
   Put,
   Query,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { BlogInputDto } from '../dto/blogs/input/blog.input.dto';
 import { CommandBus } from '@nestjs/cqrs';
@@ -32,7 +34,8 @@ import { BlogQueryDto } from '../dto/blogs/query/blog.query.dto';
 import { PostsQueryRepository } from '../infrastructure/repositories/posts/posts.query.repository';
 import { CommentQueryDto } from '../dto/comments/query/comment.query.dto';
 import { CommentsQueryRepository } from '../infrastructure/repositories/comments/comments.query.repository';
-import { AddMainImageCommand } from './application/use-cases/blog-add-img-main.use-case';
+import { BlogAddMainImageCommand } from './application/use-cases/blog-add-img-main.use-case';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('blogger/blogs')
 export class BloggerBlogsController {
@@ -47,7 +50,7 @@ export class BloggerBlogsController {
   @Post()
   async createBlog(
     @Body() blogInputDto: BlogInputDto,
-    @UserIdFromGuard() userId,
+    @UserIdFromGuard() userId: string,
   ) {
     const blogId = await this.commandBus.execute(
       new BlogCreateCommand(blogInputDto, userId),
@@ -62,7 +65,10 @@ export class BloggerBlogsController {
 
   @UseGuards(JwtBearerGuard)
   @Get()
-  async findBlogs(@Query() query: BlogQueryDto, @UserIdFromGuard() userId) {
+  async findBlogs(
+    @Query() query: BlogQueryDto,
+    @UserIdFromGuard() userId: string,
+  ) {
     return this.blogsQueryRepository.findBlogsOfCurrentBlogger(query, userId);
   }
 
@@ -71,8 +77,8 @@ export class BloggerBlogsController {
   @HttpCode(204)
   async updateBlog(
     @Body() blogInputDto: BlogInputDto,
-    @Param('id') blogId,
-    @UserIdFromGuard() userId,
+    @Param('id') blogId: string,
+    @UserIdFromGuard() userId: string,
   ) {
     const result = await this.commandBus.execute(
       new BlogUpdateCommand(blogInputDto, blogId, userId),
@@ -88,7 +94,10 @@ export class BloggerBlogsController {
   @UseGuards(JwtBearerGuard)
   @Delete(':id')
   @HttpCode(204)
-  async deleteBlog(@Param('id') blogId, @UserIdFromGuard() userId) {
+  async deleteBlog(
+    @Param('id') blogId: string,
+    @UserIdFromGuard() userId: string,
+  ) {
     const result = await this.commandBus.execute(
       new BlogDeleteCommand(blogId, userId),
     );
@@ -104,8 +113,8 @@ export class BloggerBlogsController {
   @Post(':id/posts')
   async createPost(
     @Body() postInputDto: PostInputDto,
-    @Param('id') blogId,
-    @UserIdFromGuard() userId,
+    @Param('id') blogId: string,
+    @UserIdFromGuard() userId: string,
   ) {
     const result = await this.commandBus.execute(
       new PostCreateCommand(postInputDto, blogId, userId),
@@ -123,8 +132,8 @@ export class BloggerBlogsController {
   @HttpCode(204)
   async updatePost(
     @Body() postInputDto: PostInputDto,
-    @Param() params,
-    @UserIdFromGuard() userId,
+    @Param() params: { blogId: string; postId: string },
+    @UserIdFromGuard() userId: string,
   ) {
     const result = await this.commandBus.execute(
       new PostUpdateCommand(postInputDto, params.blogId, params.postId, userId),
@@ -140,7 +149,10 @@ export class BloggerBlogsController {
   @UseGuards(JwtBearerGuard)
   @Delete(':blogId/posts/:postId')
   @HttpCode(204)
-  async deletePost(@Param() params, @UserIdFromGuard() userId) {
+  async deletePost(
+    @Param() params: { blogId: string; postId: string },
+    @UserIdFromGuard() userId: string,
+  ) {
     const result = await this.commandBus.execute(
       new PostDeleteCommand(params.blogId, params.postId, userId),
     );
@@ -156,7 +168,7 @@ export class BloggerBlogsController {
   @Get('comments')
   async findComments(
     @Query() query: CommentQueryDto,
-    @UserIdFromGuard() userId,
+    @UserIdFromGuard() userId: string,
   ) {
     return this.commentsQueryRepository.findCommentsOfBloggerPosts(
       query,
@@ -164,11 +176,23 @@ export class BloggerBlogsController {
     );
   }
 
+  @UseInterceptors(FileInterceptor('file'))
   @UseGuards(JwtBearerGuard)
   @Post(':blogId/images/main')
-  async uploadMainImage(@Param('blogId') blogId, @UserIdFromGuard() userId) {
+  async uploadMainImage(
+    @UploadedFile() file: Express.Multer.File,
+    @Param('blogId') blogId: string,
+    @UserIdFromGuard() userId: string,
+  ) {
+    // console.log(file);
     const result = await this.commandBus.execute(
-      new AddMainImageCommand(blogId, userId),
+      new BlogAddMainImageCommand(
+        blogId,
+        userId,
+        file.buffer,
+        file.mimetype,
+        file.originalname,
+      ),
     );
 
     if (result.code !== ResultCode.Success) {

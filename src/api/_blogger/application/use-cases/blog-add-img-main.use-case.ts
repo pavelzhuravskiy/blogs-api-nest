@@ -6,19 +6,29 @@ import {
   blogNotFound,
 } from '../../../../exceptions/exception.constants';
 import { BlogsRepository } from '../../../infrastructure/repositories/blogs/blogs.repository';
+import { S3Adapter } from '../../../infrastructure/aws/s3-adapter';
 
-export class AddMainImageCommand {
-  constructor(public blogId: string, public userId: string) {}
+export class BlogAddMainImageCommand {
+  constructor(
+    public blogId: string,
+    public userId: string,
+    public buffer: Buffer,
+    public mimetype: string,
+    public originalName: string,
+  ) {}
 }
 
-@CommandHandler(AddMainImageCommand)
-export class AddMainImageUseCase
-  implements ICommandHandler<AddMainImageCommand>
+@CommandHandler(BlogAddMainImageCommand)
+export class BlogAddMainImageUseCase
+  implements ICommandHandler<BlogAddMainImageCommand>
 {
-  constructor(private readonly blogsRepository: BlogsRepository) {}
+  constructor(
+    private readonly blogsRepository: BlogsRepository,
+    private readonly s3Adapter: S3Adapter,
+  ) {}
 
   async execute(
-    command: AddMainImageCommand,
+    command: BlogAddMainImageCommand,
   ): Promise<ExceptionResultType<boolean>> {
     const blog = await this.blogsRepository.findBlogWithOwner(command.blogId);
 
@@ -38,7 +48,12 @@ export class AddMainImageUseCase
       };
     }
 
-    // await this.blogsRepository.ulpoadMainImage(post.id);
+    await this.s3Adapter.uploadBlogMainImage(
+      command.blogId,
+      command.buffer,
+      command.mimetype,
+      command.originalName,
+    );
 
     return {
       data: true,
