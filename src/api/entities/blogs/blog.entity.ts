@@ -13,6 +13,7 @@ import { Post } from '../posts/post.entity';
 import { UserBanByBlogger } from '../users/user-ban-by-blogger.entity';
 import { User } from '../users/user.entity';
 import { randomUUID } from 'crypto';
+import { BlogMainImage } from './blog-image-main.entity';
 
 @Entity('blogs')
 export class Blog {
@@ -36,6 +37,9 @@ export class Blog {
 
   @OneToOne(() => BlogBan, (blogBan) => blogBan.blog)
   blogBan: BlogBan;
+
+  @OneToOne(() => BlogMainImage, (blogMainImage) => blogMainImage.blog)
+  blogMainImage: BlogMainImage;
 
   @ManyToOne(() => User, (user) => user.blog)
   @JoinColumn()

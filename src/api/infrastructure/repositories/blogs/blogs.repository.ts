@@ -49,6 +49,19 @@ export class BlogsRepository {
     }
   }
 
+  async findBlogMainImageRecord(blogId: string): Promise<Blog | null> {
+    try {
+      return await this.blogsRepository
+        .createQueryBuilder('b')
+        .leftJoinAndSelect('b.blogMainImage', 'bmi')
+        .where(`b.id = :blogId`, { blogId: blogId })
+        .getOne();
+    } catch (e) {
+      console.log(e);
+      return null;
+    }
+  }
+
   // ***** Delete operations *****
   async deleteBlog(blogId: string): Promise<boolean> {
     const result = await this.blogsRepository

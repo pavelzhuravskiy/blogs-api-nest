@@ -50,8 +50,17 @@ import { UsersTransactionsRepository } from '../infrastructure/repositories/user
 import { DataSourceRepository } from '../infrastructure/repositories/common/data-source.repository';
 import { BlogAddMainImageUseCase } from '../_blogger/application/use-cases/blog-add-img-main.use-case';
 import { S3Adapter } from '../infrastructure/aws/s3-adapter';
+import { BlogMainImage } from '../entities/blogs/blog-image-main.entity';
 
-const entities = [Blog, BlogBan, Post, PostLike, Comment, CommentLike];
+const entities = [
+  Blog,
+  BlogBan,
+  BlogMainImage,
+  Post,
+  PostLike,
+  Comment,
+  CommentLike,
+];
 
 const controllers = [
   SuperAdminBlogsController,

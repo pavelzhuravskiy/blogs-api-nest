@@ -14,6 +14,7 @@ import { PostLike } from '../api/entities/posts/post-like.entity';
 import { Device } from '../api/entities/devices/device.entity';
 import { UserPasswordRecovery } from '../api/entities/users/user-password-recovery.entity';
 import { Question } from '../api/entities/quiz/question.entity';
+import { BlogMainImage } from '../api/entities/blogs/blog-image-main.entity';
 
 export type TypeORMEntity =
   | Player
@@ -27,6 +28,7 @@ export type TypeORMEntity =
   | UserPasswordRecovery
   | Blog
   | BlogBan
+  | BlogMainImage
   | Comment
   | CommentLike
   | Post

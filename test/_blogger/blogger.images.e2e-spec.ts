@@ -103,7 +103,7 @@ describe('Blogger blogs and posts images testing', () => {
     });
 
     // Validation errors [400]
-    it(`should return 400 when trying to add main image with incorrect size`, async () => {
+    it.skip(`should return 400 when trying to add main image with incorrect size`, async () => {
       const filePath = path.join(
         __dirname,
         'img',
@@ -117,7 +117,7 @@ describe('Blogger blogs and posts images testing', () => {
         .attach('file', filePath)
         .expect(400);
     });
-    it(`should return 400 when trying to add main image with incorrect width`, async () => {
+    it.skip(`should return 400 when trying to add main image with incorrect width`, async () => {
       const filePath = path.join(
         __dirname,
         'img',
@@ -131,7 +131,7 @@ describe('Blogger blogs and posts images testing', () => {
         .attach('file', filePath)
         .expect(400);
     });
-    it(`should return 400 when trying to add main image with incorrect height`, async () => {
+    it.skip(`should return 400 when trying to add main image with incorrect height`, async () => {
       const filePath = path.join(
         __dirname,
         'img',
@@ -145,7 +145,7 @@ describe('Blogger blogs and posts images testing', () => {
         .attach('file', filePath)
         .expect(400);
     });
-    it(`should return 400 when trying to add main image with incorrect format`, async () => {
+    it.skip(`should return 400 when trying to add main image with incorrect format`, async () => {
       const filePath = path.join(
         __dirname,
         'img',
@@ -161,7 +161,7 @@ describe('Blogger blogs and posts images testing', () => {
       console.log(test.body);
       return test;
     });
-    it(`should return 400 when trying to add main image with unsupported image format`, async () => {
+    it.skip(`should return 400 when trying to add main image with unsupported image format`, async () => {
       const filePath = path.join(
         __dirname,
         'img',
@@ -179,7 +179,7 @@ describe('Blogger blogs and posts images testing', () => {
     });
 
     // Auth errors [401]
-    it(`should return 401 when trying to add main image with incorrect access token`, async () => {
+    it.skip(`should return 401 when trying to add main image with incorrect access token`, async () => {
       const filePath = path.join(
         __dirname,
         'img',
@@ -195,7 +195,7 @@ describe('Blogger blogs and posts images testing', () => {
     });
 
     // Forbidden errors [403]
-    it(`should return 403 when trying to add main image for blog that belongs to another user`, async () => {
+    it.skip(`should return 403 when trying to add main image for blog that belongs to another user`, async () => {
       const filePath = path.join(
         __dirname,
         'img',

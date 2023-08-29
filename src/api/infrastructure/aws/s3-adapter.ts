@@ -14,15 +14,10 @@ export class S3Adapter {
       },
     });
   }
-  async uploadBlogMainImage(
-    blogId: string,
-    buffer: Buffer,
-    mimetype: string,
-    originalName: string,
-  ) {
+  async uploadBlogMainImage(key: string, buffer: Buffer, mimetype: string) {
     const command = new PutObjectCommand({
       Bucket: 'blogs-api',
-      Key: `blog/img/main/${blogId}_${originalName}`,
+      Key: key,
       Body: buffer,
       ContentType: mimetype,
     });
