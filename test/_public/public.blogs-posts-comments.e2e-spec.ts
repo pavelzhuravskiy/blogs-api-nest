@@ -3,7 +3,9 @@ import { INestApplication } from '@nestjs/common';
 import {
   blog01Name,
   blogDescription,
+  bloggerBlogMainImageURI,
   bloggerBlogsURI,
+  bloggerBlogWallpaperImageURI,
   blogWebsite,
   publicBlogsURI,
 } from '../utils/constants/blogs.constants';
@@ -21,7 +23,10 @@ import {
   publicLoginUri,
 } from '../utils/constants/auth.constants';
 import { randomUUID } from 'crypto';
-import { blog01Object } from '../utils/objects/blogs.objects';
+import {
+  blog01Object,
+  createdBlogObject,
+} from '../utils/objects/blogs.objects';
 import {
   postContent,
   postShortDescription,
@@ -42,6 +47,7 @@ import {
   updatedCommentObject,
 } from '../utils/objects/comment.objects';
 import { getAppAndClearDb } from '../utils/functions/get-app';
+import path from 'path';
 
 describe('Public blogs, posts, comments testing', () => {
   let app: INestApplication;
@@ -115,8 +121,65 @@ describe('Public blogs, posts, comments testing', () => {
           websiteUrl: blogWebsite,
         })
         .expect(201);
+      expect(blog.body).toEqual(createdBlogObject);
 
       blogId = blog.body.id;
+    });
+    it(`should add wallpaper image (jpg)`, async () => {
+      const filePath = path.join(
+        __dirname,
+        'img',
+        'blog',
+        'wallpaper',
+        'wallpaper_1028x312_63kb.jpg',
+      );
+      return agent
+        .post(bloggerBlogsURI + blogId + bloggerBlogWallpaperImageURI)
+        .auth(aTokenUser01, { type: 'bearer' })
+        .attach('file', filePath)
+        .expect(201);
+    });
+    it(`should add main image (jpg)`, async () => {
+      const filePath = path.join(
+        __dirname,
+        'img',
+        'blog',
+        'main',
+        'main_156x156_10kb.jpg',
+      );
+      return agent
+        .post(bloggerBlogsURI + blogId + bloggerBlogMainImageURI)
+        .auth(aTokenUser01, { type: 'bearer' })
+        .attach('file', filePath)
+        .expect(201);
+    });
+    it(`should add main image (jpeg)`, async () => {
+      const filePath = path.join(
+        __dirname,
+        'img',
+        'blog',
+        'main',
+        'main_156x156_10kb.jpeg',
+      );
+      return agent
+        .post(bloggerBlogsURI + blogId + bloggerBlogMainImageURI)
+        .auth(aTokenUser01, { type: 'bearer' })
+        .attach('file', filePath)
+        .expect(201);
+    });
+    it(`should add main image (png)`, async () => {
+      const filePath = path.join(
+        __dirname,
+        'img',
+        'blog',
+        'main',
+        'main_156x156_10kb.png',
+      );
+      return agent
+        .post(bloggerBlogsURI + blogId + bloggerBlogMainImageURI)
+        .auth(aTokenUser01, { type: 'bearer' })
+        .attach('file', filePath)
+        .expect(201);
     });
 
     // Not found errors [404]
@@ -137,6 +200,7 @@ describe('Public blogs, posts, comments testing', () => {
     });
     it(`should return created blog by ID`, async () => {
       const blog = await agent.get(publicBlogsURI + blogId).expect(200);
+
       expect(blog.body).toEqual(blog01Object);
 
       blogId = blog.body.id;

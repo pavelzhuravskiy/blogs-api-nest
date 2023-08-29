@@ -4,7 +4,9 @@ import {
   blog01Name,
   blog02Name,
   blogDescription,
+  bloggerBlogMainImageURI,
   bloggerBlogsURI,
+  bloggerBlogWallpaperImageURI,
   blogUpdatedDescription,
   blogUpdatedName,
   blogUpdatedWebsite,
@@ -41,6 +43,7 @@ import { randomUUID } from 'crypto';
 import {
   blog01Object,
   blog02Object,
+  createdBlogObject,
   updatedBlogObject,
 } from '../utils/objects/blogs.objects';
 import {
@@ -59,6 +62,7 @@ import {
   longString109,
   longString39,
 } from '../utils/constants/common.constants';
+import path from 'path';
 
 describe('Blogger blogs and posts testing', () => {
   let app: INestApplication;
@@ -122,7 +126,7 @@ describe('Blogger blogs and posts testing', () => {
     });
   });
 
-  describe('Create blogs', () => {
+  describe('Create blogs and add images', () => {
     // Validation errors [400]
     it(`should return 400 when trying to create blog without name`, async () => {
       const response = await agent
@@ -267,7 +271,7 @@ describe('Blogger blogs and posts testing', () => {
 
     // Success
     it(`should create new blog of user 01`, async () => {
-      return agent
+      const blog = await agent
         .post(bloggerBlogsURI)
         .auth(aTokenUser01, { type: 'bearer' })
         .send({
@@ -276,9 +280,13 @@ describe('Blogger blogs and posts testing', () => {
           websiteUrl: blogWebsite,
         })
         .expect(201);
+
+      blog01Id = blog.body.id;
+
+      expect(blog.body).toEqual(createdBlogObject);
     });
     it(`should create new blog of user 02`, async () => {
-      return agent
+      const blog = await agent
         .post(bloggerBlogsURI)
         .auth(aTokenUser02, { type: 'bearer' })
         .send({
@@ -286,6 +294,96 @@ describe('Blogger blogs and posts testing', () => {
           description: blogDescription,
           websiteUrl: blogWebsite,
         })
+        .expect(201);
+
+      blog02Id = blog.body.id;
+
+      expect(blog.body).toEqual(createdBlogObject);
+    });
+
+    it(`should add wallpaper image (jpg) for blog 01`, async () => {
+      const filePath = path.join(
+        __dirname,
+        'img',
+        'blog',
+        'wallpaper',
+        'wallpaper_1028x312_63kb.jpg',
+      );
+      return agent
+        .post(bloggerBlogsURI + blog01Id + bloggerBlogWallpaperImageURI)
+        .auth(aTokenUser01, { type: 'bearer' })
+        .attach('file', filePath)
+        .expect(201);
+    });
+    it(`should add main image (jpg) for blog 01`, async () => {
+      const filePath = path.join(
+        __dirname,
+        'img',
+        'blog',
+        'main',
+        'main_156x156_10kb.jpg',
+      );
+      return agent
+        .post(bloggerBlogsURI + blog01Id + bloggerBlogMainImageURI)
+        .auth(aTokenUser01, { type: 'bearer' })
+        .attach('file', filePath)
+        .expect(201);
+    });
+    it(`should add main image (jpeg) for blog 01`, async () => {
+      const filePath = path.join(
+        __dirname,
+        'img',
+        'blog',
+        'main',
+        'main_156x156_10kb.jpeg',
+      );
+      return agent
+        .post(bloggerBlogsURI + blog01Id + bloggerBlogMainImageURI)
+        .auth(aTokenUser01, { type: 'bearer' })
+        .attach('file', filePath)
+        .expect(201);
+    });
+    it(`should add main image (png) for blog 01`, async () => {
+      const filePath = path.join(
+        __dirname,
+        'img',
+        'blog',
+        'main',
+        'main_156x156_10kb.png',
+      );
+      return agent
+        .post(bloggerBlogsURI + blog01Id + bloggerBlogMainImageURI)
+        .auth(aTokenUser01, { type: 'bearer' })
+        .attach('file', filePath)
+        .expect(201);
+    });
+
+    it(`should add wallpaper image (jpg) for blog 02`, async () => {
+      const filePath = path.join(
+        __dirname,
+        'img',
+        'blog',
+        'wallpaper',
+        'wallpaper_1028x312_63kb.jpg',
+      );
+      return agent
+        .post(bloggerBlogsURI + blog02Id + bloggerBlogWallpaperImageURI)
+        .auth(aTokenUser02, { type: 'bearer' })
+        .attach('file', filePath)
+        .expect(201);
+    });
+    it(`should add main image (jpg) for blog 02`, async () => {
+      const filePath = path.join(
+        __dirname,
+        'img',
+        'blog',
+        'main',
+        'main_156x156_10kb.jpg',
+      );
+      return agent
+        .post(bloggerBlogsURI + blog02Id + bloggerBlogMainImageURI)
+        .auth(aTokenUser02, { type: 'bearer' })
+        .attach('file', filePath)
         .expect(201);
     });
   });
@@ -305,8 +403,6 @@ describe('Blogger blogs and posts testing', () => {
         .auth(aTokenUser01, { type: 'bearer' })
         .expect(200);
 
-      blog01Id = blogs.body.items[0].id;
-
       expect(blogs.body).toEqual({
         pagesCount: 1,
         page: 1,
@@ -320,8 +416,6 @@ describe('Blogger blogs and posts testing', () => {
         .get(bloggerBlogsURI)
         .auth(aTokenUser02, { type: 'bearer' })
         .expect(200);
-
-      blog02Id = blogs.body.items[0].id;
 
       expect(blogs.body).toEqual({
         pagesCount: 1,

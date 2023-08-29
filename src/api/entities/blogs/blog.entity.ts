@@ -45,8 +45,8 @@ export class Blog {
   )
   blogWallpaperImage: BlogWallpaperImage;
 
-  @OneToMany(() => BlogMainImage, (blogMainImage) => blogMainImage.blog)
-  blogMainImage: BlogMainImage;
+  @OneToMany(() => BlogMainImage, (blogMainImages) => blogMainImages.blog)
+  blogMainImages: BlogMainImage[];
 
   @ManyToOne(() => User, (user) => user.blog)
   @JoinColumn()

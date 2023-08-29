@@ -24,6 +24,10 @@ import {
 import { randomUUID } from 'crypto';
 import { getAppAndClearDb } from '../utils/functions/get-app';
 import * as path from 'path';
+import {
+  uploadedWallpaperAndMainImagesObject,
+  uploadedWallpaperObject,
+} from '../utils/objects/blogs.objects';
 
 describe('Blogger blogs and posts images testing', () => {
   let app: INestApplication;
@@ -216,11 +220,13 @@ describe('Blogger blogs and posts images testing', () => {
         'wallpaper',
         'wallpaper_1028x312_63kb.jpg',
       );
-      return agent
+      const blogs = await agent
         .post(bloggerBlogsURI + blogId + bloggerBlogWallpaperImageURI)
         .auth(aTokenUser01, { type: 'bearer' })
         .attach('file', filePath)
         .expect(201);
+
+      expect(blogs.body).toEqual(uploadedWallpaperObject);
     });
     it(`should replace wallpaper image (jpeg)`, async () => {
       const filePath = path.join(
@@ -237,7 +243,7 @@ describe('Blogger blogs and posts images testing', () => {
         .expect(201);
     });
   });
-  describe('Add main image for blog', () => {
+  describe('Add main images for blog', () => {
     // Validation errors [400]
     it(`should return 400 when trying to add main image with incorrect size`, async () => {
       const filePath = path.join(
@@ -379,11 +385,17 @@ describe('Blogger blogs and posts images testing', () => {
         'main',
         'main_156x156_10kb.png',
       );
-      return agent
+      const blogs = await agent
         .post(bloggerBlogsURI + blogId + bloggerBlogMainImageURI)
         .auth(aTokenUser01, { type: 'bearer' })
         .attach('file', filePath)
         .expect(201);
+
+      console.log(blogs.body);
+
+      expect(blogs.body).toEqual(uploadedWallpaperAndMainImagesObject);
+
+      return blogs;
     });
   });
 

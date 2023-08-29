@@ -24,7 +24,7 @@ export class BlogMainImage {
   @Column({ type: 'bigint' })
   size: number;
 
-  @ManyToOne(() => Blog, (blog) => blog.blogMainImage, {
+  @ManyToOne(() => Blog, (blog) => blog.blogMainImages, {
     onDelete: 'CASCADE',
   })
   @JoinColumn()

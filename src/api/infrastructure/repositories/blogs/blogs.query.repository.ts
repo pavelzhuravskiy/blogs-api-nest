@@ -1,18 +1,19 @@
 import { Injectable } from '@nestjs/common';
-import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { BlogViewDto } from '../../../dto/blogs/view/blog.view.dto';
 import { Paginator } from '../../../../helpers/paginator';
 import { BlogQueryDto } from '../../../dto/blogs/query/blog.query.dto';
 import { SuperAdminBlogViewDto } from '../../../dto/blogs/view/superadmin/sa.blog.view.dto';
 import { Blog } from '../../../entities/blogs/blog.entity';
+import * as process from 'process';
+import { BlogImagesViewDto } from '../../../dto/blogs/view/blog-images.view.dto';
 
 @Injectable()
 export class BlogsQueryRepository {
   constructor(
     @InjectRepository(Blog)
     private readonly blogsRepository: Repository<Blog>,
-    @InjectDataSource() private dataSource: DataSource,
   ) {}
 
   async findBlog(blogId: string): Promise<BlogViewDto> {
@@ -20,6 +21,8 @@ export class BlogsQueryRepository {
       const blogs = await this.blogsRepository
         .createQueryBuilder('b')
         .leftJoinAndSelect('b.blogBan', 'bb')
+        .leftJoinAndSelect('b.blogWallpaperImage', 'bwi')
+        .leftJoinAndSelect('b.blogMainImages', 'bmi')
         .where(`b.id = :blogId`, {
           blogId: blogId,
         })
@@ -44,6 +47,8 @@ export class BlogsQueryRepository {
       })
       .andWhere(`bb.isBanned = false`)
       .leftJoinAndSelect('b.blogBan', 'bb')
+      .leftJoinAndSelect('b.blogWallpaperImage', 'bwi')
+      .leftJoinAndSelect('b.blogMainImages', 'bmi')
       .orderBy(`b.${query.sortBy}`, query.sortDirection)
       .skip((query.pageNumber - 1) * query.pageSize)
       .take(query.pageSize)
@@ -56,6 +61,8 @@ export class BlogsQueryRepository {
       })
       .andWhere(`bb.isBanned = false`)
       .leftJoinAndSelect('b.blogBan', 'bb')
+      .leftJoinAndSelect('b.blogWallpaperImage', 'bwi')
+      .leftJoinAndSelect('b.blogMainImages', 'bmi')
       .getCount();
 
     return Paginator.paginate({
@@ -79,6 +86,8 @@ export class BlogsQueryRepository {
         userId: userId,
       })
       .leftJoinAndSelect('b.user', 'u')
+      .leftJoinAndSelect('b.blogWallpaperImage', 'bwi')
+      .leftJoinAndSelect('b.blogMainImages', 'bmi')
       .orderBy(`b.${query.sortBy}`, query.sortDirection)
       .skip((query.pageNumber - 1) * query.pageSize)
       .take(query.pageSize)
@@ -93,6 +102,8 @@ export class BlogsQueryRepository {
         userId: userId,
       })
       .leftJoinAndSelect('b.user', 'u')
+      .leftJoinAndSelect('b.blogWallpaperImage', 'bwi')
+      .leftJoinAndSelect('b.blogMainImages', 'bmi')
       .getCount();
 
     return Paginator.paginate({
@@ -103,7 +114,9 @@ export class BlogsQueryRepository {
     });
   }
 
-  async findBlogsForSA(query: BlogQueryDto): Promise<Paginator<BlogViewDto[]>> {
+  async findBlogsForSA(
+    query: BlogQueryDto,
+  ): Promise<Paginator<SuperAdminBlogViewDto[]>> {
     const blogs = await this.blogsRepository
       .createQueryBuilder('b')
       .where(`${query.searchNameTerm ? 'b.name ilike :nameTerm' : ''}`, {
@@ -133,8 +146,65 @@ export class BlogsQueryRepository {
     });
   }
 
+  async findBlogImages(blogId: string): Promise<BlogImagesViewDto> {
+    try {
+      const blogs = await this.blogsRepository
+        .createQueryBuilder('b')
+        .leftJoinAndSelect('b.blogWallpaperImage', 'bwi')
+        .leftJoinAndSelect('b.blogMainImages', 'bmi')
+        .where(`b.id = :blogId`, {
+          blogId: blogId,
+        })
+        .getMany();
+
+      const mappedBlogs = await this.blogImagesMapping(blogs);
+      return mappedBlogs[0];
+    } catch (e) {
+      console.log(e);
+      return null;
+    }
+  }
+
+  private async blogImagesMapping(blogs: Blog[]): Promise<BlogImagesViewDto[]> {
+    return blogs.map((b) => {
+      let wallpaperImage = null;
+
+      if (b.blogWallpaperImage) {
+        wallpaperImage = {
+          url: process.env.S3_DOMAIN + b.blogWallpaperImage.url,
+          width: Number(b.blogWallpaperImage.width),
+          height: Number(b.blogWallpaperImage.height),
+          fileSize: Number(b.blogWallpaperImage.size),
+        };
+      }
+
+      return {
+        wallpaper: wallpaperImage,
+        main: b.blogMainImages.map((bmi) => {
+          return {
+            url: process.env.S3_DOMAIN + bmi.url,
+            width: Number(bmi.width),
+            height: Number(bmi.height),
+            fileSize: Number(bmi.size),
+          };
+        }),
+      };
+    });
+  }
+
   private async blogsMapping(blogs: Blog[]): Promise<BlogViewDto[]> {
     return blogs.map((b) => {
+      let wallpaperImage = null;
+
+      if (b.blogWallpaperImage) {
+        wallpaperImage = {
+          url: process.env.S3_DOMAIN + b.blogWallpaperImage.url,
+          width: Number(b.blogWallpaperImage.width),
+          height: Number(b.blogWallpaperImage.height),
+          fileSize: Number(b.blogWallpaperImage.size),
+        };
+      }
+
       return {
         id: b.id.toString(),
         name: b.name,
@@ -142,6 +212,17 @@ export class BlogsQueryRepository {
         websiteUrl: b.websiteUrl,
         createdAt: b.createdAt,
         isMembership: b.isMembership,
+        images: {
+          wallpaper: wallpaperImage,
+          main: b.blogMainImages.map((bmi) => {
+            return {
+              url: process.env.S3_DOMAIN + bmi.url,
+              width: Number(bmi.width),
+              height: Number(bmi.height),
+              fileSize: Number(bmi.size),
+            };
+          }),
+        },
       };
     });
   }
