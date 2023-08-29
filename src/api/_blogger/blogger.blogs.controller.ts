@@ -5,6 +5,7 @@ import {
   Get,
   HttpCode,
   Param,
+  ParseFilePipe,
   Post,
   Put,
   Query,
@@ -36,6 +37,8 @@ import { CommentQueryDto } from '../dto/comments/query/comment.query.dto';
 import { CommentsQueryRepository } from '../infrastructure/repositories/comments/comments.query.repository';
 import { BlogAddMainImageCommand } from './application/use-cases/blog-add-img-main.use-case';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { exceptionImagesFactory } from '../../exceptions/exception-images.factory';
+import { ImageValidator } from '../../exceptions/validators/image-validator';
 
 @Controller('blogger/blogs')
 export class BloggerBlogsController {
@@ -180,11 +183,16 @@ export class BloggerBlogsController {
   @UseGuards(JwtBearerGuard)
   @Post(':blogId/images/main')
   async uploadMainImage(
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [new ImageValidator(156, 156, 100000)],
+        exceptionFactory: exceptionImagesFactory,
+      }),
+    )
+    file: Express.Multer.File,
     @Param('blogId') blogId: string,
     @UserIdFromGuard() userId: string,
   ) {
-    // console.log(file);
     const result = await this.commandBus.execute(
       new BlogAddMainImageCommand(
         blogId,
