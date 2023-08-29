@@ -5,13 +5,8 @@ import {
   blogDescription,
   bloggerBlogMainImageURI,
   bloggerBlogsURI,
-  blogUpdatedDescription,
-  blogUpdatedName,
-  blogUpdatedWebsite,
   blogWebsite,
 } from '../utils/constants/blogs.constants';
-import { exceptionObject } from '../utils/objects/common.objects';
-import { nameField } from '../utils/constants/exceptions.constants';
 import {
   saUsersURI,
   user01Email,
@@ -40,8 +35,6 @@ describe('Blogger blogs and posts images testing', () => {
   });
 
   let blogId;
-
-  let postId;
 
   let aTokenUser01;
   let aTokenUser02;
@@ -110,66 +103,155 @@ describe('Blogger blogs and posts images testing', () => {
     });
 
     // Validation errors [400]
-    it.skip(`should return 400 when trying to add main image with incorrect dimensions`, async () => {
-      const response = await agent
-        .post(bloggerBlogsURI)
+    it(`should return 400 when trying to add main image with incorrect size`, async () => {
+      const filePath = path.join(
+        __dirname,
+        'img',
+        'blog',
+        'main',
+        'main_incorrect_size.jpg',
+      );
+      return agent
+        .post(bloggerBlogsURI + blogId + bloggerBlogMainImageURI)
         .auth(aTokenUser01, { type: 'bearer' })
-        .send({
-          description: blogDescription,
-          websiteUrl: blogWebsite,
-        })
+        .attach('file', filePath)
         .expect(400);
-
-      expect(response.body).toEqual(exceptionObject(nameField));
     });
-    it.skip(`should return 400 when trying to add main image with incorrect size`, async () => {
-      const response = await agent
-        .post(bloggerBlogsURI)
+    it(`should return 400 when trying to add main image with incorrect width`, async () => {
+      const filePath = path.join(
+        __dirname,
+        'img',
+        'blog',
+        'main',
+        'main_incorrect_width.jpg',
+      );
+      return agent
+        .post(bloggerBlogsURI + blogId + bloggerBlogMainImageURI)
         .auth(aTokenUser01, { type: 'bearer' })
-        .send({
-          description: blogDescription,
-          websiteUrl: blogWebsite,
-        })
+        .attach('file', filePath)
         .expect(400);
-
-      expect(response.body).toEqual(exceptionObject(nameField));
+    });
+    it(`should return 400 when trying to add main image with incorrect height`, async () => {
+      const filePath = path.join(
+        __dirname,
+        'img',
+        'blog',
+        'main',
+        'main_incorrect_height.jpg',
+      );
+      return agent
+        .post(bloggerBlogsURI + blogId + bloggerBlogMainImageURI)
+        .auth(aTokenUser01, { type: 'bearer' })
+        .attach('file', filePath)
+        .expect(400);
+    });
+    it(`should return 400 when trying to add main image with incorrect format`, async () => {
+      const filePath = path.join(
+        __dirname,
+        'img',
+        'blog',
+        'main',
+        'main_incorrect_format.txt',
+      );
+      const test = await agent
+        .post(bloggerBlogsURI + blogId + bloggerBlogMainImageURI)
+        .auth(aTokenUser01, { type: 'bearer' })
+        .attach('file', filePath)
+        .expect(400);
+      console.log(test.body);
+      return test;
+    });
+    it(`should return 400 when trying to add main image with unsupported image format`, async () => {
+      const filePath = path.join(
+        __dirname,
+        'img',
+        'blog',
+        'main',
+        'main_unsupported_image_format.tif',
+      );
+      const test = await agent
+        .post(bloggerBlogsURI + blogId + bloggerBlogMainImageURI)
+        .auth(aTokenUser01, { type: 'bearer' })
+        .attach('file', filePath)
+        .expect(400);
+      console.log(test.body);
+      return test;
     });
 
     // Auth errors [401]
-    it.skip(`should return 401 when trying to add main image with incorrect access token`, async () => {
+    it(`should return 401 when trying to add main image with incorrect access token`, async () => {
+      const filePath = path.join(
+        __dirname,
+        'img',
+        'blog',
+        'main',
+        'main_156x156_10kb.jpg',
+      );
       return agent
-        .post(bloggerBlogsURI)
+        .post(bloggerBlogsURI + blogId + bloggerBlogMainImageURI)
         .auth(randomUUID(), { type: 'bearer' })
-        .send({
-          name: blog01Name,
-          description: blogDescription,
-          websiteUrl: blogWebsite,
-        })
+        .attach('file', filePath)
         .expect(401);
     });
 
     // Forbidden errors [403]
-    it.skip(`should return 403 when trying to add main image of another user's blog`, async () => {
-      await agent
-        .put(bloggerBlogsURI + blogId)
+    it(`should return 403 when trying to add main image for blog that belongs to another user`, async () => {
+      const filePath = path.join(
+        __dirname,
+        'img',
+        'blog',
+        'main',
+        'main_156x156_10kb.jpg',
+      );
+      return agent
+        .post(bloggerBlogsURI + blogId + bloggerBlogMainImageURI)
         .auth(aTokenUser02, { type: 'bearer' })
-        .send({
-          name: blogUpdatedName,
-          description: blogUpdatedDescription,
-          websiteUrl: blogUpdatedWebsite,
-        })
+        .attach('file', filePath)
         .expect(403);
     });
 
     // Success
-    it(`should add main image`, async () => {
-      const filePath = path.join(__dirname, 'img', 'main_156x156_10kb.jpg');
-      const response = await agent
+    it(`should add main image (jpg)`, async () => {
+      const filePath = path.join(
+        __dirname,
+        'img',
+        'blog',
+        'main',
+        'main_156x156_10kb.jpg',
+      );
+      return agent
         .post(bloggerBlogsURI + blogId + bloggerBlogMainImageURI)
         .auth(aTokenUser01, { type: 'bearer' })
-        .attach('file', filePath);
-
-      console.log(response.body);
+        .attach('file', filePath)
+        .expect(201);
+    });
+    it(`should add main image (jpeg)`, async () => {
+      const filePath = path.join(
+        __dirname,
+        'img',
+        'blog',
+        'main',
+        'main_156x156_10kb.jpeg',
+      );
+      return agent
+        .post(bloggerBlogsURI + blogId + bloggerBlogMainImageURI)
+        .auth(aTokenUser01, { type: 'bearer' })
+        .attach('file', filePath)
+        .expect(201);
+    });
+    it(`should add main image (png)`, async () => {
+      const filePath = path.join(
+        __dirname,
+        'img',
+        'blog',
+        'main',
+        'main_156x156_10kb.png',
+      );
+      return agent
+        .post(bloggerBlogsURI + blogId + bloggerBlogMainImageURI)
+        .auth(aTokenUser01, { type: 'bearer' })
+        .attach('file', filePath)
+        .expect(201);
     });
   });
 
