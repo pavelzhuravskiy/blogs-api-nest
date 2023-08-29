@@ -54,26 +54,12 @@ export class BlogAddMainImageUseCase
 
     const s3Key = `blog/img/main/${command.blogId}_${command.originalName}`;
 
-    await this.s3Adapter.uploadBlogMainImage(
-      s3Key,
-      command.buffer,
-      command.mimetype,
-    );
+    await this.s3Adapter.uploadImage(s3Key, command.buffer, command.mimetype);
 
     const image = sharp(command.buffer);
     const metadata = await image.metadata();
 
-    const blogMainImageRecord =
-      await this.blogsRepository.findBlogMainImageRecord(command.blogId);
-
-    let mainImage;
-
-    if (!blogMainImageRecord.blogMainImage) {
-      mainImage = new BlogMainImage();
-    } else {
-      mainImage = blogMainImageRecord.blogMainImage;
-    }
-
+    const mainImage = new BlogMainImage();
     mainImage.blog = blog;
     mainImage.url = s3Key;
     mainImage.width = metadata.width;

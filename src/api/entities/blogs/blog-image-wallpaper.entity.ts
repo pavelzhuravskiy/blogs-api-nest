@@ -2,13 +2,13 @@ import {
   Column,
   Entity,
   JoinColumn,
-  ManyToOne,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Blog } from './blog.entity';
 
-@Entity('blog_images_main')
-export class BlogMainImage {
+@Entity('blog_images_wallpapers')
+export class BlogWallpaperImage {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -24,7 +24,7 @@ export class BlogMainImage {
   @Column({ type: 'bigint' })
   size: number;
 
-  @ManyToOne(() => Blog, (blog) => blog.blogMainImage, {
+  @OneToOne(() => Blog, (blog) => blog.blogWallpaperImage, {
     onDelete: 'CASCADE',
   })
   @JoinColumn()

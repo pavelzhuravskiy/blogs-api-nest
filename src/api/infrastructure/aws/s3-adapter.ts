@@ -14,7 +14,7 @@ export class S3Adapter {
       },
     });
   }
-  async uploadBlogMainImage(key: string, buffer: Buffer, mimetype: string) {
+  async uploadImage(key: string, buffer: Buffer, mimetype: string) {
     const command = new PutObjectCommand({
       Bucket: 'blogs-api',
       Key: key,

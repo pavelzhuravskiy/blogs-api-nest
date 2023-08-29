@@ -2,16 +2,16 @@ import { FileValidator } from '@nestjs/common';
 import sharp from 'sharp';
 
 type ImageOptions = {
-  width: number;
-  height: number;
-  maxSize: number;
+  width: number; // px
+  height: number; // px
+  maxSize: number; // bytes
 };
 
 export class ImageValidator extends FileValidator<ImageOptions> {
   constructor(
-    public width: number,
-    public height: number,
-    public maxSize: number,
+    public width: number, // px
+    public height: number, // px
+    public maxSize: number, // bytes
   ) {
     super({ width, height, maxSize });
   }

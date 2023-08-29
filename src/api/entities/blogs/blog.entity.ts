@@ -14,6 +14,7 @@ import { UserBanByBlogger } from '../users/user-ban-by-blogger.entity';
 import { User } from '../users/user.entity';
 import { randomUUID } from 'crypto';
 import { BlogMainImage } from './blog-image-main.entity';
+import { BlogWallpaperImage } from './blog-image-wallpaper.entity';
 
 @Entity('blogs')
 export class Blog {
@@ -38,7 +39,13 @@ export class Blog {
   @OneToOne(() => BlogBan, (blogBan) => blogBan.blog)
   blogBan: BlogBan;
 
-  @OneToOne(() => BlogMainImage, (blogMainImage) => blogMainImage.blog)
+  @OneToOne(
+    () => BlogWallpaperImage,
+    (blogWallpaperImage) => blogWallpaperImage.blog,
+  )
+  blogWallpaperImage: BlogWallpaperImage;
+
+  @OneToMany(() => BlogMainImage, (blogMainImage) => blogMainImage.blog)
   blogMainImage: BlogMainImage;
 
   @ManyToOne(() => User, (user) => user.blog)

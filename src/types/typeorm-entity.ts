@@ -15,6 +15,7 @@ import { Device } from '../api/entities/devices/device.entity';
 import { UserPasswordRecovery } from '../api/entities/users/user-password-recovery.entity';
 import { Question } from '../api/entities/quiz/question.entity';
 import { BlogMainImage } from '../api/entities/blogs/blog-image-main.entity';
+import { BlogWallpaperImage } from '../api/entities/blogs/blog-image-wallpaper.entity';
 
 export type TypeORMEntity =
   | Player
@@ -28,6 +29,7 @@ export type TypeORMEntity =
   | UserPasswordRecovery
   | Blog
   | BlogBan
+  | BlogWallpaperImage
   | BlogMainImage
   | Comment
   | CommentLike

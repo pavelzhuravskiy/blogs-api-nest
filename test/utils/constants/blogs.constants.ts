@@ -17,4 +17,5 @@ export const blogUpdatedDescription = 'New description';
 export const blogUpdatedWebsite = 'https://someurl.com/new';
 
 // Blog images strings
+export const bloggerBlogWallpaperImageURI = '/images/wallpaper/';
 export const bloggerBlogMainImageURI = '/images/main/';

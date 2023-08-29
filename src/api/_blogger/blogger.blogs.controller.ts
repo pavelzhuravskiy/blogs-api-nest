@@ -35,10 +35,11 @@ import { BlogQueryDto } from '../dto/blogs/query/blog.query.dto';
 import { PostsQueryRepository } from '../infrastructure/repositories/posts/posts.query.repository';
 import { CommentQueryDto } from '../dto/comments/query/comment.query.dto';
 import { CommentsQueryRepository } from '../infrastructure/repositories/comments/comments.query.repository';
-import { BlogAddMainImageCommand } from './application/use-cases/blog-add-img-main.use-case';
+import { BlogAddMainImageCommand } from './application/use-cases/blog-add-image-main.use-case';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { exceptionImagesFactory } from '../../exceptions/exception-images.factory';
 import { ImageValidator } from '../../exceptions/validators/image-validator';
+import { BlogAddWallpaperImageCommand } from './application/use-cases/blog-add-image-wp.use-case';
 
 @Controller('blogger/blogs')
 export class BloggerBlogsController {
@@ -195,6 +196,37 @@ export class BloggerBlogsController {
   ) {
     const result = await this.commandBus.execute(
       new BlogAddMainImageCommand(
+        blogId,
+        userId,
+        file.buffer,
+        file.mimetype,
+        file.originalname,
+      ),
+    );
+
+    if (result.code !== ResultCode.Success) {
+      return exceptionHandler(result.code, result.message, result.field);
+    }
+
+    return result;
+  }
+
+  @UseInterceptors(FileInterceptor('file'))
+  @UseGuards(JwtBearerGuard)
+  @Post(':blogId/images/wallpaper')
+  async uploadWallpaperImage(
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [new ImageValidator(1028, 312, 100000)],
+        exceptionFactory: exceptionImagesFactory,
+      }),
+    )
+    file: Express.Multer.File,
+    @Param('blogId') blogId: string,
+    @UserIdFromGuard() userId: string,
+  ) {
+    const result = await this.commandBus.execute(
+      new BlogAddWallpaperImageCommand(
         blogId,
         userId,
         file.buffer,

@@ -5,6 +5,7 @@ import {
   blogDescription,
   bloggerBlogMainImageURI,
   bloggerBlogsURI,
+  bloggerBlogWallpaperImageURI,
   blogWebsite,
 } from '../utils/constants/blogs.constants';
 import {
@@ -82,7 +83,7 @@ describe('Blogger blogs and posts images testing', () => {
       aTokenUser02 = response.body.accessToken;
     });
   });
-  describe('Add main image for blog', () => {
+  describe('Add wallpaper image for blog', () => {
     it(`should create new blog`, async () => {
       await agent
         .post(bloggerBlogsURI)
@@ -103,7 +104,142 @@ describe('Blogger blogs and posts images testing', () => {
     });
 
     // Validation errors [400]
-    it.skip(`should return 400 when trying to add main image with incorrect size`, async () => {
+    it(`should return 400 when trying to add wallpaper image with incorrect size`, async () => {
+      const filePath = path.join(
+        __dirname,
+        'img',
+        'blog',
+        'wallpaper',
+        'wallpaper_incorrect_size.jpg',
+      );
+      return agent
+        .post(bloggerBlogsURI + blogId + bloggerBlogWallpaperImageURI)
+        .auth(aTokenUser01, { type: 'bearer' })
+        .attach('file', filePath)
+        .expect(400);
+    });
+    it(`should return 400 when trying to add wallpaper image with incorrect width`, async () => {
+      const filePath = path.join(
+        __dirname,
+        'img',
+        'blog',
+        'wallpaper',
+        'wallpaper_incorrect_width.jpg',
+      );
+      return agent
+        .post(bloggerBlogsURI + blogId + bloggerBlogWallpaperImageURI)
+        .auth(aTokenUser01, { type: 'bearer' })
+        .attach('file', filePath)
+        .expect(400);
+    });
+    it(`should return 400 when trying to add wallpaper image with incorrect height`, async () => {
+      const filePath = path.join(
+        __dirname,
+        'img',
+        'blog',
+        'wallpaper',
+        'wallpaper_incorrect_height.jpg',
+      );
+      return agent
+        .post(bloggerBlogsURI + blogId + bloggerBlogWallpaperImageURI)
+        .auth(aTokenUser01, { type: 'bearer' })
+        .attach('file', filePath)
+        .expect(400);
+    });
+    it(`should return 400 when trying to add wallpaper image with incorrect format`, async () => {
+      const filePath = path.join(
+        __dirname,
+        'img',
+        'blog',
+        'wallpaper',
+        'wallpaper_incorrect_format.txt',
+      );
+      return agent
+        .post(bloggerBlogsURI + blogId + bloggerBlogWallpaperImageURI)
+        .auth(aTokenUser01, { type: 'bearer' })
+        .attach('file', filePath)
+        .expect(400);
+    });
+    it(`should return 400 when trying to add wallpaper image with unsupported image format`, async () => {
+      const filePath = path.join(
+        __dirname,
+        'img',
+        'blog',
+        'wallpaper',
+        'wallpaper_unsupported_image_format.tif',
+      );
+      return agent
+        .post(bloggerBlogsURI + blogId + bloggerBlogWallpaperImageURI)
+        .auth(aTokenUser01, { type: 'bearer' })
+        .attach('file', filePath)
+        .expect(400);
+    });
+
+    // Auth errors [401]
+    it(`should return 401 when trying to add wallpaper image with incorrect access token`, async () => {
+      const filePath = path.join(
+        __dirname,
+        'img',
+        'blog',
+        'wallpaper',
+        'wallpaper_1028x312_63kb.jpg',
+      );
+      return agent
+        .post(bloggerBlogsURI + blogId + bloggerBlogWallpaperImageURI)
+        .auth(randomUUID(), { type: 'bearer' })
+        .attach('file', filePath)
+        .expect(401);
+    });
+
+    // Forbidden errors [403]
+    it(`should return 403 when trying to add wallpaper image for blog that belongs to another user`, async () => {
+      const filePath = path.join(
+        __dirname,
+        'img',
+        'blog',
+        'wallpaper',
+        'wallpaper_1028x312_63kb.jpg',
+      );
+      return agent
+        .post(bloggerBlogsURI + blogId + bloggerBlogWallpaperImageURI)
+        .auth(aTokenUser02, { type: 'bearer' })
+        .attach('file', filePath)
+        .expect(403);
+    });
+
+    // Success
+    it(`should add wallpaper image (jpg)`, async () => {
+      const filePath = path.join(
+        __dirname,
+        'img',
+        'blog',
+        'wallpaper',
+        'wallpaper_1028x312_63kb.jpg',
+      );
+      return agent
+        .post(bloggerBlogsURI + blogId + bloggerBlogWallpaperImageURI)
+        .auth(aTokenUser01, { type: 'bearer' })
+        .attach('file', filePath)
+        .expect(201);
+    });
+    it(`should replace wallpaper image (jpeg)`, async () => {
+      const filePath = path.join(
+        __dirname,
+        'img',
+        'blog',
+        'wallpaper',
+        'wallpaper_1028x312_63kb.jpeg',
+      );
+      return agent
+        .post(bloggerBlogsURI + blogId + bloggerBlogWallpaperImageURI)
+        .auth(aTokenUser01, { type: 'bearer' })
+        .attach('file', filePath)
+        .expect(201);
+    });
+  });
+  describe('Add main image for blog', () => {
+    // Validation errors [400]
+    it(`should return 400 when trying to add main image with incorrect size`, async () => {
       const filePath = path.join(
         __dirname,
         'img',
@@ -117,7 +253,7 @@ describe('Blogger blogs and posts images testing', () => {
         .attach('file', filePath)
         .expect(400);
     });
-    it.skip(`should return 400 when trying to add main image with incorrect width`, async () => {
+    it(`should return 400 when trying to add main image with incorrect width`, async () => {
       const filePath = path.join(
         __dirname,
         'img',
@@ -131,7 +267,7 @@ describe('Blogger blogs and posts images testing', () => {
         .attach('file', filePath)
         .expect(400);
     });
-    it.skip(`should return 400 when trying to add main image with incorrect height`, async () => {
+    it(`should return 400 when trying to add main image with incorrect height`, async () => {
       const filePath = path.join(
         __dirname,
         'img',
@@ -145,7 +281,7 @@ describe('Blogger blogs and posts images testing', () => {
         .attach('file', filePath)
         .expect(400);
     });
-    it.skip(`should return 400 when trying to add main image with incorrect format`, async () => {
+    it(`should return 400 when trying to add main image with incorrect format`, async () => {
       const filePath = path.join(
         __dirname,
         'img',
@@ -153,15 +289,13 @@ describe('Blogger blogs and posts images testing', () => {
         'main',
         'main_incorrect_format.txt',
       );
-      const test = await agent
+      return agent
         .post(bloggerBlogsURI + blogId + bloggerBlogMainImageURI)
         .auth(aTokenUser01, { type: 'bearer' })
         .attach('file', filePath)
         .expect(400);
-      console.log(test.body);
-      return test;
     });
-    it.skip(`should return 400 when trying to add main image with unsupported image format`, async () => {
+    it(`should return 400 when trying to add main image with unsupported image format`, async () => {
       const filePath = path.join(
         __dirname,
         'img',
@@ -169,17 +303,15 @@ describe('Blogger blogs and posts images testing', () => {
         'main',
         'main_unsupported_image_format.tif',
       );
-      const test = await agent
+      return agent
         .post(bloggerBlogsURI + blogId + bloggerBlogMainImageURI)
         .auth(aTokenUser01, { type: 'bearer' })
         .attach('file', filePath)
         .expect(400);
-      console.log(test.body);
-      return test;
     });
 
     // Auth errors [401]
-    it.skip(`should return 401 when trying to add main image with incorrect access token`, async () => {
+    it(`should return 401 when trying to add main image with incorrect access token`, async () => {
       const filePath = path.join(
         __dirname,
         'img',
@@ -195,7 +327,7 @@ describe('Blogger blogs and posts images testing', () => {
     });
 
     // Forbidden errors [403]
-    it.skip(`should return 403 when trying to add main image for blog that belongs to another user`, async () => {
+    it(`should return 403 when trying to add main image for blog that belongs to another user`, async () => {
       const filePath = path.join(
         __dirname,
         'img',

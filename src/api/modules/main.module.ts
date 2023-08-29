@@ -48,13 +48,16 @@ import { PostLike } from '../entities/posts/post-like.entity';
 import { TransactionsRepository } from '../infrastructure/repositories/common/transactions.repository';
 import { UsersTransactionsRepository } from '../infrastructure/repositories/users/users.transactions.repository';
 import { DataSourceRepository } from '../infrastructure/repositories/common/data-source.repository';
-import { BlogAddMainImageUseCase } from '../_blogger/application/use-cases/blog-add-img-main.use-case';
+import { BlogAddMainImageUseCase } from '../_blogger/application/use-cases/blog-add-image-main.use-case';
 import { S3Adapter } from '../infrastructure/aws/s3-adapter';
 import { BlogMainImage } from '../entities/blogs/blog-image-main.entity';
+import { BlogWallpaperImage } from '../entities/blogs/blog-image-wallpaper.entity';
+import { BlogAddWallpaperImageUseCase } from '../_blogger/application/use-cases/blog-add-image-wp.use-case';
 
 const entities = [
   Blog,
   BlogBan,
+  BlogWallpaperImage,
   BlogMainImage,
   Post,
   PostLike,
@@ -89,6 +92,7 @@ const useCases = [
   LikeUpdateForCommentUseCase,
   BloggerUserBanUseCase,
   UsersGetBannedUseCase,
+  BlogAddWallpaperImageUseCase,
   BlogAddMainImageUseCase,
 ];
 
