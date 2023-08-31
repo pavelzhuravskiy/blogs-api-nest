@@ -23,9 +23,9 @@ export class S3Adapter {
     });
 
     try {
-      console.log(`SENT TO AMAZON S3!`);
-      // const response = await this.s3Client.send(command);
-      // console.log(response);
+      // console.log(`SENT TO AMAZON S3!`);
+      const response = await this.s3Client.send(command);
+      console.log(response);
     } catch (err) {
       console.error(err);
     }

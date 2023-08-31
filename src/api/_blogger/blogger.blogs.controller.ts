@@ -40,6 +40,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { exceptionImagesFactory } from '../../exceptions/exception-images.factory';
 import { ImageValidator } from '../../exceptions/validators/image-validator';
 import { BlogAddWallpaperImageCommand } from './application/use-cases/blog-add-image-wp.use-case';
+import { PostAddMainImageCommand } from './application/use-cases/post-add-image-main.use-case';
 
 @Controller('blogger/blogs')
 export class BloggerBlogsController {
@@ -183,7 +184,7 @@ export class BloggerBlogsController {
   @UseInterceptors(FileInterceptor('file'))
   @UseGuards(JwtBearerGuard)
   @Post(':blogId/images/main')
-  async uploadMainImage(
+  async uploadBlogMainImage(
     @UploadedFile(
       new ParseFilePipe({
         validators: [new ImageValidator(156, 156, 100000)],
@@ -214,7 +215,7 @@ export class BloggerBlogsController {
   @UseInterceptors(FileInterceptor('file'))
   @UseGuards(JwtBearerGuard)
   @Post(':blogId/images/wallpaper')
-  async uploadWallpaperImage(
+  async uploadBlogWallpaperImage(
     @UploadedFile(
       new ParseFilePipe({
         validators: [new ImageValidator(1028, 312, 100000)],
@@ -240,5 +241,39 @@ export class BloggerBlogsController {
     }
 
     return this.blogsQueryRepository.findBlogImages(blogId);
+  }
+
+  @UseInterceptors(FileInterceptor('file'))
+  @UseGuards(JwtBearerGuard)
+  @Post(':blogId/posts/:postId/images/main')
+  async uploadPostMainImage(
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [new ImageValidator(940, 432, 100000)],
+        exceptionFactory: exceptionImagesFactory,
+      }),
+    )
+    file: Express.Multer.File,
+    @Param() params: { blogId: string; postId: string },
+    @UserIdFromGuard() userId: string,
+  ) {
+    const result = await this.commandBus.execute(
+      new PostAddMainImageCommand(
+        params.blogId,
+        params.postId,
+        userId,
+        file.buffer,
+        file.mimetype,
+        file.originalname,
+      ),
+    );
+
+    if (result.code !== ResultCode.Success) {
+      return exceptionHandler(result.code, result.message, result.field);
+    }
+
+    return result;
+
+    // return this.blogsQueryRepository.findBlogImages(blogId);
   }
 }

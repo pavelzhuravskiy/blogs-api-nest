@@ -11,6 +11,7 @@ import { Blog } from '../blogs/blog.entity';
 import { Comment } from '../comments/comment.entity';
 import { PostLike } from './post-like.entity';
 import { randomUUID } from 'crypto';
+import { PostMainImage } from './post-image-main.entity';
 
 @Entity('posts')
 export class Post {
@@ -34,6 +35,9 @@ export class Post {
   })
   @JoinColumn()
   blog: Blog;
+
+  @OneToMany(() => PostMainImage, (postMainImages) => postMainImages.post)
+  postMainImages: PostMainImage[];
 
   @OneToMany(() => Comment, (comment) => comment.post)
   comment: Comment[];

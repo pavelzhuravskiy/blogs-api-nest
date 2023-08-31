@@ -53,6 +53,10 @@ import { S3Adapter } from '../infrastructure/aws/s3-adapter';
 import { BlogMainImage } from '../entities/blogs/blog-image-main.entity';
 import { BlogWallpaperImage } from '../entities/blogs/blog-image-wallpaper.entity';
 import { BlogAddWallpaperImageUseCase } from '../_blogger/application/use-cases/blog-add-image-wp.use-case';
+import { BlogsTransactionsRepository } from '../infrastructure/repositories/blogs/blogs.transactions.repository';
+import { PostsTransactionsRepository } from '../infrastructure/repositories/posts/posts.transactions.repository';
+import { PostMainImage } from '../entities/posts/post-image-main.entity';
+import { PostAddMainImageUseCase } from '../_blogger/application/use-cases/post-add-image-main.use-case';
 
 const entities = [
   Blog,
@@ -61,6 +65,7 @@ const entities = [
   BlogMainImage,
   Post,
   PostLike,
+  PostMainImage,
   Comment,
   CommentLike,
 ];
@@ -94,11 +99,14 @@ const useCases = [
   UsersGetBannedUseCase,
   BlogAddWallpaperImageUseCase,
   BlogAddMainImageUseCase,
+  PostAddMainImageUseCase,
 ];
 
 const repositories = [
   BlogsRepository,
+  BlogsTransactionsRepository,
   PostsRepository,
+  PostsTransactionsRepository,
   UsersRepository,
   CommentsRepository,
   UsersTransactionsRepository,

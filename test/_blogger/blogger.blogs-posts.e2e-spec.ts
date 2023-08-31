@@ -4,9 +4,9 @@ import {
   blog01Name,
   blog02Name,
   blogDescription,
-  bloggerBlogMainImageURI,
+  bloggerMainImageURI,
   bloggerBlogsURI,
-  bloggerBlogWallpaperImageURI,
+  bloggerWallpaperImageURI,
   blogUpdatedDescription,
   blogUpdatedName,
   blogUpdatedWebsite,
@@ -310,7 +310,7 @@ describe('Blogger blogs and posts testing', () => {
         'wallpaper_1028x312_63kb.jpg',
       );
       return agent
-        .post(bloggerBlogsURI + blog01Id + bloggerBlogWallpaperImageURI)
+        .post(bloggerBlogsURI + blog01Id + bloggerWallpaperImageURI)
         .auth(aTokenUser01, { type: 'bearer' })
         .attach('file', filePath)
         .expect(201);
@@ -324,7 +324,7 @@ describe('Blogger blogs and posts testing', () => {
         'main_156x156_10kb.jpg',
       );
       return agent
-        .post(bloggerBlogsURI + blog01Id + bloggerBlogMainImageURI)
+        .post(bloggerBlogsURI + blog01Id + bloggerMainImageURI)
         .auth(aTokenUser01, { type: 'bearer' })
         .attach('file', filePath)
         .expect(201);
@@ -338,7 +338,7 @@ describe('Blogger blogs and posts testing', () => {
         'main_156x156_10kb.jpeg',
       );
       return agent
-        .post(bloggerBlogsURI + blog01Id + bloggerBlogMainImageURI)
+        .post(bloggerBlogsURI + blog01Id + bloggerMainImageURI)
         .auth(aTokenUser01, { type: 'bearer' })
         .attach('file', filePath)
         .expect(201);
@@ -352,7 +352,7 @@ describe('Blogger blogs and posts testing', () => {
         'main_156x156_10kb.png',
       );
       return agent
-        .post(bloggerBlogsURI + blog01Id + bloggerBlogMainImageURI)
+        .post(bloggerBlogsURI + blog01Id + bloggerMainImageURI)
         .auth(aTokenUser01, { type: 'bearer' })
         .attach('file', filePath)
         .expect(201);
@@ -367,7 +367,7 @@ describe('Blogger blogs and posts testing', () => {
         'wallpaper_1028x312_63kb.jpg',
       );
       return agent
-        .post(bloggerBlogsURI + blog02Id + bloggerBlogWallpaperImageURI)
+        .post(bloggerBlogsURI + blog02Id + bloggerWallpaperImageURI)
         .auth(aTokenUser02, { type: 'bearer' })
         .attach('file', filePath)
         .expect(201);
@@ -381,7 +381,7 @@ describe('Blogger blogs and posts testing', () => {
         'main_156x156_10kb.jpg',
       );
       return agent
-        .post(bloggerBlogsURI + blog02Id + bloggerBlogMainImageURI)
+        .post(bloggerBlogsURI + blog02Id + bloggerMainImageURI)
         .auth(aTokenUser02, { type: 'bearer' })
         .attach('file', filePath)
         .expect(201);

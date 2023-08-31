@@ -3,9 +3,9 @@ import { INestApplication } from '@nestjs/common';
 import {
   blog01Name,
   blogDescription,
-  bloggerBlogMainImageURI,
+  bloggerMainImageURI,
   bloggerBlogsURI,
-  bloggerBlogWallpaperImageURI,
+  bloggerWallpaperImageURI,
   blogWebsite,
   publicBlogsURI,
 } from '../utils/constants/blogs.constants';
@@ -134,7 +134,7 @@ describe('Public blogs, posts, comments testing', () => {
         'wallpaper_1028x312_63kb.jpg',
       );
       return agent
-        .post(bloggerBlogsURI + blogId + bloggerBlogWallpaperImageURI)
+        .post(bloggerBlogsURI + blogId + bloggerWallpaperImageURI)
         .auth(aTokenUser01, { type: 'bearer' })
         .attach('file', filePath)
         .expect(201);
@@ -148,7 +148,7 @@ describe('Public blogs, posts, comments testing', () => {
         'main_156x156_10kb.jpg',
       );
       return agent
-        .post(bloggerBlogsURI + blogId + bloggerBlogMainImageURI)
+        .post(bloggerBlogsURI + blogId + bloggerMainImageURI)
         .auth(aTokenUser01, { type: 'bearer' })
         .attach('file', filePath)
         .expect(201);
@@ -162,7 +162,7 @@ describe('Public blogs, posts, comments testing', () => {
         'main_156x156_10kb.jpeg',
       );
       return agent
-        .post(bloggerBlogsURI + blogId + bloggerBlogMainImageURI)
+        .post(bloggerBlogsURI + blogId + bloggerMainImageURI)
         .auth(aTokenUser01, { type: 'bearer' })
         .attach('file', filePath)
         .expect(201);
@@ -176,7 +176,7 @@ describe('Public blogs, posts, comments testing', () => {
         'main_156x156_10kb.png',
       );
       return agent
-        .post(bloggerBlogsURI + blogId + bloggerBlogMainImageURI)
+        .post(bloggerBlogsURI + blogId + bloggerMainImageURI)
         .auth(aTokenUser01, { type: 'bearer' })
         .attach('file', filePath)
         .expect(201);
