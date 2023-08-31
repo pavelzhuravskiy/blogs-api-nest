@@ -14,7 +14,7 @@ export class PostsTransactionsRepository {
         .where(`p.id = :postId`, { postId: postId })
         .getOne();
     } catch (e) {
-      console.log(e);
+      console.error(e);
       return null;
     }
   }

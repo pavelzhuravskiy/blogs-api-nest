@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { Post } from '../../../entities/posts/post.entity';
 import { PostLike } from '../../../entities/posts/post-like.entity';
 
@@ -10,7 +10,6 @@ export class PostsRepository {
     @InjectRepository(Post) private readonly postsRepository: Repository<Post>,
     @InjectRepository(PostLike)
     private readonly postLikesRepository: Repository<PostLike>,
-    @InjectDataSource() private dataSource: DataSource,
   ) {}
 
   // ***** Find post operations *****
@@ -23,7 +22,7 @@ export class PostsRepository {
         })
         .getOne();
     } catch (e) {
-      console.log(e);
+      console.error(e);
       return null;
     }
   }

@@ -1,3 +1,5 @@
+import { PostImagesViewDto } from './post-images.view.dto';
+
 class likes {
   addedAt: string;
   userId: string;
@@ -18,4 +20,5 @@ export class PostViewDto {
     myStatus: string;
     newestLikes: likes[];
   };
+  images: PostImagesViewDto;
 }

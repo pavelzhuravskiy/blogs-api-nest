@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { Paginator } from '../../../../helpers/paginator';
 import { Question } from '../../../entities/quiz/question.entity';
 import { QuestionViewDto } from '../../../dto/quiz/view/question.view.dto';
@@ -11,7 +11,6 @@ export class QuestionsQueryRepository {
   constructor(
     @InjectRepository(Question)
     private readonly questionsRepository: Repository<Question>,
-    @InjectDataSource() private dataSource: DataSource,
   ) {}
 
   async findQuestion(questionId: string): Promise<QuestionViewDto> {

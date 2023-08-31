@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { CommentViewDto } from '../../../dto/comments/view/comment.view.dto';
 import { LikeStatus } from '../../../../enums/like-status.enum';
 import { Paginator } from '../../../../helpers/paginator';
@@ -14,7 +14,6 @@ export class CommentsQueryRepository {
   constructor(
     @InjectRepository(Comment)
     private readonly commentsRepository: Repository<Comment>,
-    @InjectDataSource() private dataSource: DataSource,
   ) {}
 
   async findComment(
@@ -68,7 +67,7 @@ export class CommentsQueryRepository {
       const mappedComments = await this.commentsMapping(comments);
       return mappedComments[0];
     } catch (e) {
-      console.log(e);
+      console.error(e);
       return null;
     }
   }
@@ -144,7 +143,7 @@ export class CommentsQueryRepository {
         items: await this.commentsMapping(comments),
       });
     } catch (e) {
-      console.log(e);
+      console.error(e);
       return null;
     }
   }
@@ -222,7 +221,7 @@ export class CommentsQueryRepository {
         items: await this.commentsOfBloggerMapping(comments),
       });
     } catch (e) {
-      console.log(e);
+      console.error(e);
       return null;
     }
   }

@@ -17,7 +17,7 @@ export class UsersTransactionsRepository {
         .where(`u.id = :userId`, { userId: userId })
         .getOne();
     } catch (e) {
-      console.log(e);
+      console.error(e);
       return null;
     }
   }
@@ -98,7 +98,7 @@ export class UsersTransactionsRepository {
         .where(`u.id = :userId`, { userId: userId })
         .getOne();
     } catch (e) {
-      console.log(e);
+      console.error(e);
       return null;
     }
   }

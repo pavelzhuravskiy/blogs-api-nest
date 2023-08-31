@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { Blog } from '../../../entities/blogs/blog.entity';
 import { BlogWallpaperImage } from '../../../entities/blogs/blog-image-wallpaper.entity';
 
@@ -11,7 +11,6 @@ export class BlogsRepository {
     private readonly blogsRepository: Repository<Blog>,
     @InjectRepository(BlogWallpaperImage)
     private readonly blogWallpaperImagesRepository: Repository<BlogWallpaperImage>,
-    @InjectDataSource() private dataSource: DataSource,
   ) {}
   // ***** Find blog operations *****
   async findBlog(blogId: string): Promise<Blog | null> {
@@ -21,7 +20,7 @@ export class BlogsRepository {
         .where(`b.id = :blogId`, { blogId: blogId })
         .getOne();
     } catch (e) {
-      console.log(e);
+      console.error(e);
       return null;
     }
   }
@@ -34,7 +33,7 @@ export class BlogsRepository {
         .where(`b.id = :blogId`, { blogId: blogId })
         .getOne();
     } catch (e) {
-      console.log(e);
+      console.error(e);
       return null;
     }
   }
@@ -47,7 +46,7 @@ export class BlogsRepository {
         .where(`b.id = :blogId`, { blogId: blogId })
         .getOne();
     } catch (e) {
-      console.log(e);
+      console.error(e);
       return null;
     }
   }
@@ -61,7 +60,7 @@ export class BlogsRepository {
         .where(`bwi.blogId = :blogId`, { blogId: blogId })
         .getOne();
     } catch (e) {
-      console.log(e);
+      console.error(e);
       return null;
     }
   }

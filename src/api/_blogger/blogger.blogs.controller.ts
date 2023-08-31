@@ -272,8 +272,6 @@ export class BloggerBlogsController {
       return exceptionHandler(result.code, result.message, result.field);
     }
 
-    return result;
-
-    // return this.blogsQueryRepository.findBlogImages(blogId);
+    return this.postsQueryRepository.findPostImages(params.postId);
   }
 }

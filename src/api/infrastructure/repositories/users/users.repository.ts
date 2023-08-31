@@ -1,20 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { User } from '../../../entities/users/user.entity';
-import { UserPasswordRecovery } from '../../../entities/users/user-password-recovery.entity';
-import { UserEmailConfirmation } from '../../../entities/users/user-email-confirmation.entity';
 
 @Injectable()
 export class UsersRepository {
   constructor(
     @InjectRepository(User)
     private readonly usersRepository: Repository<User>,
-    @InjectRepository(UserEmailConfirmation)
-    private readonly userEmailConfirmationsRepository: Repository<UserEmailConfirmation>,
-    @InjectRepository(UserPasswordRecovery)
-    private readonly userPasswordRecoveriesRepository: Repository<UserPasswordRecovery>,
-    @InjectDataSource() private dataSource: DataSource,
   ) {}
   // ***** Unique login and email checks *****
   async checkLogin(login: string): Promise<User | null> {
@@ -39,7 +32,7 @@ export class UsersRepository {
         .where(`u.id = :userId`, { userId: userId })
         .getOne();
     } catch (e) {
-      console.log(e);
+      console.error(e);
       return null;
     }
   }
@@ -81,7 +74,7 @@ export class UsersRepository {
         .where(`u.id = :userId`, { userId: userId })
         .getOne();
     } catch (e) {
-      console.log(e);
+      console.error(e);
       return null;
     }
   }

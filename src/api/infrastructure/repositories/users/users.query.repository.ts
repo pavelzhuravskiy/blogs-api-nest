@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { SuperAdminUserViewDto } from '../../../dto/users/view/superadmin/sa.user.view.dto';
-import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { UserQueryDto } from '../../../dto/users/query/user-query.dto';
 import { Paginator } from '../../../../helpers/paginator';
 import { BloggerUserBanQueryDto } from '../../../dto/users/query/blogger/blogger.user-ban.query.dto';
@@ -12,7 +12,6 @@ import { User } from '../../../entities/users/user.entity';
 export class UsersQueryRepository {
   constructor(
     @InjectRepository(User) private readonly usersRepository: Repository<User>,
-    @InjectDataSource() private dataSource: DataSource,
   ) {}
 
   async findUserById(userId: string): Promise<SuperAdminUserViewDto> {

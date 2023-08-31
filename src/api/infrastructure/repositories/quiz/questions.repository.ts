@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { Question } from '../../../entities/quiz/question.entity';
 
 @Injectable()
@@ -8,7 +8,6 @@ export class QuestionsRepository {
   constructor(
     @InjectRepository(Question)
     private readonly questionsRepository: Repository<Question>,
-    @InjectDataSource() private dataSource: DataSource,
   ) {}
   // ***** Find question operations *****
   async findQuestion(questionId: string): Promise<Question | null> {
@@ -18,7 +17,7 @@ export class QuestionsRepository {
         .where(`q.id = :questionId`, { questionId: questionId })
         .getOne();
     } catch (e) {
-      console.log(e);
+      console.error(e);
       return null;
     }
   }

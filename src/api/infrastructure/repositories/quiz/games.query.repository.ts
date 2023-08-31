@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository, SelectQueryBuilder } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository, SelectQueryBuilder } from 'typeorm';
 import { Game } from '../../../entities/quiz/game.entity';
 import {
   AnswerViewDto,
@@ -23,7 +23,6 @@ export class GamesQueryRepository {
     private readonly gamesRepository: Repository<Game>,
     @InjectRepository(Player)
     private readonly playersRepository: Repository<Player>,
-    @InjectDataSource() private dataSource: DataSource,
   ) {}
 
   async findMyGames(
@@ -266,7 +265,7 @@ export class GamesQueryRepository {
       const mappedGames = await this.gamesMapping(games);
       return mappedGames[0];
     } catch (e) {
-      console.log(e);
+      console.error(e);
       return null;
     }
   }

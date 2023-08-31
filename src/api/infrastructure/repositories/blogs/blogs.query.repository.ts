@@ -32,7 +32,7 @@ export class BlogsQueryRepository {
       const mappedBlogs = await this.blogsMapping(blogs);
       return mappedBlogs[0];
     } catch (e) {
-      console.log(e);
+      console.error(e);
       return null;
     }
   }
@@ -160,7 +160,7 @@ export class BlogsQueryRepository {
       const mappedBlogs = await this.blogImagesMapping(blogs);
       return mappedBlogs[0];
     } catch (e) {
-      console.log(e);
+      console.error(e);
       return null;
     }
   }

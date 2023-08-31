@@ -4,8 +4,8 @@ import {
   blog01Name,
   blog02Name,
   blogDescription,
-  bloggerMainImageURI,
   bloggerBlogsURI,
+  bloggerMainImageURI,
   bloggerWallpaperImageURI,
   blogUpdatedDescription,
   blogUpdatedName,
@@ -14,7 +14,10 @@ import {
   publicBlogsURI,
 } from '../utils/constants/blogs.constants';
 import {
+  longString1013,
+  longString109,
   longString17,
+  longString39,
   longString508,
 } from '../utils/constants/common.constants';
 import { exceptionObject } from '../utils/objects/common.objects';
@@ -55,13 +58,11 @@ import {
   postUpdatedTitle,
   publicPostsURI,
 } from '../utils/constants/posts.constants';
-import { postObject, updatedPostObject } from '../utils/objects/posts.objects';
-import { getAppAndClearDb } from '../utils/functions/get-app';
 import {
-  longString1013,
-  longString109,
-  longString39,
-} from '../utils/constants/common.constants';
+  createdPostObject,
+  updatedPostObject,
+} from '../utils/objects/posts.objects';
+import { getAppAndClearDb } from '../utils/functions/get-app';
 import path from 'path';
 
 describe('Blogger blogs and posts testing', () => {
@@ -702,7 +703,7 @@ describe('Blogger blogs and posts testing', () => {
         page: 1,
         pageSize: 10,
         totalCount: 1,
-        items: [postObject],
+        items: [createdPostObject],
       });
     });
   });

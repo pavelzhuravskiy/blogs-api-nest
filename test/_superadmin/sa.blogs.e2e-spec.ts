@@ -30,7 +30,7 @@ import {
 } from '../../src/exceptions/exception.constants';
 import { randomUUID } from 'crypto';
 import {
-  blog01Object,
+  createdBlogObject,
   saBannedBlogObject,
   saUnbannedBlogObject,
 } from '../utils/objects/blogs.objects';
@@ -41,7 +41,7 @@ import {
   postTitle,
   publicPostsURI,
 } from '../utils/constants/posts.constants';
-import { postObject } from '../utils/objects/posts.objects';
+import { createdPostObject } from '../utils/objects/posts.objects';
 import { getAppAndClearDb } from '../utils/functions/get-app';
 
 describe('Super admin blogs testing', () => {
@@ -271,7 +271,7 @@ describe('Super admin blogs testing', () => {
         page: 1,
         pageSize: 10,
         totalCount: 1,
-        items: [blog01Object],
+        items: [createdBlogObject],
       });
     });
     it(`should return created posts`, async () => {
@@ -282,7 +282,7 @@ describe('Super admin blogs testing', () => {
         page: 1,
         pageSize: 10,
         totalCount: 2,
-        items: [postObject, postObject],
+        items: [createdPostObject, createdPostObject],
       });
     });
     it(`should return created posts for blog`, async () => {
@@ -295,18 +295,18 @@ describe('Super admin blogs testing', () => {
         page: 1,
         pageSize: 10,
         totalCount: 2,
-        items: [postObject, postObject],
+        items: [createdPostObject, createdPostObject],
       });
     });
     it(`should return created blog by ID`, async () => {
       const blog = await agent.get(publicBlogsURI + blogId).expect(200);
-      expect(blog.body).toEqual(blog01Object);
+      expect(blog.body).toEqual(createdBlogObject);
     });
     it(`should return created post by ID`, async () => {
       const post01 = await agent.get(publicPostsURI + post01Id).expect(200);
       const post02 = await agent.get(publicPostsURI + post02Id).expect(200);
-      expect(post01.body).toEqual(postObject);
-      expect(post02.body).toEqual(postObject);
+      expect(post01.body).toEqual(createdPostObject);
+      expect(post02.body).toEqual(createdPostObject);
     });
 
     it(`should ban blog`, async () => {
@@ -330,7 +330,7 @@ describe('Super admin blogs testing', () => {
         page: 1,
         pageSize: 10,
         totalCount: 1,
-        items: [blog01Object],
+        items: [createdBlogObject],
       });
     });
     it(`should return created blogs for super admin`, async () => {
@@ -400,12 +400,12 @@ describe('Super admin blogs testing', () => {
         page: 1,
         pageSize: 10,
         totalCount: 1,
-        items: [blog01Object],
+        items: [createdBlogObject],
       });
     });
     it(`should return created blog by ID`, async () => {
       const blog = await agent.get(publicBlogsURI + blogId).expect(200);
-      expect(blog.body).toEqual(blog01Object);
+      expect(blog.body).toEqual(createdBlogObject);
     });
     it(`should return created posts`, async () => {
       const posts = await agent.get(publicPostsURI).expect(200);
@@ -415,7 +415,7 @@ describe('Super admin blogs testing', () => {
         page: 1,
         pageSize: 10,
         totalCount: 2,
-        items: [postObject, postObject],
+        items: [createdPostObject, createdPostObject],
       });
     });
     it(`should return created posts for blog`, async () => {
@@ -428,14 +428,14 @@ describe('Super admin blogs testing', () => {
         page: 1,
         pageSize: 10,
         totalCount: 2,
-        items: [postObject, postObject],
+        items: [createdPostObject, createdPostObject],
       });
     });
     it(`should return created post by ID`, async () => {
       const post01 = await agent.get(publicPostsURI + post01Id).expect(200);
       const post02 = await agent.get(publicPostsURI + post02Id).expect(200);
-      expect(post01.body).toEqual(postObject);
-      expect(post02.body).toEqual(postObject);
+      expect(post01.body).toEqual(createdPostObject);
+      expect(post02.body).toEqual(createdPostObject);
     });
   });
 

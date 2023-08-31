@@ -15,7 +15,7 @@ export class BlogsTransactionsRepository {
         .where(`b.id = :blogId`, { blogId: blogId })
         .getOne();
     } catch (e) {
-      console.log(e);
+      console.error(e);
       return null;
     }
   }

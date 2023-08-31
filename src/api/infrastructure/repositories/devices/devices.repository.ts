@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { Device } from '../../../entities/devices/device.entity';
 
 @Injectable()
@@ -8,7 +8,6 @@ export class DevicesRepository {
   constructor(
     @InjectRepository(Device)
     private readonly devicesRepository: Repository<Device>,
-    @InjectDataSource() private dataSource: DataSource,
   ) {}
   // ***** Find device operations *****
   async findDevice(deviceId: string): Promise<Device | null> {
@@ -19,7 +18,7 @@ export class DevicesRepository {
         .where(`d.deviceId = :deviceId`, { deviceId: deviceId })
         .getOne();
     } catch (e) {
-      console.log(e);
+      console.error(e);
       return null;
     }
   }

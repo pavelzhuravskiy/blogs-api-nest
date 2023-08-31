@@ -6,10 +6,10 @@ import {
 } from '../utils/constants/auth.constants';
 import { getAppAndClearDb } from '../utils/functions/get-app';
 import {
+  questionBody,
   questionCorrectAnswer01,
   questionCorrectAnswer02,
   questionCorrectAnswer03,
-  questionBody,
   saQuestionsURI,
 } from '../utils/constants/quiz.constants';
 import { PublishedStatus } from '../../src/enums/published-status.enum';

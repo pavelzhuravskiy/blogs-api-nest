@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { Comment } from '../../../entities/comments/comment.entity';
 import { CommentLike } from '../../../entities/comments/comment-like.entity';
 
@@ -11,7 +11,6 @@ export class CommentsRepository {
     private readonly commentsRepository: Repository<Comment>,
     @InjectRepository(CommentLike)
     private readonly commentLikesRepository: Repository<CommentLike>,
-    @InjectDataSource() private dataSource: DataSource,
   ) {}
 
   // ***** Find comment *****
@@ -25,7 +24,7 @@ export class CommentsRepository {
         })
         .getOne();
     } catch (e) {
-      console.log(e);
+      console.error(e);
       return null;
     }
   }

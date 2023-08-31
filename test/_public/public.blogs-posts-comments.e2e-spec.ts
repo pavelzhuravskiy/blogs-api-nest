@@ -3,8 +3,8 @@ import { INestApplication } from '@nestjs/common';
 import {
   blog01Name,
   blogDescription,
-  bloggerMainImageURI,
   bloggerBlogsURI,
+  bloggerMainImageURI,
   bloggerWallpaperImageURI,
   blogWebsite,
   publicBlogsURI,
@@ -219,6 +219,27 @@ describe('Public blogs, posts, comments testing', () => {
         .expect(201);
 
       postId = post.body.id;
+    });
+    it(`should add main image (jpg)`, async () => {
+      const filePath = path.join(
+        __dirname,
+        'img',
+        'post',
+        'main',
+        'main_940x432_79kb.jpg',
+      );
+
+      return agent
+        .post(
+          bloggerBlogsURI +
+            blogId +
+            publicPostsURI +
+            postId +
+            bloggerMainImageURI,
+        )
+        .auth(aTokenUser01, { type: 'bearer' })
+        .attach('file', filePath)
+        .expect(201);
     });
 
     // Not found errors [404]

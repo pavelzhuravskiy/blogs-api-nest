@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { DeviceViewDto } from '../../../dto/devices/view/device.view.dto';
 import { Device } from '../../../entities/devices/device.entity';
 
@@ -9,7 +9,6 @@ export class DevicesQueryRepository {
   constructor(
     @InjectRepository(Device)
     private readonly devicesRepository: Repository<Device>,
-    @InjectDataSource() private dataSource: DataSource,
   ) {}
 
   async findDevices(userId: string): Promise<DeviceViewDto[]> {

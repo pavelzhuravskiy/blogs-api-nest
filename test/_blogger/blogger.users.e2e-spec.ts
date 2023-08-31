@@ -38,7 +38,7 @@ import {
   postTitle,
   publicPostsURI,
 } from '../utils/constants/posts.constants';
-import { postObject } from '../utils/objects/posts.objects';
+import { createdPostObject } from '../utils/objects/posts.objects';
 import {
   commentContent,
   publicCommentsURI,
@@ -118,7 +118,7 @@ describe('Blogger users ban testing', () => {
         page: 1,
         pageSize: 10,
         totalCount: 1,
-        items: [postObject],
+        items: [createdPostObject],
       });
     });
     it(`should create comment`, async () => {

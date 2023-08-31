@@ -1,19 +1,21 @@
 import { Injectable } from '@nestjs/common';
 import { PostViewDto } from '../../../dto/posts/view/post.view.dto';
-import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { LikeStatus } from '../../../../enums/like-status.enum';
 import { PostQueryDto } from '../../../dto/posts/query/post.query.dto';
 import { Post } from '../../../entities/posts/post.entity';
 import { Paginator } from '../../../../helpers/paginator';
 import { PostLike } from '../../../entities/posts/post-like.entity';
+import { PostMainImage } from '../../../entities/posts/post-image-main.entity';
+import process from 'process';
+import { PostImagesViewDto } from '../../../dto/posts/view/post-images.view.dto';
 
 @Injectable()
 export class PostsQueryRepository {
   constructor(
     @InjectRepository(Post)
     private readonly postsRepository: Repository<Post>,
-    @InjectDataSource() private dataSource: DataSource,
   ) {}
 
   async findPost(postId: string, userId: string): Promise<PostViewDto | null> {
@@ -77,6 +79,23 @@ export class PostsQueryRepository {
 
           'newest_likes',
         )
+        .addSelect(
+          (qb) =>
+            qb
+              .select(
+                `jsonb_agg(json_build_object('url', agg.url, 'width', agg.width, 'height', agg.height, 'size', agg.size)
+                 )`,
+              )
+              .from((qb) => {
+                return qb
+                  .select(`url, width, height, size`)
+                  .from(PostMainImage, 'pmi')
+                  .where('pmi.postId = p.id');
+              }, 'agg'),
+
+          'main_images',
+        )
+        .leftJoin('p.postMainImages', 'pmi')
         .leftJoinAndSelect('p.blog', 'b')
         .leftJoinAndSelect('b.blogBan', 'bb')
         .leftJoinAndSelect('b.user', 'u')
@@ -86,12 +105,13 @@ export class PostsQueryRepository {
         })
         .andWhere(`bb.isBanned = false`)
         .andWhere(`ubsa.isBanned = false`)
+        .groupBy(`p.id, b.id, bb.id, u.id, ubsa.id`)
         .getRawMany();
 
       const mappedPosts = await this.postsMapping(posts);
       return mappedPosts[0];
     } catch (e) {
-      console.log(e);
+      console.error(e);
       return null;
     }
   }
@@ -159,6 +179,23 @@ export class PostsQueryRepository {
 
         'newest_likes',
       )
+      .addSelect(
+        (qb) =>
+          qb
+            .select(
+              `jsonb_agg(json_build_object('url', agg.url, 'width', agg.width, 'height', agg.height, 'size', agg.size)
+                 )`,
+            )
+            .from((qb) => {
+              return qb
+                .select(`url, width, height, size`)
+                .from(PostMainImage, 'pmi')
+                .where('pmi.postId = p.id');
+            }, 'agg'),
+
+        'main_images',
+      )
+      .leftJoin('p.postMainImages', 'pmi')
       .leftJoinAndSelect('p.blog', 'b')
       .leftJoinAndSelect('b.blogBan', 'bb')
       .leftJoinAndSelect('b.user', 'u')
@@ -171,6 +208,7 @@ export class PostsQueryRepository {
       )
       .limit(query.pageSize)
       .offset((query.pageNumber - 1) * query.pageSize)
+      .groupBy(`p.id, b.id, bb.id, u.id, ubsa.id`)
       .getRawMany();
 
     const totalCount = await this.postsRepository
@@ -256,6 +294,23 @@ export class PostsQueryRepository {
 
           'newest_likes',
         )
+        .addSelect(
+          (qb) =>
+            qb
+              .select(
+                `jsonb_agg(json_build_object('url', agg.url, 'width', agg.width, 'height', agg.height, 'size', agg.size)
+                 )`,
+              )
+              .from((qb) => {
+                return qb
+                  .select(`url, width, height, size`)
+                  .from(PostMainImage, 'pmi')
+                  .where('pmi.postId = p.id');
+              }, 'agg'),
+
+          'main_images',
+        )
+        .leftJoin('p.postMainImages', 'pmi')
         .leftJoinAndSelect('p.blog', 'b')
         .leftJoinAndSelect('b.blogBan', 'bb')
         .leftJoinAndSelect('b.user', 'u')
@@ -268,6 +323,7 @@ export class PostsQueryRepository {
         .orderBy(`p.${query.sortBy}`, query.sortDirection)
         .limit(query.pageSize)
         .offset((query.pageNumber - 1) * query.pageSize)
+        .groupBy(`p.id, b.id, bb.id, u.id, ubsa.id`)
         .getRawMany();
 
       if (posts.length === 0) {
@@ -294,13 +350,59 @@ export class PostsQueryRepository {
         items: await this.postsMapping(posts),
       });
     } catch (e) {
-      console.log(e);
+      console.error(e);
       return null;
     }
   }
 
+  async findPostImages(postId: string): Promise<PostImagesViewDto> {
+    try {
+      const posts = await this.postsRepository
+        .createQueryBuilder('p')
+        .leftJoinAndSelect('p.postMainImages', 'pmi')
+        .where(`p.id = :postId`, {
+          postId: postId,
+        })
+        .getMany();
+
+      const mappedPosts = await this.postImagesMapping(posts);
+      return mappedPosts[0];
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
+  }
+
+  private async postImagesMapping(posts: Post[]): Promise<PostImagesViewDto[]> {
+    return posts.map((p) => {
+      return {
+        main: p.postMainImages.map((bmi) => {
+          return {
+            url: process.env.S3_DOMAIN + bmi.url,
+            width: Number(bmi.width),
+            height: Number(bmi.height),
+            fileSize: Number(bmi.size),
+          };
+        }),
+      };
+    });
+  }
+
   private async postsMapping(posts: any[]): Promise<PostViewDto[]> {
     return posts.map((p) => {
+      let mainImages = [];
+
+      if (p.main_images) {
+        mainImages = p.main_images.map((pmi) => {
+          return {
+            url: process.env.S3_DOMAIN + pmi.url,
+            width: Number(pmi.width),
+            height: Number(pmi.height),
+            fileSize: Number(pmi.size),
+          };
+        });
+      }
+
       return {
         id: p.p_id.toString(),
         title: p.p_title,
@@ -314,6 +416,9 @@ export class PostsQueryRepository {
           dislikesCount: Number(p.dislikes_count),
           myStatus: p.like_status || LikeStatus.None,
           newestLikes: p.newest_likes || [],
+        },
+        images: {
+          main: mainImages,
         },
       };
     });

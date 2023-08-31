@@ -1,9 +1,9 @@
 import {
+  questionBody,
   questionCorrectAnswer01,
   questionCorrectAnswer02,
   questionCorrectAnswer03,
   questionCorrectAnswerNumeric,
-  questionBody,
   questionUpdatedBody,
 } from '../constants/quiz.constants';
 import { GameStatus } from '../../../src/enums/game-status.enum';
