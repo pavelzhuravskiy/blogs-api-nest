@@ -17,7 +17,8 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "ngrok:dev": "ngrok http 5000"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.398.0",
@@ -33,6 +34,7 @@
     "@nestjs/schedule": "^3.0.3",
     "@nestjs/throttler": "^4.0.0",
     "@nestjs/typeorm": "^9.0.1",
+    "axios": "^1.5.0",
     "bcrypt": "^5.1.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
@@ -68,6 +70,7 @@
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.0.0",
     "jest": "29.5.0",
+    "ngrok": "^5.0.0-beta.2",
     "prettier": "^2.3.2",
     "source-map-support": "^0.5.20",
     "supertest": "^6.1.3",
