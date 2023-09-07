@@ -24,7 +24,7 @@ import { DevicesRepository } from '../infrastructure/repositories/devices/device
 import { Repository } from 'typeorm';
 import { User } from '../entities/users/user.entity';
 import { UsersModule } from './users.module';
-import { MailAdapter } from '../infrastructure/mail/mail-adapter';
+import { MailAdapter } from '../infrastructure/mail/mail.adapter';
 import { DevicesModule } from './devices.module';
 import { UsersService } from '../_superadmin/users/application/users.service';
 import { TransactionsRepository } from '../infrastructure/repositories/common/transactions.repository';

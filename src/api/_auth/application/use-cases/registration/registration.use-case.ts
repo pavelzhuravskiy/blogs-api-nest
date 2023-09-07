@@ -1,6 +1,6 @@
 import { CommandHandler } from '@nestjs/cqrs';
 import { UserInputDto } from '../../../../dto/users/input/user-input.dto';
-import { MailAdapter } from '../../../../infrastructure/mail/mail-adapter';
+import { MailAdapter } from '../../../../infrastructure/mail/mail.adapter';
 import { DataSource, EntityManager } from 'typeorm';
 import { UserEmailConfirmation } from '../../../../entities/users/user-email-confirmation.entity';
 import { randomUUID } from 'crypto';

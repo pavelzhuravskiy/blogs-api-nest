@@ -13,7 +13,7 @@ import sharp from 'sharp';
 import { BlogsTransactionsRepository } from '../../../infrastructure/repositories/blogs/blogs.transactions.repository';
 import { ExceptionResultType } from '../../../../exceptions/types/exception-result.type';
 import { PostsTransactionsRepository } from '../../../infrastructure/repositories/posts/posts.transactions.repository';
-import { S3Adapter } from '../../../infrastructure/aws/s3-adapter';
+import { S3Adapter } from '../../../infrastructure/aws/s3.adapter';
 import { PostMainImage } from '../../../entities/posts/post-image-main.entity';
 
 export class PostAddMainImageCommand {

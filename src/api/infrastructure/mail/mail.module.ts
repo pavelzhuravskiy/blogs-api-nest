@@ -2,7 +2,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { Module } from '@nestjs/common';
 import { join } from 'path';
-import { MailAdapter } from './mail-adapter';
+import { MailAdapter } from './mail.adapter';
 
 @Module({
   imports: [

@@ -6,7 +6,7 @@ import {
   blogNotFound,
 } from '../../../../exceptions/exception.constants';
 import { BlogsRepository } from '../../../infrastructure/repositories/blogs/blogs.repository';
-import { S3Adapter } from '../../../infrastructure/aws/s3-adapter';
+import { S3Adapter } from '../../../infrastructure/aws/s3.adapter';
 import sharp from 'sharp';
 import { DataSourceRepository } from '../../../infrastructure/repositories/common/data-source.repository';
 import { BlogWallpaperImage } from '../../../entities/blogs/blog-image-wallpaper.entity';

@@ -2,7 +2,7 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { randomUUID } from 'crypto';
 import { EmailInputDto } from '../../../dto/email.input.dto';
 import { UsersRepository } from '../../../../infrastructure/repositories/users/users.repository';
-import { MailAdapter } from '../../../../infrastructure/mail/mail-adapter';
+import { MailAdapter } from '../../../../infrastructure/mail/mail.adapter';
 import { add } from 'date-fns';
 import { UserPasswordRecovery } from '../../../../entities/users/user-password-recovery.entity';
 import { DataSourceRepository } from '../../../../infrastructure/repositories/common/data-source.repository';

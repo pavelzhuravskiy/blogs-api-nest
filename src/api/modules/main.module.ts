@@ -49,7 +49,7 @@ import { TransactionsRepository } from '../infrastructure/repositories/common/tr
 import { UsersTransactionsRepository } from '../infrastructure/repositories/users/users.transactions.repository';
 import { DataSourceRepository } from '../infrastructure/repositories/common/data-source.repository';
 import { BlogAddMainImageUseCase } from '../_blogger/application/use-cases/blog-add-image-main.use-case';
-import { S3Adapter } from '../infrastructure/aws/s3-adapter';
+import { S3Adapter } from '../infrastructure/aws/s3.adapter';
 import { BlogMainImage } from '../entities/blogs/blog-image-main.entity';
 import { BlogWallpaperImage } from '../entities/blogs/blog-image-wallpaper.entity';
 import { BlogAddWallpaperImageUseCase } from '../_blogger/application/use-cases/blog-add-image-wp.use-case';
@@ -57,6 +57,7 @@ import { BlogsTransactionsRepository } from '../infrastructure/repositories/blog
 import { PostsTransactionsRepository } from '../infrastructure/repositories/posts/posts.transactions.repository';
 import { PostMainImage } from '../entities/posts/post-image-main.entity';
 import { PostAddMainImageUseCase } from '../_blogger/application/use-cases/post-add-image-main.use-case';
+import { TelegramAdapter } from '../infrastructure/telegram/telegram.adapter';
 
 const entities = [
   Blog,
@@ -130,6 +131,7 @@ const queryRepositories = [
     ...queryRepositories,
     IsBlogExistConstraint,
     S3Adapter,
+    TelegramAdapter,
   ],
 })
 export class MainModule implements NestModule {

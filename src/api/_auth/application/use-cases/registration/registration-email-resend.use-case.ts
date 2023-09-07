@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { EmailInputDto } from '../../../dto/email.input.dto';
 import { UsersRepository } from '../../../../infrastructure/repositories/users/users.repository';
-import { MailAdapter } from '../../../../infrastructure/mail/mail-adapter';
+import { MailAdapter } from '../../../../infrastructure/mail/mail.adapter';
 import { randomUUID } from 'crypto';
 import { add } from 'date-fns';
 import { DataSourceRepository } from '../../../../infrastructure/repositories/common/data-source.repository';
