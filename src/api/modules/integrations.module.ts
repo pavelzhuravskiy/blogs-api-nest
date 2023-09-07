@@ -6,14 +6,16 @@ import { DataSourceRepository } from '../infrastructure/repositories/common/data
 import { UsersRepository } from '../infrastructure/repositories/users/users.repository';
 import { UsersModule } from './users.module';
 import { CqrsModule } from '@nestjs/cqrs';
+import { MainModule } from './main.module';
 
+const controllers = [IntegrationsTelegramController];
 const adapters = [TelegramAdapter];
 const useCases = [TelegramBotGetAuthLinkUseCase];
 const repositories = [DataSourceRepository, UsersRepository];
 
 @Module({
-  imports: [UsersModule, CqrsModule],
-  controllers: [IntegrationsTelegramController],
+  imports: [UsersModule, MainModule, CqrsModule],
+  controllers: [...controllers],
   providers: [...adapters, ...useCases, ...repositories],
 })
 export class IntegrationsModule {}

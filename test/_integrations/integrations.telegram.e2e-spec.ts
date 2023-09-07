@@ -63,14 +63,18 @@ describe('Telegram bot testing', () => {
         .expect(401);
     });
     it(`should return telegram bot authentication link`, async () => {
-      const test = await agent
+      const response = await agent
         .get(integrationsTelegramBotAuthLinkURI)
         .auth(aTokenUser01, { type: 'bearer' })
         .expect(200);
-      console.log(test.body);
-      return test;
 
-      // expect(re.body).toEqual(userProfileObject);
+      console.log(response.body);
+
+      expect(response.body).toEqual({
+        link: expect.any(String),
+      });
+
+      return response;
     });
   });
 

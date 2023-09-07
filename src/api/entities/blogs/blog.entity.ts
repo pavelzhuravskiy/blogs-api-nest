@@ -15,6 +15,7 @@ import { User } from '../users/user.entity';
 import { randomUUID } from 'crypto';
 import { BlogMainImage } from './blog-image-main.entity';
 import { BlogWallpaperImage } from './blog-image-wallpaper.entity';
+import { BlogSubscriber } from './blog-subscriber.entity';
 
 @Entity('blogs')
 export class Blog {
@@ -60,6 +61,9 @@ export class Blog {
     (userBanByBlogger) => userBanByBlogger.blog,
   )
   userBanByBlogger: UserBanByBlogger[];
+
+  @OneToMany(() => BlogSubscriber, (blogSubscriber) => blogSubscriber.blog)
+  blogSubscriber: BlogSubscriber[];
 
   static checkSortingField(value: any) {
     const b = new Blog();

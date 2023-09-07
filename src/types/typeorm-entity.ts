@@ -17,6 +17,7 @@ import { Question } from '../api/entities/quiz/question.entity';
 import { BlogMainImage } from '../api/entities/blogs/blog-image-main.entity';
 import { BlogWallpaperImage } from '../api/entities/blogs/blog-image-wallpaper.entity';
 import { PostMainImage } from '../api/entities/posts/post-image-main.entity';
+import { BlogSubscriber } from '../api/entities/blogs/blog-subscriber.entity';
 
 export type TypeORMEntity =
   | Player
@@ -32,6 +33,7 @@ export type TypeORMEntity =
   | BlogBan
   | BlogWallpaperImage
   | BlogMainImage
+  | BlogSubscriber
   | Comment
   | CommentLike
   | Post

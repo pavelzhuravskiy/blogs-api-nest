@@ -16,6 +16,7 @@ import { Blog } from '../blogs/blog.entity';
 import { CommentLike } from '../comments/comment-like.entity';
 import { Player } from '../quiz/player.entity';
 import { randomUUID } from 'crypto';
+import { BlogSubscriber } from '../blogs/blog-subscriber.entity';
 
 @Entity('users')
 export class User {
@@ -36,9 +37,6 @@ export class User {
 
   @Column({ name: 'is_confirmed', type: 'bool' })
   isConfirmed: boolean;
-
-  @Column({ name: 'telegram_id', type: 'uuid', nullable: true })
-  telegramId: string;
 
   @OneToOne(() => UserBanBySA, (userBanBySA) => userBanBySA.user)
   userBanBySA: UserBanBySA;
@@ -72,6 +70,9 @@ export class User {
 
   @OneToMany(() => Player, (player) => player.user)
   player: Player[];
+
+  @OneToMany(() => BlogSubscriber, (blogSubscriber) => blogSubscriber.user)
+  blogSubscriber: BlogSubscriber[];
 
   static checkSortingField(value: any) {
     const u = new User();

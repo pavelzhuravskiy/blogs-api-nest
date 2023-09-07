@@ -12,7 +12,7 @@ export class TelegramAdapter {
   }
   async setWebhook() {
     await this.axiosInstance.post(`setWebhook`, {
-      url: `${process.env.DEPLOYMENT_URL}/api/integrations/telegram/webhook`,
+      url: `${process.env.DEPLOYMENT_URL}/integrations/telegram/webhook`,
     });
   }
 }

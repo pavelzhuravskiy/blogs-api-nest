@@ -58,12 +58,15 @@ import { PostsTransactionsRepository } from '../infrastructure/repositories/post
 import { PostMainImage } from '../entities/posts/post-image-main.entity';
 import { PostAddMainImageUseCase } from '../_blogger/application/use-cases/post-add-image-main.use-case';
 import { TelegramAdapter } from '../infrastructure/telegram/telegram.adapter';
+import { BlogSubscriber } from '../entities/blogs/blog-subscriber.entity';
+import { BlogSubscribersRepository } from '../infrastructure/repositories/blogs/blog-subscribers.repository';
 
 const entities = [
   Blog,
   BlogBan,
   BlogWallpaperImage,
   BlogMainImage,
+  BlogSubscriber,
   Post,
   PostLike,
   PostMainImage,
@@ -106,6 +109,7 @@ const useCases = [
 const repositories = [
   BlogsRepository,
   BlogsTransactionsRepository,
+  BlogSubscribersRepository,
   PostsRepository,
   PostsTransactionsRepository,
   UsersRepository,
@@ -132,7 +136,9 @@ const queryRepositories = [
     IsBlogExistConstraint,
     S3Adapter,
     TelegramAdapter,
+    BlogSubscriber,
   ],
+  exports: [BlogSubscriber, BlogSubscribersRepository],
 })
 export class MainModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

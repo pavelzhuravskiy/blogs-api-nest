@@ -2,6 +2,8 @@ import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { UsersRepository } from '../../../infrastructure/repositories/users/users.repository';
 import { randomUUID } from 'crypto';
 import { DataSourceRepository } from '../../../infrastructure/repositories/common/data-source.repository';
+import { BlogSubscriber } from '../../../entities/blogs/blog-subscriber.entity';
+import { BlogSubscribersRepository } from '../../../infrastructure/repositories/blogs/blog-subscribers.repository';
 
 export class TelegramBotGetAuthLinkQuery {
   constructor(public userId: string) {}
@@ -14,6 +16,7 @@ export class TelegramBotGetAuthLinkUseCase
   constructor(
     private readonly dataSourceRepository: DataSourceRepository,
     private readonly usersRepository: UsersRepository,
+    private readonly blogSubscribersRepository: BlogSubscribersRepository,
   ) {}
 
   async execute(query: TelegramBotGetAuthLinkQuery): Promise<{ link: string }> {
@@ -23,13 +26,19 @@ export class TelegramBotGetAuthLinkUseCase
       return null;
     }
 
-    const telegramId = randomUUID();
-    user.telegramId = telegramId;
+    let subscriber = await this.blogSubscribersRepository.findActiveSubscriber(
+      query.userId,
+    );
 
-    await this.dataSourceRepository.save(user);
+    if (!subscriber) {
+      subscriber = new BlogSubscriber();
+      subscriber.telegramId = randomUUID();
+      subscriber.user = user;
+      await this.dataSourceRepository.save(subscriber);
+    }
 
     return {
-      link: `https://t.me/blogger_platform_bot?code=${telegramId}`,
+      link: `https://t.me/blogger_platform_bot?start=code=${subscriber.telegramId}`,
     };
   }
 }
