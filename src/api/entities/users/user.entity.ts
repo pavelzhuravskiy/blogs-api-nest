@@ -37,6 +37,9 @@ export class User {
   @Column({ name: 'is_confirmed', type: 'bool' })
   isConfirmed: boolean;
 
+  @Column({ name: 'telegram_id', type: 'uuid', nullable: true })
+  telegramId: string;
+
   @OneToOne(() => UserBanBySA, (userBanBySA) => userBanBySA.user)
   userBanBySA: UserBanBySA;
 
