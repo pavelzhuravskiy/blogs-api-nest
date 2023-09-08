@@ -11,6 +11,7 @@ import { UsersRepository } from '../../../../infrastructure/repositories/users/u
 import { DataSourceRepository } from '../../../../infrastructure/repositories/common/data-source.repository';
 import { BlogsRepository } from '../../../../infrastructure/repositories/blogs/blogs.repository';
 import { BlogSubscribersRepository } from '../../../../infrastructure/repositories/blogs/blog-subscribers.repository';
+import { SubscriptionStatus } from '../../../../../enums/subscription-status.enum';
 
 export class BlogUnsubscribeCommand {
   constructor(public blogId: string, public userId: string) {}
@@ -57,9 +58,12 @@ export class BlogUnsubscribeUseCase
       command.userId,
     );
 
-    if (subscriber) {
-      console.log(subscriber.id);
-      await this.blogSubscribersRepository.deleteBlogSubscriber(subscriber.id);
+    if (
+      subscriber &&
+      subscriber.subscriptionStatus !== SubscriptionStatus.Unsubscribed
+    ) {
+      subscriber.subscriptionStatus = SubscriptionStatus.Unsubscribed;
+      await this.dataSourceRepository.save(subscriber);
     }
 
     return {

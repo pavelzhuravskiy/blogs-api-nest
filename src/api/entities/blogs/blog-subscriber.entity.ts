@@ -13,6 +13,9 @@ export class BlogSubscriber {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  @Column({ name: 'subscription_status', type: 'varchar' })
+  subscriptionStatus: string;
+
   @Column('uuid', { name: 'telegram_code', nullable: true })
   telegramCode: string;
 

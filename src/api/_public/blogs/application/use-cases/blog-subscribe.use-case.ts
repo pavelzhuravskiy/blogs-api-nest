@@ -12,6 +12,7 @@ import { DataSourceRepository } from '../../../../infrastructure/repositories/co
 import { BlogsRepository } from '../../../../infrastructure/repositories/blogs/blogs.repository';
 import { BlogSubscriber } from '../../../../entities/blogs/blog-subscriber.entity';
 import { BlogSubscribersRepository } from '../../../../infrastructure/repositories/blogs/blog-subscribers.repository';
+import { SubscriptionStatus } from '../../../../../enums/subscription-status.enum';
 
 export class BlogSubscribeCommand {
   constructor(public blogId: string, public userId: string) {}
@@ -60,6 +61,7 @@ export class BlogSubscribeUseCase
 
     if (!subscriber) {
       subscriber = new BlogSubscriber();
+      subscriber.subscriptionStatus = SubscriptionStatus.Subscribed;
       subscriber.blog = blog;
       subscriber.user = user;
       await this.dataSourceRepository.save(subscriber);

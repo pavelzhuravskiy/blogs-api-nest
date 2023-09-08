@@ -4,6 +4,7 @@ import { randomUUID } from 'crypto';
 import { DataSourceRepository } from '../../../infrastructure/repositories/common/data-source.repository';
 import { BlogSubscriber } from '../../../entities/blogs/blog-subscriber.entity';
 import { BlogSubscribersRepository } from '../../../infrastructure/repositories/blogs/blog-subscribers.repository';
+import { SubscriptionStatus } from '../../../../enums/subscription-status.enum';
 
 export class TelegramBotGetAuthLinkQuery {
   constructor(public userId: string) {}
@@ -32,6 +33,7 @@ export class TelegramBotGetAuthLinkUseCase
 
     if (!subscriber) {
       subscriber = new BlogSubscriber();
+      subscriber.subscriptionStatus = SubscriptionStatus.None;
       subscriber.telegramCode = randomUUID();
       subscriber.user = user;
       await this.dataSourceRepository.save(subscriber);
