@@ -65,7 +65,7 @@ export class BloggerBlogsController {
       return exceptionHandler(ResultCode.NotFound, userNotFound, userIDField);
     }
 
-    return this.blogsQueryRepository.findBlog(blogId);
+    return this.blogsQueryRepository.findBlog(blogId, userId);
   }
 
   @UseGuards(JwtBearerGuard)

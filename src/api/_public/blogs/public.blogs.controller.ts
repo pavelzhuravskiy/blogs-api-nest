@@ -34,13 +34,19 @@ export class PublicBlogsController {
   ) {}
 
   @Get()
-  async findBlogs(@Query() query: BlogQueryDto) {
-    return this.blogsQueryRepository.findBlogsForPublicUser(query);
+  async findBlogs(
+    @Query() query: BlogQueryDto,
+    @UserIdFromHeaders() userId: string,
+  ) {
+    return this.blogsQueryRepository.findBlogsForPublicUser(query, userId);
   }
 
   @Get(':id')
-  async findBlog(@Param('id') id: string) {
-    const result = await this.blogsQueryRepository.findBlog(id);
+  async findBlog(
+    @Param('id') blogId: string,
+    @UserIdFromHeaders() userId: string,
+  ) {
+    const result = await this.blogsQueryRepository.findBlog(blogId, userId);
 
     if (!result) {
       return exceptionHandler(ResultCode.NotFound, blogNotFound, blogIDField);

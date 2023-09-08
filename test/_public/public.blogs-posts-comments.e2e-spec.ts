@@ -122,6 +122,7 @@ describe('Public blogs, posts, comments testing', () => {
           websiteUrl: blogWebsite,
         })
         .expect(201);
+
       expect(blog.body).toEqual(createdBlogObject);
 
       blogId = blog.body.id;
@@ -214,29 +215,6 @@ describe('Public blogs, posts, comments testing', () => {
         .expect(204);
     });
   });
-  describe('Find blogs', () => {
-    // Not found errors [404]
-    it(`should return 404 when trying to get nonexistent blog`, async () => {
-      return agent.get(publicBlogsURI + randomUUID()).expect(404);
-    });
-
-    // Success
-    it(`should return created blogs`, async () => {
-      const blogs = await agent.get(publicBlogsURI).expect(200);
-      expect(blogs.body).toEqual({
-        pagesCount: 1,
-        page: 1,
-        pageSize: 10,
-        totalCount: 1,
-        items: [blog01Object],
-      });
-    });
-    it(`should return created blog by ID`, async () => {
-      const blog = await agent.get(publicBlogsURI + blogId).expect(200);
-
-      expect(blog.body).toEqual(blog01Object);
-    });
-  });
   describe('Blog unsubscribe', () => {
     // Auth errors [401]
     it(`should return 401 when trying to unsubscribe from blog with incorrect token`, async () => {
@@ -305,6 +283,33 @@ describe('Public blogs, posts, comments testing', () => {
       });
     });
     it.skip(`should return blog by ID with correct user 02 subscriber status`, async () => {
+      const blog = await agent.get(publicBlogsURI + blogId).expect(200);
+
+      expect(blog.body).toEqual(blog01Object);
+    });
+  });
+  describe('Find blogs', () => {
+    // Not found errors [404]
+    it(`should return 404 when trying to get nonexistent blog`, async () => {
+      return agent.get(publicBlogsURI + randomUUID()).expect(404);
+    });
+
+    // Success
+    it(`should return created blogs for user 02`, async () => {
+      const blogs = await agent
+        .get(publicBlogsURI)
+        .auth(aTokenUser02, { type: 'bearer' })
+        .expect(200);
+
+      expect(blogs.body).toEqual({
+        pagesCount: 1,
+        page: 1,
+        pageSize: 10,
+        totalCount: 1,
+        items: [blog01Object],
+      });
+    });
+    it(`should return created blog by ID`, async () => {
       const blog = await agent.get(publicBlogsURI + blogId).expect(200);
 
       expect(blog.body).toEqual(blog01Object);
