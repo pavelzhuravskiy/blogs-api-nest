@@ -4,6 +4,7 @@ export const bloggerBlogsURI = '/blogger/blogs/';
 export const publicBlogsURI = '/blogs/';
 export const blogURI = 'blog/';
 export const blogBindURI = '/bind-with-user/';
+export const blogSubscriptionURI = '/subscription/';
 
 // Blog creation strings
 export const blog01Name = 'Test 01 name';

@@ -13,6 +13,9 @@ export class BlogSubscriber {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  @Column('uuid', { name: 'telegram_code', nullable: true })
+  telegramCode: string;
+
   @Column('uuid', { name: 'telegram_id', nullable: true })
   telegramId: string;
 
@@ -21,7 +24,7 @@ export class BlogSubscriber {
     nullable: true,
   })
   @JoinColumn()
-  blog: User;
+  blog: Blog;
 
   @ManyToOne(() => User, (user) => user.blogSubscriber, {
     onDelete: 'CASCADE',

@@ -13,7 +13,7 @@ export class BlogsRepository {
     private readonly blogWallpaperImagesRepository: Repository<BlogWallpaperImage>,
   ) {}
   // ***** Find blog operations *****
-  async findBlog(blogId: string): Promise<Blog | null> {
+  async findBlogById(blogId: string): Promise<Blog | null> {
     try {
       return await this.blogsRepository
         .createQueryBuilder('b')

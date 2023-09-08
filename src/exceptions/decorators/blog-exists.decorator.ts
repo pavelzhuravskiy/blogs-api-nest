@@ -12,7 +12,7 @@ import { BlogsRepository } from '../../api/infrastructure/repositories/blogs/blo
 export class IsBlogExistConstraint implements ValidatorConstraintInterface {
   constructor(private readonly blogsRepository: BlogsRepository) {}
   async validate(blogId: string) {
-    const blog = await this.blogsRepository.findBlog(blogId);
+    const blog = await this.blogsRepository.findBlogById(blogId);
 
     if (!blog) {
       return false;

@@ -60,6 +60,8 @@ import { PostAddMainImageUseCase } from '../_blogger/application/use-cases/post-
 import { TelegramAdapter } from '../infrastructure/telegram/telegram.adapter';
 import { BlogSubscriber } from '../entities/blogs/blog-subscriber.entity';
 import { BlogSubscribersRepository } from '../infrastructure/repositories/blogs/blog-subscribers.repository';
+import { BlogSubscribeUseCase } from '../_public/blogs/application/use-cases/blog-subscribe.use-case';
+import { BlogUnsubscribeUseCase } from '../_public/blogs/application/use-cases/blog-unsubscribe.use-case';
 
 const entities = [
   Blog,
@@ -91,6 +93,8 @@ const useCases = [
   BlogCreateUseCase,
   BlogUpdateUseCase,
   BlogDeleteUseCase,
+  BlogSubscribeUseCase,
+  BlogUnsubscribeUseCase,
   PostCreateUseCase,
   PostUpdateUseCase,
   PostDeleteUseCase,

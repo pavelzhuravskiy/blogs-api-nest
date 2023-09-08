@@ -24,7 +24,7 @@ export class BlogBindUseCase implements ICommandHandler<BlogBindCommand> {
   async execute(
     command: BlogBindCommand,
   ): Promise<ExceptionResultType<boolean>> {
-    const blog = await this.blogsRepository.findBlog(command.blogId);
+    const blog = await this.blogsRepository.findBlogById(command.blogId);
 
     if (!blog) {
       return {

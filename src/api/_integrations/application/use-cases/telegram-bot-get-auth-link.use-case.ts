@@ -32,13 +32,14 @@ export class TelegramBotGetAuthLinkUseCase
 
     if (!subscriber) {
       subscriber = new BlogSubscriber();
-      subscriber.telegramId = randomUUID();
+      subscriber.telegramCode = randomUUID();
       subscriber.user = user;
       await this.dataSourceRepository.save(subscriber);
     }
 
+    // TODO Remove start=
     return {
-      link: `https://t.me/blogger_platform_bot?start=code=${subscriber.telegramId}`,
+      link: `https://t.me/blogger_platform_bot?start=code=${subscriber.telegramCode}`,
     };
   }
 }

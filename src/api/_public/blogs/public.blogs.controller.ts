@@ -1,4 +1,13 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import {
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  Param,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { BlogQueryDto } from '../../dto/blogs/query/blog.query.dto';
 import { exceptionHandler } from '../../../exceptions/exception.handler';
 import {
@@ -10,10 +19,16 @@ import { BlogsQueryRepository } from '../../infrastructure/repositories/blogs/bl
 import { PostQueryDto } from '../../dto/posts/query/post.query.dto';
 import { UserIdFromHeaders } from '../../_auth/decorators/user-id-from-headers.decorator';
 import { PostsQueryRepository } from '../../infrastructure/repositories/posts/posts.query.repository';
+import { JwtBearerGuard } from '../../_auth/guards/jwt-bearer.guard';
+import { UserIdFromGuard } from '../../_auth/decorators/user-id-from-guard.decorator';
+import { CommandBus } from '@nestjs/cqrs';
+import { BlogSubscribeCommand } from './application/use-cases/blog-subscribe.use-case';
+import { BlogUnsubscribeCommand } from './application/use-cases/blog-unsubscribe.use-case';
 
 @Controller('blogs')
 export class PublicBlogsController {
   constructor(
+    private commandBus: CommandBus,
     private readonly blogsQueryRepository: BlogsQueryRepository,
     private readonly postsQueryRepository: PostsQueryRepository,
   ) {}
@@ -48,6 +63,42 @@ export class PublicBlogsController {
 
     if (!result) {
       return exceptionHandler(ResultCode.NotFound, blogNotFound, blogIDField);
+    }
+
+    return result;
+  }
+
+  @UseGuards(JwtBearerGuard)
+  @Post(':id/subscription')
+  @HttpCode(204)
+  async subscribeToBlog(
+    @Param('id') blogId: string,
+    @UserIdFromGuard() userId: string,
+  ) {
+    const result = await this.commandBus.execute(
+      new BlogSubscribeCommand(blogId, userId),
+    );
+
+    if (result.code !== ResultCode.Success) {
+      return exceptionHandler(result.code, result.message, result.field);
+    }
+
+    return result;
+  }
+
+  @UseGuards(JwtBearerGuard)
+  @Delete(':id/subscription')
+  @HttpCode(204)
+  async unsubscribeFromBlog(
+    @Param('id') blogId: string,
+    @UserIdFromGuard() userId: string,
+  ) {
+    const result = await this.commandBus.execute(
+      new BlogUnsubscribeCommand(blogId, userId),
+    );
+
+    if (result.code !== ResultCode.Success) {
+      return exceptionHandler(result.code, result.message, result.field);
     }
 
     return result;
