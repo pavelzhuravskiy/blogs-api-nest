@@ -26,6 +26,15 @@ export class BlogsQueryRepository {
         .addSelect(
           (qb) =>
             qb
+              .select(`count(*)`)
+              .from(BlogSubscriber, 'bs')
+              .where('bs.blogId = b.id')
+              .andWhere(`bs.subscriptionStatus = 'Subscribed'`),
+          'subscribers_count',
+        )
+        .addSelect(
+          (qb) =>
+            qb
               .select('bs.subscriptionStatus')
               .from(BlogSubscriber, 'bs')
               .where('bs.blogId = b.id')
@@ -56,6 +65,8 @@ export class BlogsQueryRepository {
         .andWhere(`bb.isBanned = false`)
         .getRawMany();
 
+      // console.log(blogs, 'raw blog');
+
       const mappedBlogs = await this.blogsMapping(blogs);
       return mappedBlogs[0];
     } catch (e) {
@@ -70,6 +81,15 @@ export class BlogsQueryRepository {
   ): Promise<Paginator<BlogViewDto[]>> {
     const blogs = await this.blogsRepository
       .createQueryBuilder('b')
+      .addSelect(
+        (qb) =>
+          qb
+            .select(`count(*)`)
+            .from(BlogSubscriber, 'bs')
+            .where('bs.blogId = b.id')
+            .andWhere(`bs.subscriptionStatus = 'Subscribed'`),
+        'subscribers_count',
+      )
       .addSelect(
         (qb) =>
           qb
@@ -131,6 +151,15 @@ export class BlogsQueryRepository {
   ): Promise<Paginator<BlogViewDto[]>> {
     const blogs = await this.blogsRepository
       .createQueryBuilder('b')
+      .addSelect(
+        (qb) =>
+          qb
+            .select(`count(*)`)
+            .from(BlogSubscriber, 'bs')
+            .where('bs.blogId = b.id')
+            .andWhere(`bs.subscriptionStatus = 'Subscribed'`),
+        'subscribers_count',
+      )
       .addSelect(
         (qb) =>
           qb
@@ -312,6 +341,7 @@ export class BlogsQueryRepository {
           main: mainImages,
         },
         currentUserSubscriptionStatus: subscriptionStatus,
+        subscribersCount: Number(b.subscribers_count),
       };
     });
   }

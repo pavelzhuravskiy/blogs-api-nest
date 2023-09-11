@@ -238,6 +238,11 @@ describe('Public blogs, posts, comments testing', () => {
         .auth(aTokenUser02, { type: 'bearer' })
         .expect(204);
     });
+    it(`should return correct subscribers count`, async () => {
+      const blog = await agent.get(publicBlogsURI + blogId).expect(200);
+
+      expect(blog.body.subscribersCount).toBe(2);
+    });
   });
   describe('Blog unsubscribe', () => {
     // Auth errors [401]
@@ -264,52 +269,55 @@ describe('Public blogs, posts, comments testing', () => {
         .expect(204);
     });
 
-    it.skip(`should return blogs with correct subscribers count`, async () => {
+    it(`should return blogs with correct subscribers count`, async () => {
       const blogs = await agent.get(publicBlogsURI).expect(200);
-      expect(blogs.body).toEqual({
-        pagesCount: 1,
-        page: 1,
-        pageSize: 10,
-        totalCount: 1,
-        items: [blog01Object],
-      });
+      expect(blogs.body.items[0].subscribersCount).toBe(1);
     });
-    it.skip(`should return blog by ID with correct subscribers count`, async () => {
+    it(`should return blog by ID with correct subscribers count`, async () => {
       const blog = await agent.get(publicBlogsURI + blogId).expect(200);
-
-      expect(blog.body).toEqual(blog01Object);
+      expect(blog.body.subscribersCount).toBe(1);
     });
 
-    it.skip(`should return blogs with correct user 01 subscriber status`, async () => {
-      const blogs = await agent.get(publicBlogsURI).expect(200);
-      expect(blogs.body).toEqual({
-        pagesCount: 1,
-        page: 1,
-        pageSize: 10,
-        totalCount: 1,
-        items: [blog01Object],
-      });
-    });
-    it.skip(`should return blog by ID with correct user 01 subscriber status`, async () => {
-      const blog = await agent.get(publicBlogsURI + blogId).expect(200);
+    it(`should return blogs with correct user 01 subscriber status`, async () => {
+      const blogs = await agent
+        .get(publicBlogsURI)
+        .auth(aTokenUser01, { type: 'bearer' })
+        .expect(200);
 
-      expect(blog.body).toEqual(blog01Object);
+      expect(blogs.body.items[0].currentUserSubscriptionStatus).toBe(
+        SubscriptionStatus.Unsubscribed,
+      );
+    });
+    it(`should return blog by ID with correct user 01 subscriber status`, async () => {
+      const blog = await agent
+        .get(publicBlogsURI + blogId)
+        .auth(aTokenUser01, { type: 'bearer' })
+        .expect(200);
+
+      expect(blog.body.currentUserSubscriptionStatus).toBe(
+        SubscriptionStatus.Unsubscribed,
+      );
     });
 
-    it.skip(`should return blogs with correct user 02 subscriber status`, async () => {
-      const blogs = await agent.get(publicBlogsURI).expect(200);
-      expect(blogs.body).toEqual({
-        pagesCount: 1,
-        page: 1,
-        pageSize: 10,
-        totalCount: 1,
-        items: [blog01Object],
-      });
-    });
-    it.skip(`should return blog by ID with correct user 02 subscriber status`, async () => {
-      const blog = await agent.get(publicBlogsURI + blogId).expect(200);
+    it(`should return blogs with correct user 02 subscriber status`, async () => {
+      const blogs = await agent
+        .get(publicBlogsURI)
+        .auth(aTokenUser02, { type: 'bearer' })
+        .expect(200);
 
-      expect(blog.body).toEqual(blog01Object);
+      expect(blogs.body.items[0].currentUserSubscriptionStatus).toBe(
+        SubscriptionStatus.Subscribed,
+      );
+    });
+    it(`should return blog by ID with correct user 02 subscriber status`, async () => {
+      const blog = await agent
+        .get(publicBlogsURI + blogId)
+        .auth(aTokenUser02, { type: 'bearer' })
+        .expect(200);
+
+      expect(blog.body.currentUserSubscriptionStatus).toBe(
+        SubscriptionStatus.Subscribed,
+      );
     });
   });
   describe('Find blogs', () => {

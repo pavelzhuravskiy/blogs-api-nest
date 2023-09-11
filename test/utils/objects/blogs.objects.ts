@@ -20,6 +20,7 @@ export const createdBlogObject = {
     main: [],
   },
   currentUserSubscriptionStatus: expect.any(String),
+  subscribersCount: expect.any(Number),
 };
 
 export const blog01Object = {
@@ -58,6 +59,7 @@ export const blog01Object = {
     ],
   },
   currentUserSubscriptionStatus: expect.any(String),
+  subscribersCount: expect.any(Number),
 };
 
 export const blog02Object = {
@@ -84,6 +86,7 @@ export const blog02Object = {
     ],
   },
   currentUserSubscriptionStatus: expect.any(String),
+  subscribersCount: expect.any(Number),
 };
 
 export const updatedBlogObject = {
@@ -122,6 +125,7 @@ export const updatedBlogObject = {
     ],
   },
   currentUserSubscriptionStatus: expect.any(String),
+  subscribersCount: expect.any(Number),
 };
 
 export const saUnbannedBlogObject = {

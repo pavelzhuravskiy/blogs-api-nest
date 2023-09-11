@@ -10,4 +10,5 @@ export class BlogViewDto {
   isMembership: boolean;
   images: BlogImagesViewDto;
   currentUserSubscriptionStatus: SubscriptionStatus;
+  subscribersCount: number;
 }
