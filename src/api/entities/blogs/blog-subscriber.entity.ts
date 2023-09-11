@@ -19,8 +19,8 @@ export class BlogSubscriber {
   @Column('uuid', { name: 'telegram_code', nullable: true })
   telegramCode: string;
 
-  @Column('uuid', { name: 'telegram_id', nullable: true })
-  telegramId: string;
+  @Column('int', { name: 'telegram_id', nullable: true })
+  telegramId: number;
 
   @ManyToOne(() => Blog, (blog) => blog.blogSubscriber, {
     onDelete: 'CASCADE',

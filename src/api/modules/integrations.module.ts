@@ -7,10 +7,14 @@ import { UsersRepository } from '../infrastructure/repositories/users/users.repo
 import { UsersModule } from './users.module';
 import { CqrsModule } from '@nestjs/cqrs';
 import { MainModule } from './main.module';
+import { TelegramAddToNotificationsWhitelistUseCase } from '../_integrations/application/use-cases/telegram-add-to-notifications-whitelist.case';
 
 const controllers = [IntegrationsTelegramController];
 const adapters = [TelegramAdapter];
-const useCases = [TelegramBotGetAuthLinkUseCase];
+const useCases = [
+  TelegramBotGetAuthLinkUseCase,
+  TelegramAddToNotificationsWhitelistUseCase,
+];
 const repositories = [DataSourceRepository, UsersRepository];
 
 @Module({

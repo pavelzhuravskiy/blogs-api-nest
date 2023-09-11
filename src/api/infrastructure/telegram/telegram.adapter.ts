@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import process from 'process';
-import axios, { AxiosInstance } from 'axios';
+import { AxiosInstance } from 'axios';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+import axios from 'axios';
 
 @Injectable()
 export class TelegramAdapter {
@@ -10,9 +12,9 @@ export class TelegramAdapter {
       baseURL: `https://api.telegram.org/bot${process.env.TELEGRAM_TOKEN}`,
     });
   }
-  async setWebhook() {
+  async setWebhook(url: string) {
     await this.axiosInstance.post(`setWebhook`, {
-      url: `${process.env.DEPLOYMENT_URL}/integrations/telegram/webhook`,
+      url: url,
     });
   }
 }

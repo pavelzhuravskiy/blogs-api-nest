@@ -39,14 +39,19 @@ export class BlogSubscribersRepository {
     }
   }
 
-  // ***** Delete blog subscribers operations *****
-  async deleteBlogSubscriber(subscriberId: string): Promise<boolean> {
-    const result = await this.blogSubscribersRepository
-      .createQueryBuilder('bs')
-      .delete()
-      .from(BlogSubscriber)
-      .where(`id = :subscriberId`, { subscriberId: subscriberId })
-      .execute();
-    return result.affected === 1;
+  async findSubscriberByTelegramCode(
+    telegramCode: string,
+  ): Promise<BlogSubscriber | null> {
+    try {
+      return await this.blogSubscribersRepository
+        .createQueryBuilder('bs')
+        .where(`bs.telegramCode = :telegramCode`, {
+          telegramCode: telegramCode,
+        })
+        .getOne();
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
   }
 }

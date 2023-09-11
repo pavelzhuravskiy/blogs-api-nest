@@ -27,6 +27,8 @@ export class TelegramBotGetAuthLinkUseCase
       return null;
     }
 
+    const telegramCode = randomUUID();
+
     let subscriber = await this.blogSubscribersRepository.findActiveSubscriber(
       query.userId,
     );
@@ -34,10 +36,11 @@ export class TelegramBotGetAuthLinkUseCase
     if (!subscriber) {
       subscriber = new BlogSubscriber();
       subscriber.subscriptionStatus = SubscriptionStatus.None;
-      subscriber.telegramCode = randomUUID();
       subscriber.user = user;
-      await this.dataSourceRepository.save(subscriber);
     }
+
+    subscriber.telegramCode = telegramCode;
+    await this.dataSourceRepository.save(subscriber);
 
     // TODO Remove start=
     return {
