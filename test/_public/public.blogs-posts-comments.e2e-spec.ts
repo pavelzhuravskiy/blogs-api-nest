@@ -16,6 +16,8 @@ import {
   user01Login,
   user02Email,
   user02Login,
+  user03Email,
+  user03Login,
   userPassword,
 } from '../utils/constants/users.constants';
 import {
@@ -49,6 +51,7 @@ import {
 } from '../utils/objects/comment.objects';
 import { getAppAndClearDb } from '../utils/functions/get-app';
 import path from 'path';
+import { SubscriptionStatus } from '../../src/enums/subscription-status.enum';
 
 describe('Public blogs, posts, comments testing', () => {
   let app: INestApplication;
@@ -66,9 +69,10 @@ describe('Public blogs, posts, comments testing', () => {
 
   let aTokenUser01;
   let aTokenUser02;
+  let aTokenUser03;
 
   describe('Users creation and authentication', () => {
-    it(`should create two users`, async () => {
+    it(`should create three users`, async () => {
       await agent
         .post(saUsersURI)
         .auth(basicAuthLogin, basicAuthPassword)
@@ -79,13 +83,23 @@ describe('Public blogs, posts, comments testing', () => {
         })
         .expect(201);
 
-      return agent
+      await agent
         .post(saUsersURI)
         .auth(basicAuthLogin, basicAuthPassword)
         .send({
           login: user02Login,
           password: userPassword,
           email: user02Email,
+        })
+        .expect(201);
+
+      return agent
+        .post(saUsersURI)
+        .auth(basicAuthLogin, basicAuthPassword)
+        .send({
+          login: user03Login,
+          password: userPassword,
+          email: user03Email,
         })
         .expect(201);
     });
@@ -108,6 +122,16 @@ describe('Public blogs, posts, comments testing', () => {
         })
         .expect(200);
       aTokenUser02 = response.body.accessToken;
+    });
+    it(`should log in user 03`, async () => {
+      const response = await agent
+        .post(publicLoginUri)
+        .send({
+          loginOrEmail: user03Login,
+          password: userPassword,
+        })
+        .expect(200);
+      aTokenUser03 = response.body.accessToken;
     });
   });
 
@@ -295,6 +319,24 @@ describe('Public blogs, posts, comments testing', () => {
     });
 
     // Success
+    it(`should return created blogs for user 01`, async () => {
+      const blogs = await agent
+        .get(publicBlogsURI)
+        .auth(aTokenUser01, { type: 'bearer' })
+        .expect(200);
+
+      expect(blogs.body).toEqual({
+        pagesCount: 1,
+        page: 1,
+        pageSize: 10,
+        totalCount: 1,
+        items: [blog01Object],
+      });
+
+      expect(blogs.body.items[0].currentUserSubscriptionStatus).toBe(
+        SubscriptionStatus.Unsubscribed,
+      );
+    });
     it(`should return created blogs for user 02`, async () => {
       const blogs = await agent
         .get(publicBlogsURI)
@@ -308,6 +350,28 @@ describe('Public blogs, posts, comments testing', () => {
         totalCount: 1,
         items: [blog01Object],
       });
+
+      expect(blogs.body.items[0].currentUserSubscriptionStatus).toBe(
+        SubscriptionStatus.Subscribed,
+      );
+    });
+    it(`should return created blogs for user 03`, async () => {
+      const blogs = await agent
+        .get(publicBlogsURI)
+        .auth(aTokenUser03, { type: 'bearer' })
+        .expect(200);
+
+      expect(blogs.body).toEqual({
+        pagesCount: 1,
+        page: 1,
+        pageSize: 10,
+        totalCount: 1,
+        items: [blog01Object],
+      });
+
+      expect(blogs.body.items[0].currentUserSubscriptionStatus).toBe(
+        SubscriptionStatus.None,
+      );
     });
     it(`should return created blog by ID`, async () => {
       const blog = await agent.get(publicBlogsURI + blogId).expect(200);

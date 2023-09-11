@@ -19,6 +19,7 @@ export const createdBlogObject = {
     wallpaper: null,
     main: [],
   },
+  currentUserSubscriptionStatus: expect.any(String),
 };
 
 export const blog01Object = {
@@ -56,6 +57,7 @@ export const blog01Object = {
       },
     ],
   },
+  currentUserSubscriptionStatus: expect.any(String),
 };
 
 export const blog02Object = {
@@ -81,6 +83,7 @@ export const blog02Object = {
       },
     ],
   },
+  currentUserSubscriptionStatus: expect.any(String),
 };
 
 export const updatedBlogObject = {
@@ -118,6 +121,7 @@ export const updatedBlogObject = {
       },
     ],
   },
+  currentUserSubscriptionStatus: expect.any(String),
 };
 
 export const saUnbannedBlogObject = {

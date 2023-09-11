@@ -7,6 +7,7 @@ import {
   bloggerBlogsURI,
   bloggerMainImageURI,
   bloggerWallpaperImageURI,
+  blogSubscriptionURI,
   blogUpdatedDescription,
   blogUpdatedName,
   blogUpdatedWebsite,
@@ -388,6 +389,21 @@ describe('Blogger blogs and posts testing', () => {
         .expect(201);
     });
   });
+  describe('Blog subscribe', () => {
+    // Success
+    it(`should subscribe user 01 to blog 01`, async () => {
+      await agent
+        .post(publicBlogsURI + blog01Id + blogSubscriptionURI)
+        .auth(aTokenUser01, { type: 'bearer' })
+        .expect(204);
+    });
+    it(`should subscribe user 02 to blog 02`, async () => {
+      await agent
+        .post(publicBlogsURI + blog02Id + blogSubscriptionURI)
+        .auth(aTokenUser02, { type: 'bearer' })
+        .expect(204);
+    });
+  });
   describe('Find blogs', () => {
     // Auth errors [401]
     it(`should return 401 when trying to get blogs with incorrect access token`, async () => {
@@ -404,6 +420,8 @@ describe('Blogger blogs and posts testing', () => {
         .auth(aTokenUser01, { type: 'bearer' })
         .expect(200);
 
+      console.log(blogs.body, 'user 01');
+
       expect(blogs.body).toEqual({
         pagesCount: 1,
         page: 1,
@@ -417,6 +435,8 @@ describe('Blogger blogs and posts testing', () => {
         .get(bloggerBlogsURI)
         .auth(aTokenUser02, { type: 'bearer' })
         .expect(200);
+
+      console.log(blogs.body, 'user 02');
 
       expect(blogs.body).toEqual({
         pagesCount: 1,

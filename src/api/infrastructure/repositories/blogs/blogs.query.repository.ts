@@ -10,6 +10,7 @@ import * as process from 'process';
 import { BlogImagesViewDto } from '../../../dto/blogs/view/blog-images.view.dto';
 import { BlogSubscriber } from '../../../entities/blogs/blog-subscriber.entity';
 import { BlogMainImage } from '../../../entities/blogs/blog-image-main.entity';
+import { SubscriptionStatus } from '../../../../enums/subscription-status.enum';
 
 @Injectable()
 export class BlogsQueryRepository {
@@ -124,13 +125,37 @@ export class BlogsQueryRepository {
     });
   }
 
-  // TODO CHANGE SCHEMA (SEE OTHER METHODS) AND ADD SUBSCRIBERS COUNT
   async findBlogsOfCurrentBlogger(
     query: BlogQueryDto,
     userId: string,
   ): Promise<Paginator<BlogViewDto[]>> {
     const blogs = await this.blogsRepository
       .createQueryBuilder('b')
+      .addSelect(
+        (qb) =>
+          qb
+            .select('bs.subscriptionStatus')
+            .from(BlogSubscriber, 'bs')
+            .where('bs.blogId = b.id')
+            .andWhere('bs.userId = :userId', { userId: userId }),
+        'subscription_status',
+      )
+      .addSelect(
+        (qb) =>
+          qb
+            .select(
+              `jsonb_agg(json_build_object('url', agg.url, 'width', agg.width, 'height', agg.height, 'size', agg.size)
+                 )`,
+            )
+            .from((qb) => {
+              return qb
+                .select(`url, width, height, size`)
+                .from(BlogMainImage, 'bmi')
+                .where('bmi.blogId = b.id');
+            }, 'agg'),
+
+        'main_images',
+      )
       .where(`${query.searchNameTerm ? 'b.name ilike :nameTerm' : ''}`, {
         nameTerm: `%${query.searchNameTerm}%`,
       })
@@ -139,11 +164,12 @@ export class BlogsQueryRepository {
       })
       .leftJoinAndSelect('b.user', 'u')
       .leftJoinAndSelect('b.blogWallpaperImage', 'bwi')
-      .leftJoinAndSelect('b.blogMainImages', 'bmi')
       .orderBy(`b.${query.sortBy}`, query.sortDirection)
       .skip((query.pageNumber - 1) * query.pageSize)
       .take(query.pageSize)
-      .getMany();
+      .getRawMany();
+
+    // console.log(blogs);
 
     const totalCount = await this.blogsRepository
       .createQueryBuilder('b')
@@ -248,6 +274,16 @@ export class BlogsQueryRepository {
     return blogs.map((b) => {
       let wallpaperImage = null;
       let mainImages = [];
+      let subscriptionStatus = SubscriptionStatus.None;
+
+      if (b.bwi_id) {
+        wallpaperImage = {
+          url: process.env.S3_DOMAIN + b.bwi_url,
+          width: Number(b.bwi_width),
+          height: Number(b.bwi_height),
+          fileSize: Number(b.bwi_size),
+        };
+      }
 
       if (b.main_images) {
         mainImages = b.main_images.map((bmi) => {
@@ -260,13 +296,8 @@ export class BlogsQueryRepository {
         });
       }
 
-      if (b.bwi_id) {
-        wallpaperImage = {
-          url: process.env.S3_DOMAIN + b.bwi_url,
-          width: Number(b.bwi_width),
-          height: Number(b.bwi_height),
-          fileSize: Number(b.bwi_size),
-        };
+      if (b.subscription_status) {
+        subscriptionStatus = b.subscription_status;
       }
 
       return {
@@ -280,6 +311,7 @@ export class BlogsQueryRepository {
           wallpaper: wallpaperImage,
           main: mainImages,
         },
+        currentUserSubscriptionStatus: subscriptionStatus,
       };
     });
   }
