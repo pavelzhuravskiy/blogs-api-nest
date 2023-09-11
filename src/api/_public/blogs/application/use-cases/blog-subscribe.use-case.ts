@@ -54,18 +54,21 @@ export class BlogSubscribeUseCase
       };
     }
 
-    let subscriber = await this.blogSubscribersRepository.findBlogSubscriber(
-      command.blogId,
-      command.userId,
-    );
+    let subscriber =
+      await this.blogSubscribersRepository.findRecordForSubscribe(
+        command.blogId,
+        command.userId,
+      );
 
     if (!subscriber) {
       subscriber = new BlogSubscriber();
-      subscriber.subscriptionStatus = SubscriptionStatus.Subscribed;
-      subscriber.blog = blog;
       subscriber.user = user;
-      await this.dataSourceRepository.save(subscriber);
     }
+
+    subscriber.subscriptionStatus = SubscriptionStatus.Subscribed;
+    subscriber.blog = blog;
+
+    await this.dataSourceRepository.save(subscriber);
 
     return {
       data: true,

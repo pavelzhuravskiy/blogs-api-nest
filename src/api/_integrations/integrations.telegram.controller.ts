@@ -26,7 +26,7 @@ export class IntegrationsTelegramController {
   @HttpCode(204)
   async setWebhook(@Body() payload: any) {
     console.log(payload);
-    if (!payload.message.text) {
+    if (!payload.message) {
       return;
     }
 

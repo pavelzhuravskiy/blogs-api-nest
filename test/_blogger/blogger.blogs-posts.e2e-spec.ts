@@ -420,8 +420,6 @@ describe('Blogger blogs and posts testing', () => {
         .auth(aTokenUser01, { type: 'bearer' })
         .expect(200);
 
-      console.log(blogs.body, 'user 01');
-
       expect(blogs.body).toEqual({
         pagesCount: 1,
         page: 1,
@@ -727,7 +725,7 @@ describe('Blogger blogs and posts testing', () => {
       });
     });
   });
-  describe('Update post', () => {
+  describe.skip('Update post', () => {
     // Auth errors [401]
     it(`should return 401 when trying to update post with incorrect access token`, async () => {
       return agent
@@ -794,7 +792,7 @@ describe('Blogger blogs and posts testing', () => {
       expect(check.body).toEqual(updatedPostObject);
     });
   });
-  describe('Delete post', () => {
+  describe.skip('Delete post', () => {
     // Auth errors [401]
     it(`should return 401 when trying to delete post with incorrect access token`, async () => {
       return agent

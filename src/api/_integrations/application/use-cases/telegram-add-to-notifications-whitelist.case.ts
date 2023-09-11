@@ -22,6 +22,13 @@ export class TelegramAddToNotificationsWhitelistUseCase
   async execute(
     command: TelegramAddToNotificationsWhitelistCommand,
   ): Promise<TypeORMEntity | null> {
+    const telegramIdIsRegistered =
+      await this.blogSubscribersRepository.checkTelegramId(command.telegramId);
+
+    if (telegramIdIsRegistered) {
+      return null;
+    }
+
     const startMessage = command.telegramCode.split('=');
     const codeToCheck = startMessage[1];
 

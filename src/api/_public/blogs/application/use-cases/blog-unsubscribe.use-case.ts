@@ -53,15 +53,13 @@ export class BlogUnsubscribeUseCase
       };
     }
 
-    const subscriber = await this.blogSubscribersRepository.findBlogSubscriber(
-      command.blogId,
-      command.userId,
-    );
+    const subscriber =
+      await this.blogSubscribersRepository.findRecordForUnsubscribe(
+        command.blogId,
+        command.userId,
+      );
 
-    if (
-      subscriber &&
-      subscriber.subscriptionStatus !== SubscriptionStatus.Unsubscribed
-    ) {
+    if (subscriber) {
       subscriber.subscriptionStatus = SubscriptionStatus.Unsubscribed;
       await this.dataSourceRepository.save(subscriber);
     }

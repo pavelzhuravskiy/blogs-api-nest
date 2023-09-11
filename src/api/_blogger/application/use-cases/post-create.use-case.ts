@@ -9,6 +9,7 @@ import { PostInputDto } from '../../../dto/posts/input/post.input.dto';
 import { BlogsRepository } from '../../../infrastructure/repositories/blogs/blogs.repository';
 import { Post } from '../../../entities/posts/post.entity';
 import { DataSourceRepository } from '../../../infrastructure/repositories/common/data-source.repository';
+import { BlogSubscribersRepository } from '../../../infrastructure/repositories/blogs/blog-subscribers.repository';
 
 export class PostCreateCommand {
   constructor(
@@ -22,6 +23,7 @@ export class PostCreateCommand {
 export class PostCreateUseCase implements ICommandHandler<PostCreateCommand> {
   constructor(
     private readonly blogsRepository: BlogsRepository,
+    private readonly blogSubscribersRepository: BlogSubscribersRepository,
     private readonly dataSourceRepository: DataSourceRepository,
   ) {}
 
@@ -53,11 +55,22 @@ export class PostCreateUseCase implements ICommandHandler<PostCreateCommand> {
     post.content = command.postInputDto.content;
     post.createdAt = new Date();
     const savedPost = await this.dataSourceRepository.save(post);
+    await this.sendTelegramNotification(command.blogId);
 
     return {
       data: true,
       code: ResultCode.Success,
       response: savedPost.id,
     };
+  }
+
+  private async sendTelegramNotification(blogId: string): Promise<any> {
+    const listOfSubscribers =
+      await this.blogSubscribersRepository.findSubscribersForTelegramNotification(
+        blogId,
+      );
+    console.log(listOfSubscribers);
+
+    return listOfSubscribers;
   }
 }
