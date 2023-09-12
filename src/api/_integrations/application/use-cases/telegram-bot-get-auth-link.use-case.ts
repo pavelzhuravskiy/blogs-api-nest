@@ -42,9 +42,8 @@ export class TelegramBotGetAuthLinkUseCase
     subscriber.telegramCode = telegramCode;
     await this.dataSourceRepository.save(subscriber);
 
-    // TODO Remove start=
     return {
-      link: `https://t.me/blogger_platform_bot?start=code=${subscriber.telegramCode}`,
+      link: `https://t.me/blogger_platform_bot?code=${subscriber.telegramCode}`,
     };
   }
 }

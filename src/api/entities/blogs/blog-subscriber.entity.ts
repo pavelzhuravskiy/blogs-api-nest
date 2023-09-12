@@ -19,7 +19,7 @@ export class BlogSubscriber {
   @Column('uuid', { name: 'telegram_code', nullable: true })
   telegramCode: string;
 
-  @Column('int', { name: 'telegram_id', nullable: true })
+  @Column('bigint', { name: 'telegram_id', nullable: true })
   telegramId: number;
 
   @ManyToOne(() => Blog, (blog) => blog.blogSubscriber, {

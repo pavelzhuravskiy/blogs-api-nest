@@ -18,10 +18,10 @@ export class MockTelegramIdUseCase
       await this.blogSubscribersRepository.findSubscribersForTelegramMock();
 
     subscribers[0].telegramId = 57625927;
-    subscribers[1].telegramId = 96251443;
+    // subscribers[1].telegramId = 96251443;
 
     await this.dataSourceRepository.save(subscribers[0]);
-    await this.dataSourceRepository.save(subscribers[1]);
+    // await this.dataSourceRepository.save(subscribers[1]);
 
     return true;
   }

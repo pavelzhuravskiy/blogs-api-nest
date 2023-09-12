@@ -65,8 +65,6 @@ export class BlogsQueryRepository {
         .andWhere(`bb.isBanned = false`)
         .getRawMany();
 
-      // console.log(blogs, 'raw blog');
-
       const mappedBlogs = await this.blogsMapping(blogs);
       return mappedBlogs[0];
     } catch (e) {
@@ -197,8 +195,6 @@ export class BlogsQueryRepository {
       .skip((query.pageNumber - 1) * query.pageSize)
       .take(query.pageSize)
       .getRawMany();
-
-    // console.log(blogs);
 
     const totalCount = await this.blogsRepository
       .createQueryBuilder('b')

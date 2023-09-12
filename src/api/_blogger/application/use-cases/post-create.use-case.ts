@@ -10,6 +10,7 @@ import { BlogsRepository } from '../../../infrastructure/repositories/blogs/blog
 import { Post } from '../../../entities/posts/post.entity';
 import { DataSourceRepository } from '../../../infrastructure/repositories/common/data-source.repository';
 import { BlogSubscribersRepository } from '../../../infrastructure/repositories/blogs/blog-subscribers.repository';
+import { TelegramAdapter } from '../../../infrastructure/telegram/telegram.adapter';
 
 export class PostCreateCommand {
   constructor(
@@ -25,6 +26,7 @@ export class PostCreateUseCase implements ICommandHandler<PostCreateCommand> {
     private readonly blogsRepository: BlogsRepository,
     private readonly blogSubscribersRepository: BlogSubscribersRepository,
     private readonly dataSourceRepository: DataSourceRepository,
+    private readonly telegramAdapter: TelegramAdapter,
   ) {}
 
   async execute(
@@ -55,7 +57,7 @@ export class PostCreateUseCase implements ICommandHandler<PostCreateCommand> {
     post.content = command.postInputDto.content;
     post.createdAt = new Date();
     const savedPost = await this.dataSourceRepository.save(post);
-    await this.sendTelegramNotification(command.blogId);
+    await this.sendTelegramNotification(command.blogId, blog.name);
 
     return {
       data: true,
@@ -64,12 +66,23 @@ export class PostCreateUseCase implements ICommandHandler<PostCreateCommand> {
     };
   }
 
-  private async sendTelegramNotification(blogId: string): Promise<any> {
+  private async sendTelegramNotification(
+    blogId: string,
+    blogName: string,
+  ): Promise<any> {
     const listOfSubscribers =
       await this.blogSubscribersRepository.findSubscribersForTelegramNotification(
         blogId,
       );
-    console.log(listOfSubscribers);
+
+    if (listOfSubscribers.length === 0) {
+      return null;
+    }
+
+    const message = `New post published for blog "${blogName}"`;
+    listOfSubscribers.forEach((s) => {
+      return this.telegramAdapter.sendMessage(message, s.telegramId);
+    });
 
     return listOfSubscribers;
   }

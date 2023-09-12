@@ -49,7 +49,7 @@ export class BlogSubscribersRepository {
     userId: string,
   ): Promise<BlogSubscriber | null> {
     try {
-      const blogSubscriber = await this.blogSubscribersRepository
+      return await this.blogSubscribersRepository
         .createQueryBuilder('bs')
         .where(`bs.userId = :userId`, {
           userId: userId,
@@ -59,8 +59,6 @@ export class BlogSubscribersRepository {
         })
         .andWhere(`bs.subscriptionStatus = 'Subscribed'`)
         .getOne();
-      console.log(blogSubscriber, 'bs');
-      return blogSubscriber;
     } catch (e) {
       console.error(e);
       return null;

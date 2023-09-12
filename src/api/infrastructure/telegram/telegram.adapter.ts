@@ -1,8 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import process from 'process';
-import { AxiosInstance } from 'axios';
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-import axios from 'axios';
+import axios, { AxiosInstance } from 'axios';
 
 @Injectable()
 export class TelegramAdapter {
@@ -17,4 +15,20 @@ export class TelegramAdapter {
       url: url,
     });
   }
+  async sendMessage(text: string, recipientId: number) {
+    await this.axiosInstance.post(`sendMessage`, {
+      chat_id: recipientId,
+      text: text,
+    });
+  }
 }
+
+// type TelegramMessage = {
+//   message: {
+//     from: {
+//       first_name: string;
+//       last_name: string;
+//     };
+//     text: string;
+//   };
+// };
